@@ -5,6 +5,19 @@ import { Printer } from "./printer";
 
 const DEBUG = (process.env.NODE_ENV != "production");
 
+const ADDR_GAMEPAD0 = 0x01;
+const ADDR_GAMEPAD1 = 0x02;
+const ADDR_GAMEPAD2 = 0x03;
+const ADDR_GAMEPAD3 = 0x04;
+const ADDR_MOUSE_X = 0x05;
+const ADDR_MOUSE_Y = 0x07;
+const ADDR_MOUSE_BUTTONS = 0x09;
+// const ADDR_MOUSE_WHEEL = 0x07;
+
+const ADDR_PALETTE = 0x10;
+const ADDR_SCROLL_X = 0x20;
+const ADDR_SCROLL_Y = 0x24;
+
 export class Runtime {
     constructor () {
         const canvas = document.createElement("canvas");
@@ -22,16 +35,16 @@ export class Runtime {
         this.foreground = new Uint8Array(WIDTH*HEIGHT);
 
         this.memory = new WebAssembly.Memory({initial: 1, maximum: 1});
+        this.data = new DataView(this.memory.buffer);
+
+        // TODO(2021-07-03): Initialize to the CGA palette?
+        this.data.setUint32(ADDR_PALETTE, 0xcafebabe);
 
         this.printer = new Printer();
 
-        // Devices
-        this.palette = null;
-        this.gamepads = null;
-        this.mouse = null;
-        this.scroll = null;
-
         const onPointerEvent = event => {
+            event.preventDefault();
+
             // Do certain things that require a user gesture
             if (event.type == "pointerdown") {
                 if (document.fullscreenElement == null && event.pointerType == "touch") {
@@ -44,27 +57,21 @@ export class Runtime {
                 // }
             }
 
-            if (this.mouse == null) {
-                return;
-            }
-            event.preventDefault();
-
             const bounds = canvas.getBoundingClientRect();
             const x = WIDTH * (event.clientX - bounds.left) / bounds.width;
             const y = HEIGHT * (event.clientY - bounds.top) / bounds.height;
             const buttons = event.buttons;
-            this.mouse[0] = x;
-            this.mouse[1] = y;
-            this.mouse[2] = buttons;
+
+            this.data.setUint16(ADDR_MOUSE_X, Math.fround(x), true);
+            this.data.setUint16(ADDR_MOUSE_Y, Math.fround(y), true);
+            this.data.setUint8(ADDR_MOUSE_BUTTONS, buttons);
         };
         canvas.addEventListener("pointerdown", onPointerEvent);
         canvas.addEventListener("pointerup", onPointerEvent);
         canvas.addEventListener("pointermove", onPointerEvent);
 
         canvas.addEventListener("contextmenu", event => {
-            if (this.mouse != null) {
-                event.preventDefault();
-            }
+            event.preventDefault();
         });
 
         const onKeyboardEvent = async event => {
@@ -95,10 +102,6 @@ export class Runtime {
                 }
             }
 
-            if (this.gamepads == null) {
-                return;
-            }
-
             let mask = 0;
             switch (event.keyCode) {
             case 32: // Space
@@ -124,13 +127,13 @@ export class Runtime {
             }
             event.preventDefault();
 
-            let buttons = this.gamepads[0];
+            let buttons = this.data.getUint8(ADDR_GAMEPAD0);
             if (event.type == "keydown") {
                 buttons |= mask;
             } else {
                 buttons &= ~mask;
             }
-            this.gamepads[0] = buttons;
+            this.data.setUint8(ADDR_GAMEPAD0, buttons);
         };
         window.addEventListener("keydown", onKeyboardEvent);
         window.addEventListener("keyup", onKeyboardEvent);
@@ -143,7 +146,6 @@ export class Runtime {
 
                 drawRect: this.drawRect.bind(this),
                 drawSprite: this.drawSprite.bind(this),
-                mapDevice: this.mapDevice.bind(this),
 
                 // Printing functions
                 print: ptr => {
@@ -174,35 +176,19 @@ export class Runtime {
         }
     }
 
-    mapDevice (deviceId, ptr) {
-        const memory = this.memory.buffer;
-        switch (deviceId) {
-        case 0: // DEVICE_PALETTE
-            this.palette = ptr ? new Uint8Array(memory, ptr, 4) : null;
-            break;
-        case 1: // DEVICE_MOUSE
-            this.mouse = ptr ? new Uint32Array(memory, ptr, 3) : null;
-            break;
-        case 2: // DEVICE_GAMEPADS
-            this.gamepads = ptr ? new Uint8Array(memory, ptr, 4) : null;
-            break;
-        case 3: // DEVICE_SCROLL
-            this.scroll = ptr ? new Int32Array(memory, ptr, 2) : null;
-            break;
-        }
-    }
-
-    drawRect (colorIdx, x, y, width, height, flags) {
+    drawRect (x, y, width, height, flags) {
         const isForeground = (flags & 2);
 
         const layer = isForeground ? this.foreground : this.background;
         const layerWidth = isForeground ? WIDTH : BACKGROUND_WIDTH;
+        const colorIdx = this.data.getUint8(ADDR_PALETTE);
 
         graphics.drawRect(layer, layerWidth, colorIdx, x, y, width, height);
     }
 
     drawSprite (spritePtr, x, y, flags) {
         const sprite = new Uint8Array(this.memory.buffer, spritePtr);
+        const palette = new Uint8Array(this.memory.buffer, ADDR_PALETTE);
 
         const bpp2 = (flags & 1);
         const isForeground = (flags & 2);
@@ -211,10 +197,6 @@ export class Runtime {
 
         const layer = isForeground ? this.foreground : this.background;
         const layerWidth = isForeground ? WIDTH : BACKGROUND_WIDTH;
-        const palette = this.palette;
-        if (palette == null) {
-            return;
-        }
 
         this.compositor.dirty(isForeground);
 
@@ -231,11 +213,8 @@ export class Runtime {
             this.wasm.exports.update();
         }
 
-        let scrollX = 0, scrollY = 0;
-        if (this.scroll != null) {
-            scrollX = this.scroll[0];
-            scrollY = this.scroll[1];
-        }
+        const scrollX = this.data.getInt16(ADDR_SCROLL_X, true);
+        const scrollY = this.data.getInt16(ADDR_SCROLL_Y, true);
         this.compositor.composite(this.background, this.foreground, scrollX, scrollY);
     }
 }

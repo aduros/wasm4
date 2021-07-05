@@ -2,21 +2,27 @@ import { WIDTH, HEIGHT, BACKGROUND_WIDTH, BACKGROUND_HEIGHT } from "./graphics";
 import * as graphics from "./graphics";
 import { WebGLCompositor, Canvas2DCompositor } from "./compositor";
 import { Printer } from "./printer";
+import { COLORS } from "./colors";
 
 const DEBUG = (process.env.NODE_ENV != "production");
 
-const ADDR_GAMEPAD0 = 0x01;
-const ADDR_GAMEPAD1 = 0x02;
-const ADDR_GAMEPAD2 = 0x03;
-const ADDR_GAMEPAD3 = 0x04;
-const ADDR_MOUSE_X = 0x05;
-const ADDR_MOUSE_Y = 0x07;
-const ADDR_MOUSE_BUTTONS = 0x09;
-// const ADDR_MOUSE_WHEEL = 0x07;
-
-const ADDR_PALETTE = 0x10;
-const ADDR_SCROLL_X = 0x20;
-const ADDR_SCROLL_Y = 0x24;
+const ADDR_COLORS = 0x0000;
+const ADDR_PALETTE = 0x0300;
+const ADDR_SCROLL_X = 0x0310;
+const ADDR_SCROLL_Y = 0x0314;
+const ADDR_CLIP_X = 0x0318;
+const ADDR_CLIP_Y = 0x0319;
+const ADDR_CLIP_WIDTH = 0x031a;
+const ADDR_CLIP_HEIGHT = 0x031b;
+const ADDR_BACKGROUND = 0x031c;
+const ADDR_FOREGROUND = 0x66dc;
+const ADDR_GAMEPAD0 = 0xc0dc;
+const ADDR_GAMEPAD1 = 0xc0dd;
+const ADDR_GAMEPAD2 = 0xc0de;
+const ADDR_GAMEPAD3 = 0xc0df;
+const ADDR_MOUSE_X = 0xc0e0;
+const ADDR_MOUSE_Y = 0xc0e1;
+const ADDR_MOUSE_BUTTONS = 0xc0e2;
 
 export class Runtime {
     constructor () {
@@ -31,13 +37,14 @@ export class Runtime {
         });
         this.compositor = (gl != null) ? new WebGLCompositor(gl) : new Canvas2DCompositor(canvas);
 
-        this.background = new Uint8Array(BACKGROUND_WIDTH*BACKGROUND_HEIGHT);
-        this.foreground = new Uint8Array(WIDTH*HEIGHT);
-
         this.memory = new WebAssembly.Memory({initial: 1, maximum: 1});
         this.data = new DataView(this.memory.buffer);
 
-        // TODO(2021-07-03): Initialize to the CGA palette?
+        this.background = new Uint8Array(this.memory.buffer, ADDR_BACKGROUND, BACKGROUND_WIDTH*BACKGROUND_HEIGHT);
+        this.foreground = new Uint8Array(this.memory.buffer, ADDR_FOREGROUND, WIDTH*HEIGHT);
+
+        // Initialize default color table and palette
+        new Uint8Array(this.memory.buffer).set(COLORS, ADDR_COLORS);
         this.data.setUint32(ADDR_PALETTE, 0xcafebabe);
 
         this.printer = new Printer();
@@ -62,8 +69,8 @@ export class Runtime {
             const y = HEIGHT * (event.clientY - bounds.top) / bounds.height;
             const buttons = event.buttons;
 
-            this.data.setUint16(ADDR_MOUSE_X, Math.fround(x), true);
-            this.data.setUint16(ADDR_MOUSE_Y, Math.fround(y), true);
+            this.data.setUint8(ADDR_MOUSE_X, Math.fround(x));
+            this.data.setUint8(ADDR_MOUSE_Y, Math.fround(y));
             this.data.setUint8(ADDR_MOUSE_BUTTONS, buttons);
         };
         canvas.addEventListener("pointerdown", onPointerEvent);
@@ -79,16 +86,12 @@ export class Runtime {
                 switch (event.keyCode) {
                 case 50: // 2
                     // Save state
-                    this.snapshot = {
-                        memory: new Uint32Array(this.memory.buffer.slice()),
-                        background: this.background.slice(),
-                    };
+                    this.snapshot = new Uint32Array(this.memory.buffer.slice());
                     return;
                 case 52: // 4
                     // Load state
                     if (this.snapshot != null) {
-                        new Uint32Array(this.memory.buffer).set(this.snapshot.memory);
-                        this.background.set(this.snapshot.background);
+                        new Uint32Array(this.memory.buffer).set(this.snapshot);
                     }
                     return;
                 case 82: // R
@@ -198,8 +201,6 @@ export class Runtime {
         const layer = isForeground ? this.foreground : this.background;
         const layerWidth = isForeground ? WIDTH : BACKGROUND_WIDTH;
 
-        this.compositor.dirty(isForeground);
-
         if (bpp2) {
             graphics.drawSprite2BPP(layer, layerWidth, sprite, x, y, palette, flipX, flipY);
         } else {
@@ -213,8 +214,9 @@ export class Runtime {
             this.wasm.exports.update();
         }
 
-        const scrollX = this.data.getInt16(ADDR_SCROLL_X, true);
-        const scrollY = this.data.getInt16(ADDR_SCROLL_Y, true);
-        this.compositor.composite(this.background, this.foreground, scrollX, scrollY);
+        const colors = new Uint8Array(this.memory.buffer, ADDR_COLORS);
+        const scrollX = this.data.getInt32(ADDR_SCROLL_X, true);
+        const scrollY = this.data.getInt32(ADDR_SCROLL_Y, true);
+        this.compositor.composite(colors, this.background, this.foreground, scrollX, scrollY);
     }
 }

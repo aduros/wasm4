@@ -29,8 +29,6 @@ function createShader (gl, type, source) {
 export class WebGLCompositor {
     constructor (gl) {
         this.gl = gl;
-        this.dirtyForeground = false;
-        this.dirtyBackground = false;
 
         const vertexShader = createShader(gl, GL.VERTEX_SHADER, `
             const vec2 backgroundMax = vec2(${WIDTH}, ${HEIGHT}) / vec2(${BACKGROUND_WIDTH}, ${BACKGROUND_HEIGHT});
@@ -112,31 +110,22 @@ export class WebGLCompositor {
         gl.vertexAttribPointer(positionAttrib, 2, GL.FLOAT, false, 0, 0);
     }
 
-    dirty (isForeground) {
-        if (isForeground) {
-            this.dirtyForeground = true;
-        } else {
-            this.dirtyBackground = true;
-        }
-    }
-
-    composite (background, foreground, scrollX, scrollY) {
+    composite (colors, background, foreground, scrollX, scrollY) {
         const gl = this.gl;
 
+        // Upload colors
+        gl.activeTexture(GL.TEXTURE0);
+        gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGB, 256, 1, 0, GL.RGB, GL.UNSIGNED_BYTE, colors);
+
+        // Upload background
+        gl.activeTexture(GL.TEXTURE1);
+        gl.texImage2D(GL.TEXTURE_2D, 0, GL.LUMINANCE, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, 0, GL.LUMINANCE, GL.UNSIGNED_BYTE, background);
+
+        // Upload foreground
+        gl.activeTexture(GL.TEXTURE2);
+        gl.texImage2D(GL.TEXTURE_2D, 0, GL.LUMINANCE, WIDTH, HEIGHT, 0, GL.LUMINANCE, GL.UNSIGNED_BYTE, foreground);
+
         gl.uniform2i(this.scrollUniform, scrollX, scrollY);
-
-        if (this.dirtyBackground) {
-            this.dirtyBackground = false;
-            gl.activeTexture(GL.TEXTURE1);
-            gl.texImage2D(GL.TEXTURE_2D, 0, GL.LUMINANCE, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, 0, GL.LUMINANCE, GL.UNSIGNED_BYTE, background);
-        }
-
-        // if (this.dirtyForeground) {
-            // this.dirtyForeground = false;
-            gl.activeTexture(GL.TEXTURE2);
-            gl.texImage2D(GL.TEXTURE_2D, 0, GL.LUMINANCE, WIDTH, HEIGHT, 0, GL.LUMINANCE, GL.UNSIGNED_BYTE, foreground);
-        // }
-
         gl.drawArrays(GL.TRIANGLES, 0, 6);
     }
 }
@@ -161,26 +150,25 @@ export class Canvas2DCompositor {
         }
     }
 
-    dirty (isForeground) {
-    }
+    composite (colors, background, foreground, scrollX, scrollY) {
+        throw new Error("FIXME(2021-07-03)");
 
-    composite (background, foreground, scrollX, scrollY) {
-        const colors = new Uint32Array(this.imageData.data.buffer);
-        const colorTable = this.colorTable;
-
-        for (let ii = 0, y = 0; y < HEIGHT; ++y) {
-            for (let x = 0; x < WIDTH; ++x, ++ii) {
-                let color = foreground[ii];
-                if (color == 0) {
-                    let xx = (x + scrollX) % BACKGROUND_WIDTH;
-                    let yy = (y + scrollY) % BACKGROUND_HEIGHT;
-                    xx = xx - BACKGROUND_WIDTH * Math.floor(xx / BACKGROUND_WIDTH);
-                    yy = yy - BACKGROUND_HEIGHT * Math.floor(yy / BACKGROUND_HEIGHT);
-                    color = background[yy*BACKGROUND_WIDTH + xx];
-                }
-                colors[ii] = colorTable[color];
-            }
-        }
-        this.ctx2d.putImageData(this.imageData, 0, 0);
+        // const colors = new Uint32Array(this.imageData.data.buffer);
+        // const colorTable = this.colorTable;
+        //
+        // for (let ii = 0, y = 0; y < HEIGHT; ++y) {
+        //     for (let x = 0; x < WIDTH; ++x, ++ii) {
+        //         let color = foreground[ii];
+        //         if (color == 0) {
+        //             let xx = (x + scrollX) % BACKGROUND_WIDTH;
+        //             let yy = (y + scrollY) % BACKGROUND_HEIGHT;
+        //             xx = xx - BACKGROUND_WIDTH * Math.floor(xx / BACKGROUND_WIDTH);
+        //             yy = yy - BACKGROUND_HEIGHT * Math.floor(yy / BACKGROUND_HEIGHT);
+        //             color = background[yy*BACKGROUND_WIDTH + xx];
+        //         }
+        //         colors[ii] = colorTable[color];
+        //     }
+        // }
+        // this.ctx2d.putImageData(this.imageData, 0, 0);
     }
 }

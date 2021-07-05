@@ -1,8 +1,8 @@
-export const WIDTH = 320;
-export const HEIGHT = 200;
+export const WIDTH = 160;
+export const HEIGHT = 144;
 
-export const BACKGROUND_WIDTH = 320 + 8;
-export const BACKGROUND_HEIGHT = 200 + 8;
+export const BACKGROUND_WIDTH = 160 + 8;
+export const BACKGROUND_HEIGHT = 144 + 8;
 
 export function drawSprite1BPP (layer, layerWidth, sprite, x, y, palette, flipX, flipY) {
     for (let v = 0; v < 8; ++v) {

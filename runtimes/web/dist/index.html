@@ -11,17 +11,21 @@
     }
     body {
       background: #0f0f0f;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      /* display: flex; */
+      /* flex-direction: column; */
+      /* align-items: stretch; */
+      /* justify-content: center; */
     }
     canvas {
       image-rendering: pixelated;
       image-rendering: crisp-edges;
       touch-action: none;
-      flex: 1;
-      max-width: 1280px;
-      max-height: 800px;
+      object-fit: contain;
+      width: 100%;
+      height: 100%;
+      /* flex: 1; */
+      /* max-width: 640px; */
+      /* max-height: 576px; */
     }
   </style>
 </head>

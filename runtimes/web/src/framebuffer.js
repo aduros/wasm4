@@ -17,6 +17,7 @@ export class Framebuffer {
     }
 
     set (color, x, y) {
+        // TODO(2021-07-09): Map lower bits to left to match sprite packing
         const idx = (this.stride*y + x) >> 1;
         const pair = this.bytes[idx];
 
@@ -36,38 +37,33 @@ export class Framebuffer {
         }
     }
 
-    drawSprite1BPP (sprite, colors, x, y, flipX, flipY) {
+    blit (sprite, colors, x, y, width, height, stride, bpp, flipX, flipY) {
         // TODO(2021-07-07): Optimize
-        for (let v = 0; v < 8; ++v) {
-            for (let h = 0; h < 8; ++h) {
-                const colorIdx = (sprite[v] >> (7 - h)) & 0x1;
-                const color = (colors >> (4*colorIdx)) & 0x0f;
-                if (color != 0) {
-                    const dstX = x + (flipX ? 7 - h : h);
-                    const dstY = y + (flipY ? 7 - v : v);
-                    this.set(color, dstX, dstY);
+
+        const pixelsPerByte = 8 >> (bpp >> 1);
+        const bytesPerRow = width / pixelsPerByte;
+        const mask = (1 << bpp) - 1;
+        const strideInBytes = stride/pixelsPerByte;
+
+        for (let row = 0; row < height; ++row) {
+            let col = 0;
+            // For each byte in this row
+            for (let b = 0; b < bytesPerRow; ++b) {
+                let byte = sprite[row*strideInBytes + b];
+                // Process each pixel in this byte
+                for (let p = 0; p < pixelsPerByte; ++p) {
+                    const colorIdx = byte >> (8 - bpp*(1+p)) & mask;
+                    const color = (bpp == 4)
+                        ? colorIdx
+                        : (colors >> (4*colorIdx)) & 0x0f;
+                    if (color != 0) {
+                        const dstX = x + (flipX ? width - col : col);
+                        const dstY = y + (flipY ? height - row : row);
+                        this.set(color, dstX, dstY);
+                    }
+                    ++col;
                 }
             }
         }
-    }
-
-    drawSprite2BPP (sprite, colors, x, y, flipX, flipY) {
-        // TODO(2021-07-07): Optimize
-        for (let v = 0; v < 8; ++v) {
-            for (let h = 0; h < 8; ++h) {
-                const ch1 = ((sprite[v] >> (7 - h)) & 0x1);
-                const ch2 = ((sprite[v + 8] >> (7 - h)) & 0x1);
-                const colorIdx = (ch2 << 1) | ch1;
-                const color = (colors >> (4*colorIdx)) & 0x0f;
-                if (color != 0) {
-                    const dstX = x + (flipX ? 7 - h : h);
-                    const dstY = y + (flipY ? 7 - v : v);
-                    this.set(color, dstX, dstY);
-                }
-            }
-        }
-    }
-
-    drawSprite4BPP (sprite, x, y, flipX, flipY) {
     }
 }

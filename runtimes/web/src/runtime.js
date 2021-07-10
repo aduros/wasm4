@@ -131,7 +131,7 @@ export class Runtime {
                 memory: this.memory,
 
                 drawRect: this.drawRect.bind(this),
-                drawSprite: this.drawSprite.bind(this),
+                blit: this.blit.bind(this),
 
                 // Printing functions
                 print: ptr => {
@@ -167,27 +167,33 @@ export class Runtime {
     }
 
     drawRect (x, y, width, height, flags) {
-        const isForeground = (flags & 2);
+        const isForeground = (flags & 1);
         const colors = this.data.getUint16(constants.ADDR_DRAW_COLORS, true);
 
         const framebuffer = isForeground ? this.foreground : this.background;
         framebuffer.drawRect(colors & 0x0f, x, y, width, height);
     }
 
-    drawSprite (spritePtr, x, y, flags) {
+    blit (spritePtr, x, y, width, height, stride, flags) {
         const sprite = new Uint8Array(this.memory.buffer, spritePtr);
         const colors = this.data.getUint16(constants.ADDR_DRAW_COLORS, true);
-        const bpp2 = (flags & 1);
-        const isForeground = (flags & 2);
-        const flipX = (flags & 4);
-        const flipY = (flags & 8);
 
-        const framebuffer = isForeground ? this.foreground : this.background;
-        if (bpp2) {
-            framebuffer.drawSprite2BPP(sprite, colors, x, y, flipX, flipY);
+        const framebuffer = (flags & 1) ? this.foreground : this.background;
+        const flipX = (flags & 8);
+        const flipY = (flags & 16);
+
+        let bpp;
+        if (flags & 4) {
+            bpp = 1;
+        } else if (flags & 2) {
+            bpp = 2;
         } else {
-            framebuffer.drawSprite1BPP(sprite, colors, x, y, flipX, flipY);
+            bpp = 4;
         }
+        if (stride == 0) {
+            stride = width;
+        }
+        framebuffer.blit(sprite, colors, x, y, width, height, stride, bpp, flipX, flipY);
     }
 
     update () {

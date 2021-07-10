@@ -5,8 +5,8 @@ export const DEBUG = (process.env.NODE_ENV != "production");
 export const WIDTH = 160;
 export const HEIGHT = 144;
 
-export const BACKGROUND_WIDTH = 160 + 8;
-export const BACKGROUND_HEIGHT = 144 + 8;
+export const FRAMEBUFFER_WIDTH = 160 + 8;
+export const FRAMEBUFFER_HEIGHT = 144 + 8;
 
 export const COLORS = [
     0x00,0x00,0x00, // 0x0
@@ -27,22 +27,20 @@ export const COLORS = [
     0xff,0xcc,0xaa, // 0xF
 ];
 
-export const ADDR_PALETTE_BACKGROUND = 0x0;
-export const ADDR_PALETTE_FOREGROUND = 0x30;
-export const ADDR_DRAW_COLORS = 0x60;
-export const ADDR_SCROLL_X = 0x62;
-export const ADDR_SCROLL_Y = 0x66;
-export const ADDR_CLIP_X = 0x6a;
-export const ADDR_CLIP_Y = 0x6b;
-export const ADDR_CLIP_WIDTH = 0x6c;
-export const ADDR_CLIP_HEIGHT = 0x6d;
-export const ADDR_FRAMEBUFFER_BACKGROUND = 0x6e;
-export const ADDR_FRAMEBUFFER_FOREGROUND = 0x324e;
-export const ADDR_GAMEPAD0 = 0x5f4e;
-export const ADDR_GAMEPAD1 = 0x5f4f;
-export const ADDR_GAMEPAD2 = 0x5f50;
-export const ADDR_GAMEPAD3 = 0x5f51;
-export const ADDR_MOUSE_X = 0x5f52;
-export const ADDR_MOUSE_Y = 0x5f53;
-export const ADDR_MOUSE_BUTTONS = 0x5f54;
-
+export const ADDR_PALETTE_BACKGROUND = 0x0000;
+export const ADDR_PALETTE_FOREGROUND = 0x0030;
+export const ADDR_DRAW_COLORS = 0x0060;
+export const ADDR_SCROLL_X = 0x0062;
+export const ADDR_SCROLL_Y = 0x0066;
+export const ADDR_CLIP_X = 0x006a;
+export const ADDR_CLIP_Y = 0x006b;
+export const ADDR_CLIP_WIDTH = 0x006c;
+export const ADDR_CLIP_HEIGHT = 0x006d;
+export const ADDR_FRAMEBUFFER = 0x006e;
+export const ADDR_GAMEPAD0 = 0x642e;
+export const ADDR_GAMEPAD1 = 0x642f;
+export const ADDR_GAMEPAD2 = 0x6430;
+export const ADDR_GAMEPAD3 = 0x6431;
+export const ADDR_MOUSE_X = 0x6432;
+export const ADDR_MOUSE_Y = 0x6433;
+export const ADDR_MOUSE_BUTTONS = 0x6434;

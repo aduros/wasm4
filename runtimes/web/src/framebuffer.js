@@ -1,43 +1,37 @@
 export class Framebuffer {
     constructor (buffer, ptr, width, height) {
-        this.bytes = new Uint8Array(buffer, ptr, width*height >> 1);
+        this.bytes = new Uint8Array(buffer, ptr, width*height);
         this.stride = width;
     }
 
-    clear () {
-        this.bytes.fill(0);
-    }
-
-    unpack (dst) {
-        for (let ii = 0, d = 0, ll = this.bytes.length; ii < ll; ++ii) {
-            const pair = this.bytes[ii];
-            dst[d++] = (pair >> 4);
-            dst[d++] = pair & 0x0f;
+    clearForeground () {
+        // TODO(2021-07-10): Optimize by operating on 32 or 64 bit numbers instead of per individual
+        // byte?
+        const bytes = this.bytes;
+        for (let ii = 0, ll = bytes.length; ii < ll; ++ii) {
+            bytes[ii] &= 0xf0;
         }
     }
 
-    set (color, x, y) {
-        // TODO(2021-07-09): Map lower bits to left to match sprite packing
-        const idx = (this.stride*y + x) >> 1;
-        const pair = this.bytes[idx];
-
-        if (x & 1) {
-            this.bytes[idx] = (pair & 0xf0) | (color & 0x0f);
+    set (foreground, color, x, y) {
+        const idx = this.stride*y + x;
+        if (foreground) {
+            this.bytes[idx] = (this.bytes[idx] & 0xf0) | color;
         } else {
-            this.bytes[idx] = (color << 4) | (pair & 0x0f);
+            this.bytes[idx] = (this.bytes[idx] & 0x0f) | (color << 4)
         }
     }
 
-    drawRect (color, x, y, width, height) {
+    drawRect (foreground, color, x, y, width, height) {
         // TODO(2021-07-07): Optimize
         for (let yy = y; yy < y+height; ++yy) {
             for (let xx = x; xx < x+width; ++xx) {
-                this.set(color, xx, yy);
+                this.set(foreground, color, xx, yy);
             }
         }
     }
 
-    blit (sprite, colors, x, y, width, height, stride, bpp, flipX, flipY) {
+    blit (foreground, sprite, colors, x, y, width, height, stride, bpp, flipX, flipY) {
         // TODO(2021-07-07): Optimize
 
         const pixelsPerByte = 8 >> (bpp >> 1);
@@ -59,7 +53,7 @@ export class Framebuffer {
                     if (color != 0) {
                         const dstX = x + (flipX ? width - col : col);
                         const dstY = y + (flipY ? height - row : row);
-                        this.set(color, dstX, dstY);
+                        this.set(foreground, color, dstX, dstY);
                     }
                     ++col;
                 }

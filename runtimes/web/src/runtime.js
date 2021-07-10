@@ -20,10 +20,8 @@ export class Runtime {
         this.memory = new WebAssembly.Memory({initial: 1, maximum: 1});
         this.data = new DataView(this.memory.buffer);
 
-        this.background = new Framebuffer(this.memory.buffer, constants.ADDR_FRAMEBUFFER_BACKGROUND,
-            constants.BACKGROUND_WIDTH, constants.BACKGROUND_HEIGHT);
-        this.foreground = new Framebuffer(this.memory.buffer, constants.ADDR_FRAMEBUFFER_FOREGROUND,
-            constants.WIDTH, constants.HEIGHT);
+        this.framebuffer = new Framebuffer(this.memory.buffer, constants.ADDR_FRAMEBUFFER,
+            constants.FRAMEBUFFER_WIDTH, constants.FRAMEBUFFER_HEIGHT);
 
         // Initialize default color table and palette
         new Uint8Array(this.memory.buffer).set(constants.COLORS, constants.ADDR_PALETTE_BACKGROUND);
@@ -167,18 +165,17 @@ export class Runtime {
     }
 
     drawRect (x, y, width, height, flags) {
-        const isForeground = (flags & 1);
+        const foreground = (flags & 1);
         const colors = this.data.getUint16(constants.ADDR_DRAW_COLORS, true);
 
-        const framebuffer = isForeground ? this.foreground : this.background;
-        framebuffer.drawRect(colors & 0x0f, x, y, width, height);
+        this.framebuffer.drawRect(foreground, colors & 0x0f, x, y, width, height);
     }
 
     blit (spritePtr, x, y, width, height, stride, flags) {
         const sprite = new Uint8Array(this.memory.buffer, spritePtr);
         const colors = this.data.getUint16(constants.ADDR_DRAW_COLORS, true);
 
-        const framebuffer = (flags & 1) ? this.foreground : this.background;
+        const foreground = (flags & 1);
         const flipX = (flags & 8);
         const flipY = (flags & 16);
 
@@ -193,11 +190,11 @@ export class Runtime {
         if (stride == 0) {
             stride = width;
         }
-        framebuffer.blit(sprite, colors, x, y, width, height, stride, bpp, flipX, flipY);
+        this.framebuffer.blit(foreground, sprite, colors, x, y, width, height, stride, bpp, flipX, flipY);
     }
 
     update () {
-        this.foreground.clear();
+        this.framebuffer.clearForeground();
         if (this.wasm.exports.update != null) {
             this.wasm.exports.update();
         }
@@ -205,6 +202,6 @@ export class Runtime {
         const palettes = new Uint8Array(this.memory.buffer, constants.ADDR_PALETTE_BACKGROUND, 2*3*16);
         const scrollX = this.data.getInt32(constants.ADDR_SCROLL_X, true);
         const scrollY = this.data.getInt32(constants.ADDR_SCROLL_Y, true);
-        this.compositor.composite(palettes, this.background, this.foreground, scrollX, scrollY);
+        this.compositor.composite(palettes, this.framebuffer, scrollX, scrollY);
     }
 }

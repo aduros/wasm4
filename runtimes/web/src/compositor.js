@@ -1,4 +1,4 @@
-import { WIDTH, HEIGHT, BACKGROUND_WIDTH, BACKGROUND_HEIGHT } from "./constants";
+import { WIDTH, HEIGHT, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT } from "./constants";
 import * as constants from "./constants";
 import * as GL from "./webgl-constants";
 
@@ -27,40 +27,43 @@ function createShader (gl, type, source) {
 export class WebGLCompositor {
     constructor (gl) {
         this.gl = gl;
-        this.tmpBuffer = new Uint8Array(BACKGROUND_WIDTH*BACKGROUND_HEIGHT);
+        this.tmpBuffer = new Uint8Array(FRAMEBUFFER_WIDTH*FRAMEBUFFER_HEIGHT);
 
-        const vertexShader = createShader(gl, GL.VERTEX_SHADER, `
-            const vec2 backgroundMax = vec2(${WIDTH}, ${HEIGHT}) / vec2(${BACKGROUND_WIDTH}, ${BACKGROUND_HEIGHT});
-            attribute vec2 pos;
-            uniform ivec2 scroll;
-            varying vec2 backgroundCoord;
-            varying vec2 foregroundCoord;
+        // TODO(2021-07-10): Optimize
+        const vertexShader = createShader(gl, GL.VERTEX_SHADER, `#version 300 es
+            const vec2 backgroundMax = vec2(${WIDTH}, ${HEIGHT}) / vec2(${FRAMEBUFFER_WIDTH}, ${FRAMEBUFFER_HEIGHT});
+            uniform highp ivec2 scroll;
+
+            in vec2 pos;
+            out vec2 framebufferCoord;
 
             void main () {
-                foregroundCoord = pos*vec2(0.5, -0.5) + 0.5;
-                backgroundCoord = foregroundCoord*backgroundMax + vec2(scroll)/vec2(${WIDTH}, ${HEIGHT});
+                // vec2 foregroundCoord = pos*vec2(0.5, -0.5) + 0.5;
+                // framebufferCoord = pos*vec2(0.5, -0.5) + 0.5;
+                // framebufferCoord = framebufferCoord*backgroundMax + vec2(scroll)/vec2(${FRAMEBUFFER_WIDTH}, ${FRAMEBUFFER_HEIGHT});
+                framebufferCoord = vec2(${WIDTH}, ${HEIGHT}) * (pos*vec2(0.5, -0.5) + 0.5);
+                framebufferCoord += vec2(scroll);
+                framebufferCoord /= vec2(${FRAMEBUFFER_WIDTH}, ${FRAMEBUFFER_HEIGHT});
+                // framebufferCoord = framebufferCoord*backgroundMax + vec2(scroll)/vec2(${FRAMEBUFFER_WIDTH}, ${FRAMEBUFFER_HEIGHT});
                 gl_Position = vec4(pos, 0, 1);
             }
         `);
 
-        const fragmentShader = createShader(gl, GL.FRAGMENT_SHADER, `
+        const fragmentShader = createShader(gl, GL.FRAGMENT_SHADER, `#version 300 es
             precision mediump float;
+            precision mediump usampler2D;
             uniform sampler2D palettes;
-            uniform sampler2D background;
-            uniform sampler2D foreground;
-            varying vec2 backgroundCoord;
-            varying vec2 foregroundCoord;
+            uniform usampler2D framebuffer;
+            in vec2 framebufferCoord;
+            out vec4 fragColor;
 
             void main () {
-                vec2 uv;
-                float fg = texture2D(foreground, foregroundCoord).r;
-                if (fg == 0.0) {
-                    float bg = texture2D(background, backgroundCoord).r;
-                    uv = vec2(16.0*bg, 0.0);
-                } else {
-                    uv = vec2(16.0*fg, 0.5);
-                }
-                gl_FragColor = texture2D(palettes, uv);
+                uint byte = texture(framebuffer, framebufferCoord).r;
+                uint low = byte & 0x0fu;
+                vec2 uv = (low != 0u)
+                    ? vec2(float(low) / 16.0, 0.5)
+                    : vec2(float(byte >> 4u) / 16.0, 0.0);
+                fragColor = texture(palettes, uv);
             }
         `);
 
@@ -79,8 +82,8 @@ export class WebGLCompositor {
         // Setup uniforms
         this.scrollUniform = gl.getUniformLocation(program, "scroll");
         gl.uniform1i(gl.getUniformLocation(program, "palettes"), 0);
-        gl.uniform1i(gl.getUniformLocation(program, "background"), 1);
-        gl.uniform1i(gl.getUniformLocation(program, "foreground"), 2);
+        gl.uniform1i(gl.getUniformLocation(program, "framebuffer"), 1);
+        // gl.uniform1i(gl.getUniformLocation(program, "foreground"), 2);
 
         // Cleanup shaders
         gl.detachShader(program, vertexShader);
@@ -88,17 +91,13 @@ export class WebGLCompositor {
         gl.detachShader(program, fragmentShader);
         gl.deleteShader(fragmentShader);
 
-        // Create color table texture
+        // Create combined palettes texture
         createTexture(gl, GL.TEXTURE0, GL.CLAMP_TO_EDGE);
         gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGB, 16, 2, 0, GL.RGB, GL.UNSIGNED_BYTE, null);
 
-        // Create background texture
+        // Create framebuffer texture
         createTexture(gl, GL.TEXTURE1, GL.REPEAT);
-        gl.texImage2D(GL.TEXTURE_2D, 0, GL.LUMINANCE, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, 0, GL.LUMINANCE, GL.UNSIGNED_BYTE, null);
-
-        // Create foreground texture
-        createTexture(gl, GL.TEXTURE2, GL.CLAMP_TO_EDGE);
-        gl.texImage2D(GL.TEXTURE_2D, 0, GL.LUMINANCE, WIDTH, HEIGHT, 0, GL.LUMINANCE, GL.UNSIGNED_BYTE, null);
+        gl.texImage2D(GL.TEXTURE_2D, 0, GL.R8UI, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT, 0, GL.RED_INTEGER, GL.UNSIGNED_BYTE, null);
 
         // Setup static geometry
         const positionAttrib = gl.getAttribLocation(program, "pos");
@@ -113,22 +112,16 @@ export class WebGLCompositor {
         gl.vertexAttribPointer(positionAttrib, 2, GL.FLOAT, false, 0, 0);
     }
 
-    composite (palettes, background, foreground, scrollX, scrollY) {
+    composite (palettes, framebuffer, scrollX, scrollY) {
         const gl = this.gl;
 
-        // Upload colors
+        // Upload palettes
         gl.activeTexture(GL.TEXTURE0);
         gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGB, 16, 2, 0, GL.RGB, GL.UNSIGNED_BYTE, palettes);
 
-        // Upload background
+        // Upload framebuffer
         gl.activeTexture(GL.TEXTURE1);
-        background.unpack(this.tmpBuffer);
-        gl.texImage2D(GL.TEXTURE_2D, 0, GL.LUMINANCE, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, 0, GL.LUMINANCE, GL.UNSIGNED_BYTE, this.tmpBuffer);
-
-        // Upload foreground
-        gl.activeTexture(GL.TEXTURE2);
-        foreground.unpack(this.tmpBuffer);
-        gl.texImage2D(GL.TEXTURE_2D, 0, GL.LUMINANCE, WIDTH, HEIGHT, 0, GL.LUMINANCE, GL.UNSIGNED_BYTE, this.tmpBuffer);
+        gl.texImage2D(GL.TEXTURE_2D, 0, GL.R8UI, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT, 0, GL.RED_INTEGER, GL.UNSIGNED_BYTE, framebuffer.bytes);
 
         gl.uniform2i(this.scrollUniform, scrollX, scrollY);
         gl.drawArrays(GL.TRIANGLES, 0, 6);
@@ -165,11 +158,11 @@ export class Canvas2DCompositor {
         //     for (let x = 0; x < WIDTH; ++x, ++ii) {
         //         let color = foreground[ii];
         //         if (color == 0) {
-        //             let xx = (x + scrollX) % BACKGROUND_WIDTH;
-        //             let yy = (y + scrollY) % BACKGROUND_HEIGHT;
-        //             xx = xx - BACKGROUND_WIDTH * Math.floor(xx / BACKGROUND_WIDTH);
-        //             yy = yy - BACKGROUND_HEIGHT * Math.floor(yy / BACKGROUND_HEIGHT);
-        //             color = background[yy*BACKGROUND_WIDTH + xx];
+        //             let xx = (x + scrollX) % FRAMEBUFFER_WIDTH;
+        //             let yy = (y + scrollY) % FRAMEBUFFER_HEIGHT;
+        //             xx = xx - FRAMEBUFFER_WIDTH * Math.floor(xx / FRAMEBUFFER_WIDTH);
+        //             yy = yy - FRAMEBUFFER_HEIGHT * Math.floor(yy / FRAMEBUFFER_HEIGHT);
+        //             color = background[yy*FRAMEBUFFER_WIDTH + xx];
         //         }
         //         colors[ii] = colorTable[color];
         //     }

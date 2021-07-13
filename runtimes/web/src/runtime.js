@@ -24,9 +24,10 @@ export class Runtime {
             constants.FRAMEBUFFER_WIDTH, constants.FRAMEBUFFER_HEIGHT);
 
         // Initialize default color table and palette
-        new Uint8Array(this.memory.buffer).set(constants.COLORS, constants.ADDR_PALETTE_BACKGROUND);
-        new Uint8Array(this.memory.buffer).set(constants.COLORS, constants.ADDR_PALETTE_FOREGROUND);
-        this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x4321);
+        const mem8 = new Uint8Array(this.memory.buffer);
+        mem8.set(constants.COLORS, constants.ADDR_PALETTE_BACKGROUND);
+        mem8.set(constants.COLORS, constants.ADDR_PALETTE_FOREGROUND);
+        this.data.setUint16(constants.ADDR_DRAW_COLORS, 0xa904, true);
 
         this.printer = new Printer();
 

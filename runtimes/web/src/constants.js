@@ -46,3 +46,12 @@ export const ADDR_GAMEPAD3 = 0x59b1;
 export const ADDR_MOUSE_X = 0x59b2;
 export const ADDR_MOUSE_Y = 0x59b3;
 export const ADDR_MOUSE_BUTTONS = 0x59b4;
+
+export const BUTTON_X = 1;
+export const BUTTON_Z = 2;
+// export const BUTTON_RESERVED = 4;
+// export const BUTTON_RESERVED = 8;
+export const BUTTON_LEFT = 16;
+export const BUTTON_RIGHT = 32;
+export const BUTTON_UP = 64;
+export const BUTTON_DOWN = 128;

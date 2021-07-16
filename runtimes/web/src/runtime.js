@@ -1,7 +1,7 @@
 import * as constants from "./constants";
 import { WebGLCompositor, Canvas2DCompositor } from "./compositor";
-import { Printer } from "./printer";
 import { Framebuffer } from "./framebuffer";
+import { websocket } from "./websocket";
 
 export class Runtime {
     constructor () {
@@ -23,105 +23,57 @@ export class Runtime {
         this.framebuffer = new Framebuffer(this.memory.buffer, constants.ADDR_FRAMEBUFFER,
             constants.FRAMEBUFFER_WIDTH, constants.FRAMEBUFFER_HEIGHT);
 
+        this.reset();
+
+        this.paused = false;
+    }
+
+    setMouse (x, y, buttons) {
+        this.data.setUint8(constants.ADDR_MOUSE_X, x);
+        this.data.setUint8(constants.ADDR_MOUSE_Y, y);
+        this.data.setUint8(constants.ADDR_MOUSE_BUTTONS, buttons);
+    }
+
+    setGamepad (idx, buttons) {
+        this.data.setUint8(constants.ADDR_GAMEPAD0 + idx, buttons);
+    }
+
+    getGamepad (idx) {
+        return this.data.getUint8(constants.ADDR_GAMEPAD0 + idx);
+    }
+
+    maskGamepad (idx, mask, down) {
+        const addr = constants.ADDR_GAMEPAD0 + idx;
+        let buttons = this.data.getUint8(addr);
+        if (down) {
+            // if (mask & constants.BUTTON_LEFT) {
+            //     buttons &= ~constants.BUTTON_RIGHT;
+            // }
+            // if (mask & constants.BUTTON_RIGHT) {
+            //     buttons &= ~constants.BUTTON_LEFT;
+            // }
+            // if (mask & constants.BUTTON_DOWN) {
+            //     buttons &= ~constants.BUTTON_UP;
+            // }
+            // if (mask & constants.BUTTON_UP) {
+            //     buttons &= ~constants.BUTTON_DOWN;
+            // }
+            buttons |= mask;
+        } else {
+            buttons &= ~mask;
+        }
+        this.data.setUint8(addr, buttons);
+    }
+
+    reset (zeroMemory) {
         // Initialize default color table and palette
         const mem8 = new Uint8Array(this.memory.buffer);
+        if (zeroMemory) {
+            mem8.fill(0);
+        }
         mem8.set(constants.COLORS, constants.ADDR_PALETTE_BACKGROUND);
         mem8.set(constants.COLORS, constants.ADDR_PALETTE_FOREGROUND);
         this.data.setUint16(constants.ADDR_DRAW_COLORS, 0xa904, true);
-
-        this.printer = new Printer();
-
-        const onPointerEvent = event => {
-            event.preventDefault();
-
-            // Do certain things that require a user gesture
-            if (event.type == "pointerdown") {
-                if (document.fullscreenElement == null && event.pointerType == "touch") {
-                    // Go fullscreen on mobile
-                    canvas.requestFullscreen({navigationUI: "hide"});
-                }
-                // if (audioCtx.state == "suspended") {
-                //     // Try to resume audio
-                //     audioCtx.resume();
-                // }
-            }
-
-            const bounds = canvas.getBoundingClientRect();
-            const x = constants.WIDTH * (event.clientX - bounds.left) / bounds.width;
-            const y = constants.HEIGHT * (event.clientY - bounds.top) / bounds.height;
-            const buttons = event.buttons;
-
-            this.data.setUint8(constants.ADDR_MOUSE_X, Math.fround(x));
-            this.data.setUint8(constants.ADDR_MOUSE_Y, Math.fround(y));
-            this.data.setUint8(constants.ADDR_MOUSE_BUTTONS, buttons);
-        };
-        canvas.addEventListener("pointerdown", onPointerEvent);
-        canvas.addEventListener("pointerup", onPointerEvent);
-        canvas.addEventListener("pointermove", onPointerEvent);
-
-        canvas.addEventListener("contextmenu", event => {
-            event.preventDefault();
-        });
-
-        const onKeyboardEvent = async event => {
-            if (event.type == "keydown") {
-                switch (event.keyCode) {
-                case 50: // 2
-                    // Save state
-                    this.snapshot = new Uint32Array(this.memory.buffer.slice());
-                    return;
-                case 52: // 4
-                    // Load state
-                    if (this.snapshot != null) {
-                        new Uint32Array(this.memory.buffer).set(this.snapshot);
-                    }
-                    return;
-                case 82: // R
-                    // Hot reload
-                    if (constants.DEBUG) {
-                        const res = await fetch("cart.wasm");
-                        const wasmBuffer = await res.arrayBuffer();
-                        this.boot(wasmBuffer);
-                    }
-                    return;
-                }
-            }
-
-            let mask = 0;
-            switch (event.keyCode) {
-            case 32: // Space
-                mask = 1;
-                break;
-            // case 13: // Enter
-            //     mask = 2;
-            //     break;
-            case 38: // Up
-                mask = 64;
-                break;
-            case 40: // Down
-                mask = 128;
-                break;
-            case 37: // Left
-                mask = 16;
-                break;
-            case 39: // Right
-                mask = 32;
-                break;
-            default:
-                return;
-            }
-            event.preventDefault();
-
-            let buttons = this.data.getUint8(constants.ADDR_GAMEPAD0);
-            if (event.type == "keydown") {
-                buttons |= mask;
-            } else {
-                buttons &= ~mask;
-            }
-            this.data.setUint8(constants.ADDR_GAMEPAD0, buttons);
-        };
-        window.addEventListener("keydown", onKeyboardEvent);
-        window.addEventListener("keyup", onKeyboardEvent);
     }
 
     async boot (wasmBuffer) {
@@ -132,26 +84,54 @@ export class Runtime {
                 drawRect: this.drawRect.bind(this),
                 blit: this.blit.bind(this),
 
-                // Printing functions
-                print: ptr => {
-                    const cstr = new Uint8Array(this.memory.buffer, ptr);
-                    this.printer.printCStr(cstr);
-                },
-                printc: c => {
-                    this.printer.printChar(c);
-                },
-                printn: number => {
-                    this.printer.printRaw(number);
-                },
-                printd: decimal => {
-                    this.printer.printRaw(decimal);
-                },
-                printx: hex => {
-                    this.printer.printHex(hex);
+                printf: (fmt, ptr) => {
+                    if (websocket == null || websocket.readyState != 1) {
+                        return 0;
+                    }
+                    var output = "";
+                    let ch;
+                    while (ch = this.data.getUint8(fmt++)) {
+                        if (ch == 37) {
+                            switch (ch = this.data.getUint8(fmt++)) {
+                            case 37: // %
+                                output += "%";
+                                break;
+                            case 99: // c
+                                output += String.fromCharCode(this.data.getInt32(ptr, true));
+                                ptr += 4;
+                                break;
+                            case 115: // s
+                                throw new Error("TODO(2021-07-16): Implement printf %s");
+                                break;
+                            case 100: // d
+                            case 120: // x
+                                output += this.data.getInt32(ptr, true).toString(ch == 100 ? 10 : 16);
+                                ptr += 4;
+                                break;
+                            }
+                        } else {
+                            output += String.fromCharCode(ch);
+                        }
+                    }
+                    const length = output.length;
+                    if (length > 0) {
+                        console.log(output);
+                        websocket.send(output);
+                    }
+                    return length;
                 },
 
-                __memset: (ptr, byte, length) => {
-                    new Uint8Array(this.memory.buffer, ptr, length).fill(byte);
+                memset: (destPtr, fillByte, length) => {
+                    const dest = new Uint8Array(this.memory.buffer, destPtr, length);
+                    dest.fill(fillByte);
+                    return destPtr;
+                },
+
+                memcpy: (destPtr, srcPtr, length) => {
+                    const dest = new Uint8Array(this.memory.buffer, destPtr);
+                    const src = new Uint8Array(this.memory.buffer, srcPtr, length);
+                    dest.set(src);
+                    return destPtr;
                 },
 
                 // Temporary(?) for assemblyscript
@@ -195,6 +175,10 @@ export class Runtime {
     }
 
     update () {
+        if (this.paused) {
+            return;
+        }
+
         this.framebuffer.clearForeground();
         if (this.wasm.exports.update != null) {
             this.wasm.exports.update();

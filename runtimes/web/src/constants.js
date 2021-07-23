@@ -3,10 +3,10 @@
 export const DEBUG = (process.env.NODE_ENV != "production");
 
 export const WIDTH = 160;
-export const HEIGHT = 128;
+export const HEIGHT = 160;
 
-export const FRAMEBUFFER_WIDTH = 160 + 8;
-export const FRAMEBUFFER_HEIGHT = 128 + 8;
+export const FRAMEBUFFER_WIDTH = 160 + 16;
+export const FRAMEBUFFER_HEIGHT = 160 + 16;
 
 // Default palette
 export const COLORS = [

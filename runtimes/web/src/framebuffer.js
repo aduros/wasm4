@@ -1,7 +1,25 @@
+function readPixel (sprite, x, y, bpp, stride) {
+    switch (bpp) {
+    case 1:
+        var byte = sprite[(y*stride + x) >> 3];
+        var shift = 7 - (x & 0x07);
+        return (byte >> shift) & 0b1;
+    case 2:
+        var byte = sprite[(y*stride + x) >> 2];
+        var shift = 6 - ((x & 0x03) << 1);
+        return (byte >> shift) & 0b11;
+    case 4:
+        var byte = sprite[(y*stride + x) >> 1];
+        return (x & 1) ? byte & 0b1111 : byte >> 4;
+    }
+    return 0;
+}
+
 export class Framebuffer {
     constructor (buffer, ptr, width, height) {
         this.bytes = new Uint8Array(buffer, ptr, width*height);
         this.stride = width;
+        this.height = height;
     }
 
     clearForeground () {
@@ -24,6 +42,7 @@ export class Framebuffer {
 
     drawRect (foreground, color, x, y, width, height) {
         // TODO(2021-07-07): Optimize
+        // TODO(2021-07-21): Clipping
         for (let yy = y; yy < y+height; ++yy) {
             for (let xx = x; xx < x+width; ++xx) {
                 this.set(foreground, color, xx, yy);
@@ -31,31 +50,39 @@ export class Framebuffer {
         }
     }
 
-    blit (foreground, sprite, colors, x, y, width, height, stride, bpp, flipX, flipY) {
-        // TODO(2021-07-07): Optimize
+    blit (foreground, sprite, colors, dstX, dstY, width, height, srcX, srcY, srcStride, bpp, flipX, flipY, rotate) {
+        const clipXMin = Math.max(0, dstX) - dstX;
+        const clipYMin = Math.max(0, dstY) - dstY;
+        const clipXMax = Math.min(width, this.stride - dstX);
+        const clipYMax = Math.min(height, this.height - dstY);
 
-        const pixelsPerByte = 8 >> (bpp >> 1);
-        const bytesPerRow = width / pixelsPerByte;
-        const mask = (1 << bpp) - 1;
-        const strideInBytes = stride/pixelsPerByte;
+        if (rotate) {
+            flipX = !flipX;
+        }
 
-        for (let row = 0; row < height; ++row) {
-            let col = 0;
-            // For each byte in this row
-            for (let b = 0; b < bytesPerRow; ++b) {
-                let byte = sprite[row*strideInBytes + b];
-                // Process each pixel in this byte
-                for (let p = 0; p < pixelsPerByte; ++p) {
-                    const colorIdx = byte >> (8 - bpp*(1+p)) & mask;
-                    const color = (bpp == 4)
-                        ? colorIdx
-                        : (colors >> (4*colorIdx)) & 0x0f;
-                    if (color != 0) {
-                        const dstX = x + (flipX ? width - col : col);
-                        const dstY = y + (flipY ? height - row : row);
-                        this.set(foreground, color, dstX, dstY);
-                    }
-                    ++col;
+        for (let row = clipYMin; row < clipYMax; ++row) {
+            for (let col = clipXMin; col < clipXMax; ++col) {
+                let sx, sy;
+                if (rotate) {
+                    sx = row;
+                    sy = col;
+                } else {
+                    sx = col;
+                    sy = row;
+                }
+                if (flipX) {
+                    sx = clipXMax - sx - 1;
+                }
+                if (flipY) {
+                    sy = clipYMax - sy - 1;
+                }
+
+                const colorIdx = readPixel(sprite, srcX+sx, srcY+sy, bpp, srcStride);
+                const color = (bpp == 4)
+                    ? colorIdx
+                    : (colors >> (colorIdx << 2)) & 0x0f;
+                if (color != 0) {
+                    this.set(foreground, color, dstX + col, dstY + row);
                 }
             }
         }

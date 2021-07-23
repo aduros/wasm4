@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "webpack --mode production",
-    "serve": "webpack serve --mode development --content-base dist --devtool inline-source-map --host 0.0.0.0"
+    "start": "webpack serve --mode development --content-base dist --devtool inline-source-map --host 0.0.0.0"
   },
   "keywords": [],
   "author": "",

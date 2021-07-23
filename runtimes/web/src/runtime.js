@@ -83,6 +83,7 @@ export class Runtime {
 
                 drawRect: this.drawRect.bind(this),
                 blit: this.blit.bind(this),
+                blitSub: this.blitSub.bind(this),
 
                 printf: (fmt, ptr) => {
                     if (websocket == null || websocket.readyState != 1) {
@@ -152,13 +153,18 @@ export class Runtime {
         this.framebuffer.drawRect(foreground, colors & 0x0f, x, y, width, height);
     }
 
-    blit (spritePtr, x, y, width, height, stride, flags) {
+    blit (spritePtr, x, y, width, height, flags) {
+        this.blitSub(spritePtr, x, y, width, height, 0, 0, width, flags);
+    }
+
+    blitSub (spritePtr, x, y, width, height, srcX, srcY, stride, flags) {
         const sprite = new Uint8Array(this.memory.buffer, spritePtr);
         const colors = this.data.getUint16(constants.ADDR_DRAW_COLORS, true);
 
         const foreground = (flags & 1);
         const flipX = (flags & 8);
         const flipY = (flags & 16);
+        const rotate = (flags & 32);
 
         let bpp;
         if (flags & 4) {
@@ -168,10 +174,7 @@ export class Runtime {
         } else {
             bpp = 4;
         }
-        if (stride == 0) {
-            stride = width;
-        }
-        this.framebuffer.blit(foreground, sprite, colors, x, y, width, height, stride, bpp, flipX, flipY);
+        this.framebuffer.blit(foreground, sprite, colors, x, y, width, height, srcX, srcY, stride, bpp, flipX, flipY, rotate);
     }
 
     update () {

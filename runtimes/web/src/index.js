@@ -54,6 +54,8 @@ function setClass (element, className, enabled) {
     const onKeyboardEvent = event => {
         const down = (event.type == "keydown");
 
+        runtime.unlockAudio();
+
         if (down) {
             switch (event.keyCode) {
             case 50: // 2
@@ -113,10 +115,8 @@ function setClass (element, className, enabled) {
                 // Go fullscreen on mobile
                 document.body.requestFullscreen({navigationUI: "hide"});
             }
-            // if (audioCtx.state == "suspended") {
-            //     // Try to resume audio
-            //     audioCtx.resume();
-            // }
+
+            runtime.unlockAudio();
         }
 
         if (event.pointerType != "touch") {

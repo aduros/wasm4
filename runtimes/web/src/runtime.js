@@ -1,6 +1,7 @@
 import * as constants from "./constants";
-import { WebGLCompositor, Canvas2DCompositor } from "./compositor";
+import { APU } from "./apu";
 import { Framebuffer } from "./framebuffer";
+import { WebGLCompositor, Canvas2DCompositor } from "./compositor";
 import { websocket } from "./websocket";
 
 export class Runtime {
@@ -16,6 +17,8 @@ export class Runtime {
             antialias: false,
         });
         this.compositor = (gl != null) ? new WebGLCompositor(gl) : new Canvas2DCompositor(canvas);
+
+        this.apu = new APU();
 
         this.memory = new WebAssembly.Memory({initial: 1, maximum: 1});
         this.data = new DataView(this.memory.buffer);
@@ -65,6 +68,13 @@ export class Runtime {
         this.data.setUint8(addr, buttons);
     }
 
+    unlockAudio () {
+        const ctx = this.apu.ctx;
+        if (ctx.state == "suspended") {
+            ctx.resume();
+        }
+    }
+
     reset (zeroMemory) {
         // Initialize default color table and palette
         const mem8 = new Uint8Array(this.memory.buffer);
@@ -84,6 +94,8 @@ export class Runtime {
                 drawRect: this.drawRect.bind(this),
                 blit: this.blit.bind(this),
                 blitSub: this.blitSub.bind(this),
+
+                tone: this.apu.tone.bind(this.apu),
 
                 printf: (fmt, ptr) => {
                     if (websocket == null || websocket.readyState != 1) {

@@ -5,8 +5,8 @@ export const DEBUG = (process.env.NODE_ENV != "production");
 export const WIDTH = 160;
 export const HEIGHT = 160;
 
-export const FRAMEBUFFER_WIDTH = 160 + 16;
-export const FRAMEBUFFER_HEIGHT = 160 + 16;
+export const FRAMEBUFFER_WIDTH = 160 + 8;
+export const FRAMEBUFFER_HEIGHT = 160 + 8;
 
 // Default palette
 export const COLORS = [
@@ -39,13 +39,13 @@ export const ADDR_CLIP_Y = 0x006b;
 export const ADDR_CLIP_WIDTH = 0x006c;
 export const ADDR_CLIP_HEIGHT = 0x006d;
 export const ADDR_FRAMEBUFFER = 0x006e;
-export const ADDR_GAMEPAD0 = 0x59ae;
-export const ADDR_GAMEPAD1 = 0x59af;
-export const ADDR_GAMEPAD2 = 0x59b0;
-export const ADDR_GAMEPAD3 = 0x59b1;
-export const ADDR_MOUSE_X = 0x59b2;
-export const ADDR_MOUSE_Y = 0x59b3;
-export const ADDR_MOUSE_BUTTONS = 0x59b4;
+export const ADDR_GAMEPAD0 = 0x6eae;
+export const ADDR_GAMEPAD1 = 0x6eaf;
+export const ADDR_GAMEPAD2 = 0x6eb0;
+export const ADDR_GAMEPAD3 = 0x6eb1;
+export const ADDR_MOUSE_X = 0x6eb2;
+export const ADDR_MOUSE_Y = 0x6eb3;
+export const ADDR_MOUSE_BUTTONS = 0x6eb4;
 
 export const BUTTON_X = 1;
 export const BUTTON_Z = 2;

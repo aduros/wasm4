@@ -1,0 +1,17 @@
+{
+  "name": "wasm4",
+  "version": "1.0.0",
+  "description": "",
+  "bin": {
+    "w4": "./cli.js"
+  },
+  "author": "Bruno Garcia <b@aduros.com>",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^8.0.0",
+    "express": "^4.17.1",
+    "node-watch": "^0.7.1",
+    "pngjs": "^6.0.0",
+    "ws": "^7.5.3"
+  }
+}

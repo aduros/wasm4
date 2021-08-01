@@ -26,7 +26,7 @@
       width: auto;
       height: 100%;
     }
-    @media (max-aspect-ratio: 128/128) {
+    @media (max-aspect-ratio: 1/1) {
       body {
         /* background: green; */
       }
@@ -41,6 +41,11 @@
     /*   } */
     /* } */
 
+    @media (pointer: fine) {
+      .gamepad {
+        display: none;
+      }
+    }
     .gamepad {
       pointer-events: none;
     }

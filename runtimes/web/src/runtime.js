@@ -11,20 +11,19 @@ export class Runtime {
         canvas.height = constants.HEIGHT;
         this.canvas = canvas;
 
-        const gl = canvas.getContext("webgl2", {
+        const gl = canvas.getContext("webgl", {
             alpha: false,
             depth: false,
             antialias: false,
         });
-        this.compositor = (gl != null) ? new WebGLCompositor(gl) : new Canvas2DCompositor(canvas);
+        this.compositor = new WebGLCompositor(gl); // TODO(2021-08-01): Fallback to CanvasCompositor
 
         this.apu = new APU();
 
         this.memory = new WebAssembly.Memory({initial: 1, maximum: 1});
         this.data = new DataView(this.memory.buffer);
 
-        this.framebuffer = new Framebuffer(this.memory.buffer, constants.ADDR_FRAMEBUFFER,
-            constants.FRAMEBUFFER_WIDTH, constants.FRAMEBUFFER_HEIGHT);
+        this.framebuffer = new Framebuffer(this.memory.buffer);
 
         this.reset();
 
@@ -38,15 +37,15 @@ export class Runtime {
     }
 
     setGamepad (idx, buttons) {
-        this.data.setUint8(constants.ADDR_GAMEPAD0 + idx, buttons);
+        this.data.setUint8(constants.ADDR_GAMEPAD1 + idx, buttons);
     }
 
     getGamepad (idx) {
-        return this.data.getUint8(constants.ADDR_GAMEPAD0 + idx);
+        return this.data.getUint8(constants.ADDR_GAMEPAD1 + idx);
     }
 
     maskGamepad (idx, mask, down) {
-        const addr = constants.ADDR_GAMEPAD0 + idx;
+        const addr = constants.ADDR_GAMEPAD1 + idx;
         let buttons = this.data.getUint8(addr);
         if (down) {
             // if (mask & constants.BUTTON_LEFT) {
@@ -81,9 +80,8 @@ export class Runtime {
         if (zeroMemory) {
             mem8.fill(0);
         }
-        mem8.set(constants.COLORS, constants.ADDR_PALETTE_BACKGROUND);
-        mem8.set(constants.COLORS, constants.ADDR_PALETTE_FOREGROUND);
-        this.data.setUint16(constants.ADDR_DRAW_COLORS, 0xa904, true);
+        mem8.set(constants.COLORS, constants.ADDR_PALETTE);
+        this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
     }
 
     async boot (wasmBuffer) {
@@ -160,16 +158,12 @@ export class Runtime {
     }
 
     drawRect (x, y, width, height, flags) {
-        const foreground = (flags & 1);
-        const colors = this.data.getUint16(constants.ADDR_DRAW_COLORS, true);
-
-        this.framebuffer.drawRect(foreground, colors & 0x0f, x, y, width, height);
+        this.framebuffer.drawRect(x, y, width, height);
     }
 
     drawText (textPtr, x, y) {
         const text = new Uint8Array(this.memory.buffer, textPtr);
-        const colors = this.data.getUint16(constants.ADDR_DRAW_COLORS, true);
-        this.framebuffer.drawText(text, colors, x, y);
+        this.framebuffer.drawText(text, x, y);
     }
 
     blit (spritePtr, x, y, width, height, flags) {
@@ -178,22 +172,13 @@ export class Runtime {
 
     blitSub (spritePtr, x, y, width, height, srcX, srcY, stride, flags) {
         const sprite = new Uint8Array(this.memory.buffer, spritePtr);
-        const colors = this.data.getUint16(constants.ADDR_DRAW_COLORS, true);
 
-        const foreground = (flags & 1);
         const flipX = (flags & 8);
         const flipY = (flags & 16);
         const rotate = (flags & 32);
+        const bpp = (flags & 2) ? 2 : 1;
 
-        let bpp;
-        if (flags & 4) {
-            bpp = 1;
-        } else if (flags & 2) {
-            bpp = 2;
-        } else {
-            bpp = 4;
-        }
-        this.framebuffer.blit(foreground, sprite, colors, x, y, width, height, srcX, srcY, stride, bpp, flipX, flipY, rotate);
+        this.framebuffer.blit(sprite, x, y, width, height, srcX, srcY, stride, bpp, flipX, flipY, rotate);
     }
 
     update () {
@@ -201,14 +186,12 @@ export class Runtime {
             return;
         }
 
-        this.framebuffer.clearForeground();
+        this.framebuffer.clear();
         if (this.wasm.exports.update != null) {
             this.wasm.exports.update();
         }
 
-        const palettes = new Uint8Array(this.memory.buffer, constants.ADDR_PALETTE_BACKGROUND, 2*3*16);
-        const scrollX = this.data.getInt32(constants.ADDR_SCROLL_X, true);
-        const scrollY = this.data.getInt32(constants.ADDR_SCROLL_Y, true);
-        this.compositor.composite(palettes, this.framebuffer, scrollX, scrollY);
+        const palette = new Uint8Array(this.memory.buffer, constants.ADDR_PALETTE, 3*4);
+        this.compositor.composite(palette, this.framebuffer);
     }
 }

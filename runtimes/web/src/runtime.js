@@ -191,6 +191,10 @@ export class Runtime {
             this.wasm.exports.update();
         }
 
+        this.composite();
+    }
+
+    composite () {
         const palette = new Uint8Array(this.memory.buffer, constants.ADDR_PALETTE, 3*4);
         this.compositor.composite(palette, this.framebuffer);
     }

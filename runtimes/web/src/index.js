@@ -74,6 +74,18 @@ function setClass (element, className, enabled) {
             case 80: // P
                 // this.paused = !this.paused;
                 return;
+            case 120: // F9
+                // Render a frame before taking a screenshot
+                runtime.composite();
+                canvas.toBlob(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const anchor = document.createElement("a");
+                    anchor.href = url;
+                    anchor.download = "wasm4-screenshot.png";
+                    anchor.click();
+                    URL.revokeObjectURL(url);
+                });
+                return;
             }
         }
 

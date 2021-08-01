@@ -92,6 +92,7 @@ export class Runtime {
                 memory: this.memory,
 
                 drawRect: this.drawRect.bind(this),
+                drawText: this.drawText.bind(this),
                 blit: this.blit.bind(this),
                 blitSub: this.blitSub.bind(this),
 
@@ -163,6 +164,12 @@ export class Runtime {
         const colors = this.data.getUint16(constants.ADDR_DRAW_COLORS, true);
 
         this.framebuffer.drawRect(foreground, colors & 0x0f, x, y, width, height);
+    }
+
+    drawText (textPtr, x, y) {
+        const text = new Uint8Array(this.memory.buffer, textPtr);
+        const colors = this.data.getUint16(constants.ADDR_DRAW_COLORS, true);
+        this.framebuffer.drawText(text, colors, x, y);
     }
 
     blit (spritePtr, x, y, width, height, flags) {

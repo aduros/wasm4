@@ -79,8 +79,12 @@ function setClass (element, className, enabled) {
 
         let mask = 0;
         switch (event.keyCode) {
-        case 32:
+        case 88: case 32: case 81:
             mask = constants.BUTTON_X;
+            break;
+        case 90: case 18: case 186:
+        case 67: case 74:
+            mask = constants.BUTTON_Z;
             break;
         case 38:
             mask = constants.BUTTON_UP;

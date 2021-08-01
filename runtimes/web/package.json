@@ -1,15 +1,10 @@
 {
-  "name": "wasmbox-web",
-  "version": "1.0.0",
-  "description": "",
+  "name": "wasm4-runtime",
   "private": true,
   "scripts": {
     "build": "webpack --mode production",
     "start": "webpack serve --mode development --content-base dist --devtool inline-source-map --host 0.0.0.0"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "webpack": "^5.41.0",
     "webpack-cli": "^4.7.2",

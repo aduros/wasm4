@@ -3,20 +3,21 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
-  title: 'WasmBox',
-  tagline: 'Dinosaurs are cool',
+  title: 'WASM-4',
+  // tagline: 'A fantasy console for retro games built with WebAssembly',
+  tagline: 'Build retro games using WebAssembly for a fantasy console',
   url: 'https://your-docusaurus-test-site.com',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'aduros', // Usually your GitHub org/user name.
-  projectName: 'wasmbox', // Usually your repo name.
+  projectName: 'wasm4', // Usually your repo name.
   themeConfig: {
     navbar: {
-      title: 'WasmBox',
+      title: 'WASM-4',
       logo: {
-        alt: 'WasmBox Logo',
+        alt: 'WASM-4 Logo',
         src: 'img/logo.svg',
       },
       items: [
@@ -93,12 +94,12 @@ module.exports = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl:
-            'https://github.com/aduros/wasmbox/edit/master/site/',
+            'https://github.com/aduros/wasm4/edit/master/site/',
         },
         blog: {
           showReadingTime: false,
           // Please change this to your repo.
-          // editUrl: 'https://github.com/aduros/wasmbox/edit/master/site/blog/',
+          // editUrl: 'https://github.com/aduros/wasm4/edit/master/site/blog/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

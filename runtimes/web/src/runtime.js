@@ -176,9 +176,9 @@ export class Runtime {
         const flipX = (flags & 8);
         const flipY = (flags & 16);
         const rotate = (flags & 32);
-        const bpp = (flags & 2) ? 2 : 1;
+        const bpp2 = (flags & 2);
 
-        this.framebuffer.blit(sprite, x, y, width, height, srcX, srcY, stride, bpp, flipX, flipY, rotate);
+        this.framebuffer.blit(sprite, x, y, width, height, srcX, srcY, stride, bpp2, flipX, flipY, rotate);
     }
 
     update () {

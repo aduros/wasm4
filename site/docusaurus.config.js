@@ -94,12 +94,12 @@ module.exports = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           editUrl:
-            'https://github.com/aduros/wasm4/edit/master/site/',
+            'https://github.com/aduros/wasm4/edit/main/site/',
         },
         blog: {
           showReadingTime: false,
           // Please change this to your repo.
-          // editUrl: 'https://github.com/aduros/wasm4/edit/master/site/blog/',
+          // editUrl: 'https://github.com/aduros/wasm4/edit/main/site/blog/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

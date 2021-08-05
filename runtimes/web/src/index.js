@@ -12,7 +12,7 @@ function setClass (element, className, enabled) {
 
 (async function () {
     const res = await fetch("cart.wasm");
-    const wasmBuffer = await res.arrayBuffer();
+    let wasmBuffer = await res.arrayBuffer();
 
     const runtime = new Runtime();
     const canvas = runtime.canvas;
@@ -24,7 +24,7 @@ function setClass (element, className, enabled) {
             switch (event.data) {
             case "reload": case "hotswap":
                 const res = await fetch("cart.wasm");
-                const wasmBuffer = await res.arrayBuffer();
+                wasmBuffer = await res.arrayBuffer();
                 if (event.data == "reload") {
                     runtime.reset(true);
                 }
@@ -32,6 +32,71 @@ function setClass (element, className, enabled) {
                 break;
             }
         });
+    }
+
+    function reboot () {
+        runtime.reset(true);
+        runtime.boot(wasmBuffer);
+    }
+
+    function takeScreenshot () {
+        // We need to render a frame first
+        runtime.composite();
+
+        canvas.toBlob(blob => {
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement("a");
+            anchor.href = url;
+            anchor.download = "wasm4-screenshot.png";
+            anchor.click();
+            URL.revokeObjectURL(url);
+        });
+    }
+
+    let videoRecorder = null;
+    function recordVideo () {
+        if (videoRecorder != null) {
+            return; // Still recording, ignore
+        }
+
+        const mimeType = "video/webm";
+        const videoStream = canvas.captureStream();
+        videoRecorder = new MediaRecorder(videoStream, {
+            mimeType,
+            videoBitsPerSecond: 25000000,
+        });
+
+        const chunks = [];
+        videoRecorder.ondataavailable = event => {
+            chunks.push(event.data);
+        };
+
+        videoRecorder.onstop = () => {
+            const blob = new Blob(chunks, { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement("a");
+            anchor.href = url;
+            anchor.download = "wasm4-animation.webm";
+            anchor.click();
+            URL.revokeObjectURL(url);
+        };
+
+        videoRecorder.start();
+        setTimeout(() => {
+            videoRecorder.requestData();
+            videoRecorder.stop();
+            videoRecorder = null;
+        }, 4000);
+    }
+
+    let savedState = null;
+    function saveState () {
+        savedState = new Uint32Array(runtime.memory.buffer.slice());
+    }
+    function loadState () {
+        if (savedState != null) {
+            new Uint32Array(runtime.memory.buffer).set(savedState);
+        }
     }
 
     const onMouseEvent = event => {
@@ -59,32 +124,19 @@ function setClass (element, className, enabled) {
         if (down) {
             switch (event.keyCode) {
             case 50: // 2
-                // Save state
-                // this.snapshot = new Uint32Array(this.memory.buffer.slice());
+                saveState();
                 return;
             case 52: // 4
-                // Load state
-                // if (this.snapshot != null) {
-                //     new Uint32Array(this.memory.buffer).set(this.snapshot);
-                // }
+                loadState();
                 return;
             case 82: // R
-                // this.reset(false);
-                return;
-            case 80: // P
-                // this.paused = !this.paused;
+                reboot();
                 return;
             case 120: // F9
-                // Render a frame before taking a screenshot
-                runtime.composite();
-                canvas.toBlob(blob => {
-                    const url = URL.createObjectURL(blob);
-                    const anchor = document.createElement("a");
-                    anchor.href = url;
-                    anchor.download = "wasm4-screenshot.png";
-                    anchor.click();
-                    URL.revokeObjectURL(url);
-                });
+                takeScreenshot();
+                return;
+            case 121: // F10
+                recordVideo();
                 return;
             }
         }

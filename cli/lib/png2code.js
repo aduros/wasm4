@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const pngjs = require("pngjs");
 
-function run (sourceFile) {
+function run (sourceFile, { lang }) {
     const png = pngjs.PNG.sync.read(fs.readFileSync(sourceFile), {
         colorType: 1,
         inputColorType: 1,
@@ -20,14 +20,16 @@ function run (sourceFile) {
         palette.set(packed, ii);
     }
 
-    let flags;
+    let flags, flagsHumanReadable;
     let bpp;
     if (palette.size <= 2) {
         bpp = 1;
-        flags = "DRAW_1BPP";
+        flags = 0;
+        flagsHumanReadable = "BLIT_1BPP";
     } else if (palette.size <= 4) {
         bpp = 2;
-        flags = "DRAW_2BPP";
+        flags = 1;
+        flagsHumanReadable = "BLIT_2BPP";
     } else {
         throw new Error("Palette is larger than 4 colors");
     }
@@ -73,30 +75,57 @@ function run (sourceFile) {
         }
     }
 
-    const varName = path.basename(sourceFile, ".png").replace(/[^0-9A-Za-z]+/g, "_").replace(/^([0-9])/, "_$1");
-    console.log(`#define ${varName}_WIDTH ${png.width}`);
-    console.log(`#define ${varName}_HEIGHT ${png.height}`);
-    console.log(`#define ${varName}_FLAGS ${flags}`);
-    process.stdout.write(`const char ${varName}[${bytes.length}] = { `);
-    for (let ii = 0; ii < bytes.length; ++ii) {
-        const byte = bytes[ii];
-        if (ii > 0) {
-            process.stdout.write(",");
+    function printBytes () {
+        for (let ii = 0; ii < bytes.length; ++ii) {
+            const byte = bytes[ii];
+            if (ii > 0) {
+                process.stdout.write(",");
+            }
+            process.stdout.write("0x"+byte.toString(16).padStart(2, "0"));
         }
-        process.stdout.write("0x"+byte.toString(16).padStart(2, "0"));
     }
-    console.log(" };");
+
+    const varName = path.basename(sourceFile, ".png").replace(/[^0-9A-Za-z]+/g, "_").replace(/^([0-9])/, "_$1");
+
+    switch (lang) {
+    case "assemblyscript":
+        console.log(`const ${varName}_WIDTH = ${png.width};`);
+        console.log(`const ${varName}_HEIGHT = ${png.height};`);
+        console.log(`const ${varName}_FLAGS = ${flags}; // ${flagsHumanReadable}`);
+        process.stdout.write(`const ${varName} = memory.data<u8>([ `);
+        printBytes();
+        console.log(" ]);");
+        break;
+
+    case "rust":
+        console.log(`const ${varName}_WIDTH: u32 = ${png.width};`);
+        console.log(`const ${varName}_HEIGHT: u32 = ${png.height};`);
+        console.log(`const ${varName}_FLAGS: u32 = ${flags}; // ${flagsHumanReadable}`);
+        process.stdout.write(`const ${varName}: [u8; ${bytes.length}] = [ `);
+        printBytes();
+        console.log(" ];");
+        break;
+
+    default: // C
+        console.log(`#define ${varName}_WIDTH ${png.width}`);
+        console.log(`#define ${varName}_HEIGHT ${png.height}`);
+        console.log(`#define ${varName}_FLAGS ${flagsHumanReadable}`);
+        process.stdout.write(`const char ${varName}[${bytes.length}] = { `);
+        printBytes();
+        console.log(" };");
+        break;
+    }
 }
 exports.run = run;
 
-function runAll (files) {
+function runAll (files, opts) {
     for (let ii = 0; ii < files.length; ++ii) {
         const file = files[ii];
         try {
             if (ii > 0) {
                 console.log();
             }
-            run(file);
+            run(file, opts);
         } catch (error) {
             console.error("Error processing "+file+": "+error.message);
             break;

@@ -172,11 +172,10 @@ export class Runtime {
 
     blitSub (spritePtr, x, y, width, height, srcX, srcY, stride, flags) {
         const sprite = new Uint8Array(this.memory.buffer, spritePtr);
-
-        const flipX = (flags & 8);
-        const flipY = (flags & 16);
-        const rotate = (flags & 32);
-        const bpp2 = (flags & 2);
+        const bpp2 = (flags & 1);
+        const flipX = (flags & 2);
+        const flipY = (flags & 4);
+        const rotate = (flags & 8);
 
         this.framebuffer.blit(sprite, x, y, width, height, srcX, srcY, stride, bpp2, flipX, flipY, rotate);
     }

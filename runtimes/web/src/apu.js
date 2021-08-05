@@ -23,6 +23,7 @@ const NOISE_LENGTH = 0x8000;
 class Channel {
     constructor (ctx, node) {
         this.node = node;
+        this.gainLevel = 1;
 
         const gain = ctx.createGain();
         this.gain = gain;
@@ -35,7 +36,8 @@ class Channel {
     }
 
     setEnvelope (currentTime, sustainLevel, attack, decay, sustain, release) {
-        const peakLevel = 2*sustainLevel;
+        const peakLevel = this.gainLevel * 2*sustainLevel;
+        sustainLevel *= this.gainLevel;
 
         const gainValue = this.gain.gain;
         gainValue.cancelScheduledValues(0);
@@ -108,10 +110,16 @@ export class APU {
         this.ctx = ctx;
 
         const pulse1 = new OscillatorChannel(ctx);
+        pulse1.gainLevel = 0.5;
+
         const pulse2 = new OscillatorChannel(ctx);
+        pulse2.gainLevel = 0.5;
+
         const triangle = new OscillatorChannel(ctx);
         triangle.node.type = "triangle";
+
         const noise = new NoiseChannel(ctx);
+
         this.channels = [pulse1, pulse2, triangle, noise];
 
         const duty25 = createDutyCycle(ctx, 0.25);

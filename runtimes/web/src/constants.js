@@ -5,6 +5,8 @@ export const DEBUG = (process.env.NODE_ENV != "production");
 export const WIDTH = 160;
 export const HEIGHT = 160;
 
+export const STORAGE_SIZE = 1024;
+
 // Default palette
 export const COLORS = [
     0xe0,0xf8,0xd0,

@@ -1,4 +1,5 @@
 import * as constants from "./constants";
+import * as z85 from "./z85";
 import { APU } from "./apu";
 import { Framebuffer } from "./framebuffer";
 import { WebGLCompositor, Canvas2DCompositor } from "./compositor";
@@ -96,6 +97,9 @@ export class Runtime {
 
                 tone: this.apu.tone.bind(this.apu),
 
+                storageRead: this.storageRead.bind(this),
+                storageWrite: this.storageWrite.bind(this),
+
                 printf: (fmt, ptr) => {
                     if (websocket == null || websocket.readyState != 1) {
                         return 0;
@@ -178,6 +182,39 @@ export class Runtime {
         const rotate = (flags & 8);
 
         this.framebuffer.blit(sprite, x, y, width, height, srcX, srcY, stride, bpp2, flipX, flipY, rotate);
+    }
+
+    storageRead (destPtr, size) {
+        let str;
+        try {
+            str = localStorage.getItem("disk");
+        } catch (error) {
+            if (constants.DEBUG) {
+                console.error(error);
+            }
+        }
+        if (str == null) {
+            return 0;
+        }
+
+        const dest = new Uint8Array(this.memory.buffer, destPtr, Math.min(size, constants.STORAGE_SIZE));
+        const bytesRead = z85.decode(str, dest);
+        return bytesRead;
+    }
+
+    storageWrite (srcPtr, size) {
+        const bytesWritten = Math.min(size, constants.STORAGE_SIZE);
+        const src = new Uint8Array(this.memory.buffer, srcPtr, bytesWritten);
+        const str = z85.encode(src);
+        try {
+            localStorage.setItem("disk", str);
+        } catch (error) {
+            if (constants.DEBUG) {
+                console.error(error);
+            }
+            return 0;
+        }
+        return bytesWritten;
     }
 
     update () {

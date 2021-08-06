@@ -11,7 +11,10 @@ function setClass (element, className, enabled) {
 }
 
 (async function () {
-    const res = await fetch("cart.wasm");
+    const qs = new URL(document.location).searchParams;
+    const cartUrl = qs.has("url") ? qs.get("url") : "cart.wasm";
+
+    const res = await fetch(cartUrl);
     let wasmBuffer = await res.arrayBuffer();
 
     const runtime = new Runtime();
@@ -23,7 +26,7 @@ function setClass (element, className, enabled) {
         websocket.addEventListener("message", async event => {
             switch (event.data) {
             case "reload": case "hotswap":
-                const res = await fetch("cart.wasm");
+                const res = await fetch(cartUrl);
                 wasmBuffer = await res.arrayBuffer();
                 if (event.data == "reload") {
                     runtime.reset(true);

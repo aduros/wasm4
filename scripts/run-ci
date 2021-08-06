@@ -1,0 +1,14 @@
+#!/bin/sh -e
+
+runtime=$PWD/runtimes/web
+site=$PWD/site
+
+cd "$runtime"
+npm ci
+npm run build
+
+cd "$site"
+rm -rf static/embed
+cp -r "$runtime/dist" static/embed
+npm ci
+npm run build

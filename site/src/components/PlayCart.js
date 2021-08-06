@@ -28,18 +28,16 @@ import { Giscus } from "@giscus/react";
 // }
 
 function Embed ({ id, title, author }) {
-    const params = new URLSearchParams();
-    params.set("url", `/carts/${id}.wasm`);
+    let params = "?url="+encodeURIComponent(`/carts/${id}.wasm`);
     if (title) {
-        params.set("title", title);
+        params += "&title="+encodeURIComponent(title);
     }
     if (author) {
-        params.set("author", author);
+        params += "&author="+encodeURIComponent(author);
     }
-    // style={{position: "absolute", width: "100%", height: "100%"}}
     return (
         <iframe
-            src={`/embed/?${params.toString()}`}
+            src={`/embed/${params}`}
             allow="fullscreen"
             frameBorder="0"
             className="game-embed">

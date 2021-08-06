@@ -28,3 +28,14 @@
 html[data-theme='dark'] .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.3);
 }
+
+.game-container {
+  text-align: center;
+}
+
+.game-embed {
+  aspect-ratio: 1 / 1;
+  width: calc(min(480px, 100%, 100vh - 200px));
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}

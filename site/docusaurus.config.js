@@ -1,6 +1,11 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
+const CARTS = [
+    { id: "watris", title: "Watris", author: "Bruno Garcia" },
+    { id: "watris2", title: "Watris 2", author: "Bruno Garcia" },
+];
+
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: 'WASM-4',
@@ -106,5 +111,36 @@ module.exports = {
         },
       },
     ],
+  ],
+  plugins: [
+      function cartsPlugin (context, options) {
+          return {
+              name: "carts-plugin",
+              async contentLoaded ({ content, actions }) {
+                  const cartsJsonPath = await actions.createData("carts.json", JSON.stringify(CARTS));
+
+                  actions.addRoute({
+                      path: "/play",
+                      component: "@site/src/components/Carts",
+                      modules: {
+                          carts: cartsJsonPath,
+                      },
+                      exact: true,
+                  });
+
+                  for (let cart of CARTS) {
+                      const cartJsonPath = await actions.createData(`cart-${cart.id}.json`, JSON.stringify(cart));
+                      actions.addRoute({
+                          path: "/play/"+cart.id,
+                          component: "@site/src/components/PlayCart",
+                          modules: {
+                              cart: cartJsonPath,
+                          },
+                          exact: true,
+                      });
+                  }
+              },
+          }
+      }
   ],
 };

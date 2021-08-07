@@ -1,6 +1,18 @@
 import * as constants from "./constants";
 import { Runtime } from "./runtime";
-import { websocket } from "./websocket";
+import { websocket } from "./devkit";
+
+const qs = new URL(document.location).searchParams;
+const cartUrl = qs.has("url") ? qs.get("url") : "cart.wasm";
+
+const poster = document.getElementById("poster");
+let posterImg;
+const posterUrl = qs.get("screenshot");
+if (posterUrl != null) {
+    posterImg = document.createElement("img");
+    posterImg.src = posterUrl;
+    poster.appendChild(posterImg);
+}
 
 function setClass (element, className, enabled) {
     if (enabled) {
@@ -11,8 +23,6 @@ function setClass (element, className, enabled) {
 }
 
 (async function () {
-    const qs = new URL(document.location).searchParams;
-    const cartUrl = qs.has("url") ? qs.get("url") : "cart.wasm";
 
     const res = await fetch(cartUrl);
     let wasmBuffer = await res.arrayBuffer();
@@ -20,7 +30,27 @@ function setClass (element, className, enabled) {
     const runtime = new Runtime();
     const canvas = runtime.canvas;
     document.getElementById("content").appendChild(canvas);
-    await runtime.boot(wasmBuffer);
+    await runtime.load(wasmBuffer);
+
+    if (posterImg != null) {
+        await new Promise(resolve => {
+            posterImg.onpointerdown = function () {
+                posterImg.onpointerdown = null;
+                runtime.unlockAudio();
+                resolve();
+            };
+        });
+
+        window.onblur = function () {
+            poster.style.display = "";
+        }
+        window.onfocus = function () {
+            poster.style.display = "none";
+        }
+        poster.style.display = "none";
+    }
+
+    runtime.start();
 
     if (websocket != null) {
         websocket.addEventListener("message", async event => {
@@ -31,7 +61,8 @@ function setClass (element, className, enabled) {
                 if (event.data == "reload") {
                     runtime.reset(true);
                 }
-                runtime.boot(wasmBuffer);
+                runtime.load(wasmBuffer);
+                runtime.start();
                 break;
             }
         });
@@ -39,7 +70,8 @@ function setClass (element, className, enabled) {
 
     function reboot () {
         runtime.reset(true);
-        runtime.boot(wasmBuffer);
+        runtime.load(wasmBuffer);
+        runtime.start();
     }
 
     function takeScreenshot () {

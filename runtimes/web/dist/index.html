@@ -13,33 +13,26 @@
       background: #202020;
       touch-action: none;
     }
-    #content {
+
+    .container {
       width: 100%;
       height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    #content canvas {
+    #content {
+      width: 100vmin;
+      height: 100vmin;
+      overflow: hidden;
+    }
+
+    #content canvas, #poster img {
+      width: 100%;
+      height: 100%;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
-      width: auto;
-      height: 100%;
     }
-    @media (max-aspect-ratio: 1/1) {
-      body {
-        /* background: green; */
-      }
-      #content canvas {
-        width: 100%;
-        height: auto;
-      }
-    }
-    /* @media (max-aspect-ratio: 4/5) and (orientation: portrait) { */
-    /*   #content { */
-    /*     height: 70%; */
-    /*   } */
-    /* } */
 
     @media (pointer: fine) {
       .gamepad {
@@ -112,10 +105,55 @@
     #gamepad-action1.pressed, #gamepad-action2.pressed {
       background: #A93671;
     }
+
+    .play-button {
+      box-sizing: border-box;
+      position: relative;
+      display: block;
+      /* transform: scale(var(--ggs,1)); */
+      transform: scale(10);
+      width: 22px;
+      height: 22px;
+      border: 2px solid;
+      border-radius: 20px
+    }
+    .play-button::before {
+      content: "";
+      display: block;
+      box-sizing: border-box;
+      position: absolute;
+      width: 0;
+      height: 10px;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      border-left: 6px solid;
+      top: 4px;
+      left: 7px
+    }
+
+    .info {
+      position: absolute;
+      background: rgba(0,0,0,0.5);
+      width: 100vmin;
+    }
+
+    #poster {
+      /* position: absolute; */
+    }
   </style>
 </head>
 <body>
-  <div id="content"></div>
+  <div class="container">
+    <div id="content">
+      <!-- <div class="info"> -->
+      <!--   <h2 class="title">Watris</h2> -->
+      <!--   <h4 class="author">by Bruno Garcia</h4> -->
+      <!-- </div> -->
+      <div id="poster">
+      </div>
+      <!-- <span class="play&#45;button"></span> -->
+    </div>
+  </div>
   <div class="gamepad">
     <div id="gamepad-dpad"></div>
     <div id="gamepad-action1"></div>

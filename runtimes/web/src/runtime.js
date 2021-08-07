@@ -3,7 +3,7 @@ import * as z85 from "./z85";
 import { APU } from "./apu";
 import { Framebuffer } from "./framebuffer";
 import { WebGLCompositor, Canvas2DCompositor } from "./compositor";
-import { websocket } from "./websocket";
+import { websocket } from "./devkit";
 
 export class Runtime {
     constructor () {
@@ -85,7 +85,7 @@ export class Runtime {
         this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
     }
 
-    async boot (wasmBuffer) {
+    async load (wasmBuffer) {
         const module = await WebAssembly.instantiate(wasmBuffer, {
             env: {
                 memory: this.memory,
@@ -101,9 +101,6 @@ export class Runtime {
                 storageWrite: this.storageWrite.bind(this),
 
                 printf: (fmt, ptr) => {
-                    if (websocket == null || websocket.readyState != 1) {
-                        return 0;
-                    }
                     var output = "";
                     let ch;
                     while (ch = this.data.getUint8(fmt++)) {
@@ -132,7 +129,9 @@ export class Runtime {
                     const length = output.length;
                     if (length > 0) {
                         console.log(output);
-                        websocket.send(output);
+                        if (websocket != null && websocket.readyState == 1) {
+                            websocket.send(output);
+                        }
                     }
                     return length;
                 },
@@ -155,10 +154,6 @@ export class Runtime {
             },
         });
         this.wasm = module.instance;
-
-        if (this.wasm.exports.start != null) {
-            this.wasm.exports.start();
-        }
     }
 
     drawRect (x, y, width, height, flags) {
@@ -215,6 +210,12 @@ export class Runtime {
             return 0;
         }
         return bytesWritten;
+    }
+
+    start () {
+        if (this.wasm.exports.start != null) {
+            this.wasm.exports.start();
+        }
     }
 
     update () {

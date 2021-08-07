@@ -29,6 +29,8 @@ import { Giscus } from "@giscus/react";
 
 function Embed ({ id, title, author }) {
     let params = "?url="+encodeURIComponent(`/carts/${id}.wasm`);
+    // params += "&screenshot="+encodeURIComponent(`/carts/${id}.png`);
+    params += "&screenshot="+encodeURIComponent("https://placekitten.com/160");
     if (title) {
         params += "&title="+encodeURIComponent(title);
     }
@@ -47,8 +49,6 @@ function Embed ({ id, title, author }) {
 
 export default function PlayCart ({ cart }) {
     const {siteConfig} = useDocusaurusContext();
-    // <div style={{position: "relative", width: "calc(min(480px, 100%, 100vh - 200px))"}}>
-        // <div style={{"padding-bottom": "100%", position: "relative"}}>
     return (
         <Layout
             title={cart.title}

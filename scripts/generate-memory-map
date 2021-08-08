@@ -1,0 +1,54 @@
+#!/usr/bin/env node
+
+const memory = {
+    PALETTE: 3*4,
+    DRAW_COLORS: 2,
+    // CLIP_X: 1,
+    // CLIP_Y: 1,
+    // CLIP_WIDTH: 1,
+    // CLIP_HEIGHT: 1,
+
+    // FIXME(2021-08-01): Make sure framebuffer is word aligned?
+    // TODO(2021-08-01): Move framebuffer last in memory layout
+    FRAMEBUFFER: 160*160 >> 2,
+
+    GAMEPAD1: 1,
+    GAMEPAD2: 1,
+    GAMEPAD3: 1,
+    GAMEPAD4: 1,
+    MOUSE_X: 1,
+    MOUSE_Y: 1,
+    MOUSE_BUTTONS: 1,
+};
+
+const types = {
+    PALETTE: "unsigned char",
+    DRAW_COLORS: "unsigned short",
+    FRAMEBUFFER: "unsigned char",
+};
+
+var p = 0;
+for (let k in memory) {
+    const hex = `0x${p.toString(16).padStart(4, "0")}`;
+    console.log(`#define ${k} ((${types[k] || "const unsigned char"}*)${hex})`);
+    p += memory[k];
+}
+console.log();
+
+var p = 0;
+for (let k in memory) {
+    const hex = `0x${p.toString(16).padStart(4, "0")}`;
+    console.log(`export const ADDR_${k} = ${hex};`);
+    p += memory[k];
+}
+console.log();
+
+var p = 0;
+for (let k in memory) {
+    const hex = `0x${p.toString(16).padStart(4, "0")}`;
+    console.log(`pub const ${k}: Register<u8> = Register::new(${hex});`);
+    p += memory[k];
+}
+
+console.log()
+console.log("--global-base="+p);

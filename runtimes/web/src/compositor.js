@@ -108,13 +108,21 @@ export class WebGLCompositor {
 
     composite (palette, framebuffer) {
         const gl = this.gl;
+        const bytes = framebuffer.bytes, colorBuffer = this.colorBuffer, table = this.table;
 
         // Upload palette
+        // TODO(2021-08-08): Don't upload if the palette is unchanged
+        const rgb = new Uint8Array(colorBuffer.buffer, 3*4);
+        for (let ii = 0, n = 0; ii < 4; ++ii) {
+            const argb = palette[ii];
+            rgb[n++] = argb >> 16;
+            rgb[n++] = argb >> 8;
+            rgb[n++] = argb;
+        }
         gl.activeTexture(GL.TEXTURE0);
-        gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGB, 4, 1, 0, GL.RGB, GL.UNSIGNED_BYTE, palette);
+        gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGB, 4, 1, 0, GL.RGB, GL.UNSIGNED_BYTE, rgb);
 
         // Unpack the framebuffer into one byte per pixel
-        const bytes = framebuffer.bytes, colorBuffer = this.colorBuffer, table = this.table;
         for (let ii = 0; ii < WIDTH*HEIGHT >> 2; ++ii) {
             colorBuffer[ii] = table[bytes[ii]];
         }

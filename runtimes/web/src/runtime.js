@@ -77,11 +77,11 @@ export class Runtime {
 
     reset (zeroMemory) {
         // Initialize default color table and palette
-        const mem8 = new Uint8Array(this.memory.buffer);
+        const mem32 = new Uint32Array(this.memory.buffer);
         if (zeroMemory) {
-            mem8.fill(0);
+            mem32.fill(0);
         }
-        mem8.set(constants.COLORS, constants.ADDR_PALETTE);
+        mem32.set(constants.COLORS, constants.ADDR_PALETTE >> 2);
         this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
     }
 
@@ -232,7 +232,8 @@ export class Runtime {
     }
 
     composite () {
-        const palette = new Uint8Array(this.memory.buffer, constants.ADDR_PALETTE, 3*4);
+        const palette = new Uint32Array(this.memory.buffer, constants.ADDR_PALETTE, 4*4);
+
         this.compositor.composite(palette, this.framebuffer);
     }
 }

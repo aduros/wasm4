@@ -61,16 +61,16 @@ function setClass (element, className, enabled) {
                 if (event.data == "reload") {
                     runtime.reset(true);
                 }
-                runtime.load(wasmBuffer);
+                await runtime.load(wasmBuffer);
                 runtime.start();
                 break;
             }
         });
     }
 
-    function reboot () {
+    async function reboot () {
         runtime.reset(true);
-        runtime.load(wasmBuffer);
+        await runtime.load(wasmBuffer);
         runtime.start();
     }
 

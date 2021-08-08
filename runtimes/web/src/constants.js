@@ -9,23 +9,23 @@ export const STORAGE_SIZE = 1024;
 
 // Default palette
 export const COLORS = [
-    0xe0,0xf8,0xd0,
-    0x88,0xc0,0x70,
-    0x34,0x68,0x56,
-    0x08,0x18,0x20,
+    0xe0f8d0,
+    0x88c070,
+    0x346856,
+    0x081820,
 ];
 
 // Memory layout
-export const ADDR_PALETTE = 0x0000;
-export const ADDR_DRAW_COLORS = 0x000c;
-export const ADDR_FRAMEBUFFER = 0x000e;
-export const ADDR_GAMEPAD1 = 0x190e;
-export const ADDR_GAMEPAD2 = 0x190f;
-export const ADDR_GAMEPAD3 = 0x1910;
-export const ADDR_GAMEPAD4 = 0x1911;
-export const ADDR_MOUSE_X = 0x1912;
-export const ADDR_MOUSE_Y = 0x1913;
-export const ADDR_MOUSE_BUTTONS = 0x1914;
+export const ADDR_PALETTE = 0x04;
+export const ADDR_DRAW_COLORS = 0x14;
+export const ADDR_GAMEPAD1 = 0x16;
+export const ADDR_GAMEPAD2 = 0x17;
+export const ADDR_GAMEPAD3 = 0x18;
+export const ADDR_GAMEPAD4 = 0x19;
+export const ADDR_MOUSE_X = 0x1a;
+export const ADDR_MOUSE_Y = 0x1b;
+export const ADDR_MOUSE_BUTTONS = 0x1c;
+export const ADDR_FRAMEBUFFER = 0xa0;
 
 export const BUTTON_X = 1;
 export const BUTTON_Z = 2;

@@ -48,7 +48,7 @@
     <style
        id="style65">
       .cls-1 {
-        fill: #654ff0;
+        fill: #638f34;
       }
     </style>
   </defs>
@@ -75,27 +75,27 @@
     </g>
   </g>
   <circle
-     style="fill:#ffffff;stroke-width:0.871886"
+     style="fill:#d5f66e;stroke-width:0.871886"
      id="path128"
      cx="70.539375"
      cy="79.037666"
      r="9" />
   <rect
-     style="fill:#ffffff;stroke-width:0.778069"
+     style="fill:#d2e6bc;stroke-width:0.778069"
      id="rect150"
      width="10"
      height="35"
      x="24.339548"
      y="51.827705" />
   <rect
-     style="fill:#ffffff;stroke-width:0.778069"
+     style="fill:#d2e6bc;stroke-width:0.778069"
      id="rect150-1"
      width="35"
      height="10"
      x="11.345667"
      y="63.991669" />
   <circle
-     style="fill:#ffffff;stroke-width:0.871887"
+     style="fill:#d2e6bc;stroke-width:0.871887"
      id="path128-0"
      cx="87"
      cy="59.400848"

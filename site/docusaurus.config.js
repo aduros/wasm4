@@ -31,13 +31,23 @@ module.exports = {
           type: 'doc',
           docId: 'intro',
           position: 'left',
-          label: 'Docs',
+          label: 'Learn',
         },
         {to: '/blog', label: 'Blog', position: 'left'},
-        {to: '/community', label: 'Community', position: 'left'},
+        {to: '/blog', label: 'Community', position: 'left'},
+        // {
+        //   href: 'https://github.com/aduros/wasm4',
+        //   label: 'GitHub',
+        //   position: 'right',
+        // },
         {
-          href: 'https://github.com/aduros/wasm4',
-          label: 'GitHub',
+          href: 'https://github.com/facebook/docusaurus',
+          position: 'right',
+          className: 'header-github-link',
+          'aria-label': 'GitHub repository',
+        },
+        {
+          type: 'search',
           position: 'right',
         },
       ],
@@ -95,6 +105,10 @@ module.exports = {
       defaultMode: 'dark',
       disableSwitch: true,
       respectPrefersColorScheme: false,
+    },
+    algolia: {
+      apiKey: '47ecd3b21be71c5822571b9f59e52544',
+      indexName: 'docusaurus-2',
     },
   },
   presets: [

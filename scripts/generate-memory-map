@@ -14,11 +14,11 @@ const memory = {
     GAMEPAD2: 1,
     GAMEPAD3: 1,
     GAMEPAD4: 1,
-    MOUSE_X: 1,
-    MOUSE_Y: 1,
+    MOUSE_X: 2,
+    MOUSE_Y: 2,
     MOUSE_BUTTONS: 1,
 
-    _RESERVED: 131,
+    _RESERVED: 129,
 
     // Framebuffer should be 64 bit aligned
     FRAMEBUFFER: 160*160 >> 2,
@@ -27,6 +27,8 @@ const memory = {
 const cTypes = {
     PALETTE: "unsigned int",
     DRAW_COLORS: "unsigned short",
+    MOUSE_X: "const short",
+    MOUSE_Y: "const short",
     FRAMEBUFFER: "unsigned char",
 };
 

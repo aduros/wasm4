@@ -23,8 +23,8 @@ export const ADDR_GAMEPAD2 = 0x17;
 export const ADDR_GAMEPAD3 = 0x18;
 export const ADDR_GAMEPAD4 = 0x19;
 export const ADDR_MOUSE_X = 0x1a;
-export const ADDR_MOUSE_Y = 0x1b;
-export const ADDR_MOUSE_BUTTONS = 0x1c;
+export const ADDR_MOUSE_Y = 0x1c;
+export const ADDR_MOUSE_BUTTONS = 0x1e;
 export const ADDR_FRAMEBUFFER = 0xa0;
 
 export const BUTTON_X = 1;

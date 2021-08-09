@@ -32,8 +32,8 @@ export class Runtime {
     }
 
     setMouse (x, y, buttons) {
-        this.data.setUint8(constants.ADDR_MOUSE_X, x);
-        this.data.setUint8(constants.ADDR_MOUSE_Y, y);
+        this.data.setInt16(constants.ADDR_MOUSE_X, x);
+        this.data.setInt16(constants.ADDR_MOUSE_Y, y);
         this.data.setUint8(constants.ADDR_MOUSE_BUTTONS, buttons);
     }
 

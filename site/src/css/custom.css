@@ -50,6 +50,20 @@ html[data-theme='dark'] .header-github-link:before {
     no-repeat;
 }
 
+.cart a:hover {
+  text-decoration: none;
+  color: var(--ifm-color-primary);
+}
+.cart a {
+  color: var(--ifm-navbar-link-color);
+}
+
+.cart .screenshot {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  width: 100%;
+}
+
 .game-container {
   text-align: center;
 }

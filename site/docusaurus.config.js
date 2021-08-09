@@ -2,8 +2,13 @@ const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 const CARTS = [
-    { id: "watris", title: "Watris", author: "Bruno Garcia" },
-    { id: "watris2", title: "Watris 2", author: "Bruno Garcia" },
+    { id: "watris", title: "Watris", author: "Bruno Garcia", github: "aduros" },
+    { id: "watris2", title: "Watris 2", author: "Bruno Garcia", github: "aduros" },
+    { id: "watris3", title: "Watris 3", author: "Bruno Garcia", github: "aduros" },
+    { id: "watris4", title: "Watris 4", author: "Bruno Garcia", github: "aduros" },
+    { id: "watris5", title: "Watris 5", author: "Bruno Garcia", github: "aduros" },
+    { id: "watris6", title: "Watris 6", author: "Bruno Garcia", github: "aduros" },
+    { id: "watris7", title: "Watris 7", author: "Bruno Garcia", github: "aduros" },
 ];
 
 /** @type {import('@docusaurus/types').DocusaurusConfig} */

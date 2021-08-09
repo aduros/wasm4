@@ -139,7 +139,7 @@ function setClass (element, className, enabled) {
             const bounds = canvas.getBoundingClientRect();
             const x = Math.fround(constants.WIDTH * (event.clientX - bounds.left) / bounds.width);
             const y = Math.fround(constants.HEIGHT * (event.clientY - bounds.top) / bounds.height);
-            const buttons = event.buttons;
+            const buttons = event.buttons & 0b111;
             runtime.setMouse(x, y, buttons);
         }
     };

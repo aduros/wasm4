@@ -41,7 +41,7 @@ module.exports = {
         //   position: 'right',
         // },
         {
-          href: 'https://github.com/facebook/docusaurus',
+          href: 'https://github.com/aduros/wasm4',
           position: 'right',
           className: 'header-github-link',
           'aria-label': 'GitHub repository',

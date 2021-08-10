@@ -21,16 +21,18 @@ program.command("publish <cart>")
 
 program.command("png2code <images...>")
     .option("--c", "Generate C/C++ source")
-    .option("--rs, --rust", "Generate Rust source")
     .option("--as, --assemblyscript", "Generate AssemblyScript source")
+    .option("--rs, --rust", "Generate Rust source")
+    .option("--go", "Generate Go source")
     .action((images, opts) => {
         const png2code = require("./lib/png2code");
-        console.log(opts);
         let lang = "c";
-        if (opts.rust) {
-            lang = "rust";
-        } else if (opts.assemblyscript) {
+        if (opts.assemblyscript) {
             lang = "assemblyscript";
+        } else if (opts.rust) {
+            lang = "rust";
+        } else if (opts.go) {
+            lang = "go";
         }
         png2code.runAll(images, { lang });
     });

@@ -106,6 +106,15 @@ function run (sourceFile, { lang }) {
         console.log(" ];");
         break;
 
+    case "go":
+        console.log(`const ${varName}_WIDTH = ${png.width};`);
+        console.log(`const ${varName}_HEIGHT = ${png.height};`);
+        console.log(`const ${varName}_FLAGS = ${flags}; // ${flagsHumanReadable}`);
+        process.stdout.write(`var ${varName} = [${bytes.length}]byte { `);
+        printBytes();
+        console.log(" };");
+        break;
+
     default: // C
         console.log(`#define ${varName}_WIDTH ${png.width}`);
         console.log(`#define ${varName}_HEIGHT ${png.height}`);

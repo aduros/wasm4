@@ -1,16 +1,16 @@
 # Functions
 
-All function parameters are 32 bit integers.
+All function parameters are 32 bit integers unless otherwise noted.
 
 ## Drawing
 
 All drawing functions are affected by the [`DRAW_COLORS`](memory#draw_colors) register.
 
-### `blit (sprite, x, y, width, height, flags)`
+### `blit (spritePtr, x, y, width, height, flags)`
 
 Copies pixels to the framebuffer.
 
-* `sprite`: Pointer to raw pixel data stored in either 1BPP or 2BPP format.
+* `spritePtr`: Pointer to raw pixel data stored in either 1BPP or 2BPP format.
 * `x`: X position in the destination framebuffer.
 * `y`: Y position in the destination framebuffer.
 * `width`: Width of the sprite.
@@ -27,7 +27,7 @@ Copies pixels to the framebuffer.
 A 1BPP sprite uses 1 bit for each pixel and can contain up to 2 colors. A 2BPP sprite uses 2 bits per
 pixel and can contain up to 4 colors.
 
-### `blitSub (sprite, x, y, width, height, srcX, srcY, stride, flags)`
+### `blitSub (spritePtr, x, y, width, height, srcX, srcY, stride, flags)`
 
 Copies a subregion within a larger sprite atlas to the framebuffer. Same as `blit`, but with 3
 additional parameters.
@@ -36,7 +36,7 @@ additional parameters.
 * `srcY`: Source Y position of the sprite region.
 * `stride`: Total width of the overall sprite atlas. This is typically larger than `width`.
 
-For info on other parameters, see `blit`.
+For info on other parameters, see `blit()`.
 
 ### `rect (x, y, width, height)`
 
@@ -50,12 +50,21 @@ Draws a circle (ellipse).
 
 `DRAW_COLORS` color 0 is used as the fill color, `DRAW_COLORS` color 1 is used as the stroke color.
 
-### `text (string, x, y)`
+### `text (str, x, y)`
 
-Draws text using the built-in system font. `string` is a pointer to a null terminated ASCII string.
-The string may contain new-line (`\n`) characters.
+Draws text using the built-in system font. The string may contain new-line (`\n`) characters.
 
 `DRAW_COLORS` color 0 is used as the text color, `DRAW_COLORS` color 1 is used as the background color.
+
+:::note
+
+By default, `str` is expected to be a `\0` terminated ASCII string. There are 2 additional variants
+of this function for passing unterminated UTF-8 and UTF-16 strings along with a byte length.
+
+* `textUtf8 (strUtf8, byteLength, x, y)`
+* `textUtf16 (strUtf16, byteLength, x, y)`
+
+:::
 
 ### `line (x1, y1, x2, y2)`
 
@@ -103,15 +112,15 @@ finally fades to zero volume during the release time.
 
 Games can store up to 1024 bytes of persisted data.
 
-### `storageRead (dest, size)`
+### `storageRead (destPtr, size)`
 
-Reads up to `size` bytes from persistent storage into the pointer `dest`.
+Reads up to `size` bytes from persistent storage into the pointer `destPtr`.
 
 Returns the number of bytes read, which may be less than `size`.
 
-### `storageWrite (src, size)`
+### `storageWrite (srcPtr, size)`
 
-Writes up to `size` bytes from the pointer `src` into persistent storage.
+Writes up to `size` bytes from the pointer `srcPtr` into persistent storage.
 
 Returns the number of bytes written, which may be less than `size`.
 
@@ -126,3 +135,37 @@ Called at the start of the game, before the first update.
 ### `update ()`
 
 Called every frame, about 60 times per second.
+
+## Other
+
+### `print (str)`
+
+Prints `str` to the console log.
+
+:::note
+
+By default, `str` is expected to be a `\0` terminated ASCII string. There are 2 additional variants
+of this function for passing unterminated UTF-8 and UTF-16 strings along with a byte length.
+
+* `printUtf8 (strUtf8, byteLength, x, y)`
+* `printUtf16 (strUtf16, byteLength, x, y)`
+
+:::
+
+### `printf (fmt, stackPtr)`
+
+Used to implement a limited `printf` for C/C++. Only the following formatting characters are supported:
+
+* `%c`: Character
+* `%d`: Decimal
+* `%f`: Float
+* `%s`: String
+* `%x`: Hex
+
+### `memset (destPtr, value, size)`
+
+Fills memory at `destPtr` with `size` bytes of the fixed value `value`.
+
+### `memcpy (destPtr, srcPtr, size)`
+
+Copies `size` bytes from `srcPtr` into `destPtr`.

@@ -24,13 +24,26 @@ WASM-4 uses a fixed memory layout of 64 KB.
 | 16 - 23 | Red channel           |
 | 24 - 31 | -                     |
 
+### DRAW_COLORS
+
+Indexes into the color palette used by all drawing functions.
+
+| Bits    | Description   |
+| ---     | ---           |
+| 0 - 3   | Draw color 0 |
+| 4 - 7   | Draw color 1 |
+| 8 - 11  | Draw color 2 |
+| 12 - 15 | Draw color 3 |
+
+Each draw color can be a value between 0 and 3 representing a palette color index, or 15 (#F) to
+signify "transparent".
+
 Example:
 
 ```c
-PALETTE[0] = 0xffa500; // Set palette color #0 to orange
+// Set the first draw color to 1, the second to 0, and the third to transparent
+*DRAW_COLORS = 0xf01;
 ```
-
-### DRAW_COLORS
 
 ### GAMEPADS
 
@@ -46,14 +59,6 @@ PALETTE[0] = 0xffa500; // Set palette color #0 to orange
 | 5   | D-pad right   |
 | 6   | D-pad up      |
 | 7   | D-pad down    |
-
-Example:
-
-```c
-if (*GAMEPAD1 | 2) {
-    // Z button was pressed
-}
-```
 
 ### MOUSE_X
 

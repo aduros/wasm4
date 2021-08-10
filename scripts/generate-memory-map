@@ -32,6 +32,18 @@ const cTypes = {
     FRAMEBUFFER: "unsigned char",
 };
 
+const rustTypes = {
+    // TODO(2021-08-10)
+};
+
+const goTypes = {
+    PALETTE: "[4]uint32",
+    DRAW_COLORS: "uint16",
+    MOUSE_X: "uint16",
+    MOUSE_Y: "uint16",
+    FRAMEBUFFER: "[6400]uint8",
+};
+
 function generate (fn) {
     let p = 0;
     for (let name in memory) {
@@ -44,17 +56,20 @@ function generate (fn) {
     console.log();
 }
 
-// Runtime constants.js
+console.log("// Runtime constants.js");
 generate((name, addr) => `export const ADDR_${name} = ${addr};`);
 
-// C
+console.log("// C");
 generate((name, addr) => `#define ${name} ((${cTypes[name] || "const unsigned char"}*)${addr})`);
 
-// AssemblyScript
-generate((name, addr) => `export const ${name} = ${addr};`);
+console.log("// AssemblyScript");
+generate((name, addr) => `export const ${name}: usize = ${addr};`);
 
-// Rust
+console.log("// Rust");
 generate((name, addr) => `pub const ${name}: Register<u8> = Register::new(${addr});`);
+
+console.log("// Go");
+generate((name, addr) => `var ${name} = (*${goTypes[name] || "uint8"})(unsafe.Pointer(uintptr(${addr})));`);
 
 var sum = 0;
 for (let name in memory) {

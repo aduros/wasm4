@@ -92,7 +92,7 @@ export class Runtime {
                 memory: this.memory,
 
                 rect: this.framebuffer.drawRect.bind(this.framebuffer),
-                circle: this.framebuffer.drawCircle.bind(this.framebuffer),
+                oval: this.framebuffer.drawOval.bind(this.framebuffer),
                 line: this.framebuffer.drawLine.bind(this.framebuffer),
 
                 text: this.text.bind(this),

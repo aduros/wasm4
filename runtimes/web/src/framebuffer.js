@@ -79,11 +79,59 @@ export class Framebuffer {
         }
     }
 
-    drawCircle (x, y, width, height) {
-        throw new Error("TODO(2021-08-11): circle()");
+    drawOval (x0, y0, a, b) {
+        // TODO(2021-08-11): Implement oval()
+        //
+        // const drawColors = this.drawColors[0];
+        // // const color0 = drawColors & 0xf;
+        // const color1 = (drawColors >> 4) & 0xf;
+        // if (color1 == 0xf) {
+        //     return;
+        // }
+        // const strokeColor = color1 & 0x3;
+        //
+        // if(a <= 0) return;
+        // if(b <= 0) return;
+        //
+        // let aa2 = a*a*2, bb2 = b*b*2;
+        //
+        // {
+        //     let x = a, y = 0;
+        //     let dx = (1-2*a)*b*b, dy = a*a;
+        //     let sx = bb2*a, sy=0;
+        //     let e = 0;
+        //
+        //     while (sx >= sy)
+        //     {
+        //         this.drawPoint(strokeColor, (x0+x), (y0+y)); /*   I. Quadrant */
+        //         this.drawPoint(strokeColor, (x0+x), (y0-y)); /*  II. Quadrant */
+        //         this.drawPoint(strokeColor, (x0-x), (y0+y)); /* III. Quadrant */
+        //         this.drawPoint(strokeColor, (x0-x), (y0-y)); /*  IV. Quadrant */
+        //         y++; sy += aa2; e += dy; dy += aa2;
+        //         if(2*e+dx >0) { x--; sx -= bb2; e  += dx; dx += bb2; }
+        //     }
+        // }
+        //
+        // {
+        //     let x = 0, y = b;
+        //     let dx = b*b, dy = (1-2*b)*a*a;
+        //     let sx = 0, sy=aa2*b;
+        //     let e = 0;
+        //
+        //     while (sy >= sx)
+        //     {
+        //         this.drawPoint(strokeColor, (x0+x), (y0+y)); /*   I. Quadrant */
+        //         this.drawPoint(strokeColor, (x0+x), (y0-y)); /*  II. Quadrant */
+        //         this.drawPoint(strokeColor, (x0-x), (y0+y)); /* III. Quadrant */
+        //         this.drawPoint(strokeColor, (x0-x), (y0-y)); /*  IV. Quadrant */
+        //
+        //         x++; sx += bb2; e += dx; dx += bb2;
+        //         if(2*e+dy >0) { y--; sy -= aa2; e  += dy; dy += aa2; }
+        //     }
+        // }
     }
 
-    // Implementation from http://www.brackeen.com/vga/source/djgpp20/lines.c.html
+    // From https://github.com/nesbox/TIC-80/blob/master/src/core/draw.c
     drawLine (x1, y1, x2, y2) {
         const drawColors = this.drawColors[0];
         const color1 = (drawColors >> 4) & 0xf;
@@ -92,42 +140,33 @@ export class Framebuffer {
         }
         const strokeColor = color1 & 0x3;
 
-        const dx = x2 - x1;
+        if (y1 > y2) {
+            let swap = x1;
+            x1 = x2;
+            x2 = swap;
+
+            swap = y1;
+            y1 = y2;
+            y2 = swap;
+        }
+
+        const dx = Math.abs(x2 - x1), sx = x1 < x2 ? 1 : -1;
         const dy = y2 - y1;
-        const dxabs = Math.abs(dx);
-        const dyabs = Math.abs(dy);
-        const sdx = Math.sign(dx);
-        const sdy = Math.sign(dy);
+        let err = (dx > dy ? dx : -dy) / 2, e2;
 
-        let x = dyabs >> 1;
-        let y = dxabs >> 1;
-        let px = x1;
-        let py = y1;
-
-        this.drawPointUnclipped(strokeColor, px, py);
-
-        if (dxabs >= dyabs) {
-            // The line is more horizontal than vertical
-            for (let ii = 0; ii < dxabs; ii++) {
-                y += dyabs;
-                if (y >= dxabs) {
-                    y -= dxabs;
-                    py += sdy;
-                }
-                px += sdx;
-                this.drawPointUnclipped(strokeColor, px, py);
+        for (;;) {
+            this.drawPointUnclipped(strokeColor, x1, y1);
+            if (x1 == x2 && y1 == y2) {
+                break;
             }
-
-        } else {
-            // The line is more vertical than horizontal
-            for (let ii = 0; ii < dyabs; ii++) {
-                x += dxabs;
-                if (x >= dyabs) {
-                    x -= dyabs;
-                    px += sdx;
-                }
-                py += sdy;
-                this.drawPointUnclipped(strokeColor, px, py);
+            e2 = err;
+            if (e2 > -dx) {
+                err -= dy;
+                x1 += sx;
+            }
+            if (e2 < dy) {
+                err += dx;
+                y1++;
             }
         }
     }

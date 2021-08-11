@@ -13,11 +13,17 @@ export class Framebuffer {
         this.bytes.fill(0);
     }
 
-    set (color, x, y) {
+    drawPoint (color, x, y) {
         const idx = (WIDTH*y + x) >> 2;
         const shift = (x & 0x3) << 1;
         const mask = 0x3 << shift;
         this.bytes[idx] = (color << shift) | (this.bytes[idx] & (~mask));
+    }
+
+    drawPointUnclipped (color, x, y) {
+        if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
+            this.drawPoint(color, x, y);
+        }
     }
 
     drawRect (x, y, width, height) {
@@ -35,7 +41,7 @@ export class Framebuffer {
 
             for (let yy = startY; yy < endY; ++yy) {
                 for (let xx = startX; xx < endX; ++xx) {
-                    this.set(fillColor, xx, yy);
+                    this.drawPoint(fillColor, xx, yy);
                 }
             }
         }
@@ -46,28 +52,28 @@ export class Framebuffer {
             // Left edge
             if (x >= 0 && x < WIDTH) {
                 for (let yy = startY; yy < endY; ++yy) {
-                    this.set(strokeColor, x, yy);
+                    this.drawPoint(strokeColor, x, yy);
                 }
             }
 
             // Right edge
             if (endX > 0 && endX < WIDTH) {
                 for (let yy = startY; yy < endY; ++yy) {
-                    this.set(strokeColor, endX-1, yy);
+                    this.drawPoint(strokeColor, endX-1, yy);
                 }
             }
 
             // Top edge
             if (y >= 0 && y < HEIGHT) {
                 for (let xx = startX; xx < endX; ++xx) {
-                    this.set(strokeColor, xx, y);
+                    this.drawPoint(strokeColor, xx, y);
                 }
             }
 
             // Bottom edge
             if (endY > 0 && endY < HEIGHT) {
                 for (let xx = startX; xx < endX; ++xx) {
-                    this.set(strokeColor, xx, endY-1);
+                    this.drawPoint(strokeColor, xx, endY-1);
                 }
             }
         }
@@ -77,8 +83,53 @@ export class Framebuffer {
         throw new Error("TODO(2021-08-11): circle()");
     }
 
+    // Implementation from http://www.brackeen.com/vga/source/djgpp20/lines.c.html
     drawLine (x1, y1, x2, y2) {
-        throw new Error("TODO(2021-08-11): line()");
+        const drawColors = this.drawColors[0];
+        const color1 = (drawColors >> 4) & 0xf;
+        if (color1 == 0xf) {
+            return;
+        }
+        const strokeColor = color1 & 0x3;
+
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const dxabs = Math.abs(dx);
+        const dyabs = Math.abs(dy);
+        const sdx = Math.sign(dx);
+        const sdy = Math.sign(dy);
+
+        let x = dyabs >> 1;
+        let y = dxabs >> 1;
+        let px = x1;
+        let py = y1;
+
+        this.drawPointUnclipped(strokeColor, px, py);
+
+        if (dxabs >= dyabs) {
+            // The line is more horizontal than vertical
+            for (let ii = 0; ii < dxabs; ii++) {
+                y += dyabs;
+                if (y >= dxabs) {
+                    y -= dxabs;
+                    py += sdy;
+                }
+                px += sdx;
+                this.drawPointUnclipped(strokeColor, px, py);
+            }
+
+        } else {
+            // The line is more vertical than horizontal
+            for (let ii = 0; ii < dyabs; ii++) {
+                x += dxabs;
+                if (x >= dyabs) {
+                    x -= dyabs;
+                    px += sdx;
+                }
+                py += sdy;
+                this.drawPointUnclipped(strokeColor, px, py);
+            }
+        }
     }
 
     drawText (charArray, x, y) {
@@ -146,7 +197,7 @@ export class Framebuffer {
                 // Get the final color using the drawColors indirection
                 const color = (drawColors >> (colorIdx << 2)) & 0x0f;
                 if (color != 0x0f) {
-                    this.set(color & 0x03, dstX + col, dstY + row);
+                    this.drawPoint(color & 0x03, dstX + col, dstY + row);
                 }
             }
         }

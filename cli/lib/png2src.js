@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const pngjs = require("pngjs");
 
-function run (sourceFile, { lang }) {
+function run (sourceFile, lang) {
     const png = pngjs.PNG.sync.read(fs.readFileSync(sourceFile), {
         colorType: 1,
         inputColorType: 1,
@@ -128,13 +128,22 @@ function run (sourceFile, { lang }) {
 exports.run = run;
 
 function runAll (files, opts) {
+    let lang = "c";
+    if (opts.assemblyscript) {
+        lang = "assemblyscript";
+    } else if (opts.rust) {
+        lang = "rust";
+    } else if (opts.go) {
+        lang = "go";
+    }
+
     for (let ii = 0; ii < files.length; ++ii) {
         const file = files[ii];
         try {
             if (ii > 0) {
                 console.log();
             }
-            run(file, opts);
+            run(file, lang);
         } catch (error) {
             console.error("Error processing "+file+": "+error.message);
             break;

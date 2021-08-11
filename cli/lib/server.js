@@ -1,7 +1,12 @@
-const path = require("path");
-const fs = require("fs");
 const express = require("express");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const qrcode = require("qrcode");
 const { Server: WebSocketServer } = require("ws");
+const open = require("open");
+
+const PORT = 4444;
 
 function start (cartFile) {
     const app = express();
@@ -10,8 +15,12 @@ function start (cartFile) {
     });
     app.use(express.static(__dirname+"/../../runtimes/web/dist"));
 
-    const server = app.listen(4444, () => {
-        console.log("Listening on http://localhost:4444");
+    const server = app.listen(PORT, async () => {
+        const qr = await qrcode.toString(`http://${getIP()}:${PORT}`, {type: "terminal"});
+        console.log("\n  " + qr.replace(/\n/g, "\n  "));
+        console.log(`Open http://localhost:${PORT}, or scan this QR code on your phone. Press ctrl-C to exit.`);
+
+        open(`http://localhost:${PORT}`);
     });
 
     const wsServer = new WebSocketServer({ noServer: true });
@@ -44,3 +53,16 @@ function start (cartFile) {
     });
 }
 exports.start = start;
+
+function getIP () {
+    var ip = null;
+    var ifaces = os.networkInterfaces();
+    for (var device in ifaces) {
+        ifaces[device].forEach(function (iface) {
+            if (!iface.internal && iface.family == "IPv4") {
+                ip = iface.address;
+            }
+        });
+    }
+    return ip;
+}

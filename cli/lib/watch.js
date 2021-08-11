@@ -19,11 +19,12 @@ function start () {
 
     } else if (fs.existsSync("package.json")) {
         buildCommand = "npm";
-        buildParams = ["--silent", "run", "build"];
+        buildParams = ["--silent", "run", "build:debug"];
         buildOutput = "build/cart.wasm";
 
     } else {
-        throw new Error("Don't know how to build this project");
+        console.error("This directory doesn't look like a WASM-4 project.");
+        process.exit(1);
     }
 
     let currentlyBuilding = false, rebuildAfterBuild = false, serveAfterBuild = true;

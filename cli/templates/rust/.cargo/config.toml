@@ -1,0 +1,15 @@
+[build]
+target = "wasm32-unknown-unknown"
+
+[target.wasm32-unknown-unknown]
+rustflags = [
+    "-A", "dead_code",
+
+    "-C", "link-arg=--import-memory",
+    "-C", "link-arg=--initial-memory=65536",
+    "-C", "link-arg=--max-memory=65536",
+    "-C", "link-arg=-zstack-size=6560",
+
+    # Not working? https://github.com/rust-lang/rust/issues/46645#issuecomment-423912553
+    # "-C", "link-arg=--global-base=50000",
+]

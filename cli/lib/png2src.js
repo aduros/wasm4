@@ -39,7 +39,7 @@ function run (sourceFile, lang) {
         throw new Error(`${bpp}BPP sprites must have a width divisible by ${factor}`);
     }
 
-    const bytes = Buffer.alloc(png.width*png.height*bpp/8);
+    const bytes = new Uint8Array(png.width*png.height*bpp/8);
 
     // Read a color (palette index) from the source png
     function readColor (x, y) {
@@ -54,18 +54,25 @@ function run (sourceFile, lang) {
 
     // Write a color (palette index) to the output buffer
     function writeColor (color, x, y) {
+        let idx, shift, mask;
         switch (bpp) {
         case 1:
-            var idx = (y*png.width + x) >> 3;
-            var offset = 7 - (x & 0x07);
-            bytes[idx] = (bytes[idx] & ~(0x01 << offset)) | (color << offset);
+            idx = (y*png.width + x) >> 3;
+            shift = 7 - (x & 0x07);
+            mask = 0x1 << shift;
+            break;
+
         case 2:
-            var idx = (y*png.width + x) >> 2;
-            var shift = 6 - ((x & 0x3) << 1);
-            const mask = 0x3 << shift;
-            bytes[idx] = (color << shift) | (bytes[idx] & (~mask));
-            return;
+            idx = (y*png.width + x) >> 2;
+            shift = 6 - ((x & 0x3) << 1);
+            mask = 0x3 << shift;
+            break;
+
+        default:
+            throw new Error("assert");
         }
+
+        bytes[idx] = (color << shift) | (bytes[idx] & (~mask));
     }
 
     for (let y = 0; y < png.height; ++y) {

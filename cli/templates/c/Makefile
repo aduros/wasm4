@@ -1,53 +1,55 @@
-# Build-time dependencies
+# Build dependencies
 CC = clang
 LD = wasm-ld
 WASM_OPT = wasm-opt
 
-BUILD_DIR ?= ./build
-SRC_DIRS ?= ./src
+# Whether to build for debugging instead of release
+DEBUG = 0
 
-RELEASE=1
-ifeq ($(RELEASE),1)
-	OPT_FLAGS = -Oz
+# Compilation flags
+CFLAGS = -std=c99 -nostdlib --target=wasm32 -W -Wall -Wextra -Werror -Wno-unused -MMD -MP
+ifeq ($(DEBUG), 1)
+	CFLAGS += -DDEBUG -O0 -g
 else
-	OPT_FLAGS = -g4 --source-map-base "http://0.0.0.0:7001/build/" # -s DEMANGLE_SUPPORT=1
-endif
-# LDFLAGS = $(OPT_FLAGS) --no-entry -s WASM=1 -s WARN_ON_UNDEFINED_SYMBOLS=0 \
-# 		  -s INITIAL_MEMORY=64kb -s MAXIMUM_MEMORY=64kb -s TOTAL_STACK=4kb -s IMPORTED_MEMORY=1 \
-# 		  -s GLOBAL_BASE=49380
-# 		  # -Wl,--import-memory
-LDFLAGS = --no-entry --strip-all --export-dynamic --lto-O3 -O3 --gc-sections --allow-undefined --import-memory --global-base=49380 \
-	--initial-memory=65536 -max-memory=65536 -z stack-size=0
-CFLAGS ?= --target=wasm32 -nostdlib -flto -fvisibility=hidden -ffunction-sections -fdata-sections $(INC_FLAGS) -MMD -MP $(OPT_FLAGS) -W -Wall -Wextra -Werror
-
-SRCS := $(shell find $(SRC_DIRS) -name "*.c" -o -name "*.cpp")
-OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
-DEPS := $(OBJS:.o=.d)
-
-INC_DIRS := $(shell find $(SRC_DIRS) -type d)
-INC_FLAGS := $(addprefix -I,$(INC_DIRS))
-
-all: $(BUILD_DIR)/cart.wasm
-
-$(BUILD_DIR)/cart.wasm: $(OBJS)
-	mkdir -p $(dir $@)
-	$(LD) $(OBJS) -o $@ $(LDFLAGS)
-ifeq ($(RELEASE),1)
-	$(WASM_OPT) -Oz --zero-filled-memory $@ -o $@.opt
-	mv $@.opt $@
+	CFLAGS += -DNDEBUG -Oz -flto
 endif
 
-$(BUILD_DIR)/%.c.o: %.c
-	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+# Linker flags
+LDFLAGS = --no-entry --import-memory --initial-memory=65536 --max-memory=65536 \
+	--global-base=6560 -zstack-size=1024
+ifeq ($(DEBUG), 1)
+	LDFLAGS += --export-all --no-gc-sections
+else
+	LDFLAGS += --strip-all --export-dynamic --gc-sections --lto-O3 -O3
+endif
 
-$(BUILD_DIR)/%.cpp.o: %.cpp
-	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+# wasm-opt flags
+WASM_OPT_FLAGS = -Oz --zero-filled-memory
+
+SOURCES = $(wildcard src/*.c)
+OBJECTS = $(patsubst src/%.c, build/%.o, $(SOURCES))
+DEPS = $(OBJECTS:.o=.d)
+
+all: build/cart.wasm
+
+# Link cart.wasm from all object files and run wasm-opt
+build/cart.wasm: $(OBJECTS)
+	$(LD) -o $@ $(OBJECTS) $(LDFLAGS)
+ifneq ($(DEBUG), 1)
+ifeq (, $(shell $(WASM_OPT) --version))
+	@echo WARNING: $(WASM_OPT) was not found. Install it from binaryen for smaller builds!
+else
+	$(WASM_OPT) $(WASM_OPT_FLAGS) $@ -o $@
+endif
+endif
+
+# Compile each C source file to an object file
+build/%.o: src/%.c
+	@mkdir -p build
+	$(CC) -c $< -o $@ $(CFLAGS)
 
 .PHONY: clean
-
 clean:
-	$(RM) -r $(BUILD_DIR)
+	rm -rf build
 
 -include $(DEPS)

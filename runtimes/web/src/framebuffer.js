@@ -21,52 +21,83 @@ export class Framebuffer {
     }
 
     drawRect (x, y, width, height) {
-        // TODO(2021-07-07): Optimize
-        // TODO(2021-07-21): Clipping
-        const color = this.drawColors[0] & 0x3;
-        for (let yy = y; yy < y+height; ++yy) {
-            for (let xx = x; xx < x+width; ++xx) {
-                this.set(color, xx, yy);
+        const startX = Math.max(0, x);
+        const startY = Math.max(0, y);
+        const endX = Math.min(x+width, WIDTH);
+        const endY = Math.min(y+height, HEIGHT);
+
+        const drawColors = this.drawColors[0];
+        const color0 = drawColors & 0xf;
+        const color1 = (drawColors >> 4) & 0xf;
+
+        if (color0 != 0xf) {
+            const fillColor = color0 & 0x3;
+
+            for (let yy = startY; yy < endY; ++yy) {
+                for (let xx = startX; xx < endX; ++xx) {
+                    this.set(fillColor, xx, yy);
+                }
             }
         }
+
+        if (color1 != 0xf) {
+            const strokeColor = color1 & 0x3;
+
+            // Left edge
+            if (x >= 0 && x < WIDTH) {
+                for (let yy = startY; yy < endY; ++yy) {
+                    this.set(strokeColor, x, yy);
+                }
+            }
+
+            // Right edge
+            if (endX > 0 && endX < WIDTH) {
+                for (let yy = startY; yy < endY; ++yy) {
+                    this.set(strokeColor, endX-1, yy);
+                }
+            }
+
+            // Top edge
+            if (y >= 0 && y < HEIGHT) {
+                for (let xx = startX; xx < endX; ++xx) {
+                    this.set(strokeColor, xx, y);
+                }
+            }
+
+            // Bottom edge
+            if (endY > 0 && endY < HEIGHT) {
+                for (let xx = startX; xx < endX; ++xx) {
+                    this.set(strokeColor, xx, endY-1);
+                }
+            }
+        }
+    }
+
+    drawCircle (x, y, width, height) {
+        throw new Error("TODO(2021-08-11): circle()");
+    }
+
+    drawLine (x1, y1, x2, y2) {
+        throw new Error("TODO(2021-08-11): line()");
     }
 
     drawText (charArray, x, y) {
         let currentX = x;
-        for (let ii = 0; charArray[ii]; ++ii) {
-            const c = charArray[ii];
-            switch (c) {
-            case 10:
-                y += 8;
-                currentX = x;
-                break;
-            default:
-                this.drawChar(c, currentX, y);
-                currentX += 8;
-                break;
-            }
-        }
-    }
-
-    drawTextLength (charArray, x, y) {
-        let currentX = x;
         for (let ii = 0, length = charArray.length; ii < length; ++ii) {
-            const c = charArray[ii] & 0xff;
-            switch (c) {
+            const charCode = charArray[ii];
+            switch (charCode) {
+            case 0:
+                return; // Null terminator
             case 10:
                 y += 8;
                 currentX = x;
                 break;
             default:
-                this.drawChar(c, currentX, y);
+                this.blit(FONT, currentX, y, 8, 8, 0, (charCode-32)*8, 8, false, false, false);
                 currentX += 8;
                 break;
             }
         }
-    }
-
-    drawChar (charCode, x, y) {
-        this.blit(FONT, x, y, 8, 8, 0, (charCode-32)*8, 8, false, false, false);
     }
 
     blit (sprite, dstX, dstY, width, height, srcX, srcY, srcStride, bpp2, flipX, flipY, rotate) {

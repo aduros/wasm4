@@ -11,5 +11,5 @@ rustflags = [
     "-C", "link-arg=-zstack-size=6560",
 
     # Not working? https://github.com/rust-lang/rust/issues/46645#issuecomment-423912553
-    # "-C", "link-arg=--global-base=50000",
+    # "-C", "link-arg=--global-base=6560",
 ]

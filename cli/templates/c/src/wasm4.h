@@ -26,11 +26,11 @@
 #define BUTTON_UP 64
 #define BUTTON_DOWN 128
 
-WASM_IMPORT("drawRect")
-void drawRect (int x, int y, int width, int height);
+WASM_IMPORT("rect")
+void rect (int x, int y, int width, int height);
 
-WASM_IMPORT("drawText")
-void drawText (const char* text, int x, int y);
+WASM_IMPORT("text")
+void text (const char* text, int x, int y);
 
 WASM_IMPORT("blit")
 void blit (const char* data, int x, int y, int width, int height, int flags);

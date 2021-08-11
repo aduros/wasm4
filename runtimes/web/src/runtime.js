@@ -82,7 +82,8 @@ export class Runtime {
             mem32.fill(0);
         }
         mem32.set(constants.COLORS, constants.ADDR_PALETTE >> 2);
-        this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
+        // this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
+        this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x31f2, true);
     }
 
     async load (wasmBuffer) {
@@ -90,10 +91,14 @@ export class Runtime {
             env: {
                 memory: this.memory,
 
-                drawRect: this.drawRect.bind(this),
-                drawText: this.drawText.bind(this),
-                drawTextUtf8: this.drawTextUtf8.bind(this),
-                drawTextUtf16: this.drawTextUtf16.bind(this),
+                rect: this.framebuffer.drawRect.bind(this.framebuffer),
+                circle: this.framebuffer.drawCircle.bind(this.framebuffer),
+                line: this.framebuffer.drawLine.bind(this.framebuffer),
+
+                text: this.text.bind(this),
+                textUtf8: this.textUtf8.bind(this),
+                textUtf16: this.textUtf16.bind(this),
+
                 blit: this.blit.bind(this),
                 blitSub: this.blitSub.bind(this),
 
@@ -159,21 +164,17 @@ export class Runtime {
         this.wasm = module.instance;
     }
 
-    drawRect (x, y, width, height, flags) {
-        this.framebuffer.drawRect(x, y, width, height);
-    }
-
-    drawText (textPtr, x, y) {
+    text (textPtr, x, y) {
         const text = new Uint8Array(this.memory.buffer, textPtr);
         this.framebuffer.drawText(text, x, y);
     }
 
-    drawTextUtf8 (textPtr, byteLength, x, y) {
+    textUtf8 (textPtr, byteLength, x, y) {
         const text = new Uint8Array(this.memory.buffer, textPtr, byteLength);
         this.framebuffer.drawTextLength(text, x, y);
     }
 
-    drawTextUtf16 (textPtr, byteLength, x, y) {
+    textUtf16 (textPtr, byteLength, x, y) {
         const text = new Uint16Array(this.memory.buffer, textPtr, byteLength >> 1);
         this.framebuffer.drawTextLength(text, x, y);
     }

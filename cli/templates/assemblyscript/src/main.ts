@@ -30,7 +30,7 @@ export function update () :void {
     // }
     //
     // store<u16>(w4.DRAW_COLORS, 0x10);
-    w4.drawText("Hello world!", 10, 10);
+    w4.text("Hello world!", 10, 10);
     w4.print("Hi there 123");
     //
     // store<u16>(w4.DRAW_COLORS, 0x02);

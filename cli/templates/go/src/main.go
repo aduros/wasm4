@@ -45,7 +45,7 @@ func update () {
     blit(&face[0], x, y, face_WIDTH, face_HEIGHT, 0);
 
     *DRAW_COLORS = 0xff2f;
-    drawText("Hello utf8 from GO\xff!", 0, 10);
+    text("Hello utf8 from GO\xff!", 0, 10);
 
     print("Hello utf8 Bruno!");
 

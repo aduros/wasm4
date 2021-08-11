@@ -29,17 +29,17 @@ export const BLIT_FLIP_X: u32 = 2;
 export const BLIT_FLIP_Y: u32 = 4;
 export const BLIT_ROTATE: u32 = 8;
 
-@external("env", "drawRect")
-export declare function drawRect (x: i32, y: i32, width: u32, height: u32): void;
+@external("env", "rect")
+export declare function rect (x: i32, y: i32, width: u32, height: u32): void;
 
 @external("env", "circle")
 export declare function circle (x: i32, y: i32, width: u32, height: u32): void;
 
-@external("env", "drawTextUtf16")
-declare function drawTextUtf16 (text: string, byteLength :i32, x: i32, y: i32): void;
-export function drawText (str: string, x: i32, y: i32): void {
+@external("env", "textUtf16")
+declare function textUtf16 (text: string, byteLength :i32, x: i32, y: i32): void;
+export function text (str: string, x: i32, y: i32): void {
     const byteLength = load<u32>(changetype<usize>(str) - 4);
-    drawTextUtf16(str, byteLength, x, y);
+    textUtf16(str, byteLength, x, y);
 }
 
 @external("env", "line")

@@ -29,9 +29,12 @@ void update () {
         y += 1;
     }
 
-    *DRAW_COLORS = 0xfff2;
-    blit(face, x, y, 8, 8, 0);
+    /* *DRAW_COLORS = 0xf2; */
+    /* blit(face, x, y, 8, 8, 0); */
 
-    *DRAW_COLORS = 0xff2f;
-    drawText("Hello utf8 from C!", 0, 10);
+    /* *DRAW_COLORS = 0xff2f; */
+    text("Hello from C!", 0, 10);
+
+    *DRAW_COLORS = 0x3f;
+    rect(x, y, 50, 50);
 }

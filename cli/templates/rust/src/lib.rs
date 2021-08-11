@@ -1,7 +1,6 @@
 mod wasm4;
 use wasm4::*;
 
-use std::mem;
 // use std::cell::RefCell;
 
 const BUNNY_WIDTH: u32 = 48;
@@ -41,7 +40,7 @@ fn update () {
     // gamepad1.get();
 
     // DRAW_COLORS.set(1);
-    // draw_rect(20, 20, 50, 50);
+    // rect(20, 20, 50, 50);
     //
     // DRAW_COLORS.set(0x3210);
     // let mut y = 0i32;
@@ -54,8 +53,8 @@ fn update () {
 
     // TEST.set(123);
 
-    draw_text("Hello from Rust", 0, 50);
-    print("Debug from Rust");
+    text("Hello from Rust", 0, 50);
+    // print("Debug from Rust");
 
     // let gamepad = unsafe { *GAMEPAD1 };
     // let framebuffer = unsafe { &*FRAMEBUFFER };
@@ -76,7 +75,7 @@ fn update () {
 
     // b = unsafe{mem::transmute(0x0a)};
 
-    // draw_rect(b[0].into(), 0, 0, 0);
+    // rect(b[0].into(), 0, 0, 0);
     // println!("{:x},{:x},{:x},{:x}", b[0],b[1],b[2],b[3]);
     // unsafe {
     //     let fb = *FRAMEBUFFER;

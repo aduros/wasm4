@@ -18,25 +18,25 @@ pub static mut FRAMEBUFFER: *mut [u8; 4] = 69 as *mut [u8; 4];
 // pub const FRAMEBUFFER: &'static [u8; 4] = unsafe { &*(69 as *mut [u8; 4]) }uuu;
 
 extern {
-    #[link_name = "drawRect"]
-    fn draw_rect_ (x :i32, y :i32, width :u32, height :u32);
+    #[link_name = "rect"]
+    fn rect_ (x :i32, y :i32, width :u32, height :u32);
 
     #[link_name = "blit"]
     fn blit_ (sprite :*const u8, x :i32, y :i32, width :u32, height :u32, flags :u32);
 
-    #[link_name = "drawTextUtf8"]
-    fn draw_text_utf8 (text: *const u8, length: usize, x: i32, y: i32);
+    #[link_name = "textUtf8"]
+    fn text_utf8 (text: *const u8, length: usize, x: i32, y: i32);
 
     #[link_name = "printUtf8"]
     fn print_utf8 (text: *const u8, length: usize);
 }
 
-pub fn draw_text (text: &str, x: i32, y: i32) {
-    unsafe { draw_text_utf8(text.as_ptr(), text.len(), x, y) }
+pub fn text (text: &str, x: i32, y: i32) {
+    unsafe { text_utf8(text.as_ptr(), text.len(), x, y) }
 }
 
-pub fn draw_rect (x :i32, y :i32, width :u32, height :u32) {
-    unsafe { draw_rect_(x, y, width, height) }
+pub fn rect (x :i32, y :i32, width :u32, height :u32) {
+    unsafe { rect_(x, y, width, height) }
 }
 
 pub fn blit (sprite :&[u8], x :i32, y :i32, width :u32, height :u32, flags :u32) {

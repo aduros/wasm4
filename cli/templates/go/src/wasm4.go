@@ -17,8 +17,8 @@ var FRAMEBUFFER = (*[6400]uint8)(unsafe.Pointer(uintptr(0xa0)));
 //export blit
 func blit (ptr *byte, x int, y int, width int, height int, flags int);
 
-//export drawTextUtf8
-func drawText (ptr string, x int, y int);
+//export textUtf8
+func text (ptr string, x int, y int);
 
 //export printUtf8
 func print (msg string);

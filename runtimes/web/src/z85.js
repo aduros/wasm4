@@ -1,3 +1,5 @@
+// Encodes binary data into text, like base64 but more efficient.
+//
 // Implements http://rfc.zeromq.org/spec:32
 // Ported from https://github.com/zeromq/libzmq/blob/8cda54c52b08005b71f828243f22051cdbc482b4/src/zmq_utils.cpp#L77-L168
 

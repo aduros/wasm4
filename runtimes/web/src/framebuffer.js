@@ -41,11 +41,32 @@ export class Framebuffer {
                 currentX = x;
                 break;
             default:
-                this.blit(FONT, currentX, y, 8, 8, 0, (c-32)*8, 8, false, false, false, false);
+                this.drawChar(c, currentX, y);
                 currentX += 8;
                 break;
             }
         }
+    }
+
+    drawTextLength (charArray, x, y) {
+        let currentX = x;
+        for (let ii = 0, length = charArray.length; ii < length; ++ii) {
+            const c = charArray[ii] & 0xff;
+            switch (c) {
+            case 10:
+                y += 8;
+                currentX = x;
+                break;
+            default:
+                this.drawChar(c, currentX, y);
+                currentX += 8;
+                break;
+            }
+        }
+    }
+
+    drawChar (charCode, x, y) {
+        this.blit(FONT, x, y, 8, 8, 0, (charCode-32)*8, 8, false, false, false);
     }
 
     blit (sprite, dstX, dstY, width, height, srcX, srcY, srcStride, bpp2, flipX, flipY, rotate) {

@@ -92,6 +92,8 @@ export class Runtime {
 
                 drawRect: this.drawRect.bind(this),
                 drawText: this.drawText.bind(this),
+                drawTextUtf8: this.drawTextUtf8.bind(this),
+                drawTextUtf16: this.drawTextUtf16.bind(this),
                 blit: this.blit.bind(this),
                 blitSub: this.blitSub.bind(this),
 
@@ -99,6 +101,10 @@ export class Runtime {
 
                 storageRead: this.storageRead.bind(this),
                 storageWrite: this.storageWrite.bind(this),
+
+                // print: this.print.bind(this),
+                printUtf8: this.printUtf8.bind(this),
+                printUtf16: this.printUtf16.bind(this),
 
                 printf: (fmt, ptr) => {
                     var output = "";
@@ -113,27 +119,24 @@ export class Runtime {
                                 output += String.fromCharCode(this.data.getInt32(ptr, true));
                                 ptr += 4;
                                 break;
-                            case 115: // s
-                                throw new Error("TODO(2021-07-16): Implement printf %s");
-                                break;
                             case 100: // d
                             case 120: // x
                                 output += this.data.getInt32(ptr, true).toString(ch == 100 ? 10 : 16);
                                 ptr += 4;
+                                break;
+                            case 115: // s
+                                throw new Error("TODO(2021-07-16): Implement printf %s");
+                                break;
+                            case 102: // f
+                                throw new Error("TODO(2021-07-16): Implement printf %f");
                                 break;
                             }
                         } else {
                             output += String.fromCharCode(ch);
                         }
                     }
-                    const length = output.length;
-                    if (length > 0) {
-                        console.log(output);
-                        if (websocket != null && websocket.readyState == 1) {
-                            websocket.send(output);
-                        }
-                    }
-                    return length;
+                    this.print(output);
+                    return output.length;
                 },
 
                 memset: (destPtr, fillByte, length) => {
@@ -163,6 +166,16 @@ export class Runtime {
     drawText (textPtr, x, y) {
         const text = new Uint8Array(this.memory.buffer, textPtr);
         this.framebuffer.drawText(text, x, y);
+    }
+
+    drawTextUtf8 (textPtr, byteLength, x, y) {
+        const text = new Uint8Array(this.memory.buffer, textPtr, byteLength);
+        this.framebuffer.drawTextLength(text, x, y);
+    }
+
+    drawTextUtf16 (textPtr, byteLength, x, y) {
+        const text = new Uint16Array(this.memory.buffer, textPtr, byteLength >> 1);
+        this.framebuffer.drawTextLength(text, x, y);
     }
 
     blit (spritePtr, x, y, width, height, flags) {
@@ -210,6 +223,27 @@ export class Runtime {
             return 0;
         }
         return bytesWritten;
+    }
+
+    print (str) {
+        if (str.length > 0) {
+            console.log(str);
+            if (websocket != null && websocket.readyState == 1) {
+                websocket.send(str);
+            }
+        }
+    }
+
+    printUtf8 (strUtf8Ptr, byteLength) {
+        const strUtf8 = new Uint8Array(this.memory.buffer, strUtf8Ptr, byteLength);
+        const str = new TextDecoder().decode(strUtf8);
+        this.print(str);
+    }
+
+    printUtf16 (strUtf16Ptr, byteLength) {
+        const strUtf16 = new Uint8Array(this.memory.buffer, strUtf16Ptr, byteLength);
+        const str = new TextDecoder("utf-16").decode(strUtf16);
+        this.print(str);
     }
 
     start () {

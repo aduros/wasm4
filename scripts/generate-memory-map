@@ -39,8 +39,8 @@ const rustTypes = {
 const goTypes = {
     PALETTE: "[4]uint32",
     DRAW_COLORS: "uint16",
-    MOUSE_X: "uint16",
-    MOUSE_Y: "uint16",
+    MOUSE_X: "int16",
+    MOUSE_Y: "int16",
     FRAMEBUFFER: "[6400]uint8",
 };
 

@@ -9,10 +9,10 @@ export const STORAGE_SIZE = 1024;
 
 // Default palette
 export const COLORS = [
-    0xe0f8d0,
-    0x88c070,
-    0x346856,
-    0x081820,
+    0xe0f8cf,
+    0x86c06c,
+    0x306850,
+    0x071821,
 ];
 
 // Memory layout

@@ -82,8 +82,7 @@ export class Runtime {
             mem32.fill(0);
         }
         mem32.set(constants.COLORS, constants.ADDR_PALETTE >> 2);
-        // this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
-        this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x31f2, true);
+        this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
     }
 
     async load (wasmBuffer) {

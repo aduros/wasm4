@@ -33,11 +33,11 @@ export class Framebuffer {
         const endY = Math.min(y+height, HEIGHT);
 
         const drawColors = this.drawColors[0];
-        const color0 = drawColors & 0xf;
-        const color1 = (drawColors >> 4) & 0xf;
+        const dc0 = drawColors & 0xf;
+        const dc1 = (drawColors >> 4) & 0xf;
 
-        if (color0 != 0xf) {
-            const fillColor = color0 & 0x3;
+        if (dc0 != 0) {
+            const fillColor = (dc0-1) & 0x3;
 
             for (let yy = startY; yy < endY; ++yy) {
                 for (let xx = startX; xx < endX; ++xx) {
@@ -46,8 +46,8 @@ export class Framebuffer {
             }
         }
 
-        if (color1 != 0xf) {
-            const strokeColor = color1 & 0x3;
+        if (dc1 != 0) {
+            const strokeColor = (dc1-1) & 0x3;
 
             // Left edge
             if (x >= 0 && x < WIDTH) {
@@ -57,7 +57,7 @@ export class Framebuffer {
             }
 
             // Right edge
-            if (endX > 0 && endX < WIDTH) {
+            if (endX > 0 && endX < WIDTH+1) {
                 for (let yy = startY; yy < endY; ++yy) {
                     this.drawPoint(strokeColor, endX-1, yy);
                 }
@@ -71,7 +71,7 @@ export class Framebuffer {
             }
 
             // Bottom edge
-            if (endY > 0 && endY < HEIGHT) {
+            if (endY > 0 && endY < HEIGHT+1) {
                 for (let xx = startX; xx < endX; ++xx) {
                     this.drawPoint(strokeColor, xx, endY-1);
                 }
@@ -83,12 +83,12 @@ export class Framebuffer {
         // TODO(2021-08-11): Implement oval()
         //
         // const drawColors = this.drawColors[0];
-        // // const color0 = drawColors & 0xf;
-        // const color1 = (drawColors >> 4) & 0xf;
-        // if (color1 == 0xf) {
+        // // const dc0 = drawColors & 0xf;
+        // const dc1 = (drawColors >> 4) & 0xf;
+        // if (dc1 == 0xf) {
         //     return;
         // }
-        // const strokeColor = color1 & 0x3;
+        // const strokeColor = (dc1-1) & 0x3;
         //
         // if(a <= 0) return;
         // if(b <= 0) return;
@@ -134,11 +134,11 @@ export class Framebuffer {
     // From https://github.com/nesbox/TIC-80/blob/master/src/core/draw.c
     drawLine (x1, y1, x2, y2) {
         const drawColors = this.drawColors[0];
-        const color1 = (drawColors >> 4) & 0xf;
-        if (color1 == 0xf) {
+        const dc0 = drawColors & 0xf;
+        if (dc0 == 0) {
             return;
         }
-        const strokeColor = color1 & 0x3;
+        const strokeColor = (dc0-1) & 0x3;
 
         if (y1 > y2) {
             let swap = x1;
@@ -234,9 +234,10 @@ export class Framebuffer {
                 }
 
                 // Get the final color using the drawColors indirection
-                const color = (drawColors >> (colorIdx << 2)) & 0x0f;
-                if (color != 0x0f) {
-                    this.drawPoint(color & 0x03, dstX + col, dstY + row);
+                // TODO(2021-08-11): Use a lookup table here?
+                const dc = (drawColors >> (colorIdx << 2)) & 0x0f;
+                if (dc != 0) {
+                    this.drawPoint((dc-1) & 0x03, dstX + col, dstY + row);
                 }
             }
         }

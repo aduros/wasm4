@@ -135,6 +135,9 @@ function setClass (element, className, enabled) {
     }
 
     const onMouseEvent = event => {
+        // Unhide the cursor if it was hidden by the keyboard handler
+        document.body.style.cursor = "";
+
         if (event.isPrimary) {
             const bounds = canvas.getBoundingClientRect();
             const x = Math.fround(constants.WIDTH * (event.clientX - bounds.left) / bounds.width);
@@ -143,9 +146,9 @@ function setClass (element, className, enabled) {
             runtime.setMouse(x, y, buttons);
         }
     };
-    canvas.addEventListener("pointerdown", onMouseEvent);
-    canvas.addEventListener("pointerup", onMouseEvent);
-    canvas.addEventListener("pointermove", onMouseEvent);
+    window.addEventListener("pointerdown", onMouseEvent);
+    window.addEventListener("pointerup", onMouseEvent);
+    window.addEventListener("pointermove", onMouseEvent);
 
     canvas.addEventListener("contextmenu", event => {
         event.preventDefault();
@@ -154,7 +157,11 @@ function setClass (element, className, enabled) {
     const onKeyboardEvent = event => {
         const down = (event.type == "keydown");
 
+        // Poke WebAudio
         runtime.unlockAudio();
+
+        // We're using the keyboard now, hide the mouse cursor for extra immersion
+        document.body.style.cursor = "none";
 
         if (down) {
             switch (event.keyCode) {

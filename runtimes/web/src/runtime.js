@@ -32,8 +32,8 @@ export class Runtime {
     }
 
     setMouse (x, y, buttons) {
-        this.data.setInt16(constants.ADDR_MOUSE_X, x);
-        this.data.setInt16(constants.ADDR_MOUSE_Y, y);
+        this.data.setInt16(constants.ADDR_MOUSE_X, x, true);
+        this.data.setInt16(constants.ADDR_MOUSE_Y, y, true);
         this.data.setUint8(constants.ADDR_MOUSE_BUTTONS, buttons);
     }
 
@@ -83,6 +83,10 @@ export class Runtime {
         }
         mem32.set(constants.COLORS, constants.ADDR_PALETTE >> 2);
         this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
+
+        // Initialize the mouse off screen
+        this.data.setInt16(constants.ADDR_MOUSE_X, 0x7fff, true);
+        this.data.setInt16(constants.ADDR_MOUSE_Y, 0x7fff, true);
     }
 
     async load (wasmBuffer) {

@@ -1,11 +1,11 @@
 import * as constants from "./constants";
 import { Runtime } from "./runtime";
 import { websocket } from "./devkit";
+import * as z85 from "./z85";
 
 import "./styles.css";
 
 const qs = new URL(document.location).searchParams;
-const cartUrl = qs.has("url") ? qs.get("url") : "cart.wasm";
 
 const poster = document.getElementById("poster");
 let posterImg;
@@ -24,14 +24,27 @@ function setClass (element, className, enabled) {
     }
 }
 
+async function loadCartWasm () {
+    if (typeof WASM4_CART == "string") {
+        // The cart was bundled in the html, decode it
+        const buffer = new Uint8Array(WASM4_CART_SIZE);
+        z85.decode(WASM4_CART, buffer);
+        console.log(buffer.length);
+        return buffer;
+
+    } else {
+        // Load the cart from a url
+        const cartUrl = qs.has("url") ? qs.get("url") : "cart.wasm";
+        const res = await fetch(cartUrl);
+        return await res.arrayBuffer();
+    }
+}
+
 (async function () {
-
-    const res = await fetch(cartUrl);
-    let wasmBuffer = await res.arrayBuffer();
-
     const runtime = new Runtime();
     const canvas = runtime.canvas;
     document.getElementById("content").appendChild(canvas);
+    const wasmBuffer = await loadCartWasm();
     await runtime.load(wasmBuffer);
 
     if (posterImg != null) {
@@ -58,8 +71,7 @@ function setClass (element, className, enabled) {
         websocket.addEventListener("message", async event => {
             switch (event.data) {
             case "reload": case "hotswap":
-                const res = await fetch(cartUrl);
-                wasmBuffer = await res.arrayBuffer();
+                const wasmBuffer = await loadCartWasm();
                 if (event.data == "reload") {
                     runtime.reset(true);
                 }

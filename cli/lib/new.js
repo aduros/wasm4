@@ -39,7 +39,7 @@ async function run (destDir, opts) {
     await copy(srcDir, destDir);
 
     const help = HELP[lang];
-    console.log(`Created ${help.name} project at ${path.resolve(destDir)}`);
+    console.log(`OK! Created ${help.name} project at ${path.resolve(destDir)}`);
     console.log();
     if (help.setup) {
         console.log(`First setup the project by running:`);

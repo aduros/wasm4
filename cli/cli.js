@@ -24,11 +24,6 @@ program.command("run <cart>")
         server.start(cart);
     });
 
-// program.command("export <cart>")
-//     .action(cart => {
-//         console.log("TODO(2021-07-21): Export "+cart);
-//     });
-
 program.command("png2src <images...>")
     .option("--c", "Generate C/C++ source")
     .option("--as, --assemblyscript", "Generate AssemblyScript source")
@@ -37,6 +32,13 @@ program.command("png2src <images...>")
     .action((images, opts) => {
         const png2src = require("./lib/png2src");
         png2src.runAll(images, opts);
+    });
+
+program.command("bundle <cart>")
+    .option("--html <output>", "Bundle standalone HTML")
+    .action((cart, opts) => {
+        const bundle = require("./lib/bundle");
+        bundle.run(cart, opts);
     });
 
 program.parse();

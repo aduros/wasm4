@@ -18,7 +18,7 @@ function start (cartFile) {
     const server = app.listen(PORT, async () => {
         const qr = await qrcode.toString(`http://${getIP()}:${PORT}`, {type: "terminal"});
         console.log("\n  " + qr.replace(/\n/g, "\n  "));
-        console.log(`Open http://localhost:${PORT}, or scan this QR code on your phone. Press ctrl-C to exit.`);
+        console.log(`Open http://localhost:${PORT}, or scan this QR code on your mobile device. Press ctrl-C to exit.`);
 
         open(`http://localhost:${PORT}`);
     });

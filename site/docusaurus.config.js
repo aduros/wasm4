@@ -1,15 +1,7 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
-const CARTS = [
-    { id: "watris", title: "Watris", author: "Bruno Garcia", github: "aduros" },
-    { id: "watris2", title: "Watris 2", author: "Bruno Garcia", github: "aduros" },
-    { id: "watris3", title: "Watris 3", author: "Bruno Garcia", github: "aduros" },
-    { id: "watris4", title: "Watris 4", author: "Bruno Garcia", github: "aduros" },
-    { id: "watris5", title: "Watris 5", author: "Bruno Garcia", github: "aduros" },
-    { id: "watris6", title: "Watris 6", author: "Bruno Garcia", github: "aduros" },
-    { id: "watris7", title: "Watris 7", author: "Bruno Garcia", github: "aduros" },
-];
+const CARTS = require('./carts');
 
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
@@ -39,7 +31,7 @@ module.exports = {
           label: 'Learn',
         },
         {to: '/blog', label: 'Blog', position: 'left'},
-        {to: '/blog', label: 'Community', position: 'left'},
+        {to: '/community', label: 'Community', position: 'left'},
         // {
         //   href: 'https://github.com/aduros/wasm4',
         //   label: 'GitHub',
@@ -155,9 +147,9 @@ module.exports = {
                   });
 
                   for (let cart of CARTS) {
-                      const cartJsonPath = await actions.createData(`cart-${cart.id}.json`, JSON.stringify(cart));
+                      const cartJsonPath = await actions.createData(`cart-${cart.slug}.json`, JSON.stringify(cart));
                       actions.addRoute({
-                          path: "/play/"+cart.id,
+                          path: "/play/"+cart.slug,
                           component: "@site/src/components/PlayCart",
                           modules: {
                               cart: cartJsonPath,

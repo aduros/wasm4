@@ -27,10 +27,9 @@ import { Giscus } from "@giscus/react";
 //   );
 // }
 
-function Embed ({ id, title, author }) {
-    let params = "?url="+encodeURIComponent(`/carts/${id}.wasm`);
-    // params += "&screenshot="+encodeURIComponent(`/carts/${id}.png`);
-    params += "&screenshot="+encodeURIComponent("https://placekitten.com/160");
+function Embed ({ slug, title, author }) {
+    let params = "?url="+encodeURIComponent(`/carts/${slug}.wasm`);
+    params += "&screenshot="+encodeURIComponent(`/carts/${slug}.png`);
     if (title) {
         params += "&title="+encodeURIComponent(title);
     }

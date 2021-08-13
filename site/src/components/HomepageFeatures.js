@@ -4,32 +4,30 @@ import styles from './HomepageFeatures.module.css';
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
-    Svg: require('../../static/img/undraw_docusaurus_mountain.svg').default,
+    title: 'Minimalist and Easy',
+    Svg: require('../../static/img/human-handsup.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Everything you need to build complete games without being overwhelming. Get creative within
+        160x160 pixels and 4 colors.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('../../static/img/undraw_docusaurus_tree.svg').default,
+    title: 'Language Agnostic',
+    Svg: require('../../static/img/notes-multiple.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Use any programming language, as long as it can compile to WebAssembly. AssemblyScript, C/C++, Rust, Go, and more.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('../../static/img/undraw_docusaurus_react.svg').default,
+    title: 'Run Anywhere',
+    Svg: require('../../static/img/devices.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Besides great desktop/mobile web support, run your game natively (no webviews!) even on low-powered microcontrollers.
       </>
     ),
   },

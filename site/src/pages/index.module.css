@@ -23,3 +23,7 @@
   align-items: center;
   justify-content: center;
 }
+
+.buttons > a {
+  margin-right: 1rem;
+}

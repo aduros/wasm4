@@ -8,6 +8,8 @@
 }
 
 .featureSvg {
-  height: 200px;
-  width: 200px;
+  height: 128px;
+  width: 128px;
+  margin: 2rem;
+  color: #8dc156;
 }

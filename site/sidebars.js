@@ -27,10 +27,10 @@ module.exports = {
     },
     {
         type: "category",
-        label: "Guides",
+        label: "Examples",
         collapsible: false,
         items: [
-            "guides/images",
+            "examples/images",
         ],
     },
     {

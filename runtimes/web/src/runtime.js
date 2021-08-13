@@ -90,80 +90,48 @@ export class Runtime {
     }
 
     async load (wasmBuffer) {
-        const module = await WebAssembly.instantiate(wasmBuffer, {
-            env: {
-                memory: this.memory,
+        const env = {
+            memory: this.memory,
 
-                rect: this.framebuffer.drawRect.bind(this.framebuffer),
-                oval: this.framebuffer.drawOval.bind(this.framebuffer),
-                line: this.framebuffer.drawLine.bind(this.framebuffer),
+            rect: this.framebuffer.drawRect.bind(this.framebuffer),
+            oval: this.framebuffer.drawOval.bind(this.framebuffer),
+            line: this.framebuffer.drawLine.bind(this.framebuffer),
 
-                text: this.text.bind(this),
-                textUtf8: this.textUtf8.bind(this),
-                textUtf16: this.textUtf16.bind(this),
+            text: this.text.bind(this),
+            textUtf8: this.textUtf8.bind(this),
+            textUtf16: this.textUtf16.bind(this),
 
-                blit: this.blit.bind(this),
-                blitSub: this.blitSub.bind(this),
+            blit: this.blit.bind(this),
+            blitSub: this.blitSub.bind(this),
 
-                tone: this.apu.tone.bind(this.apu),
+            tone: this.apu.tone.bind(this.apu),
 
-                storageRead: this.storageRead.bind(this),
-                storageWrite: this.storageWrite.bind(this),
+            diskr: this.diskr.bind(this),
+            diskw: this.diskw.bind(this),
 
-                // print: this.print.bind(this),
-                printUtf8: this.printUtf8.bind(this),
-                printUtf16: this.printUtf16.bind(this),
+            trace: this.trace.bind(this),
+            traceUtf8: this.traceUtf8.bind(this),
+            traceUtf16: this.traceUtf16.bind(this),
+            tracef: this.tracef.bind(this),
 
-                printf: (fmt, ptr) => {
-                    var output = "";
-                    let ch;
-                    while (ch = this.data.getUint8(fmt++)) {
-                        if (ch == 37) {
-                            switch (ch = this.data.getUint8(fmt++)) {
-                            case 37: // %
-                                output += "%";
-                                break;
-                            case 99: // c
-                                output += String.fromCharCode(this.data.getInt32(ptr, true));
-                                ptr += 4;
-                                break;
-                            case 100: // d
-                            case 120: // x
-                                output += this.data.getInt32(ptr, true).toString(ch == 100 ? 10 : 16);
-                                ptr += 4;
-                                break;
-                            case 115: // s
-                                throw new Error("TODO(2021-07-16): Implement printf %s");
-                                break;
-                            case 102: // f
-                                throw new Error("TODO(2021-07-16): Implement printf %f");
-                                break;
-                            }
-                        } else {
-                            output += String.fromCharCode(ch);
-                        }
-                    }
-                    this.print(output);
-                    return output.length;
-                },
-
-                memset: (destPtr, fillByte, length) => {
-                    const dest = new Uint8Array(this.memory.buffer, destPtr, length);
-                    dest.fill(fillByte);
-                    return destPtr;
-                },
-
-                memcpy: (destPtr, srcPtr, length) => {
-                    const dest = new Uint8Array(this.memory.buffer, destPtr);
-                    const src = new Uint8Array(this.memory.buffer, srcPtr, length);
-                    dest.set(src);
-                    return destPtr;
-                },
-
-                // Temporary(?) for assemblyscript
-                abort: function () {},
+            memset: (destPtr, fillByte, length) => {
+                const dest = new Uint8Array(this.memory.buffer, destPtr, length);
+                dest.fill(fillByte);
+                return destPtr;
             },
-        });
+
+            memcpy: (destPtr, srcPtr, length) => {
+                const dest = new Uint8Array(this.memory.buffer, destPtr);
+                const src = new Uint8Array(this.memory.buffer, srcPtr, length);
+                dest.set(src);
+                return destPtr;
+            },
+
+            // Temporary(?) for assemblyscript
+            abort: function () {},
+        };
+
+        const module = await WebAssembly.instantiate(wasmBuffer, { env });
         this.wasm = module.instance;
     }
 
@@ -196,7 +164,7 @@ export class Runtime {
         this.framebuffer.blit(sprite, x, y, width, height, srcX, srcY, stride, bpp2, flipX, flipY, rotate);
     }
 
-    storageRead (destPtr, size) {
+    diskr (destPtr, size) {
         let str;
         try {
             str = localStorage.getItem("disk");
@@ -214,7 +182,7 @@ export class Runtime {
         return bytesRead;
     }
 
-    storageWrite (srcPtr, size) {
+    diskw (srcPtr, size) {
         const bytesWritten = Math.min(size, constants.STORAGE_SIZE);
         const src = new Uint8Array(this.memory.buffer, srcPtr, bytesWritten);
         const str = z85.encode(src);
@@ -238,16 +206,60 @@ export class Runtime {
         }
     }
 
-    printUtf8 (strUtf8Ptr, byteLength) {
+    trace (cstrPtr) {
+        let str = "";
+        for (;;) {
+            const c = this.data.getUint8(cstrPtr++);
+            if (c == 0) {
+                break;
+            }
+            str += String.fromCharCode(c);
+        }
+        this.print(str);
+    }
+
+    traceUtf8 (strUtf8Ptr, byteLength) {
         const strUtf8 = new Uint8Array(this.memory.buffer, strUtf8Ptr, byteLength);
         const str = new TextDecoder().decode(strUtf8);
         this.print(str);
     }
 
-    printUtf16 (strUtf16Ptr, byteLength) {
+    traceUtf16 (strUtf16Ptr, byteLength) {
         const strUtf16 = new Uint8Array(this.memory.buffer, strUtf16Ptr, byteLength);
         const str = new TextDecoder("utf-16").decode(strUtf16);
         this.print(str);
+    }
+
+    tracef (fmtPtr, argPtr) {
+        var output = "";
+        let ch;
+        while (ch = this.data.getUint8(fmtPtr++)) {
+            if (ch == 37) {
+                switch (ch = this.data.getUint8(fmtPtr++)) {
+                case 37: // %
+                    output += "%";
+                    break;
+                case 99: // c
+                    output += String.fromCharCode(this.data.getInt32(argPtr, true));
+                    argPtr += 4;
+                    break;
+                case 100: // d
+                case 120: // x
+                    output += this.data.getInt32(argPtr, true).toString(ch == 100 ? 10 : 16);
+                    argPtr += 4;
+                    break;
+                case 115: // s
+                    throw new Error("TODO(2021-07-16): Implement printf %s");
+                    break;
+                case 102: // f
+                    throw new Error("TODO(2021-07-16): Implement printf %f");
+                    break;
+                }
+            } else {
+                output += String.fromCharCode(ch);
+            }
+        }
+        this.print(output);
     }
 
     start () {

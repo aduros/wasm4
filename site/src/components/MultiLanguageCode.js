@@ -33,7 +33,7 @@ export default function MultiLanguageCode (props) {
     return (
         <Tabs
           groupId="code-language"
-          defaultValue="language-cpp"
+          defaultValue="language-typescript"
           values={ props.children.map(child => {
               const lang = getLanguage(child);
               return { label: LABELS[lang], value: lang };

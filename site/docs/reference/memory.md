@@ -35,14 +35,15 @@ Indexes into the color palette used by all drawing functions.
 | 8 - 11  | Draw color 2 |
 | 12 - 15 | Draw color 3 |
 
-Each draw color can be a value between 0 and 3 representing a palette color index, or 15 (#F) to
-signify "transparent".
+Each draw color can be a value between 1 and 4 representing a palette color, or 0 to signify
+transparency.
 
 Example:
 
 ```c
-// Set the first draw color to 1, the second to 0, and the third to transparent
-*DRAW_COLORS = 0xf01;
+// Set the first draw color to palette color #2, the second to
+// transparent, and the third to palette color #4.
+*DRAW_COLORS = 0x402;
 ```
 
 ### GAMEPADS

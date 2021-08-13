@@ -42,13 +42,13 @@ For info on other parameters, see `blit()`.
 
 Draws a rectangle.
 
-`DRAW_COLORS` color 0 is used as the fill color, `DRAW_COLORS` color 1 is used as the stroke color.
+`DRAW_COLORS` color 0 is used as the fill color, `DRAW_COLORS` color 1 is used as the border color.
 
-### `circle (x, y, width, height)`
+### `oval (x, y, width, height)`
 
-Draws a circle (ellipse).
+Draws an oval (or circle).
 
-`DRAW_COLORS` color 0 is used as the fill color, `DRAW_COLORS` color 1 is used as the stroke color.
+`DRAW_COLORS` color 0 is used as the fill color, `DRAW_COLORS` color 1 is used as the border color.
 
 ### `text (str, x, y)`
 
@@ -56,14 +56,12 @@ Draws text using the built-in system font. The string may contain new-line (`\n`
 
 `DRAW_COLORS` color 0 is used as the text color, `DRAW_COLORS` color 1 is used as the background color.
 
-:::note
-
+:::note String Encoding
 By default, `str` is expected to be a `\0` terminated ASCII string. There are 2 additional variants
 of this function for passing unterminated UTF-8 and UTF-16 strings along with a byte length.
 
 * `textUtf8 (strUtf8, byteLength, x, y)`
 * `textUtf16 (strUtf16, byteLength, x, y)`
-
 :::
 
 ### `line (x1, y1, x2, y2)`
@@ -110,15 +108,15 @@ finally fades to zero volume during the release time.
 
 ## Storage
 
-Games can store up to 1024 bytes of persisted data.
+Games can persist up to 1024 bytes of data.
 
-### `storageRead (destPtr, size)`
+### `diskr (destPtr, size)`
 
 Reads up to `size` bytes from persistent storage into the pointer `destPtr`.
 
 Returns the number of bytes read, which may be less than `size`.
 
-### `storageWrite (srcPtr, size)`
+### `diskw (srcPtr, size)`
 
 Writes up to `size` bytes from the pointer `srcPtr` into persistent storage.
 
@@ -138,23 +136,22 @@ Called every frame, about 60 times per second.
 
 ## Other
 
-### `print (str)`
+### `trace (str)`
 
-Prints `str` to the console log.
+Prints `str` to the debug console. Note that by default `trace` calls are stripped from release
+builds.
 
-:::note
-
+:::note String Encoding
 By default, `str` is expected to be a `\0` terminated ASCII string. There are 2 additional variants
 of this function for passing unterminated UTF-8 and UTF-16 strings along with a byte length.
 
-* `printUtf8 (strUtf8, byteLength, x, y)`
-* `printUtf16 (strUtf16, byteLength, x, y)`
-
+* `traceUtf8 (strUtf8, byteLength)`
+* `traceUtf16 (strUtf16, byteLength)`
 :::
 
-### `printf (fmt, stackPtr)`
+### `tracef (fmt, stackPtr)`
 
-Used to implement a limited `printf` for C/C++. Only the following formatting characters are supported:
+C/C++ only, works like `printf`. Only these formatting characters are supported:
 
 * `%c`: Character
 * `%d`: Decimal

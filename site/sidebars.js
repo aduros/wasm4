@@ -19,27 +19,28 @@ module.exports = {
     {
         type: "category",
         label: "Getting Started",
-        // collapsible: false,
+        collapsible: false,
         items: [
-            "getting-started/installation",
-            "getting-started/configuration",
+            "getting-started/setup",
+            "getting-started/hello-world",
         ],
     },
     {
         type: "category",
         label: "Guides",
-        // collapsible: false,
+        collapsible: false,
         items: [
             "guides/images",
         ],
     },
     {
         type: "category",
-        label: "Programming Reference",
-        // collapsible: false,
+        label: "Reference",
+        collapsible: false,
         items: [
-            "programming-reference/functions",
-            "programming-reference/memory",
+            "reference/functions",
+            "reference/memory",
+            "reference/hotkeys",
         ],
     },
   ],

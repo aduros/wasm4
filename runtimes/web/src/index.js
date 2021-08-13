@@ -2,6 +2,8 @@ import * as constants from "./constants";
 import { Runtime } from "./runtime";
 import { websocket } from "./devkit";
 
+import "./styles.css";
+
 const qs = new URL(document.location).searchParams;
 const cartUrl = qs.has("url") ? qs.get("url") : "cart.wasm";
 

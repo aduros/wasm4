@@ -1,0 +1,135 @@
+html, body {
+  height: 100%;
+  margin: 0;
+}
+body {
+  background: #202020;
+  touch-action: none;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#content {
+  width: 100vmin;
+  height: 100vmin;
+  overflow: hidden;
+}
+
+#content canvas, #poster img {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+@media (pointer: fine) {
+  .gamepad {
+    display: none;
+  }
+}
+.gamepad {
+  pointer-events: none;
+}
+
+#gamepad-dpad {
+  position: absolute;
+  width: 39px;
+  height: 120px;
+  left: 69px;
+  bottom: 30px;
+  background: #444;
+  border-radius: 9px;
+}
+#gamepad-dpad:before {
+  position: absolute;
+  width: 120px;
+  height: 39px;
+  top: 39px;
+  left: -39px;
+  background: #444;
+  border-radius: 9px;
+  content: "";
+}
+#gamepad-dpad:after {
+  position: absolute;
+  height: 39px;
+  width: 39px;
+  top: 39px;
+  border-radius: 100%;
+  background: #333;
+  content: "";
+}
+#gamepad-dpad.pressed-left:before {
+  border-left: 4px solid #A93671;
+  width: 116px;
+}
+#gamepad-dpad.pressed-right:before {
+  border-right: 4px solid #A93671;
+  width: 116px;
+}
+#gamepad-dpad.pressed-up {
+  border-top: 4px solid #A93671;
+}
+#gamepad-dpad.pressed-down {
+  border-bottom: 4px solid #A93671;
+  height: 116px;
+}
+
+#gamepad-action1 {
+  right: 80px;
+  bottom: 30px;
+}
+#gamepad-action2 {
+  right: 30px;
+  bottom: 90px;
+}
+#gamepad-action1, #gamepad-action2 {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border: 4px solid #A93671;
+  border-radius: 50px;
+}
+#gamepad-action1.pressed, #gamepad-action2.pressed {
+  background: #A93671;
+}
+
+.play-button {
+  box-sizing: border-box;
+  position: relative;
+  display: block;
+  /* transform: scale(var(--ggs,1)); */
+  transform: scale(10);
+  width: 22px;
+  height: 22px;
+  border: 2px solid;
+  border-radius: 20px
+}
+.play-button::before {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  width: 0;
+  height: 10px;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 6px solid;
+  top: 4px;
+  left: 7px
+}
+
+.info {
+  position: absolute;
+  background: rgba(0,0,0,0.5);
+  width: 100vmin;
+}
+
+#poster {
+  /* position: absolute; */
+}

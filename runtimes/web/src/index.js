@@ -134,6 +134,13 @@ function setClass (element, className, enabled) {
         }
     }
 
+    function requestFullscreen () {
+        if (document.fullscreenElement == null) {
+            document.body.requestFullscreen({navigationUI: "hide"});
+        }
+    }
+
+
     const onMouseEvent = event => {
         // Unhide the cursor if it was hidden by the keyboard handler
         document.body.style.cursor = "";
@@ -154,6 +161,15 @@ function setClass (element, className, enabled) {
         event.preventDefault();
     });
 
+    const HOTKEYS = {
+        50: saveState, // 2
+        52: loadState, // 4
+        82: reboot, // R
+        120: takeScreenshot, // F9
+        121: recordVideo, // F10
+        122: requestFullscreen, // F11
+    };
+
     const onKeyboardEvent = event => {
         const down = (event.type == "keydown");
 
@@ -164,21 +180,10 @@ function setClass (element, className, enabled) {
         document.body.style.cursor = "none";
 
         if (down) {
-            switch (event.keyCode) {
-            case 50: // 2
-                saveState();
-                return;
-            case 52: // 4
-                loadState();
-                return;
-            case 82: // R
-                reboot();
-                return;
-            case 120: // F9
-                takeScreenshot();
-                return;
-            case 121: // F10
-                recordVideo();
+            const hotkeyFn = HOTKEYS[event.keyCode];
+            if (hotkeyFn) {
+                hotkeyFn();
+                event.preventDefault();
                 return;
             }
         }
@@ -221,11 +226,9 @@ function setClass (element, className, enabled) {
     function onPointerEvent (event) {
         // Do certain things that require a user gesture
         if (event.type == "pointerup") {
-            if (document.fullscreenElement == null && event.pointerType == "touch") {
-                // Go fullscreen on mobile
-                document.body.requestFullscreen({navigationUI: "hide"});
+            if (event.pointerType == "touch") {
+                requestFullscreen();
             }
-
             runtime.unlockAudio();
         }
 

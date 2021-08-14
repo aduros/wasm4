@@ -6,14 +6,14 @@ const CARTS = [
         github: "aduros",
     },
     {
-        slug: "watris2",
-        title: "Watris 2",
+        slug: "platformer-test",
+        title: "Platformer Test",
         author: "Bruno Garcia",
         github: "aduros",
     },
     {
-        slug: "watris3",
-        title: "Watris 3",
+        slug: "sound-demo",
+        title: "Sound Demo",
         author: "Bruno Garcia",
         github: "aduros",
     },

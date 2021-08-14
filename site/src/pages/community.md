@@ -39,5 +39,6 @@ Here are WASM-4's goals for the future:
 
 WASM-4 was started by [Bruno Garcia](https://aduros.com).
 
-It was very much inspired by [PICO-8](https://www.lexaloffle.com/pico-8.php) and other fantasy
-consoles.
+It draws much inspiration from other small computers like
+[uxn](https://wiki.xxiivv.com/site/uxn.html) and [PICO-8](https://www.lexaloffle.com/pico-8.php),
+without which WASM-4 would not exist.

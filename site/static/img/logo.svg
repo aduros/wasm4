@@ -37,12 +37,13 @@
      id="namedview80"
      showgrid="false"
      inkscape:zoom="3.8307073"
-     inkscape:cx="26.65063"
-     inkscape:cy="48.126087"
+     inkscape:cx="-18.902315"
+     inkscape:cy="48.778708"
      inkscape:window-x="0"
      inkscape:window-y="35"
      inkscape:window-maximized="0"
-     inkscape:current-layer="svg78" />
+     inkscape:current-layer="svg78"
+     inkscape:document-rotation="0" />
   <defs
      id="defs67">
     <style
@@ -75,7 +76,7 @@
     </g>
   </g>
   <circle
-     style="fill:#d5f66e;stroke-width:0.871886"
+     style="fill:#d2e6bc;stroke-width:0.871886;fill-opacity:1"
      id="path128"
      cx="70.539375"
      cy="79.037666"
@@ -95,7 +96,7 @@
      x="11.345667"
      y="63.991669" />
   <circle
-     style="fill:#d2e6bc;stroke-width:0.871887"
+     style="fill:#d2e6bc;stroke-width:0.871887;fill-opacity:1"
      id="path128-0"
      cx="87"
      cy="59.400848"

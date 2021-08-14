@@ -43,7 +43,7 @@ export default function Carts ({ carts }) {
                     <div className="text--center">
                         <h1>Newest Games</h1>
                         <p>Games and experiments built by users.</p>
-                        <p><a className="button button--primary button--outline" target="_blank" href="https://github.com/aduros/wasm4/site/carts.js">+ Add Your Game</a></p>
+                        <p><a className="button button--primary button--outline" target="_blank" href="https://github.com/aduros/wasm4/blob/main/site/carts.js">+ Add Your Game</a></p>
                     </div>
                     <div className="row">
                         {cartButtons}

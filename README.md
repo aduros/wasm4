@@ -18,7 +18,7 @@
 ## About
 
 **WASM-4** is a low-level fantasy game console for building small games with WebAssembly. Game
-cartridges (ROMs) are small, self-contained .wasm files that can be built with any programming
+cartridges (ROMs) are small, self-contained `.wasm` files that can be built with any programming
 language that compiles to WebAssembly.
 
 ## Key Features
@@ -32,7 +32,7 @@ language that compiles to WebAssembly.
 * **Portable**: WASM-4 is designed to run on any device that can execute WebAssembly, even outside of
   the web. We're planning a lightweight implementation written in C that will run even on a potato.
 
-## 60 Second Quickstart
+## 🚀 60 Second Quickstart
 
 ```shell
 # Install the w4 command
@@ -52,7 +52,7 @@ w4 run build/cart.wasm
 
 For more info and guides, check the [full documentation](https://wasm4.org/docs).
 
-## Hardware Specs
+## 🎮 Hardware Specs
 
 - Display: 160x160 pixels, 4 customizable colors, updated at 60 Hz.
 - Memory: 64 KB linear RAM, memory-mapped I/O, save states.

@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://wasm4.org" target="_blank"><img src="https://wasm4.org/img/logo.svg" alt="WASM-4 Logo" width="200"></a>
+  <a href="https://wasm4.org"><img src="https://wasm4.org/img/logo.svg" alt="WASM-4 Logo" width="200"></a>
   <br>
   WASM-4
   <br>
@@ -9,29 +9,28 @@
 <h3 align="center">Build retro games using WebAssembly for a fantasy console</h3>
 
 <h4 align="center">
-  <a href="https://wasm4.org" target="_blank">Website</a> •
-  <a href="https://wasm4.org/play" target="_blank">Showcase</a> •
-  <a href="https://wasm4.org/docs" target="_blank">Docs</a> •
+  <a href="https://wasm4.org">Website</a> •
+  <a href="https://wasm4.org/play">Showcase</a> •
+  <a href="https://wasm4.org/docs">Docs</a> •
   <a href="https://github.com/aduros/wasm4/discussions">Discussions</a>
 </h4>
 
 ## About
 
-WASM-4 is a low-level fantasy game console for building small games with WebAssembly. Game
+**WASM-4** is a low-level fantasy game console for building small games with WebAssembly. Game
 cartridges (ROMs) are small, self-contained .wasm files that can be built with any programming
 language that compiles to WebAssembly.
 
 ## Key Features
 
-* Minimal: Fantasy consoles force developers to work within tech and design limitations. This is in
+* **Minimalist**: Fantasy consoles force developers to work within tech and design limitations. This is in
   contrast to large game engines like Unity, which can be daunting and distracting.
 
-* Language Agnostic: Use any programming language, as long as it can compile to WebAssembly. Out of
+* **Language Agnostic**: Use any programming language, as long as it can compile to WebAssembly. Out of
   the box we currently support: AssemblyScript, C/C++, Rust, Go.
 
-* Run Anywhere: WASM-4 is designed to be portable, with the goal of running on any device that can
-  execute WebAssembly, even outside of the web. We're planning a SDL implementation written in C
-  that will run even on a potato.
+* **Portable**: WASM-4 is designed to run on any device that can execute WebAssembly, even outside of
+  the web. We're planning a lightweight implementation written in C that will run even on a potato.
 
 ## 60 Second Quickstart
 
@@ -71,16 +70,3 @@ There are many ways to contribute, here are just a few ideas:
 - Submit a bug report or feature request on Github.
 - Answer questions on the discussions forum.
 - Implement support for a new tool or language.
-
-## Roadmap
-
-Here are WASM-4's goals for the future:
-
-- Grow and support a friendly open source community.
-- Build a lightweight native runtime in C + SDL.
-- Support bundling of native Windows/Mac/Linux/Android/iOS applications.
-- Add a pause button and options menu to the emulator.
-- First-class support for new languages: [Swift](https://swiftwasm.org/),
-  [Zig](https://ziglang.org/).
-- Support importing and playing music from [Beepbox](https://www.beepbox.co).
-- Improve responsiveness of the virtual gamepad on mobile.

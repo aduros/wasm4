@@ -30,13 +30,8 @@ module.exports = {
           position: 'left',
           label: 'Learn',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+        // {to: '/blog', label: 'Blog', position: 'left'},
         {to: '/community', label: 'Community', position: 'left'},
-        // {
-        //   href: 'https://github.com/aduros/wasm4',
-        //   label: 'GitHub',
-        //   position: 'right',
-        // },
         {
           href: 'https://github.com/aduros/wasm4',
           position: 'right',

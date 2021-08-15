@@ -142,12 +142,12 @@ export class Runtime {
 
     textUtf8 (textPtr, byteLength, x, y) {
         const text = new Uint8Array(this.memory.buffer, textPtr, byteLength);
-        this.framebuffer.drawTextLength(text, x, y);
+        this.framebuffer.drawText(text, x, y);
     }
 
     textUtf16 (textPtr, byteLength, x, y) {
         const text = new Uint16Array(this.memory.buffer, textPtr, byteLength >> 1);
-        this.framebuffer.drawTextLength(text, x, y);
+        this.framebuffer.drawText(text, x, y);
     }
 
     blit (spritePtr, x, y, width, height, flags) {

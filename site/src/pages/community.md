@@ -21,6 +21,7 @@ There are many ways to contribute, here are just a few ideas:
 - Submit a bug report or feature request on Github.
 - Answer questions on the forums.
 - Implement support for a new tool or language.
+- Give the project a star on Github for visibility.
 
 ## Roadmap
 

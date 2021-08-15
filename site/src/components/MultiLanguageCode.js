@@ -4,7 +4,7 @@ import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
 
 const LABELS = {
-    "language-cpp": "C/C++",
+    "language-cpp": "C / C++",
     "language-typescript": "AssemblyScript",
     "language-rust": "Rust",
     "language-go": "Go",

@@ -58,6 +58,11 @@ html[data-theme='dark'] .header-github-link:before {
   color: var(--ifm-navbar-link-color);
 }
 
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
 .cart .screenshot {
   image-rendering: pixelated;
   image-rendering: crisp-edges;

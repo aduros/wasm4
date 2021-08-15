@@ -56,17 +56,18 @@ For more info and guides, check the [full documentation](https://wasm4.org/docs)
 
 - Display: 160x160 pixels, 4 customizable colors, updated at 60 Hz.
 - Memory: 64 KB linear RAM, memory-mapped I/O, save states.
-- Cartridge Size Limit: 128 KB.
+- Cartridge Size Limit: 64 KB.
 - Input: Keyboard, mouse, touchscreen, up to 4 gamepads.
 - Audio: 2 pulse wave channels, 1 triangle wave channel, 1 noise channel.
 - Disk Storage: 1024 bytes.
 
-## Contributing
+## 🙏 Contributing
 
-There are many ways to contribute, here are just a few ideas:
+Contributions are welcome! Here are just a few ways to help:
 
 - **Build a game or experiment, we'll feature it on wasm4.org!**
 - Improve our documentation or write a tutorial.
 - Submit a bug report or feature request on Github.
 - Answer questions on the discussions forum.
 - Implement support for a new tool or language.
+- Give the project a star on Github for visibility.

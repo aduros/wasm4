@@ -42,19 +42,21 @@ For info on other parameters, see `blit()`.
 
 Draws a rectangle.
 
-`DRAW_COLORS` color 0 is used as the fill color, `DRAW_COLORS` color 1 is used as the border color.
+`DRAW_COLORS` color 1 is used as the fill color, `DRAW_COLORS` color 2 is used as the border color.
 
 ### `oval (x, y, width, height)`
 
 Draws an oval (or circle).
 
-`DRAW_COLORS` color 0 is used as the fill color, `DRAW_COLORS` color 1 is used as the border color.
+`DRAW_COLORS` color 1 is used as the fill color, `DRAW_COLORS` color 2 is used as the border color.
 
 ### `text (str, x, y)`
 
 Draws text using the built-in system font. The string may contain new-line (`\n`) characters.
 
-`DRAW_COLORS` color 0 is used as the text color, `DRAW_COLORS` color 1 is used as the background color.
+The font is 8x8 pixels per character.
+
+`DRAW_COLORS` color 1 is used as the text color, `DRAW_COLORS` color 2 is used as the background color.
 
 :::note String Encoding
 By default, `str` is expected to be a `\0` terminated ASCII string. There are 2 additional variants
@@ -68,7 +70,7 @@ of this function for passing unterminated UTF-8 and UTF-16 strings along with a 
 
 Draws a line between two points.
 
-`DRAW_COLORS` color 0 is used as the line color.
+`DRAW_COLORS` color 1 is used as the line color.
 
 ## Sound
 
@@ -119,6 +121,8 @@ Returns the number of bytes read, which may be less than `size`.
 ### `diskw (srcPtr, size)`
 
 Writes up to `size` bytes from the pointer `srcPtr` into persistent storage.
+
+Any previously saved data on the disk is replaced.
 
 Returns the number of bytes written, which may be less than `size`.
 

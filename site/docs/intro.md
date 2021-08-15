@@ -26,7 +26,7 @@ it.
 
 - Display: 160x160 pixels, 4 customizable colors, updated at 60 Hz.
 - Memory: 64 KB linear RAM, memory-mapped I/O, save states.
-- Cartridge Size Limit: 128 KB.
+- Cartridge Size Limit: 64 KB.
 - Input: Keyboard, mouse, touchscreen, up to 4 gamepads.
 - Audio: 2 pulse wave channels, 1 triangle wave channel, 1 noise channel.
 - Disk Storage: 1024 bytes.

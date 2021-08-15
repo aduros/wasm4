@@ -6,9 +6,8 @@ const CARTS = require('./carts');
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: 'WASM-4',
-  // tagline: 'A fantasy console for retro games built with WebAssembly',
   tagline: 'Build retro games using WebAssembly for a fantasy console',
-  url: 'https://your-docusaurus-test-site.com',
+  url: 'https://wasm4.org',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',

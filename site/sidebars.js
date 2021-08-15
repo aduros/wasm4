@@ -27,10 +27,15 @@ module.exports = {
     },
     {
         type: "category",
-        label: "Examples",
+        label: "Guides",
         collapsible: false,
         items: [
-            "examples/images",
+            "guides/user-input",
+            "guides/basic-drawing",
+            "guides/sprites",
+            "guides/audio",
+            "guides/saving-data",
+            "guides/distribution",
         ],
     },
     {

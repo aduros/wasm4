@@ -122,7 +122,7 @@ blit(&smiley[0], 10, 10, 8, 8, BLIT_1BPP | BLIT_FLIP_Y);
 
 </MultiLanguageCode>
 
-For a full list of blit flags, see the [Functions](/doc/reference/functions) reference.
+For a full list of blit flags, see the [Functions](/docs/reference/functions) reference.
 
 ## 2BPP Format
 

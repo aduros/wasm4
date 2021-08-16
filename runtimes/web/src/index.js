@@ -7,13 +7,21 @@ import "./styles.css";
 
 const qs = new URL(document.location).searchParams;
 
-const poster = document.getElementById("poster");
-let posterImg;
-const posterUrl = qs.get("screenshot");
-if (posterUrl != null) {
-    posterImg = document.createElement("img");
-    posterImg.src = posterUrl;
-    poster.appendChild(posterImg);
+const screenshot = qs.get("screenshot");
+if (screenshot != null) {
+    const img = document.createElement("img");
+    img.src = screenshot;
+    document.getElementById("screenshot").appendChild(img);
+}
+
+const title = qs.get("title");
+if (title != null) {
+    document.getElementById("title").textContent = title;
+}
+
+const author = qs.get("author");
+if (author != null) {
+    document.getElementById("author").textContent = "by "+author;
 }
 
 function setClass (element, className, enabled) {
@@ -47,22 +55,23 @@ async function loadCartWasm () {
     const wasmBuffer = await loadCartWasm();
     await runtime.load(wasmBuffer);
 
-    if (posterImg != null) {
+    if (screenshot != null) {
+        // Wait until the initial focus before starting the runtime
         await new Promise(resolve => {
-            posterImg.onpointerdown = function () {
-                posterImg.onpointerdown = null;
+            window.onpointerdown = function () {
+                window.onpointerdown = null;
                 runtime.unlockAudio();
                 resolve();
             };
         });
 
         window.onblur = function () {
-            poster.style.display = "";
+            document.body.classList.remove("focus");
         }
         window.onfocus = function () {
-            poster.style.display = "none";
+            document.body.classList.add("focus");
         }
-        poster.style.display = "none";
+        document.body.classList.add("focus");
     }
 
     runtime.start();

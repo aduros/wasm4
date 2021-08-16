@@ -2,9 +2,11 @@ html, body {
   height: 100%;
   margin: 0;
 }
+
 body {
   background: #202020;
   touch-action: none;
+  font-family: system-ui;
 }
 
 .container {
@@ -20,7 +22,7 @@ body {
   overflow: hidden;
 }
 
-#content canvas, #poster img {
+#content canvas, #screenshot img {
   width: 100%;
   height: 100%;
   image-rendering: pixelated;
@@ -32,6 +34,15 @@ body {
     display: none;
   }
 }
+
+body.focus .infobox, body.focus #screenshot {
+  display: none;
+}
+
+body:not(.focus) .gamepad {
+  display: none;
+}
+
 .gamepad {
   pointer-events: none;
 }
@@ -101,14 +112,16 @@ body {
 
 .play-button {
   box-sizing: border-box;
-  position: relative;
   display: block;
-  /* transform: scale(var(--ggs,1)); */
-  transform: scale(10);
+  transform: scale(4);
   width: 22px;
   height: 22px;
   border: 2px solid;
-  border-radius: 20px
+  border-radius: 20px;
+
+  position: absolute;
+  top: calc(50vmin - 11px);
+  left: calc(50vmin - 11px);
 }
 .play-button::before {
   content: "";
@@ -124,12 +137,16 @@ body {
   left: 7px
 }
 
-.info {
+.infobox {
   position: absolute;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.8);
   width: 100vmin;
+  height: 100%;
+  color: #fff;
+  padding: 20px;
+  cursor: pointer;
 }
 
-#poster {
-  /* position: absolute; */
+body {
+  overflow: hidden;
 }

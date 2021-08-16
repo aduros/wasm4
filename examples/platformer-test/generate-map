@@ -1,0 +1,36 @@
+#!/usr/bin/env node
+//
+// Quick tool to generate a compressed map
+
+const width = 16; // must be multiple of 8
+const height = 10;
+const map = [
+    1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,
+    1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,
+    1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,
+    1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,
+    1,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,
+    1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,
+    1,0,0,0,0,1,1,0,0,1,0,0,0,0,0,0,
+    1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,
+    1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,
+    1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,
+];
+const bytes = new Uint8Array(Math.ceil(width*height/8));
+
+function set (value, x, y) {
+    const idx = (y*width + x) >> 3;
+    const shift = (x & 0x07);
+    const mask = 0x1 << shift;
+    bytes[idx] = (value << shift) | (bytes[idx] & (~mask));
+}
+
+for (let y = 0; y < height; ++y) {
+    for (let x = 0; x < width; ++x) {
+        set(map[y*width+x], x, y);
+    }
+}
+
+console.log(`#define MAP_WIDTH ${width}`);
+console.log(`#define MAP_HEIGHT ${height}`);
+console.log(`const char map[] = { ${bytes.join(",")} };`);

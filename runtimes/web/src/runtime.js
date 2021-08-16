@@ -198,11 +198,9 @@ export class Runtime {
     }
 
     print (str) {
-        if (str.length > 0) {
-            console.log(str);
-            if (websocket != null && websocket.readyState == 1) {
-                websocket.send(str);
-            }
+        console.log(str);
+        if (websocket != null && websocket.readyState == 1) {
+            websocket.send(str);
         }
     }
 

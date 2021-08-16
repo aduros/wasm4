@@ -26,7 +26,7 @@ function start (cartFile) {
     const wsServer = new WebSocketServer({ noServer: true });
     wsServer.on("connection", socket => {
         socket.on("message", message => {
-            process.stdout.write(message);
+            console.log(message);
         });
     });
     server.on("upgrade", (request, socket, head) => {

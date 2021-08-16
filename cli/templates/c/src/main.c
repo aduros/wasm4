@@ -1,6 +1,6 @@
 #include "wasm4.h"
 
-const char face[] = {
+const char smiley[] = {
     0b11000011,
     0b10000001,
     0b00100100,
@@ -11,30 +11,15 @@ const char face[] = {
     0b11000011,
 };
 
-int x = 76;
-int y = 76;
-
 void update () {
+    *DRAW_COLORS = 2;
+    text("Hello from C!", 10, 10);
+
     char gamepad = *GAMEPAD1;
-    if (gamepad & BUTTON_LEFT) {
-        x -= 1;
-    }
-    if (gamepad & BUTTON_RIGHT) {
-        x += 1;
-    }
-    if (gamepad & BUTTON_UP) {
-        y -= 1;
-    }
-    if (gamepad & BUTTON_DOWN) {
-        y += 1;
+    if (gamepad & BUTTON_1) {
+        *DRAW_COLORS = 4;
     }
 
-    /* *DRAW_COLORS = 0xf2; */
-    /* blit(face, x, y, 8, 8, 0); */
-
-    /* *DRAW_COLORS = 0xff2f; */
-    text("Hello from C!", 0, 10);
-
-    *DRAW_COLORS = 0x3f;
-    rect(x, y, 50, 50);
+    blit(smiley, 76, 76, 8, 8, BLIT_1BPP);
+    text("Press X to blink", 16, 90);
 }

@@ -79,56 +79,57 @@ export class Framebuffer {
         }
     }
 
-    drawOval (x0, y0, a, b) {
-        // TODO(2021-08-11): Implement oval()
-        //
-        // const drawColors = this.drawColors[0];
-        // // const dc0 = drawColors & 0xf;
-        // const dc1 = (drawColors >> 4) & 0xf;
-        // if (dc1 == 0xf) {
-        //     return;
-        // }
-        // const strokeColor = (dc1-1) & 0x3;
-        //
-        // if(a <= 0) return;
-        // if(b <= 0) return;
-        //
-        // let aa2 = a*a*2, bb2 = b*b*2;
-        //
-        // {
-        //     let x = a, y = 0;
-        //     let dx = (1-2*a)*b*b, dy = a*a;
-        //     let sx = bb2*a, sy=0;
-        //     let e = 0;
-        //
-        //     while (sx >= sy)
-        //     {
-        //         this.drawPoint(strokeColor, (x0+x), (y0+y)); /*   I. Quadrant */
-        //         this.drawPoint(strokeColor, (x0+x), (y0-y)); /*  II. Quadrant */
-        //         this.drawPoint(strokeColor, (x0-x), (y0+y)); /* III. Quadrant */
-        //         this.drawPoint(strokeColor, (x0-x), (y0-y)); /*  IV. Quadrant */
-        //         y++; sy += aa2; e += dy; dy += aa2;
-        //         if(2*e+dx >0) { x--; sx -= bb2; e  += dx; dx += bb2; }
-        //     }
-        // }
-        //
-        // {
-        //     let x = 0, y = b;
-        //     let dx = b*b, dy = (1-2*b)*a*a;
-        //     let sx = 0, sy=aa2*b;
-        //     let e = 0;
-        //
-        //     while (sy >= sx)
-        //     {
-        //         this.drawPoint(strokeColor, (x0+x), (y0+y)); /*   I. Quadrant */
-        //         this.drawPoint(strokeColor, (x0+x), (y0-y)); /*  II. Quadrant */
-        //         this.drawPoint(strokeColor, (x0-x), (y0+y)); /* III. Quadrant */
-        //         this.drawPoint(strokeColor, (x0-x), (y0-y)); /*  IV. Quadrant */
-        //
-        //         x++; sx += bb2; e += dx; dx += bb2;
-        //         if(2*e+dy >0) { y--; sy -= aa2; e  += dy; dy += aa2; }
-        //     }
-        // }
+    drawOval (x, y, width, height) {
+        const drawColors = this.drawColors[0];
+        // const dc0 = drawColors & 0xf;
+        const dc1 = (drawColors >> 4) & 0xf;
+        if (dc1 == 0xf) {
+            return;
+        }
+        const strokeColor = (dc1-1) & 0x3;
+
+        const a = width/2, b = height/2;
+
+        if(a <= 0) return;
+        if(b <= 0) return;
+
+        const x0 = x + a, y0 = y + b;
+        const aa2 = a*a*2, bb2 = b*b*2;
+
+        {
+            let x = a, y = 0;
+            let dx = (1-2*a)*b*b, dy = a*a;
+            let sx = bb2*a, sy=0;
+            let e = 0;
+
+            while (sx >= sy)
+            {
+                this.drawPointUnclipped(strokeColor, (x0+x), (y0+y)); /*   I. Quadrant */
+                this.drawPointUnclipped(strokeColor, (x0+x), (y0-y)); /*  II. Quadrant */
+                this.drawPointUnclipped(strokeColor, (x0-x), (y0+y)); /* III. Quadrant */
+                this.drawPointUnclipped(strokeColor, (x0-x), (y0-y)); /*  IV. Quadrant */
+                y++; sy += aa2; e += dy; dy += aa2;
+                if(2*e+dx >0) { x--; sx -= bb2; e  += dx; dx += bb2; }
+            }
+        }
+
+        {
+            let x = 0, y = b;
+            let dx = b*b, dy = (1-2*b)*a*a;
+            let sx = 0, sy=aa2*b;
+            let e = 0;
+
+            while (sy >= sx)
+            {
+                this.drawPointUnclipped(strokeColor, (x0+x), (y0+y)); /*   I. Quadrant */
+                this.drawPointUnclipped(strokeColor, (x0+x), (y0-y)); /*  II. Quadrant */
+                this.drawPointUnclipped(strokeColor, (x0-x), (y0+y)); /* III. Quadrant */
+                this.drawPointUnclipped(strokeColor, (x0-x), (y0-y)); /*  IV. Quadrant */
+
+                x++; sx += bb2; e += dx; dx += bb2;
+                if(2*e+dy >0) { y--; sy -= aa2; e  += dy; dy += aa2; }
+            }
+        }
     }
 
     // From https://github.com/nesbox/TIC-80/blob/master/src/core/draw.c

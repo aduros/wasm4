@@ -71,8 +71,8 @@ async function loadCartWasm () {
         window.onfocus = function () {
             document.body.classList.add("focus");
         }
-        document.body.classList.add("focus");
     }
+    document.body.classList.add("focus");
 
     runtime.start();
 

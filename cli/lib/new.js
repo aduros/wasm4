@@ -26,13 +26,17 @@ const HELP = {
 }
 
 async function run (destDir, opts) {
-    let lang = "c";
+    let lang;
     if (opts.assemblyscript) {
         lang = "assemblyscript";
+    } else if (opts.c) {
+        lang = "c";
     } else if (opts.rust) {
         lang = "rust";
     } else if (opts.go) {
         lang = "go";
+    } else {
+        lang = "assemblyscript";
     }
 
     const srcDir = path.resolve(__dirname+"/../templates/"+lang);

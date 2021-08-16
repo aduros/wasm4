@@ -95,38 +95,38 @@ function run (sourceFile, lang) {
     const varName = path.basename(sourceFile, ".png").replace(/[^0-9A-Za-z]+/g, "_").replace(/^([0-9])/, "_$1");
 
     switch (lang) {
-    case "assemblyscript":
-        console.log(`const ${varName}_WIDTH = ${png.width};`);
-        console.log(`const ${varName}_HEIGHT = ${png.height};`);
-        console.log(`const ${varName}_FLAGS = ${flags}; // ${flagsHumanReadable}`);
+    case "assemblyscript": default:
+        console.log(`const ${varName}Width = ${png.width};`);
+        console.log(`const ${varName}Height = ${png.height};`);
+        console.log(`const ${varName}Flags = ${flags}; // ${flagsHumanReadable}`);
         process.stdout.write(`const ${varName} = memory.data<u8>([ `);
         printBytes();
         console.log(" ]);");
         break;
 
+    case "c":
+        console.log(`#define ${varName}Width ${png.width}`);
+        console.log(`#define ${varName}Height ${png.height}`);
+        console.log(`#define ${varName}Flags ${flagsHumanReadable}`);
+        process.stdout.write(`const char ${varName}[${bytes.length}] = { `);
+        printBytes();
+        console.log(" };");
+        break;
+
     case "rust":
-        console.log(`const ${varName}_WIDTH: u32 = ${png.width};`);
-        console.log(`const ${varName}_HEIGHT: u32 = ${png.height};`);
-        console.log(`const ${varName}_FLAGS: u32 = ${flags}; // ${flagsHumanReadable}`);
+        console.log(`const ${varName}Width: u32 = ${png.width};`);
+        console.log(`const ${varName}Height: u32 = ${png.height};`);
+        console.log(`const ${varName}Flags: u32 = ${flags}; // ${flagsHumanReadable}`);
         process.stdout.write(`const ${varName}: [u8; ${bytes.length}] = [ `);
         printBytes();
         console.log(" ];");
         break;
 
     case "go":
-        console.log(`const ${varName}_WIDTH = ${png.width};`);
-        console.log(`const ${varName}_HEIGHT = ${png.height};`);
-        console.log(`const ${varName}_FLAGS = ${flags}; // ${flagsHumanReadable}`);
+        console.log(`const ${varName}Width = ${png.width};`);
+        console.log(`const ${varName}Height = ${png.height};`);
+        console.log(`const ${varName}Flags = ${flags}; // ${flagsHumanReadable}`);
         process.stdout.write(`var ${varName} = [${bytes.length}]byte { `);
-        printBytes();
-        console.log(" };");
-        break;
-
-    default: // C
-        console.log(`#define ${varName}_WIDTH ${png.width}`);
-        console.log(`#define ${varName}_HEIGHT ${png.height}`);
-        console.log(`#define ${varName}_FLAGS ${flagsHumanReadable}`);
-        process.stdout.write(`const char ${varName}[${bytes.length}] = { `);
         printBytes();
         console.log(" };");
         break;
@@ -135,13 +135,17 @@ function run (sourceFile, lang) {
 exports.run = run;
 
 function runAll (files, opts) {
-    let lang = "c";
+    let lang;
     if (opts.assemblyscript) {
         lang = "assemblyscript";
+    } else if (opts.c) {
+        lang = "c";
     } else if (opts.rust) {
         lang = "rust";
     } else if (opts.go) {
         lang = "go";
+    } else {
+        lang = "assemblyscript";
     }
 
     for (let ii = 0; ii < files.length; ++ii) {

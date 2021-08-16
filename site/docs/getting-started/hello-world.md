@@ -52,9 +52,33 @@ We place this in a callback function called `update()` which is marked for expor
 (exact syntax varies by language). The WASM-4 runtime calls the `update()` callback every frame, at
 60 frames per second.
 
+## Debugging
+
+Use `trace()` to output a message to the debug console, which can be very useful for quick debugging.
+
+<MultiLanguageCode>
+
+```typescript
+w4.trace("Hello world!");
+```
+
+```c
+trace("Hello world!");
+```
+
+```rust
+trace("Hello world!");
+```
+
+```go
+trace("Hello world!");
+```
+
+</MultiLanguageCode>
+
 ## Accessing Memory
 
-Memory in WebAssembly is a contiguous, linear chunk that can be randomly accessed. WASM-4 reserves a
+Memory in WebAssembly is a contiguous, linear block that can be randomly accessed. WASM-4 reserves a
 region of that memory to map its state registers.
 
 One of those registers is `DRAW_COLORS` at address $14. Its value affects the color of all drawing
@@ -88,7 +112,3 @@ rect(10, 10, 32, 32);
 ```
 
 </MultiLanguageCode>
-
-:::info
-`DRAW_COLORS` can contain up to 4 colors, which we'll explore in the following pages.
-:::

@@ -66,7 +66,7 @@ console.log("// AssemblyScript");
 generate((name, addr) => `export const ${name}: usize = ${addr};`);
 
 console.log("// Rust");
-generate((name, addr) => `pub const ${name}: Register<u8> = Register::new(${addr});`);
+generate((name, addr) => `pub const ${name}: *const u8 = ${addr} as *const u8;`);
 
 console.log("// Go");
 generate((name, addr) => `var ${name} = (*${goTypes[name] || "uint8"})(unsafe.Pointer(uintptr(${addr})));`);

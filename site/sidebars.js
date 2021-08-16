@@ -30,8 +30,8 @@ module.exports = {
         label: "Guides",
         collapsible: false,
         items: [
-            "guides/user-input",
             "guides/basic-drawing",
+            "guides/user-input",
             "guides/sprites",
             "guides/audio",
             "guides/saving-data",

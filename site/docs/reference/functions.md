@@ -42,11 +42,11 @@ additional parameters.
 
 For info on other parameters, see `blit()`.
 
-### `rect (x, y, width, height)`
+### `line (x1, y1, x2, y2)`
 
-Draws a rectangle.
+Draws a line between two points.
 
-`DRAW_COLORS` color 1 is used as the fill color, `DRAW_COLORS` color 2 is used as the outline color.
+`DRAW_COLORS` color 1 is used as the line color.
 
 ### `oval (x, y, width, height)`
 
@@ -57,6 +57,12 @@ Draws an oval (or circle).
 :::caution
 `oval()` is not yet fully implemented and currently only supports drawing the outline.
 :::
+
+### `rect (x, y, width, height)`
+
+Draws a rectangle.
+
+`DRAW_COLORS` color 1 is used as the fill color, `DRAW_COLORS` color 2 is used as the outline color.
 
 ### `text (str, x, y)`
 
@@ -74,15 +80,11 @@ of this function for passing unterminated UTF-8 and UTF-16 strings along with a 
 * `textUtf16 (strUtf16, byteLength, x, y)`
 :::
 
-### `line (x1, y1, x2, y2)`
-
-Draws a line between two points.
-
-`DRAW_COLORS` color 1 is used as the line color.
-
 ## Sound
 
 ### `tone (frequency, volume, duration, flags)`
+
+Plays a sound tone.
 
 * `frequency`: Wave frequency in hertz.
 * `volume`: Volume between 0 and 100.
@@ -148,10 +150,17 @@ Called every frame, about 60 times per second.
 
 ## Other
 
+### `memcpy (destPtr, srcPtr, size)`
+
+Copies `size` bytes from `srcPtr` into `destPtr`.
+
+### `memset (destPtr, value, size)`
+
+Fills memory at `destPtr` with `size` bytes of the fixed value `value`.
+
 ### `trace (str)`
 
-Prints `str` to the debug console. Note that by default `trace` calls are stripped from release
-builds.
+Prints a message to the debug console.
 
 :::note String Encoding
 By default, `str` is expected to be a `\0` terminated ASCII string. There are 2 additional variants
@@ -170,11 +179,3 @@ C/C++ only, works like `printf`. Only these formatting characters are supported:
 * `%f`: Float
 * `%s`: String
 * `%x`: Hex
-
-### `memset (destPtr, value, size)`
-
-Fills memory at `destPtr` with `size` bytes of the fixed value `value`.
-
-### `memcpy (destPtr, srcPtr, size)`
-
-Copies `size` bytes from `srcPtr` into `destPtr`.

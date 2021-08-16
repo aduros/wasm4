@@ -24,7 +24,7 @@ else
 endif
 
 # wasm-opt flags
-WASM_OPT_FLAGS = -Oz --zero-filled-memory
+WASM_OPT_FLAGS = -Oz --zero-filled-memory --strip-producers
 
 SOURCES = $(wildcard src/*.c)
 OBJECTS = $(patsubst src/%.c, build/%.o, $(SOURCES))
@@ -36,8 +36,8 @@ all: build/cart.wasm
 build/cart.wasm: $(OBJECTS)
 	$(LD) -o $@ $(OBJECTS) $(LDFLAGS)
 ifneq ($(DEBUG), 1)
-ifeq (, $(shell $(WASM_OPT) --version))
-	@echo WARNING: $(WASM_OPT) was not found. Install it from binaryen for smaller builds!
+ifeq (, $(shell which $(WASM_OPT)))
+	@echo Tip: $(WASM_OPT) was not found. Install it from binaryen for smaller builds!
 else
 	$(WASM_OPT) $(WASM_OPT_FLAGS) $@ -o $@
 endif

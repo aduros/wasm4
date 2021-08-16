@@ -21,16 +21,23 @@
 cartridges (ROMs) are small, self-contained `.wasm` files that can be built with any programming
 language that compiles to WebAssembly.
 
+Development status: 🚧 Alpha
+
 ## Key Features
 
-* **Minimalist**: Fantasy consoles force developers to work within tech and design limitations. This is in
-  contrast to large game engines like Unity, which can be daunting and distracting.
+* **No Glue Code**: If you've ever tried to write even a simple "Hello World"
+  with WebAssembly before, you'll know it usually involves writing a bunch of
+  JS and HTML glue. WASM-4 removes all of that, games interface directly with
+  the system through a small API.
+
+* **Minimalist**: Fantasy consoles force developers to work with limited resources.
+  This makes them simple to learn, and easier to focus on finishing your game.
 
 * **Language Agnostic**: Use any programming language, as long as it can compile to WebAssembly. Out of
   the box we currently support: AssemblyScript, C/C++, Rust, Go.
 
 * **Portable**: WASM-4 is designed to run on any device that can execute WebAssembly, even outside of
-  the web. We're planning a lightweight implementation written in C that will run even on a potato.
+  the web! We're planning a lightweight implementation written in C that will run even on a potato.
 
 ## 🚀 60 Second Quickstart
 

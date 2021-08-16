@@ -135,7 +135,7 @@ PNG. We can then use `w4 png2src` to convert it to source code to paste into our
 
 For example, if we have this 4-color image of a bunny:
 
-<img src="bunny.png" width="160" className="pixelated"/>
+<img src="/img/bunny.png" width="160" className="pixelated"/>
 
 Note that the RGB color of this sprite doesn't matter, `w4 png2src` only cares about a pixel's
 palette index.

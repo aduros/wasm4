@@ -64,25 +64,25 @@ the palette).
 <MultiLanguageCode>
 
 ```typescript
-store<u16>(w4.DRAW_COLORS, 1);
+store<u16>(w4.DRAW_COLORS, 2);
 
 w4.rect(10, 10, 32, 32);
 ```
 
 ```c
-*DRAW_COLORS = 1;
+*DRAW_COLORS = 2;
 
 rect(10, 10, 32, 32);
 ```
 
 ```rust
-unsafe { *DRAW_COLORS = 1 }
+unsafe { *DRAW_COLORS = 2 }
 
 rect(10, 10, 32, 32);
 ```
 
 ```go
-*DRAW_COLORS = 1;
+*DRAW_COLORS = 2;
 
 rect(10, 10, 32, 32);
 ```

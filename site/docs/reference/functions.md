@@ -1,4 +1,8 @@
-# Functions
+---
+sidebar_label: Functions
+---
+
+# Functions Reference
 
 All function parameters are 32 bit integers unless otherwise noted.
 
@@ -76,7 +80,7 @@ Draws a line between two points.
 
 ### `tone (frequency, volume, duration, flags)`
 
-* `frequency`
+* `frequency`: Wave frequency in hertz.
 * `volume`: Volume between 0 and 100.
 * `duration`: Duration of the tone in frames (1/60th of a second), up to 255 frames.
 * `flags`: Flags that modify behavior:

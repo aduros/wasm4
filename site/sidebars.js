@@ -46,6 +46,7 @@ module.exports = {
             "reference/functions",
             "reference/memory",
             "reference/hotkeys",
+            "reference/inspiration",
         ],
     },
   ],

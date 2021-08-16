@@ -55,8 +55,8 @@ The default Gameboy-ish palette looks like this:
 All drawing functions are affected by the `DRAW_COLORS` memory register. `DRAW_COLORS` is a 16 bit value that can store up to 4 colors.
 
 For example, `rect()` uses the first draw color for the fill color, and the
-second draw color as the border color. To draw a light-green (palette color 2)
-rectangle with a black (palette color 4) border:
+second draw color as the outline color. To draw a light-green (palette color 2)
+rectangle with a black (palette color 4) outline:
 
 <MultiLanguageCode>
 
@@ -83,7 +83,7 @@ rect(10, 10, 32, 32);
 </MultiLanguageCode>
 
 A value of `0` in a draw color means it will be transparent. For example, to
-draw a black bordered rectangle with no fill, set `DRAW_COLORS` to `0x40`.
+draw a black outlined rectangle with no fill, set `DRAW_COLORS` to `0x40`.
 
 ## Drawing Text
 

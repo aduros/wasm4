@@ -21,7 +21,7 @@
 cartridges (ROMs) are small, self-contained `.wasm` files that can be built with any programming
 language that compiles to WebAssembly.
 
-Development status: 🚧 Alpha
+> Development status: ⚡ Alpha
 
 ## Key Features
 

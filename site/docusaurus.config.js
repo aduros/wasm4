@@ -37,10 +37,10 @@ module.exports = {
           className: 'header-github-link',
           'aria-label': 'GitHub repository',
         },
-        {
-          type: 'search',
-          position: 'right',
-        },
+        // {
+        //   type: 'search',
+        //   position: 'right',
+        // },
       ],
     },
     footer: {
@@ -98,10 +98,10 @@ module.exports = {
       disableSwitch: true,
       respectPrefersColorScheme: false,
     },
-    algolia: {
-      apiKey: '47ecd3b21be71c5822571b9f59e52544',
-      indexName: 'docusaurus-2',
-    },
+    // algolia: {
+    //   apiKey: '47ecd3b21be71c5822571b9f59e52544',
+    //   indexName: 'docusaurus-2',
+    // },
   },
   presets: [
     [

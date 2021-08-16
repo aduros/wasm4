@@ -46,13 +46,17 @@ For info on other parameters, see `blit()`.
 
 Draws a rectangle.
 
-`DRAW_COLORS` color 1 is used as the fill color, `DRAW_COLORS` color 2 is used as the border color.
+`DRAW_COLORS` color 1 is used as the fill color, `DRAW_COLORS` color 2 is used as the outline color.
 
 ### `oval (x, y, width, height)`
 
 Draws an oval (or circle).
 
-`DRAW_COLORS` color 1 is used as the fill color, `DRAW_COLORS` color 2 is used as the border color.
+`DRAW_COLORS` color 1 is used as the fill color, `DRAW_COLORS` color 2 is used as the outline color.
+
+:::caution
+`oval()` is not yet fully implemented and currently only supports drawing the outline.
+:::
 
 ### `text (str, x, y)`
 

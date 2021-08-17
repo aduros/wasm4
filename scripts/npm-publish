@@ -1,0 +1,16 @@
+#!/bin/sh -e
+
+cd runtimes/web
+npm run build
+cd -
+
+dir=`mktemp --directory`
+
+cp -r cli "$dir"
+cp README.md LICENSE.txt "$dir/cli"
+rm -f "$dir/cli/runtime"
+cp -r runtimes/web/dist "$dir/cli/runtime"
+
+npm publish "$dir/cli" "$@"
+
+rm -rf "$dir"

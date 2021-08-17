@@ -16,13 +16,13 @@ Coming soon!
 
 ## Publish on wasm4.org
 
-Send us a PR on Github to feature your game on the site!
+Send a PR on Github to feature your game on the site!
 
 1. Fork the repository.
 2. Edit
    [`/site/carts.js`](https://github.com/aduros/wasm4/blob/main/site/carts.js)
    and add an entry for your game. It should have a unique slug for the URL.
-3. Include your `<slug>.wasm` (cart) and `<slug>.png` (160x160 screenshot) in
+3. Add your `<slug>.wasm` (cart) and `<slug>.png` (160x160 screenshot) to
    [`/site/static/carts`](https://github.com/aduros/wasm4/tree/main/site/static/carts).
 4. Open a pull request!
 

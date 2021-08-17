@@ -52,30 +52,6 @@ We place this in a callback function called `update()` which is marked for expor
 (exact syntax varies by language). The WASM-4 runtime calls the `update()` callback every frame, at
 60 frames per second.
 
-## Debugging
-
-Use `trace()` to output a message to the debug console, which can be very useful for quick debugging.
-
-<MultiLanguageCode>
-
-```typescript
-w4.trace("Hello world!");
-```
-
-```c
-trace("Hello world!");
-```
-
-```rust
-trace("Hello world!");
-```
-
-```go
-trace("Hello world!");
-```
-
-</MultiLanguageCode>
-
 ## Accessing Memory
 
 Memory in WebAssembly is a contiguous, linear block that can be randomly accessed. WASM-4 reserves a
@@ -109,6 +85,30 @@ rect(10, 10, 32, 32);
 *DRAW_COLORS = 2;
 
 rect(10, 10, 32, 32);
+```
+
+</MultiLanguageCode>
+
+## Debugging
+
+Use `trace()` to output a message to the console, which can be very useful for quick debugging.
+
+<MultiLanguageCode>
+
+```typescript
+w4.trace("Hello world!");
+```
+
+```c
+trace("Hello world!");
+```
+
+```rust
+trace("Hello world!");
+```
+
+```go
+trace("Hello world!");
 ```
 
 </MultiLanguageCode>

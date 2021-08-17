@@ -19,7 +19,7 @@ right button is pressed.
 const gamepad = load<u8>(w4.GAMEPAD1);
 
 if (gamepad & w4.BUTTON_RIGHT) {
-    trace("Right button is down!");
+    w4.trace("Right button is down!");
 }
 ```
 

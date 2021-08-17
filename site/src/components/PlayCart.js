@@ -57,11 +57,12 @@ export default function PlayCart ({ cart }) {
                 <Embed {... cart}/>
 
                 <Giscus
-                    repo="laymonage/giscus"
-                    repoId="MDEwOlJlcG9zaXRvcnkzNTE5NTgwNTM="
-                    categoryId="MDE4OkRpc2N1c3Npb25DYXRlZ29yeTMyNzk2NTc1"
+                    repo="aduros/wasm4"
+                    repoId="MDEwOlJlcG9zaXRvcnkzOTMxOTY4MjI="
+                    category="Games"
+                    categoryId="DIC_kwDOF2-1Fs4B-mU1"
                     mapping="specific"
-                    term="Welcome to giscus!"
+                    term={cart.title}
                     theme="transparent_dark"
                     reactionsEnabled="1"
                     emitMetadata="0"

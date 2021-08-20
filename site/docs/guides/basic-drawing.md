@@ -12,9 +12,9 @@ For example, to change the palette to [Ice Cream GB](https://lospec.com/palette-
 
 ```typescript
 store<u32>(w4.PALETTE, 0xfff6d3, 0);
-store<u32>(w4.PALETTE, 0xf9a875, 1);
-store<u32>(w4.PALETTE, 0xeb6b6f, 2);
-store<u32>(w4.PALETTE, 0x7c3f58, 3);
+store<u32>(w4.PALETTE, 0xf9a875, 4);
+store<u32>(w4.PALETTE, 0xeb6b6f, 8);
+store<u32>(w4.PALETTE, 0x7c3f58, 12);
 ```
 
 ```c

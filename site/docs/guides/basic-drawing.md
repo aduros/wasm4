@@ -50,6 +50,8 @@ The default Gameboy-ish palette looks like this:
     <div className="col col--2" style={{padding: "1.5rem", background: "#071821", color: "#fff"}}>Color 4</div>
 </div>
 
+The fist color in the register is used as the screen background color. 
+
 ## The `DRAW_COLORS` Register
 
 All drawing functions are affected by the `DRAW_COLORS` memory register. `DRAW_COLORS` is a 16 bit value that can store up to 4 colors.

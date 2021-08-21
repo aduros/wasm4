@@ -128,7 +128,7 @@ export class Runtime {
             },
 
             // seed for AssemblyScript random generator
-            seed: Date,
+            seed: Date.now,
 
             // Temporary(?) for assemblyscript
             abort: function () {},

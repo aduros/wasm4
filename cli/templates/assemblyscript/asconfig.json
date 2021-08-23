@@ -4,7 +4,7 @@
   ],
   "options": {
     "binaryFile": "build/cart.wasm",
-    "runtime": "minimal",
+    "runtime": "incremental",
     "importMemory": true,
     "initialMemory": 1,
     "maximumMemory": 1,

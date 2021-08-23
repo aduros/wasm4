@@ -1,0 +1,23 @@
+{
+  "entries": [
+    "./src/main.ts"
+  ],
+  "options": {
+    "binaryFile": "build/cart.wasm",
+    "runtime": "incremental",
+    "importMemory": true,
+    "initialMemory": 1,
+    "maximumMemory": 1,
+    "noExportMemory": true,
+    "memoryBase": 6560
+  },
+  "targets": {
+    "release": {
+      "optimize": 3,
+      "noAssert": true
+    },
+    "debug": {
+      "debug": true
+    }
+  }
+}

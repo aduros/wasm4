@@ -56,6 +56,8 @@ export default function PlayCart ({ cart }) {
             <div className="container game-container">
                 <Embed {... cart}/>
 
+                <p>Controls: Arrows, X, Z</p>
+
                 <Giscus
                     repo="aduros/wasm4"
                     repoId="MDEwOlJlcG9zaXRvcnkzOTMxOTY4MjI="

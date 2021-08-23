@@ -50,7 +50,7 @@ The default Gameboy-ish palette looks like this:
     <div className="col col--2" style={{padding: "1.5rem", background: "#071821", color: "#fff"}}>Color 4</div>
 </div>
 
-The fist color in the register is used as the screen background color. 
+The first color in the palette register is used as the screen background color.
 
 ## The `DRAW_COLORS` Register
 

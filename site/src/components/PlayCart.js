@@ -51,7 +51,7 @@ export default function PlayCart ({ cart }) {
     return (
         <Layout
             title={cart.title}
-            description={cart.description}>
+            image={`https://wasm4.org/carts/${cart.slug}.png`}>
             <main>
             <div className="container game-container">
                 <Embed {... cart}/>

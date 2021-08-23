@@ -15,6 +15,10 @@ module.exports = {
   organizationName: 'aduros', // Usually your GitHub org/user name.
   projectName: 'wasm4', // Usually your repo name.
   themeConfig: {
+    image: 'img/logo.png',
+    metadatas: [
+        { name: 'description', property: 'og:description', content: 'Build retro games using WebAssembly for a fantasy console' },
+    ],
     navbar: {
       title: 'WASM-4',
       logo: {

@@ -11,10 +11,10 @@ For example, to change the palette to [Ice Cream GB](https://lospec.com/palette-
 <MultiLanguageCode>
 
 ```typescript
-store<u32>(w4.PALETTE, 0xfff6d3, 0);
-store<u32>(w4.PALETTE, 0xf9a875, 4);
-store<u32>(w4.PALETTE, 0xeb6b6f, 8);
-store<u32>(w4.PALETTE, 0x7c3f58, 12);
+store<u32>(w4.PALETTE, 0xfff6d3, 0 * sizeof<u32>());
+store<u32>(w4.PALETTE, 0xf9a875, 1 * sizeof<u32>());
+store<u32>(w4.PALETTE, 0xeb6b6f, 2 * sizeof<u32>());
+store<u32>(w4.PALETTE, 0x7c3f58, 3 * sizeof<u32>());
 ```
 
 ```c

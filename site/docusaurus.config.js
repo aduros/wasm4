@@ -102,10 +102,10 @@ module.exports = {
       disableSwitch: true,
       respectPrefersColorScheme: false,
     },
-    // algolia: {
-    //   apiKey: '47ecd3b21be71c5822571b9f59e52544',
-    //   indexName: 'docusaurus-2',
-    // },
+    algolia: {
+      apiKey: 'd2a6c52773edfa8a691cbd670d02e0f6',
+      indexName: 'wasm4',
+    },
   },
   presets: [
     [

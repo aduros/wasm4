@@ -217,7 +217,7 @@ async function loadCartWasm () {
             mask = constants.BUTTON_X;
             break;
         case 90: case 18: case 186:
-        case 67: case 74:
+        case 67: case 74: case 89:
             mask = constants.BUTTON_Z;
             break;
         case 38:

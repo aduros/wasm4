@@ -48,6 +48,7 @@ program.command("bundle <cart>")
     });
 
 program
+    .name("w4")
     .description("WASM-4: Build retro games using WebAssembly for a fantasy console.\n\nLearn more: https://wasm4.org")
     .version(JSON.parse(fs.readFileSync(__dirname+"/package.json")).version)
     .parse();

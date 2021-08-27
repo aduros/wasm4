@@ -8,8 +8,8 @@ dir=`mktemp --directory`
 
 cp -r cli "$dir"
 cp README.md LICENSE.txt "$dir/cli"
-rm -f "$dir/cli/runtime"
-cp -r runtimes/web/dist "$dir/cli/runtime"
+rm -f "$dir/cli/assets/runtime"
+cp -r runtimes/web/dist "$dir/cli/assets/runtime"
 
 npm publish "$dir/cli" "$@"
 

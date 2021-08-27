@@ -47,7 +47,7 @@ async function run (destDir, opts) {
         lang = LANGS.ASSEMBLYSCRIPT;
     }
 
-    const srcDir = path.resolve(__dirname+"/../templates/"+lang);
+    const srcDir = path.resolve(__dirname+"/../assets/templates/"+lang);
     await copy(srcDir, destDir);
     await init(destDir, lang);
 

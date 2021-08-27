@@ -37,5 +37,8 @@
     "qrcode": "^1.4.4",
     "recursive-copy": "^2.0.13",
     "ws": "^7.5.3"
+  },
+  "pkg": {
+    "assets": "assets/**/*"
   }
 }

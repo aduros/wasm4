@@ -13,7 +13,7 @@ function start (cartFile) {
     app.get("/cart.wasm", (req, res) => {
         fs.createReadStream(cartFile).pipe(res);
     });
-    app.use(express.static(__dirname+"/../runtime"));
+    app.use(express.static(__dirname+"/../assets/runtime"));
 
     const server = app.listen(PORT, async () => {
         const qr = await qrcode.toString(`http://${getIP()}:${PORT}`, {type: "terminal"});

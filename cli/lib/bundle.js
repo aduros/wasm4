@@ -30,7 +30,7 @@ function z85 (src) {
 }
 
 async function run (cartFile, opts) {
-    const runtimeDir = path.resolve(__dirname+"/../runtime");
+    const runtimeDir = path.resolve(__dirname+"/../assets/runtime");
 
     const outFile = opts.html;
     if (outFile == null) {

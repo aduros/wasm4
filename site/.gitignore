@@ -1,4 +1,5 @@
 /static/embed
+/static/download
 
 # Dependencies
 /node_modules

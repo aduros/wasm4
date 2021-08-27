@@ -2,6 +2,7 @@
 
 runtime=$PWD/runtimes/web
 site=$PWD/site
+cli=$PWD/cli
 
 cd "$runtime"
 npm ci
@@ -12,3 +13,26 @@ rm -rf static/embed
 cp -r "$runtime/dist" static/embed
 npm ci
 npm run build
+
+rm -rf static/download
+mkdir static/download
+npm install -g pkg
+pkg --compress GZip --out-path static/download/bin --targets node12-win,node12-mac,node12-linux "$cli"
+cd static/download
+
+mkdir wasm4-linux
+mv bin/wasm4-linux wasm4-linux/w4
+zip -r wasm4-linux.zip wasm4-linux
+rm -rf wasm4-linux
+
+mkdir wasm4-macos
+mv bin/wasm4-macos wasm4-macos/w4
+zip -r wasm4-macos.zip wasm4-macos
+rm -rf wasm4-macos
+
+mkdir wasm4-windows
+mv bin/wasm4-win.exe wasm4-windows/w4.exe
+zip -r wasm4-windows.zip wasm4-windows
+rm -rf wasm4-windows
+
+rm -rf bin

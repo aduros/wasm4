@@ -4,6 +4,9 @@ runtime=$PWD/runtimes/web
 site=$PWD/site
 cli=$PWD/cli
 
+cd "$cli"
+npm ci
+
 cd "$runtime"
 npm ci
 npm run build

@@ -8,8 +8,8 @@ WASM-4 uses a fixed memory layout of 64 KB.
 | `$0014` | 2            | [DRAW_COLORS](#draw_colors)     |
 | `$0016` | 4            | [GAMEPADS](#gamepads)           |
 | `$001a` | 2            | [MOUSE_X](#mouse_x)             |
-| `$001b` | 2            | [MOUSE_Y](#mouse_y)             |
-| `$001c` | 1            | [MOUSE_BUTTONS](#mouse_buttons) |
+| `$001c` | 2            | [MOUSE_Y](#mouse_y)             |
+| `$001e` | 1            | [MOUSE_BUTTONS](#mouse_buttons) |
 | `$00a0` | 6400         | [FRAMEBUFFER](#framebuffer)     |
 | `$19a0` | 58975        | Available program memory        |
 

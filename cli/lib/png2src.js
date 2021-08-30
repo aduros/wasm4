@@ -114,10 +114,13 @@ function run (sourceFile, lang) {
         break;
 
     case "rust":
-        console.log(`const ${varName.toLocaleUpperCase()}_WIDTH = ${png.width};`);
-        console.log(`const ${varName.toLocaleUpperCase()}_HEIGHT = ${png.height};`);
-        console.log(`const ${varName.toLocaleUpperCase()}_FLAGS = ${flags}; // ${flagsHumanReadable}`);
-        process.stdout.write(`const ${varName.toLocaleUpperCase()}: [u8; ${bytes.length}] = [ `);
+        let idiomaticVarName = (varName.substr(0,1) + varName.substr(1)
+                        .replace(/[A-Z]/g, l => '_' + l))
+                        .toLocaleUpperCase()
+        console.log(`const ${idiomaticVarName}_WIDTH = ${png.width};`);
+        console.log(`const ${idiomaticVarName}_HEIGHT = ${png.height};`);
+        console.log(`const ${idiomaticVarName}_FLAGS = ${flags}; // ${flagsHumanReadable}`);
+        process.stdout.write(`const ${idiomaticVarName}: [u8; ${bytes.length}] = [ `);
         printBytes();
         console.log(" ];");
         break;

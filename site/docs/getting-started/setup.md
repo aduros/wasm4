@@ -87,7 +87,8 @@ w4 run build/cart.wasm
 
 <TabItem value="language-rust">
 
-To compile Rust projects you will need `cargo` installed.
+To compile Rust projects you will need `cargo` installed. You will also need the wasm32 target,
+which can be installed with `rustup target add wasm32-unknown-unknown`.
 
 ```shell
 w4 new --rust hello-world

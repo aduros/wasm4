@@ -114,10 +114,10 @@ function run (sourceFile, lang) {
         break;
 
     case "rust":
-        console.log(`const ${varName}Width: u32 = ${png.width};`);
-        console.log(`const ${varName}Height: u32 = ${png.height};`);
-        console.log(`const ${varName}Flags: u32 = ${flags}; // ${flagsHumanReadable}`);
-        process.stdout.write(`const ${varName}: [u8; ${bytes.length}] = [ `);
+        console.log(`const ${varName.toLocaleUpperCase()}_WIDTH = ${png.width};`);
+        console.log(`const ${varName.toLocaleUpperCase()}_HEIGHT = ${png.height};`);
+        console.log(`const ${varName.toLocaleUpperCase()}_FLAGS = ${flags}; // ${flagsHumanReadable}`);
+        process.stdout.write(`const ${varName.toLocaleUpperCase()}: [u8; ${bytes.length}] = [ `);
         printBytes();
         console.log(" ];");
         break;

@@ -4,7 +4,7 @@
         "--import-memory",
         "--initial-memory=65536",
         "--max-memory=65536",
-        "-zstack-size=6560",
+        "-zstack-size=7584",
         "--strip-all"
     ]
 }

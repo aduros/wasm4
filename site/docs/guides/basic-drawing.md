@@ -25,11 +25,14 @@ PALETTE[3] = 0x7c3f58;
 ```
 
 ```rust
-let mut palette = unsafe { *PALETTE };
-palette[0] = 0xfff6d3;
-palette[1] = 0xf9a875;
-palette[2] = 0xeb6b6f;
-palette[3] = 0x7c3f58;
+unsafe {
+    *PALETTE = [
+        0xfff6d3,
+        0xf9a875,
+        0xeb6b6f,
+        0x7c3f58,
+    ];
+}
 ```
 
 ```go

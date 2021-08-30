@@ -49,12 +49,12 @@ extern {
 }
 
 /// Copies a subregion within a larger sprite atlas to the framebuffer.
-pub fn blit_sub (sprite: &[u8], x: i32, y: i32, width: u32, height: u32, src_x: u32, src_y: u32, stride: i32, flags: u32) {
+pub fn blit_sub (sprite: &[u8], x: i32, y: i32, width: u32, height: u32, src_x: u32, src_y: u32, stride: u32, flags: u32) {
     unsafe { extern_blit_sub(sprite.as_ptr(), x, y, width, height, src_x, src_y, stride, flags) }
 }
 extern {
     #[link_name = "blitSub"]
-    fn extern_blit_sub (sprite: *const u8, x: i32, y: i32, width: u32, height: u32, src_x: u32, src_y: u32, stride: i32, flags: u32);
+    fn extern_blit_sub (sprite: *const u8, x: i32, y: i32, width: u32, height: u32, src_x: u32, src_y: u32, stride: u32, flags: u32);
 }
 
 pub const BLIT_2BPP: u32 = 1;

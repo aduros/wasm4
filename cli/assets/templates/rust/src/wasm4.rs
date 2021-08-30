@@ -154,10 +154,10 @@ extern {
 }
 
 /// Prints a message to the debug console.
-pub fn trace (text: &str, x: i32, y: i32) {
-    unsafe { extern_trace(text.as_ptr(), text.len(), x, y) }
+pub fn trace (text: &str) {
+    unsafe { extern_trace(text.as_ptr(), text.len()) }
 }
 extern {
     #[link_name = "traceUtf8"]
-    fn extern_trace (trace: *const u8, length: usize, x: i32, y: i32);
+    fn extern_trace (trace: *const u8, length: usize);
 }

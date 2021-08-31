@@ -2,11 +2,15 @@ import { WIDTH, HEIGHT } from "./constants";
 import * as constants from "./constants";
 import * as GL from "./webgl-constants";
 
+const PALLETE_SIZE = 4;
+
 export class WebGLCompositor {
     constructor (gl) {
         this.gl = gl;
 
         this.colorBuffer = new Uint32Array(WIDTH*HEIGHT >> 2);
+        this.palleteBuffer = new Float32Array(3 * PALLETE_SIZE);
+        this.lastPallete = Array(PALLETE_SIZE);
 
         // Create a lookup table for each byte mapping to 4 bytes:
         // 0bxxyyzzww --> 0bxx000000_yy000000_zz000000_ww000000
@@ -52,14 +56,24 @@ export class WebGLCompositor {
             }
         `);
 
+        const lookupBlock = Array.from({length: PALLETE_SIZE}, 
+                (_, i) => {
+                    return `palette[${i}] * step(${i}., index) * step(index, ${(i + 1)}.)`
+                }).join('+\n');
+
         const fragmentShader = createShader(GL.FRAGMENT_SHADER, `
             precision mediump float;
-            uniform sampler2D palette;
+            uniform vec3 palette[${PALLETE_SIZE.toFixed(0)}];
             uniform sampler2D framebuffer;
             varying vec2 framebufferCoord;
 
+            vec3 lookup(float index) {
+                return ${lookupBlock};
+            }
+
             void main () {
-                gl_FragColor = texture2D(palette, vec2(texture2D(framebuffer, framebufferCoord).r, 0.0));
+                float index = texture2D(framebuffer, framebufferCoord).r * ${PALLETE_SIZE}.;
+                gl_FragColor = vec4(lookup(index), 1.);
             }
         `);
 
@@ -76,8 +90,8 @@ export class WebGLCompositor {
         gl.useProgram(program);
 
         // Setup uniforms
-        gl.uniform1i(gl.getUniformLocation(program, "palette"), 0);
-        gl.uniform1i(gl.getUniformLocation(program, "framebuffer"), 1);
+        this.palleteLocation = gl.getUniformLocation(program, "palette");
+        gl.uniform1i(gl.getUniformLocation(program, "framebuffer"), 0);
 
         // Cleanup shaders
         gl.detachShader(program, vertexShader);
@@ -85,12 +99,8 @@ export class WebGLCompositor {
         gl.detachShader(program, fragmentShader);
         gl.deleteShader(fragmentShader);
 
-        // Create palette texture
-        createTexture(GL.TEXTURE0);
-        gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGB, 4, 1, 0, GL.RGB, GL.UNSIGNED_BYTE, null);
-
         // Create framebuffer texture
-        createTexture(GL.TEXTURE1);
+        createTexture(GL.TEXTURE0);
         gl.texImage2D(GL.TEXTURE_2D, 0, GL.LUMINANCE, WIDTH, HEIGHT, 0, GL.LUMINANCE, GL.UNSIGNED_BYTE, null);
 
         // Setup static geometry
@@ -108,19 +118,31 @@ export class WebGLCompositor {
 
     composite (palette, framebuffer) {
         const gl = this.gl;
-        const bytes = framebuffer.bytes, colorBuffer = this.colorBuffer, table = this.table;
+        const 
+            bytes = framebuffer.bytes,
+            colorBuffer = this.colorBuffer,
+            table = this.table,
+            lastPallete = this.lastPallete,
+            rgb = this.palleteBuffer;
 
-        // Upload palette
-        // TODO(2021-08-08): Don't upload if the palette is unchanged
-        const rgb = new Uint8Array(colorBuffer.buffer, 3*4);
-        for (let ii = 0, n = 0; ii < 4; ++ii) {
+        // Upload palette when needed 
+        let syncPallete = false;
+
+        for (let ii = 0, n = 0; ii < PALLETE_SIZE; ++ii) {
             const argb = palette[ii];
-            rgb[n++] = argb >> 16;
-            rgb[n++] = argb >> 8;
-            rgb[n++] = argb;
+
+            syncPallete = syncPallete || lastPallete[ii] !== argb;
+
+            rgb[n++] = ((argb >> 16) & 0xff) / 0xff;
+            rgb[n++] = ((argb >> 8) & 0xff) / 0xff;
+            rgb[n++] = (argb & 0xff) / 0xff;
+
+            lastPallete[ii] = argb;
         }
-        gl.activeTexture(GL.TEXTURE0);
-        gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGB, 4, 1, 0, GL.RGB, GL.UNSIGNED_BYTE, rgb);
+
+        if (syncPallete) {
+            gl.uniform3fv(this.palleteLocation, this.palleteBuffer);
+        }
 
         // Unpack the framebuffer into one byte per pixel
         for (let ii = 0; ii < WIDTH*HEIGHT >> 2; ++ii) {
@@ -128,7 +150,6 @@ export class WebGLCompositor {
         }
 
         // Upload framebuffer
-        gl.activeTexture(GL.TEXTURE1);
         gl.texImage2D(GL.TEXTURE_2D, 0, GL.LUMINANCE, WIDTH, HEIGHT, 0, GL.LUMINANCE, GL.UNSIGNED_BYTE, new Uint8Array(colorBuffer.buffer));
 
         // Draw the fullscreen quad

@@ -9,8 +9,8 @@ export class WebGLCompositor {
         this.gl = gl;
 
         this.colorBuffer = new Uint32Array(WIDTH*HEIGHT >> 2);
-        this.palleteBuffer = new Float32Array(3 * PALETTE_SIZE);
-        this.lastPallete = Array(PALETTE_SIZE);
+        this.paletteBuffer = new Float32Array(3 * PALETTE_SIZE);
+        this.lastPalette = Array(PALETTE_SIZE);
 
         // Create a lookup table for each byte mapping to 4 bytes:
         // 0bxxyyzzww --> 0bxx000000_yy000000_zz000000_ww000000
@@ -90,7 +90,7 @@ export class WebGLCompositor {
         gl.useProgram(program);
 
         // Setup uniforms
-        this.palleteLocation = gl.getUniformLocation(program, "palette");
+        this.paletteLocation = gl.getUniformLocation(program, "palette");
         gl.uniform1i(gl.getUniformLocation(program, "framebuffer"), 0);
 
         // Cleanup shaders
@@ -122,26 +122,26 @@ export class WebGLCompositor {
             bytes = framebuffer.bytes,
             colorBuffer = this.colorBuffer,
             table = this.table,
-            lastPallete = this.lastPallete,
-            rgb = this.palleteBuffer;
+            lastPalette = this.lastPalette,
+            rgb = this.paletteBuffer;
 
         // Upload palette when needed 
-        let syncPallete = false;
+        let syncPalette = false;
 
         for (let ii = 0, n = 0; ii < PALETTE_SIZE; ++ii) {
             const argb = palette[ii];
 
-            syncPallete = syncPallete || lastPallete[ii] !== argb;
+            syncPalette = syncPalette || lastPalette[ii] !== argb;
 
             rgb[n++] = ((argb >> 16) & 0xff) / 0xff;
             rgb[n++] = ((argb >> 8) & 0xff) / 0xff;
             rgb[n++] = (argb & 0xff) / 0xff;
 
-            lastPallete[ii] = argb;
+            lastPalette[ii] = argb;
         }
 
-        if (syncPallete) {
-            gl.uniform3fv(this.palleteLocation, this.palleteBuffer);
+        if (syncPalette) {
+            gl.uniform3fv(this.paletteLocation, this.paletteBuffer);
         }
 
         // Unpack the framebuffer into one byte per pixel

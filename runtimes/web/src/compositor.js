@@ -2,15 +2,15 @@ import { WIDTH, HEIGHT } from "./constants";
 import * as constants from "./constants";
 import * as GL from "./webgl-constants";
 
-const PALLETE_SIZE = 4;
+const PALETTE_SIZE = 4;
 
 export class WebGLCompositor {
     constructor (gl) {
         this.gl = gl;
 
         this.colorBuffer = new Uint32Array(WIDTH*HEIGHT >> 2);
-        this.palleteBuffer = new Float32Array(3 * PALLETE_SIZE);
-        this.lastPallete = Array(PALLETE_SIZE);
+        this.palleteBuffer = new Float32Array(3 * PALETTE_SIZE);
+        this.lastPallete = Array(PALETTE_SIZE);
 
         // Create a lookup table for each byte mapping to 4 bytes:
         // 0bxxyyzzww --> 0bxx000000_yy000000_zz000000_ww000000
@@ -56,14 +56,14 @@ export class WebGLCompositor {
             }
         `);
 
-        const lookupBlock = Array.from({length: PALLETE_SIZE}, 
+        const lookupBlock = Array.from({length: PALETTE_SIZE}, 
                 (_, i) => {
                     return `palette[${i}] * step(${i}., index) * step(index, ${(i + 1)}.)`
                 }).join('+\n');
 
         const fragmentShader = createShader(GL.FRAGMENT_SHADER, `
             precision mediump float;
-            uniform vec3 palette[${PALLETE_SIZE.toFixed(0)}];
+            uniform vec3 palette[${PALETTE_SIZE}];
             uniform sampler2D framebuffer;
             varying vec2 framebufferCoord;
 
@@ -72,7 +72,7 @@ export class WebGLCompositor {
             }
 
             void main () {
-                float index = texture2D(framebuffer, framebufferCoord).r * ${PALLETE_SIZE}.;
+                float index = texture2D(framebuffer, framebufferCoord).r * ${PALETTE_SIZE}.;
                 gl_FragColor = vec4(lookup(index), 1.);
             }
         `);
@@ -128,7 +128,7 @@ export class WebGLCompositor {
         // Upload palette when needed 
         let syncPallete = false;
 
-        for (let ii = 0, n = 0; ii < PALLETE_SIZE; ++ii) {
+        for (let ii = 0, n = 0; ii < PALETTE_SIZE; ++ii) {
             const argb = palette[ii];
 
             syncPallete = syncPallete || lastPallete[ii] !== argb;

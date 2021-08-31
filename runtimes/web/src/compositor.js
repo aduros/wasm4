@@ -56,10 +56,10 @@ export class WebGLCompositor {
             }
         `);
 
-        const lookupBlock = Array.from({length: PALETTE_SIZE}, 
+        const lookupBlock = Array.from({length: PALETTE_SIZE - 1}, 
                 (_, i) => {
-                    return `palette[${i}] * step(${i}., index) * step(index, ${(i + 1)}.)`
-                }).join('+\n');
+                    return `p = mix(p, palette[${i + 1}],  step(${((i + 1) / PALETTE_SIZE).toFixed(2)}, index));`
+                }).join('\n');
 
         const fragmentShader = createShader(GL.FRAGMENT_SHADER, `
             precision mediump float;
@@ -68,12 +68,13 @@ export class WebGLCompositor {
             varying vec2 framebufferCoord;
 
             vec3 lookup(float index) {
-                return ${lookupBlock};
+                vec3 p = palette[0];
+                ${lookupBlock}
+                return p;
             }
 
             void main () {
-                float index = texture2D(framebuffer, framebufferCoord).r * ${PALETTE_SIZE}.;
-                gl_FragColor = vec4(lookup(index), 1.);
+                gl_FragColor = vec4(lookup(texture2D(framebuffer, framebufferCoord).r), 1.);
             }
         `);
 

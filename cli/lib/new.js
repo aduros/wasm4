@@ -47,6 +47,10 @@ async function run (destDir, opts) {
         lang = LANGS.ASSEMBLYSCRIPT;
     }
 
+    if (!fs.existsSync(destDir)) {
+        fs.mkdirSync(destDir, { recursive: true });
+    }
+
     const srcDir = path.resolve(__dirname+"/../assets/templates/"+lang);
     await copy(srcDir, destDir);
     await init(destDir, lang);

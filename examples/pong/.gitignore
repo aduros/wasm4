@@ -1,7 +1,5 @@
 /target
 
-.cargo
-
 # Ignore log files
 *.log
 
@@ -18,3 +16,4 @@
 # vim temp files
 *.swp
 *.swo
+

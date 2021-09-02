@@ -2,7 +2,40 @@ const fs = require("fs");
 const path = require("path");
 const pngjs = require("pngjs");
 
+const DEFAULT_LANG = 'assemblyscript';
+const TEMPLATES = {        
+    assemblyscript: 
+`const %name%Width = %width%;
+const %name%Height = %height%;
+const %name%Flags = %flags%; // %flagsHumanReadable%
+const %name% = memory.data<u8>([ %bytes% ]);
+`,
+
+    c: 
+`#define %name%Width %width%
+#define %name%Height %height%
+#define %name%Flags %flagsHumanReadable%
+const char %name%[%length%] = { %bytes% };
+`,
+
+    rust: 
+`const %idiomaticName%_WIDTH = %width%;
+const %idiomaticName%_HEIGHT = %height%;
+const %idiomaticName%_FLAGS = %flags%; // %flagsHumanReadable%
+const %idiomaticName%:[u8;%length%] = [ %bytes% ];
+`,  
+
+    go: 
+`const %name%Width = %width%;
+const %name%Height = %height%;
+const %name%Flags = %flags%; // %flagsHumanReadable%
+var %name% = [%length%]byte { %bytes% };
+`,
+}
+
 function run (sourceFile, lang) {
+    lang = lang in TEMPLATES ? lang : DEFAULT_LANG;
+
     const png = pngjs.PNG.sync.read(fs.readFileSync(sourceFile), {
         colorType: 1,
         inputColorType: 1,
@@ -82,73 +115,43 @@ function run (sourceFile, lang) {
         }
     }
 
-    function printBytes () {
-        for (let ii = 0; ii < bytes.length; ++ii) {
-            const byte = bytes[ii];
-            if (ii > 0) {
-                process.stdout.write(",");
-            }
-            process.stdout.write("0x"+byte.toString(16).padStart(2, "0"));
-        }
-    }
+    const varName = path
+        .basename(sourceFile, ".png")
+        .replace(/[^0-9A-Za-z]+/g, "_")
+        .replace(/^([0-9])/, "_$1");
 
-    const varName = path.basename(sourceFile, ".png").replace(/[^0-9A-Za-z]+/g, "_").replace(/^([0-9])/, "_$1");
+    const idiomaticVarName = (varName.substr(0,1) + varName.substr(1)
+        .replace(/[A-Z]/g, l => '_' + l))
+        .toLocaleUpperCase()
 
-    switch (lang) {
-    case "assemblyscript": default:
-        console.log(`const ${varName}Width = ${png.width};`);
-        console.log(`const ${varName}Height = ${png.height};`);
-        console.log(`const ${varName}Flags = ${flags}; // ${flagsHumanReadable}`);
-        process.stdout.write(`const ${varName} = memory.data<u8>([ `);
-        printBytes();
-        console.log(" ]);");
-        break;
+    const template = TEMPLATES[lang] || TEMPLATES.assemblyscript;
+    const data = [...bytes]
+            .map((b) => "0x" + b.toString(16).padStart(2, "0"))
+            .join(',')
 
-    case "c":
-        console.log(`#define ${varName}Width ${png.width}`);
-        console.log(`#define ${varName}Height ${png.height}`);
-        console.log(`#define ${varName}Flags ${flagsHumanReadable}`);
-        process.stdout.write(`const char ${varName}[${bytes.length}] = { `);
-        printBytes();
-        console.log(" };");
-        break;
-
-    case "rust":
-        let idiomaticVarName = (varName.substr(0,1) + varName.substr(1)
-                        .replace(/[A-Z]/g, l => '_' + l))
-                        .toLocaleUpperCase()
-        console.log(`const ${idiomaticVarName}_WIDTH = ${png.width};`);
-        console.log(`const ${idiomaticVarName}_HEIGHT = ${png.height};`);
-        console.log(`const ${idiomaticVarName}_FLAGS = ${flags}; // ${flagsHumanReadable}`);
-        process.stdout.write(`const ${idiomaticVarName}: [u8; ${bytes.length}] = [ `);
-        printBytes();
-        console.log(" ];");
-        break;
-
-    case "go":
-        console.log(`const ${varName}Width = ${png.width};`);
-        console.log(`const ${varName}Height = ${png.height};`);
-        console.log(`const ${varName}Flags = ${flags}; // ${flagsHumanReadable}`);
-        process.stdout.write(`var ${varName} = [${bytes.length}]byte { `);
-        printBytes();
-        console.log(" };");
-        break;
-    }
+    const output = template
+        .replace(/%name%/gi, varName)
+        .replace(/%idiomaticName%/gi, idiomaticVarName)
+        .replace(/%height%/gi, png.height)
+        .replace(/%width%/gi, png.height)
+        .replace(/%length%/gi, bytes.length)
+        .replace(/%flags%/gi, flags)
+        .replace(/%flagsHumanReadable%/gi, flagsHumanReadable)
+        .replace(/%bytes%/gi,data);
+   
+    console.log(output);
 }
+
 exports.run = run;
 
 function runAll (files, opts) {
-    let lang;
-    if (opts.assemblyscript) {
-        lang = "assemblyscript";
-    } else if (opts.c) {
-        lang = "c";
-    } else if (opts.rust) {
-        lang = "rust";
-    } else if (opts.go) {
-        lang = "go";
-    } else {
-        lang = "assemblyscript";
+    let lang = DEFAULT_LANG;
+    // iterate over all options and search key that presented in templates
+    for(let key in opts) {
+        if (key in TEMPLATES) {
+            lang = key;
+            break;
+        }
     }
 
     for (let ii = 0; ii < files.length; ++ii) {

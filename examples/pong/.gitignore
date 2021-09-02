@@ -1,0 +1,19 @@
+/target
+
+# Ignore log files
+*.log
+
+# MacOS generated files
+.DS_Store
+.DS_Store?
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+# vim temp files
+*.swp
+*.swo
+

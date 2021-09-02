@@ -29,6 +29,12 @@ const CARTS = [
         author: "Bruno Garcia",
         github: "aduros",
     },
+    {
+        slug: "raw-assembly",
+        title: "Raw Assembly Test",
+        author: "Bruno Garcia",
+        github: "aduros",
+    },
 ];
 
 module.exports = CARTS;

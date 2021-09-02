@@ -1,5 +1,11 @@
 const CARTS = [
     {
+        slug: "pong",
+        title: "Pong",
+        author: "Fabrizio Vitale",
+        github: "FaberVitale",
+    },
+    {
         slug: "snake",
         title: "Snake",
         author: "Tomas Tulka",
@@ -20,6 +26,12 @@ const CARTS = [
     {
         slug: "sound-demo",
         title: "Sound Demo",
+        author: "Bruno Garcia",
+        github: "aduros",
+    },
+    {
+        slug: "raw-assembly",
+        title: "Raw Assembly Test",
         author: "Bruno Garcia",
         github: "aduros",
     },

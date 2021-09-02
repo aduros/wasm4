@@ -37,6 +37,12 @@ async function run (cartFile, opts) {
         throw new Error("You must specify one or more bundle outputs.");
     }
 
+    if (!require("fs").existsSync(outFile)) {
+        await fs.mkdir(path.dirname(outFile), {
+            recursive: true
+        });
+    }
+
     let [cart, html, css, js] = await Promise.all([
         fs.readFile(cartFile),
         fs.readFile(runtimeDir+"/index.html", "utf8"),

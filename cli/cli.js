@@ -34,6 +34,7 @@ program.command("png2src <images...>")
     .option("--c", "Generate C/C++ source")
     .option("--rs, --rust", "Generate Rust source")
     .option("--go", "Generate Go source")
+    .option("--t, --template <file>", "Generate source follow template", "")
     .action((images, opts) => {
         const png2src = require("./lib/png2src");
         png2src.runAll(images, opts);

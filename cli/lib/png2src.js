@@ -33,8 +33,8 @@ var %name% = [%length%]byte { %bytes% };
 `,
 }
 
-function run (sourceFile, lang) {
-    lang = lang in TEMPLATES ? lang : DEFAULT_LANG;
+function run (sourceFile, template) {
+    template = template || TEMPLATES[DEFAULT_LANG];
 
     const png = pngjs.PNG.sync.read(fs.readFileSync(sourceFile), {
         colorType: 1,
@@ -124,7 +124,6 @@ function run (sourceFile, lang) {
         .replace(/[A-Z]/g, l => '_' + l))
         .toLocaleUpperCase()
 
-    const template = TEMPLATES[lang] || TEMPLATES.assemblyscript;
     const data = [...bytes]
             .map((b) => "0x" + b.toString(16).padStart(2, "0"))
             .join(',')
@@ -145,26 +144,35 @@ function run (sourceFile, lang) {
 exports.run = run;
 
 function runAll (files, opts) {
-    let lang = DEFAULT_LANG;
-    // iterate over all options and search key that presented in templates
-    for(let key in opts) {
-        if (key in TEMPLATES) {
-            lang = key;
-            break;
+    let template = TEMPLATES[DEFAULT_LANG];
+
+    if (!opts.template) {
+        // iterate over all options and search a key that presented in templates
+        for(let key in opts) {
+            if (key in TEMPLATES) {        
+                template = TEMPLATES[key]
+                break;
+            }
         }
+
+    } else {
+        template = fs.readFileSync(opts.template, {encoding: 'utf8'});
     }
 
     for (let ii = 0; ii < files.length; ++ii) {
         const file = files[ii];
+
         try {
             if (ii > 0) {
                 console.log();
             }
-            run(file, lang);
+
+            run(file, template);
         } catch (error) {
             console.error("Error processing "+file+": "+error.message);
             break;
         }
     }
 }
+
 exports.runAll = runAll;

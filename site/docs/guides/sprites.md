@@ -180,7 +180,7 @@ const char %name%[%length%] = { %bytes% };
 Where:
 - `%name%` - filename (string),
 - `%idiomaticName%` - Rust specific variable name (string)
-- `%width%`, `%height%` - image dimensions (intiger)
+- `%width%`, `%height%` - image dimensions (integer)
 - `%flags%`, `%flagsHumanReadable%` - type flag as integer and enum name (BLIT_2BPP or BLIT_1BPP)
-- `%length%` - count of bytes (intiger)
+- `%length%` - count of bytes (integer)
 - `%bytes%` - comma separated series of bytes (string)

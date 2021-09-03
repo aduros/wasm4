@@ -163,3 +163,24 @@ blit(bunny, 10, 10, bunny_width, bunny_height, bunny_flags);
 [`DRAW_COLORS`](basic-drawing) is used here to modify the 4 colors of the original sprite. Reading
 from right to left: color 1 becomes 3, color 2 becomes 1, color 3 becomes 0 (transparent), and color
 4 becomes 2.
+
+### Custom template
+
+You can use a custom template for generating a image source.
+Use a `--template filename` for this.
+
+Basic template (C):
+```
+#define %name%Width %width%
+#define %name%Height %height%
+#define %name%Flags %flagsHumanReadable%
+const char %name%[%length%] = { %bytes% };
+```
+
+Where:
+- `%name%` - filename (string),
+- `%idiomaticName%` - Rust specific variable name (string)
+- `%width%`, `%height%` - image dimensions (integer)
+- `%flags%`, `%flagsHumanReadable%` - type flag as integer and enum name (BLIT_2BPP or BLIT_1BPP)
+- `%length%` - count of bytes (integer)
+- `%bytes%` - comma separated series of bytes (string)

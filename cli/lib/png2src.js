@@ -22,7 +22,7 @@ const char %name%[%length%] = { %bytes% };
 `const %idiomaticName%_WIDTH = %width%;
 const %idiomaticName%_HEIGHT = %height%;
 const %idiomaticName%_FLAGS = %flags%; // %flagsHumanReadable%
-const %idiomaticName%:[u8;%length%] = [ %bytes% ];
+const %idiomaticName%: [u8; %length%] = [ %bytes% ];
 `,  
 
     go: 

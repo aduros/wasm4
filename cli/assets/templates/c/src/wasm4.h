@@ -86,7 +86,7 @@ void text (const char* text, int x, int y);
 
 /** Plays a sound tone. */
 WASM_IMPORT("tone")
-void tone (unsigned int frequency, unsigned int envelope, unsigned int duration, unsigned int flags);
+void tone (unsigned int frequency, unsigned int duration, unsigned int volume, unsigned int flags);
 
 #define TONE_PULSE1 0
 #define TONE_PULSE2 1

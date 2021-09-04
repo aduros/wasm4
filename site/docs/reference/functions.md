@@ -82,13 +82,13 @@ of this function for passing unterminated UTF-8 and UTF-16 strings along with a 
 
 ## Sound
 
-### `tone (frequency, volume, duration, flags)`
+### `tone (frequency, duration, volume, flags)`
 
 Plays a sound tone.
 
 * `frequency`: Wave frequency in hertz.
-* `volume`: Volume between 0 and 100.
 * `duration`: Duration of the tone in frames (1/60th of a second), up to 255 frames.
+* `volume`: Volume between 0 and 100.
 * `flags`: Flags that modify behavior:
 
 | Flag bits | Description                                                                                     |

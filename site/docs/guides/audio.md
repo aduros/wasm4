@@ -18,30 +18,30 @@ WASM-4's sound system is closely inspired by the architecture of the Nintendo NE
 
 The `tone()` function is used to play a tone with a given frequency on a given channel.
 
-`tone (frequency, volume, duration, flags)`
+`tone (frequency, duration, volume, flags)`
 
 - Frequency is the "pitch", measured in hertz.
-- Volume ranges from 0 (silent) to 100 (full volume).
 - Durations are measured in frames, 1/60ths of a second.
+- Volume ranges from 0 (silent) to 100 (full volume).
 
 For example, to play a one second (60 frames) tone of 262 Hz ([middle C](https://pages.mtu.edu/~suits/notefreqs.html)) on the first pulse wave channel:
 
 <MultiLanguageCode>
 
 ```typescript
-w4.tone(262, 100, 60, w4.TONE_PULSE1);
+w4.tone(262, 60, 100, w4.TONE_PULSE1);
 ```
 
 ```c
-tone(262, 100, 60, TONE_PULSE1);
+tone(262, 60, 100, TONE_PULSE1);
 ```
 
 ```rust
-tone(262, 100, 60, TONE_PULSE1);
+tone(262, 60, 100, TONE_PULSE1);
 ```
 
 ```go
-tone(262, 100, 60, TONE_PULSE1);
+tone(262, 60, 100, TONE_PULSE1);
 ```
 
 </MultiLanguageCode>
@@ -63,19 +63,19 @@ For example, to play at 50% duty cycle (square wave):
 <MultiLanguageCode>
 
 ```typescript
-w4.tone(262, 100, 60, w4.TONE_PULSE1 | w4.TONE_MODE3);
+w4.tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_MODE3);
 ```
 
 ```c
-tone(262, 100, 60, TONE_PULSE1 | TONE_MODE3);
+tone(262, 60, 100, TONE_PULSE1 | TONE_MODE3);
 ```
 
 ```rust
-tone(262, 100, 60, TONE_PULSE1 | TONE_MODE3);
+tone(262, 60, 100, TONE_PULSE1 | TONE_MODE3);
 ```
 
 ```go
-tone(262, 100, 60, TONE_PULSE1 | TONE_MODE3);
+tone(262, 60, 100, TONE_PULSE1 | TONE_MODE3);
 ```
 
 </MultiLanguageCode>
@@ -91,19 +91,19 @@ For example, to slide the tone starting from 262 Hz and up to 523 Hz:
 <MultiLanguageCode>
 
 ```typescript
-w4.tone(262 | (523 << 16), 100, 60, w4.TONE_PULSE1);
+w4.tone(262 | (523 << 16), 60, 100, w4.TONE_PULSE1);
 ```
 
 ```c
-tone(262 | (523 << 16), 100, 60, TONE_PULSE1);
+tone(262 | (523 << 16), 60, 100, TONE_PULSE1);
 ```
 
 ```rust
-tone(262 | (523 << 16), 100, 60, TONE_PULSE1);
+tone(262 | (523 << 16), 60, 100, TONE_PULSE1);
 ```
 
 ```go
-tone(262 | (523 << 16), 100, 60, TONE_PULSE1);
+tone(262 | (523 << 16), 60, 100, TONE_PULSE1);
 ```
 
 </MultiLanguageCode>
@@ -128,19 +128,19 @@ For example, to play a tone that sustains for one second and releases over half 
 <MultiLanguageCode>
 
 ```typescript
-w4.tone(262, 100, 60 | (30 << 8), w4.TONE_PULSE1);
+w4.tone(262, 60 | (30 << 8), 100, w4.TONE_PULSE1);
 ```
 
 ```c
-tone(262, 100, 60 | (30 << 8), TONE_PULSE1);
+tone(262, 60 | (30 << 8), 100, TONE_PULSE1);
 ```
 
 ```rust
-tone(262, 100, 60 | (30 << 8), TONE_PULSE1);
+tone(262, 60 | (30 << 8), 100, TONE_PULSE1);
 ```
 
 ```go
-tone(262, 100, 60 | (30 << 8), TONE_PULSE1);
+tone(262, 60 | (30 << 8), 100, TONE_PULSE1);
 ```
 
 </MultiLanguageCode>

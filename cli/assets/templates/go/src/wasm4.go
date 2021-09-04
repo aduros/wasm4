@@ -84,7 +84,7 @@ func text (text string, x int, y int);
 
 /** Plays a sound tone. */
 //go:export tone
-func tone (frequency uint, volume uint, duration uint, flags uint);
+func tone (frequency uint, duration uint, volume uint, flags uint);
 
 const TONE_PULSE1 = 0;
 const TONE_PULSE2 = 1;

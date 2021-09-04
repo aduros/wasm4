@@ -82,7 +82,7 @@ declare function textUtf16 (text: string, byteLength: i32, x: i32, y: i32): void
 
 /** Plays a sound tone. */
 @external("env", "tone")
-export declare function tone (frequency: u32, volume: u32, duration: u32, flags: u32): void;
+export declare function tone (frequency: u32, duration: u32, volume: u32, flags: u32): void;
 
 export const TONE_PULSE1: u32 = 0;
 export const TONE_PULSE2: u32 = 1;

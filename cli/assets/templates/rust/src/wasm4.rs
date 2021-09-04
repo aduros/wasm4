@@ -106,12 +106,12 @@ extern {
 // └───────────────────────────────────────────────────────────────────────────┘
 
 /// Plays a sound tone.
-pub fn tone (frequency: u32, volume: u32, duration: u32, flags: u32) {
-    unsafe { extern_tone(frequency, volume, duration, flags) }
+pub fn tone (frequency: u32, duration: u32, volume: u32, flags: u32) {
+    unsafe { extern_tone(frequency, duration, volume, flags) }
 }
 extern {
     #[link_name = "tone"]
-    fn extern_tone (frequency: u32, volume: u32, duration: u32, flags: u32);
+    fn extern_tone (frequency: u32, duration: u32, volume: u32, flags: u32);
 }
 
 pub const TONE_PULSE1: u32 = 0;

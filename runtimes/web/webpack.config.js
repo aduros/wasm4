@@ -51,13 +51,13 @@ async function generateBuildConfig() {
 
   // Use only env var prefixed by `WASM4_`.
   const buildConfig = {
-    CART_NAME: process.env.WASM4_CART_NAME ?? 'Wasm 4 cart',
+    CART_NAME: process.env.WASM4_CART_NAME || 'Wasm 4 cart',
     CART_DESCRIPTION:
-      process.env.WASM4_CART_DESCRIPTION ??
+      process.env.WASM4_CART_DESCRIPTION ||
       'A cartrige for Wasm 4: https://wasm4.org/',
     INLINE_ASSETS: process.env.WASM4_INLINE_ASSETS === 'true',
     FAVICON_HREF:
-      process.env.WASM4_FAVICON_HREF ?? 'https://wasm4.org/img/favicon.ico',
+      process.env.WASM4_FAVICON_HREF || 'https://wasm4.org/img/favicon.ico',
     WASM4_CART,
     WASM4_CART_SIZE,
     BUILD_DATE: new Date().toISOString(),

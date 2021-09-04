@@ -61,7 +61,7 @@ async function generateBuildConfig() {
     WASM4_CART,
     WASM4_CART_SIZE,
     BUILD_DATE: new Date().toISOString(),
-    WASM4_VERSION: process.env.WASM4_VERSION ?? '',
+    WASM4_VERSION: process.env.WASM4_VERSION || '',
   };
 
   return buildConfig;

@@ -19,9 +19,9 @@ const char %name%[%length%] = { %bytes% };
 `,
 
     rust: 
-`const %idiomaticName%_WIDTH = %width%;
-const %idiomaticName%_HEIGHT = %height%;
-const %idiomaticName%_FLAGS = %flags%; // %flagsHumanReadable%
+`const %idiomaticName%_WIDTH: u32 = %width%;
+const %idiomaticName%_HEIGHT: u32 = %height%;
+const %idiomaticName%_FLAGS: u32 = %flags%; // %flagsHumanReadable%
 const %idiomaticName%: [u8; %length%] = [ %bytes% ];
 `,  
 

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="shortcut icon" href="<%- htmlWebpackPlugin.options.buildConfig.FAVICON_HREF %>">
+  <title><%- htmlWebpackPlugin.options.title %></title>
+</head>
+<body>
+  <div class="container">
+    <div id="content">
+      <div class="infobox">
+        <h2 id="title"></h2>
+        <h4 id="author"></h4>
+        <span class="play-button"></span>
+      </div>
+      <div id="screenshot"></div>
+    </div>
+  </div>
+  <div class="gamepad">
+    <div id="gamepad-dpad"></div>
+    <div id="gamepad-action1"></div>
+    <div id="gamepad-action2"></div>
+  </div>
+  <div id="build-info">
+    <input type="hidden" name="build-date", value="<%- htmlWebpackPlugin.options.buildConfig.BUILD_DATE %>">
+    <input type="hidden" name="wasm4-version", value="<%- htmlWebpackPlugin.options.buildConfig.WASM4_VERSION %>">
+  </div>
+  <% if (htmlWebpackPlugin.options.buildConfig.WASM4_CART_SIZE) { %>
+  <script type="application/json" id="wasm4-cart-json">{ 
+    "WASM4_CART": "<%= htmlWebpackPlugin.options.buildConfig.WASM4_CART %>", 
+    "WASM4_CART_SIZE": <%= htmlWebpackPlugin.options.buildConfig.WASM4_CART_SIZE %> 
+  }</script>
+  <% } %>
+</body>
+</html>

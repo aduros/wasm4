@@ -33,7 +33,11 @@ function setClass (element, className, enabled) {
 }
 
 async function loadCartWasm () {
-    if (typeof WASM4_CART == "string") {
+    const jsonElem = document.getElementById('wasm4-cart-json');
+
+    if (jsonElem) {
+        const { WASM4_CART, WASM4_CART_SIZE } = JSON.parse(jsonElem.textContent);
+
         // The cart was bundled in the html, decode it
         const buffer = new Uint8Array(WASM4_CART_SIZE);
         z85.decode(WASM4_CART, buffer);

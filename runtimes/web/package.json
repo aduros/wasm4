@@ -3,15 +3,22 @@
   "private": true,
   "scripts": {
     "build": "webpack --mode production",
+    "build:inline": "cross-env WASM4_INLINE_ASSETS=true npm run build",
     "start": "webpack serve --mode development --content-base dist --devtool inline-source-map --host 0.0.0.0"
   },
   "devDependencies": {
+    "@types/mini-css-extract-plugin": "^2.2.0",
     "css-loader": "^6.2.0",
     "css-minimizer-webpack-plugin": "^3.0.2",
+    "handlebars-loader": "^1.7.1",
+    "html-inline-css-webpack-plugin": "^1.11.1",
+    "html-webpack-plugin": "^5.3.2",
     "mini-css-extract-plugin": "^2.2.0",
+    "react-dev-utils": "^11.0.4",
     "style-loader": "^3.2.1",
     "webpack": "^5.41.0",
     "webpack-cli": "^4.7.2",
-    "webpack-dev-server": "^3.11.2"
+    "webpack-dev-server": "^3.11.2",
+    "cross-env": "^7.0.3"
   }
 }

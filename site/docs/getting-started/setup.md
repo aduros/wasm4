@@ -111,7 +111,7 @@ w4 run target/wasm32-unknown-unknown/release/cart.wasm
 
 <TabItem value="language-go">
 
-To compile GO projects you will need `go` and `tinygo` installed.
+To compile Go projects you will need `go` and `tinygo` installed.
 
 ```shell
 w4 new --go hello-world

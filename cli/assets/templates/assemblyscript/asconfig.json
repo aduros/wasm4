@@ -10,6 +10,7 @@
     "initialMemory": 1,
     "maximumMemory": 1,
     "noExportMemory": true,
+    "zeroFilledMemory": true,
     "memoryBase": 6560
   },
   "targets": {

@@ -48,8 +48,8 @@ export declare function blit (spritePtr: usize, x: i32, y: i32, width: u32, heig
 export declare function blitSub (spritePtr: usize, x: i32, y: i32, width: u32, height: u32,
     srcX: u32, srcY: u32, stride: i32, flags: u32): void;
 
-export const BLIT_2BPP: u32 = 1;
 export const BLIT_1BPP: u32 = 0;
+export const BLIT_2BPP: u32 = 1;
 export const BLIT_FLIP_X: u32 = 2;
 export const BLIT_FLIP_Y: u32 = 4;
 export const BLIT_ROTATE: u32 = 8;
@@ -72,7 +72,7 @@ export function text (str: string, x: i32, y: i32): void {
     textUtf16(str, byteLength, x, y);
 }
 @external("env", "textUtf16")
-declare function textUtf16 (text: string, byteLength: i32, x: i32, y: i32): void;
+declare function textUtf16 (text: string, byteLength: u32, x: i32, y: i32): void;
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │
@@ -127,4 +127,4 @@ export function trace (str: string): void {
     traceUtf16(str, byteLength);
 }
 @external("env", "traceUtf16")
-declare function traceUtf16 (str: string, byteLength: i32): void;
+declare function traceUtf16 (str: string, byteLength: u32): void;

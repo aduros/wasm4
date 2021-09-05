@@ -12,12 +12,12 @@ const smiley = memory.data<u8>([
 ]);
 
 export function update (): void {
-    store<u16>(w4.DRAW_COLORS, 2);
+    store<u16>(w4.DRAW_COLORS, 1 * sizeof<u16>());
     w4.text("Hello from\nAssemblyScript!", 10, 10);
 
     const gamepad = load<u8>(w4.GAMEPAD1);
     if (gamepad & w4.BUTTON_1) {
-        store<u16>(w4.DRAW_COLORS, 4);
+        store<u16>(w4.DRAW_COLORS, 2 * sizeof<u16>());
     }
 
     w4.blit(smiley, 76, 76, 8, 8, w4.BLIT_1BPP);

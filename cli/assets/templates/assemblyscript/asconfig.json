@@ -5,6 +5,7 @@
   "options": {
     "binaryFile": "build/cart.wasm",
     "runtime": "incremental",
+    "sourceMap": true,
     "importMemory": true,
     "initialMemory": 1,
     "maximumMemory": 1,
@@ -13,7 +14,8 @@
   },
   "targets": {
     "release": {
-      "optimize": 3,
+      "optimizeLevel": 3,
+      "shrinkLevel": 0,
       "noAssert": true
     },
     "debug": {

@@ -6,6 +6,6 @@
     "build:debug": "asc --target debug"
   },
   "devDependencies": {
-    "assemblyscript": "^0.19.5"
+    "assemblyscript": "^0.19.12"
   }
 }

@@ -43,6 +43,9 @@ program.command("png2src <images...>")
 program.command("bundle <cart>")
     .description("Bundle a cartridge for final distribution")
     .option("--html <output>", "Bundle standalone HTML")
+    .option("--title <title>", "html page title. Default value: 'Wasm 4 game'")
+    .option("--desc <description>", "html page description")
+    .option("--icon <favicon-url>", "favicon url")
     .action((cart, opts) => {
         const bundle = require("./lib/bundle");
         bundle.run(cart, opts);

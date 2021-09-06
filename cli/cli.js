@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const { program } = require("commander");
-const fs = require("fs");
+const pkg = require('./package.json');
 
 program.command("new <directory>")
     .description("Create a new blank project")
@@ -43,9 +43,10 @@ program.command("png2src <images...>")
 program.command("bundle <cart>")
     .description("Bundle a cartridge for final distribution")
     .option("--html <output>", "Bundle standalone HTML")
-    .option("--title <title>", "html page title. Default value: 'Wasm 4 game'")
-    .option("--desc <description>", "html page description")
-    .option("--icon <favicon-url>", "favicon url")
+    .option("--title <title>", "Html page title. Default value: 'Wasm 4 game'")
+    .option("--desc <description>", "Html page description")
+    .option("--icon <favicon-url>", "Favicon url")
+    .option("--timestamp", 'Adds build timestamp to output html', false)
     .action((cart, opts) => {
         const bundle = require("./lib/bundle");
         bundle.run(cart, opts);
@@ -54,7 +55,7 @@ program.command("bundle <cart>")
 program
     .name("w4")
     .description("WASM-4: Build retro games using WebAssembly for a fantasy console.\n\nLearn more: https://wasm4.org")
-    .version(JSON.parse(fs.readFileSync(__dirname+"/package.json")).version)
+    .version(pkg.version)
     .parse();
 
 // Manages unhandled rejections:

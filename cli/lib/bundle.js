@@ -3,13 +3,14 @@ const path = require('path');
 const htmlEscape = require('htmlescape');
 const z85 = require('./utils/z85');
 const Handlebars = require('handlebars');
+const pkg = require('../package.json');
 
-async function compileTemplate() { 
+async function compileTemplate() {
     const templateSource = await fs.readFile(
         path.resolve(__dirname, '../assets/bundle/html-page.hbs'),
         { encoding: 'utf-8' }
     );
-    
+
     return Handlebars.compile(templateSource);
 }
 
@@ -46,6 +47,15 @@ async function bundle(cartFile, opts) {
         WASM4_CART_SIZE: cart.length,
     });
 
+    const buildInfo = [{ value: pkg.version, name: 'wasm4-version' }];
+
+    if (opts.timestamp) {
+        buildInfo.push({
+            value: new Date().toISOString(),
+            name: 'created-at',
+        });
+    }
+
     const bundleTemplate = await compileTemplate();
 
     const outFileContent = bundleTemplate({
@@ -56,6 +66,7 @@ async function bundle(cartFile, opts) {
             wasm4Css,
             wasm4js,
         },
+        buildInfo,
         opts,
     });
 

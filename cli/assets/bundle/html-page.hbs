@@ -35,5 +35,10 @@
       type="application/json"
     >{{{html.wasmCartJson}}}</script>
     <script id="wasm4-js">{{{html.wasm4js}}}</script>
+    <div id="wasm4-bundle-info">
+    {{#each buildInfo}}
+      <input type="hidden" name="{{this.name}}" value="{{this.value}}">
+    {{/each}}
+    </div>
   </body>
 </html>

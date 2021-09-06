@@ -125,4 +125,4 @@ func memset (dest *byte, b byte, size uint) uint;
 
 /** Prints a message to the debug console. */
 //go:export traceUtf8
-func trace (str string, byteLength int);
+func trace (str string);

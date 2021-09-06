@@ -53,3 +53,13 @@ program
     .description("WASM-4: Build retro games using WebAssembly for a fantasy console.\n\nLearn more: https://wasm4.org")
     .version(JSON.parse(fs.readFileSync(__dirname+"/package.json")).version)
     .parse();
+
+// Manages unhandled rejections:
+// conforms behaviour between node versions:
+// node 15+ throw on `unhandledRejection`.
+// @see https://nodejs.org/api/process.html#process_event_unhandledrejection
+process.on('unhandledRejection', unhandledRejectionError => {
+    console.log('[w4] error:\n');
+    
+    throw unhandledRejectionError;
+});

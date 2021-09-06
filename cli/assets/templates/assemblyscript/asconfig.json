@@ -9,15 +9,18 @@
     "initialMemory": 1,
     "maximumMemory": 1,
     "noExportMemory": true,
+    "zeroFilledMemory": true,
     "memoryBase": 6560
   },
   "targets": {
     "release": {
-      "optimize": 3,
+      "optimizeLevel": 3,
+      "shrinkLevel": 0,
       "noAssert": true
     },
     "debug": {
-      "debug": true
+      "debug": true,
+      "sourceMap": true
     }
   }
 }

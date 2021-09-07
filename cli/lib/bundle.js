@@ -6,6 +6,7 @@ const {
     escapeCssContentToInline,
     stringifyForJSONScript,
 } = require('./utils/html-escape');
+const { iconToBase64DataUrl } = require('./utils/icon');
 const Handlebars = require('handlebars');
 const pkg = require('../package.json');
 
@@ -34,10 +35,17 @@ async function bundle(cartFile, opts) {
         });
     }
 
-    let [cart, wasm4Css, wasm4js] = await Promise.all([
+    let iconPromise = opts.iconUrl;
+
+    if (opts.iconFile) {
+        iconPromise = iconToBase64DataUrl(opts.iconFile);
+    }
+
+    let [cart, wasm4Css, wasm4js, iconUrl] = await Promise.all([
         fs.readFile(cartFile),
         fs.readFile(wasm4CssFilepath, 'utf8'),
         fs.readFile(wasm4jsFilepath, 'utf8'),
+        iconPromise,
     ]);
 
     wasm4js = escapeJsContentToInline(wasm4js);
@@ -66,6 +74,7 @@ async function bundle(cartFile, opts) {
             wasmCartJson,
             wasm4Css,
             wasm4js,
+            iconUrl,
         },
         buildInfo,
         opts,

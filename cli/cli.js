@@ -2,6 +2,7 @@
 
 const { program } = require("commander");
 const pkg = require('./package.json');
+const { supportedIconExtensions } = require('./lib/utils/icon');
 
 program.command("new <directory>")
     .description("Create a new blank project")
@@ -45,7 +46,8 @@ program.command("bundle <cart>")
     .option("--html <output>", "Bundle standalone HTML")
     .option("--title <title>", "Html page title", "Wasm 4 game")
     .option("--description <description>", "Html page description")
-    .option("--icon <favicon-url>", "Favicon url")
+    .option("--icon-file <filepath>", `Favicon icon file. Supported types: ${supportedIconExtensions().join(',')}.\nTakes precedence over --icon-url`)
+    .option("--icon-url <url>", 'Favicon icon url')
     .option("--timestamp", 'Adds build timestamp to output html', false)
     .action((cart, opts) => {
         const bundle = require("./lib/bundle");

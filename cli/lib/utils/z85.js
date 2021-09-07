@@ -1,3 +1,7 @@
+/**
+ * @param {Buffer|string|Array<number>|Uint8Array} src
+ * @returns {string}
+ */
 function encode(src) {
     const ENCODER =
         '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#'.split(

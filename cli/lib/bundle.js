@@ -2,6 +2,10 @@ const fs = require('fs').promises;
 const path = require('path');
 const htmlEscape = require('htmlescape');
 const z85 = require('./utils/z85');
+const {
+    escapeJsContentToInline,
+    escapeCssContentToInline,
+} = require('./utils/html-escape');
 const Handlebars = require('handlebars');
 const pkg = require('../package.json');
 
@@ -36,10 +40,8 @@ async function bundle(cartFile, opts) {
         fs.readFile(wasm4jsFilepath, 'utf8'),
     ]);
 
-    // @see https://mathiasbynens.be/notes/etago#html5
-    // @see https://html.spec.whatwg.org/multipage/parsing.html#script-data-end-tag-open-state
-    wasm4js = wasm4js.replace(/<\//g, '\\u003C\\u002F');
-    wasm4Css = wasm4Css.replace(/<\//g, '\\003C\\002F');
+    wasm4js = escapeJsContentToInline(wasm4js);
+    wasm4Css = escapeCssContentToInline(wasm4Css);
 
     // @see https://www.npmjs.com/package/htmlescape
     const wasmCartJson = htmlEscape({

@@ -1,10 +1,10 @@
 const fs = require('fs').promises;
 const path = require('path');
-const htmlEscape = require('htmlescape');
 const z85 = require('./utils/z85');
 const {
     escapeJsContentToInline,
     escapeCssContentToInline,
+    stringifyForJSONScript,
 } = require('./utils/html-escape');
 const Handlebars = require('handlebars');
 const pkg = require('../package.json');
@@ -43,8 +43,7 @@ async function bundle(cartFile, opts) {
     wasm4js = escapeJsContentToInline(wasm4js);
     wasm4Css = escapeCssContentToInline(wasm4Css);
 
-    // @see https://www.npmjs.com/package/htmlescape
-    const wasmCartJson = htmlEscape({
+    const wasmCartJson = stringifyForJSONScript({
         WASM4_CART: z85.encode(cart),
         WASM4_CART_SIZE: cart.length,
     });

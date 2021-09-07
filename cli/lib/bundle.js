@@ -62,7 +62,7 @@ async function bundle(cartFile, opts) {
     const outFileContent = bundleTemplate({
         html: {
             title: opts.title,
-            desc: opts.desc,
+            description: opts.description,
             wasmCartJson,
             wasm4Css,
             wasm4js,

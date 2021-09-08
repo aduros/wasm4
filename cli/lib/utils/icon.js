@@ -17,7 +17,7 @@ function supportedIconExtensions() {
  * @returns {string}
  */
 async function iconToBase64DataUrl(filePath) {
-    const fileExt = path.extname(filePath).toLowerCase().replace(/\W+/, '');
+    const fileExt = path.extname(filePath).toLowerCase().replace(/\W+/g, '');
     const mimeType = mapSupportedFileExtensionToMimeType[fileExt];
 
     if (!fileExt || !mimeType) {

@@ -10,6 +10,10 @@ const { iconToBase64DataUrl } = require('./utils/icon');
 const Handlebars = require('handlebars');
 const pkg = require('../package.json');
 
+function createGeneratorContent() {
+    return `WASM-4 ${pkg.version}`;
+}
+
 async function compileTemplate() {
     const templateSource = await fs.readFile(
         path.resolve(__dirname, '../assets/bundle/html-page.hbs'),
@@ -56,12 +60,12 @@ async function bundle(cartFile, opts) {
         WASM4_CART_SIZE: cart.length,
     });
 
-    const buildInfo = [{ value: pkg.version, name: 'wasm4-version' }];
+    const metadata = [{ content: createGeneratorContent(), name: 'generator' }];
 
     if (opts.timestamp) {
-        buildInfo.push({
-            value: new Date().toISOString(),
-            name: 'created-at',
+        metadata.push({
+            content: new Date().toISOString(),
+            name: 'created',
         });
     }
 
@@ -75,8 +79,8 @@ async function bundle(cartFile, opts) {
             wasm4Css,
             wasm4js,
             iconUrl,
+            metadata,
         },
-        buildInfo,
         opts,
     });
 

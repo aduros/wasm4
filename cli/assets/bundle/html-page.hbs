@@ -5,6 +5,9 @@
       name="viewport"
       content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"
     />
+    {{#each html.metadata}}
+    <meta name="{{this.name}}" content="{{this.content}}" />
+    {{/each}}
     {{#if html.description}}
     <meta name="description" content="{{html.description}}" />
     {{/if}}
@@ -34,11 +37,6 @@
       id="wasm4-cart-json"
       type="application/json"
     >{{{html.wasmCartJson}}}</script>
-    <div id="wasm4-bundle-info">
-    {{#each buildInfo}}
-      <input type="hidden" name="{{this.name}}" value="{{this.value}}">
-    {{/each}}
-    </div>
     <script id="wasm4-js">{{{html.wasm4js}}}</script>
   </body>
 </html>

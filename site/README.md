@@ -1,25 +1,10 @@
-# Website
+This directory contains the website hosted at https://wasm4.org. It's built with
+[Docusaurus](https://docusaurus.io/), a static site generator.
 
-This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
+## Development
 
-## Installation
+First run `npm install` to install dependencies.
 
-```console
-npm install
-```
+For quick development run `npm start`.
 
-## Local Development
-
-```console
-npm start
-```
-
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
-
-## Build
-
-```console
-npm build
-```
-
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+Run `npm run build` to build a release build.

@@ -17,6 +17,17 @@ A [pong](https://en.wikipedia.org/wiki/Pong) game cartridge written in [rust].
 cargo build --release
 ```
 
+
+#### Reduce bundle size after compilation
+
+Use [wasm-opt](https://github.com/WebAssembly/binaryen) to reduce cartridge size after `rustc` compilation:
+
+```bash
+wasm-opt -Oz -o output.wasm input.wasm
+```
+
+More info are available [here](https://rustwasm.github.io/book/reference/code-size.html#use-the-wasm-opt-tool).
+
 #### Build with dev_tools feature
 
 An optional feature, `dev_tools`, can be enabled to provide

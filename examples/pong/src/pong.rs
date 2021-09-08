@@ -247,7 +247,7 @@ impl PongGame {
         if self.ball.rect.is_colliding_rect(&GAME_FRAME.right) {
             collision |= CollisionType::RIGHT;
         } else if self.ball.rect.is_colliding_rect(&GAME_FRAME.left) {
-            collision = CollisionType::LEFT;
+            collision |= CollisionType::LEFT;
         }
 
         if !collision.is_empty() {

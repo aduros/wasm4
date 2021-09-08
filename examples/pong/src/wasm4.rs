@@ -57,7 +57,7 @@ pub fn blit_sub(
     height: u32,
     src_x: u32,
     src_y: u32,
-    stride: i32,
+    stride: u32,
     flags: u32,
 ) {
     unsafe {
@@ -84,7 +84,7 @@ extern "C" {
         height: u32,
         src_x: u32,
         src_y: u32,
-        stride: i32,
+        stride: u32,
         flags: u32,
     );
 }
@@ -138,12 +138,12 @@ extern "C" {
 // └───────────────────────────────────────────────────────────────────────────┘
 
 /// Plays a sound tone.
-pub fn tone(frequency: u32, volume: u32, duration: u32, flags: u32) {
-    unsafe { extern_tone(frequency, volume, duration, flags) }
+pub fn tone(frequency: u32, duration: u32, volume: u32, flags: u32) {
+    unsafe { extern_tone(frequency, duration, volume, flags) }
 }
 extern "C" {
     #[link_name = "tone"]
-    fn extern_tone(frequency: u32, volume: u32, duration: u32, flags: u32);
+    fn extern_tone(frequency: u32, duration: u32, volume: u32, flags: u32);
 }
 
 pub const TONE_PULSE1: u32 = 0;

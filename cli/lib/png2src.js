@@ -132,7 +132,7 @@ function run (sourceFile, template) {
         .replace(/%name%/gi, varName)
         .replace(/%idiomaticName%/gi, idiomaticVarName)
         .replace(/%height%/gi, png.height)
-        .replace(/%width%/gi, png.height)
+        .replace(/%width%/gi, png.width)
         .replace(/%length%/gi, bytes.length)
         .replace(/%flags%/gi, flags)
         .replace(/%flagsHumanReadable%/gi, flagsHumanReadable)

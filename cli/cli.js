@@ -44,11 +44,11 @@ program.command("png2src <images...>")
 program.command("bundle <cart>")
     .description("Bundle a cartridge for final distribution")
     .option("--html <output>", "Bundle standalone HTML")
-    .option("--title <title>", "Html page title", "Wasm 4 game")
-    .option("--description <description>", "Html page description")
-    .option("--icon-file <filepath>", `Favicon icon file. Supported types: ${supportedIconExtensions().join(',')}.\nTakes precedence over --icon-url`)
+    .option("--title <title>", "Game title", "WASM-4 Game")
+    .option("--description <description>", "Game description")
+    .option("--icon-file <file>", `Game icon image. Supported types: ${supportedIconExtensions().join(', ')}.\nTakes precedence over --icon-url`)
     .option("--icon-url <url>", 'Favicon icon url')
-    .option("--timestamp", 'Adds build timestamp to output html', false)
+    .option("--timestamp", 'Adds build timestamp to output', false)
     .action((cart, opts) => {
         const bundle = require("./lib/bundle");
         bundle.run(cart, opts);

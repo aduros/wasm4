@@ -31,6 +31,7 @@
   "dependencies": {
     "commander": "^8.0.0",
     "express": "^4.17.1",
+    "handlebars": "^4.7.7",
     "node-watch": "^0.7.1",
     "open": "^8.2.1",
     "pngjs": "^6.0.0",

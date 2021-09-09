@@ -1,63 +1,92 @@
-const fs = require("fs").promises;
-const path = require("path");
+const fs = require('fs').promises;
+const path = require('path');
+const z85 = require('./utils/z85');
+const {
+    escapeJsContentToInline,
+    escapeCssContentToInline,
+    stringifyForJSONScript,
+} = require('./utils/html-escape');
+const { iconToBase64DataUrl } = require('./utils/icon');
+const Handlebars = require('handlebars');
+const pkg = require('../package.json');
 
-function z85 (src) {
-    const ENCODER = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#".split("");
-
-    const size = src.length;
-    const extra = (size % 4);
-    const paddedSize = extra ? size + 4-extra : size;
-    
-    let str = "",
-        byte_nbr = 0,
-        value = 0;
-    while (byte_nbr < paddedSize) {
-        const b = (byte_nbr < size) ? src[byte_nbr] : 0;
-        ++byte_nbr;
-        value = (value * 256) + b;
-        if ((byte_nbr % 4) == 0) {
-            let divisor = 85 * 85 * 85 * 85;
-            while (divisor >= 1) {
-                const idx = Math.floor(value / divisor) % 85;
-                str += ENCODER[idx];
-                divisor /= 85;
-            }
-            value = 0;
-        }
-    }
-    
-    return str;
+function createGeneratorContent() {
+    return `WASM-4 ${pkg.version}`;
 }
 
-async function run (cartFile, opts) {
-    const runtimeDir = path.resolve(__dirname+"/../assets/runtime");
+async function compileTemplate() {
+    const templateSource = await fs.readFile(
+        path.resolve(__dirname, '../assets/bundle/html-page.hbs'),
+        { encoding: 'utf-8' }
+    );
+
+    return Handlebars.compile(templateSource);
+}
+
+async function bundle(cartFile, opts) {
+    const runtimeDir = path.resolve(__dirname, '../assets/runtime');
+    const wasm4CssFilepath = path.resolve(runtimeDir, './wasm4.css');
+    const wasm4jsFilepath = path.resolve(runtimeDir, './wasm4.js');
 
     const outFile = opts.html;
     if (outFile == null) {
-        throw new Error("You must specify one or more bundle outputs.");
+        throw new Error('You must specify one or more bundle outputs.');
     }
 
-    if (!require("fs").existsSync(outFile)) {
+    if (!require('fs').existsSync(outFile)) {
         await fs.mkdir(path.dirname(outFile), {
-            recursive: true
+            recursive: true,
         });
     }
 
-    let [cart, html, css, js] = await Promise.all([
+    let iconPromise = opts.iconUrl;
+
+    if (opts.iconFile) {
+        iconPromise = iconToBase64DataUrl(opts.iconFile);
+    }
+
+    let [cart, wasm4Css, wasm4js, iconUrl] = await Promise.all([
         fs.readFile(cartFile),
-        fs.readFile(runtimeDir+"/index.html", "utf8"),
-        fs.readFile(runtimeDir+"/wasm4.css", "utf8"),
-        fs.readFile(runtimeDir+"/wasm4.js", "utf8"),
+        fs.readFile(wasm4CssFilepath, 'utf8'),
+        fs.readFile(wasm4jsFilepath, 'utf8'),
+        iconPromise,
     ]);
 
-    js = `const WASM4_CART="${z85(cart)}",WASM4_CART_SIZE=${cart.length};${js}`;
-    js = js.replace(/<\//g, "<\\/");
+    wasm4js = escapeJsContentToInline(wasm4js);
+    wasm4Css = escapeCssContentToInline(wasm4Css);
 
-    // It would be safer to use an HTML parser, but this is good enough for now
-    html = html.replace('<link rel="stylesheet" href="wasm4.css">', `<style>${css}</style>`);
-    html = html.replace('<script src="wasm4.js"></script>', `<script>${js}</script>`);
+    const wasmCartJson = stringifyForJSONScript({
+        WASM4_CART: z85.encode(cart),
+        WASM4_CART_SIZE: cart.length,
+    });
 
-    await fs.writeFile(outFile, html);
+    const metadata = [{ content: createGeneratorContent(), name: 'generator' }];
+
+    if (opts.timestamp) {
+        metadata.push({
+            content: new Date().toISOString(),
+            name: 'created',
+        });
+    }
+
+    const bundleTemplate = await compileTemplate();
+
+    const outFileContent = bundleTemplate({
+        html: {
+            title: opts.title,
+            description: opts.description,
+            wasmCartJson,
+            wasm4Css,
+            wasm4js,
+            iconUrl,
+            metadata,
+        },
+        opts,
+    });
+
+    await fs.writeFile(outFile, outFileContent);
+
     console.log(`OK! Bundled ${outFile}.`);
 }
-exports.run = run;
+
+exports.run = bundle;

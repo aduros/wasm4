@@ -1,0 +1,42 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    {{#each html.metadata}}
+    <meta name="{{this.name}}" content="{{this.content}}" />
+    {{/each}}
+    {{#if html.description}}
+    <meta name="description" content="{{html.description}}" />
+    {{/if}}
+    {{#if html.iconUrl}}
+    <link rel="shortcut icon" href="{{html.iconUrl}}" />
+    {{/if}}
+    <title>{{html.title}}</title>
+    <style type="text/css" id="wasm4-css">{{{html.wasm4Css}}}</style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="content">
+        <div class="infobox">
+          <h2 id="title"></h2>
+          <h4 id="author"></h4>
+          <span class="play-button"></span>
+        </div>
+        <div id="screenshot"></div>
+      </div>
+    </div>
+    <div class="gamepad">
+      <div id="gamepad-dpad"></div>
+      <div id="gamepad-action1"></div>
+      <div id="gamepad-action2"></div>
+    </div>
+    <script
+      id="wasm4-cart-json"
+      type="application/json"
+    >{{{html.wasmCartJson}}}</script>
+    <script id="wasm4-js">{{{html.wasm4js}}}</script>
+  </body>
+</html>

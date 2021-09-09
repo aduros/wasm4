@@ -136,6 +136,11 @@ export class Runtime {
 
         const module = await WebAssembly.instantiate(wasmBuffer, { env });
         this.wasm = module.instance;
+
+        // Call the WASI _start function (different from WASM-4's start callback!)
+        if (this.wasm.exports._start != null) {
+            this.wasm.exports._start();
+        }
     }
 
     text (textPtr, x, y) {

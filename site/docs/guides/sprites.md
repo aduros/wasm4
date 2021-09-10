@@ -69,7 +69,7 @@ var smiley = [8]byte {
     0b00100100,
     0b10011001,
     0b11000011,
-};
+}
 ```
 
 </MultiLanguageCode>
@@ -91,7 +91,7 @@ blit(&smiley, 10, 10, 8, 8, BLIT_1BPP);
 ```
 
 ```go
-blit(&smiley[0], 10, 10, 8, 8, BLIT_1BPP);
+w4.Blit(&smiley[0], 10, 10, 8, 8, w4.BLIT_1BPP)
 ```
 
 </MultiLanguageCode>
@@ -117,7 +117,7 @@ blit(&smiley, 10, 10, 8, 8, BLIT_1BPP | BLIT_FLIP_Y);
 ```
 
 ```go
-blit(&smiley[0], 10, 10, 8, 8, BLIT_1BPP | BLIT_FLIP_Y);
+w4.Blit(&smiley[0], 10, 10, 8, 8, w4.BLIT_1BPP | w4.BLIT_FLIP_Y)
 ```
 
 </MultiLanguageCode>

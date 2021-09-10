@@ -32,8 +32,8 @@ diskw(&gameData, sizeof(gameData));
 import "unsafe"
 // ...
 
-var gameData int32 = 1337;
-diskw(unsafe.Pointer(&gameData), unsafe.Sizeof(gameData));
+var gameData int32 = 1337
+w4.DiskW(unsafe.Pointer(&gameData), unsafe.Sizeof(gameData))
 ```
 
 </MultiLanguageCode>
@@ -67,8 +67,8 @@ diskr(&gameData, sizeof(gameData));
 import "unsafe"
 // ...
 
-var gameData int32;
-diskr(unsafe.Pointer(&gameData), unsafe.Sizeof(gameData));
+var gameData int32
+w4.DiskR(unsafe.Pointer(&gameData), unsafe.Sizeof(gameData))
 ```
 
 </MultiLanguageCode>

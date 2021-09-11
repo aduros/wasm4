@@ -5,6 +5,10 @@ const FONT = new Uint8Array([ 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xc7,0xc7,
 
 export class Framebuffer {
     constructor (memory) {
+        this.updateMemory(memory);
+    }
+
+    updateMemory(memory) {
         this.bytes = new Uint8Array(memory, constants.ADDR_FRAMEBUFFER, WIDTH*HEIGHT >> 2);
         this.drawColors = new Uint16Array(memory, constants.ADDR_DRAW_COLORS, 1);
     }

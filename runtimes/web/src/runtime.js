@@ -21,7 +21,7 @@ export class Runtime {
 
         this.apu = new APU();
 
-        this.memory = new WebAssembly.Memory({initial: 1, maximum: 1});
+        this.memory = new WebAssembly.Memory({initial: 1, maximum: 2});
         this.data = new DataView(this.memory.buffer);
 
         this.framebuffer = new Framebuffer(this.memory.buffer);
@@ -282,6 +282,8 @@ export class Runtime {
         this.framebuffer.clear();
         if (this.wasm.exports.update != null) {
             this.wasm.exports.update();
+            this.data = new DataView(this.memory.buffer);
+            this.framebuffer.updateMemory(this.memory.buffer);
         }
 
         this.composite();

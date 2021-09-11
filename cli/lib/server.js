@@ -23,8 +23,15 @@ function start (cartFile) {
     const app = express();
 
     app.get("/cart.wasm", (req, res) => {
-        const patchedWasm = wasmmap.SetSourceMapURL(fs.readFileSync(cartFile), `${url}/cart.wasm.map`);
-        bufferToStream(patchedWasm).pipe(res);
+        if (fs.existsSync(cartFile + '.map')) {
+            console.log('Source map exist, patch wasm!');
+
+            const patchedWasm = wasmmap.SetSourceMapURL(fs.readFileSync(cartFile), `${url}/cart.wasm.map`);
+            bufferToStream(patchedWasm).pipe(res);
+            return;
+        }
+
+        fs.createReadStream(cartFile).pipe(res);
     });
 
     app.get("/cart.wasm.map", (req, res) => {

@@ -8,7 +8,7 @@ rustflags = [
     # Import memory from WASM-4
     "-C", "link-arg=--import-memory",
     "-C", "link-arg=--initial-memory=65536",
-    "-C", "link-arg=--max-memory=65536",
+    "-C", "link-arg=--max-memory=131072",
 
     # Reserve 1024 bytes of stack space, offset from 6580
     "-C", "link-arg=-zstack-size=7584",

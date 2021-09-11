@@ -1,3 +1,5 @@
+const { Readable } = require('stream');
+const wasmmap = require('wasm-sourcemap');
 const express = require("express");
 const fs = require("fs");
 const os = require("os");
@@ -8,11 +10,27 @@ const open = require("open");
 
 const PORT = 4444;
 
+function bufferToStream(buffer) { 
+    var stream = new Readable();
+    stream.push(buffer);
+    stream.push(null);
+  
+    return stream;
+  }
+
 function start (cartFile) {
+    const url = `http://localhost:${PORT}`;
     const app = express();
+
     app.get("/cart.wasm", (req, res) => {
-        fs.createReadStream(cartFile).pipe(res);
+        const patchedWasm = wasmmap.SetSourceMapURL(fs.readFileSync(cartFile), `${url}/cart.wasm.map`);
+        bufferToStream(patchedWasm).pipe(res);
     });
+
+    app.get("/cart.wasm.map", (req, res) => {
+        fs.createReadStream(cartFile + '.map').pipe(res);
+    });
+    
     app.use(express.static(__dirname+"/../assets/runtime"));
 
     const server = app.listen(PORT, async () => {
@@ -20,7 +38,7 @@ function start (cartFile) {
         console.log("\n  " + qr.replace(/\n/g, "\n  "));
         console.log(`Open http://localhost:${PORT}, or scan this QR code on your mobile device. Press ctrl-C to exit.`);
 
-        open(`http://localhost:${PORT}`);
+        open(url);
     });
 
     const wsServer = new WebSocketServer({ noServer: true });

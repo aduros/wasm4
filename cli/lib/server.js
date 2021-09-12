@@ -13,6 +13,9 @@ function start (cartFile) {
     app.get("/cart.wasm", (req, res) => {
         fs.createReadStream(cartFile).pipe(res);
     });
+    app.get("/cart.wasm.map", (req, res) => {
+        fs.createReadStream(cartFile+".map").pipe(res);
+    });
     app.use(express.static(__dirname+"/../assets/runtime"));
 
     const server = app.listen(PORT, async () => {

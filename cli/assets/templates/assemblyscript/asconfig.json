@@ -21,7 +21,7 @@
     },
     "debug": {
       "debug": true,
-      "sourceMap": true,
+      "sourceMap": "http://localhost:4444/cart.wasm.map",
       "use": "abort=src/wasm4/abortHandler"
     }
   }

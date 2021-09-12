@@ -35,9 +35,13 @@ fn update () {
 ```go
 package main
 
+import "cart/w4"
+
+func main() {}
+
 //go:export update
 func update () {
-    rect(10, 10, 32, 32);
+    w4.Rect(10, 10, 32, 32)
 }
 ```
 
@@ -82,9 +86,9 @@ rect(10, 10, 32, 32);
 ```
 
 ```go
-*DRAW_COLORS = 2;
+*w4.DRAW_COLORS = 2
 
-rect(10, 10, 32, 32);
+w4.Rect(10, 10, 32, 32)
 ```
 
 </MultiLanguageCode>
@@ -108,7 +112,7 @@ trace("Hello world!");
 ```
 
 ```go
-trace("Hello world!");
+w4.Trace("Hello world!")
 ```
 
 </MultiLanguageCode>

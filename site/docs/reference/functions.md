@@ -6,6 +6,10 @@ sidebar_label: Functions
 
 All function parameters are 32 bit integers unless otherwise noted.
 
+:::note
+Go uses Go-Idiomatic names (PascalCase). Like `Blit` instead of `blit` and `DiskW` instead of `diskw`.
+:::
+
 ## Drawing
 
 All drawing functions are affected by the [`DRAW_COLORS`](memory#draw_colors) register.

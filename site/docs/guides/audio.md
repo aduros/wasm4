@@ -41,7 +41,7 @@ tone(262, 60, 100, TONE_PULSE1);
 ```
 
 ```go
-tone(262, 60, 100, TONE_PULSE1);
+w4.Tone(262, 60, 100, w4.TONE_PULSE1)
 ```
 
 </MultiLanguageCode>
@@ -75,7 +75,7 @@ tone(262, 60, 100, TONE_PULSE1 | TONE_MODE3);
 ```
 
 ```go
-tone(262, 60, 100, TONE_PULSE1 | TONE_MODE3);
+w4.Tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_MODE3)
 ```
 
 </MultiLanguageCode>
@@ -103,7 +103,7 @@ tone(262 | (523 << 16), 60, 100, TONE_PULSE1);
 ```
 
 ```go
-tone(262 | (523 << 16), 60, 100, TONE_PULSE1);
+w4.Tone(262 | (523 << 16), 60, 100, w4.TONE_PULSE1)
 ```
 
 </MultiLanguageCode>
@@ -140,7 +140,7 @@ tone(262, 60 | (30 << 8), 100, TONE_PULSE1);
 ```
 
 ```go
-tone(262, 60 | (30 << 8), 100, TONE_PULSE1);
+w4.Tone(262, 60 | (30 << 8), 100, w4.TONE_PULSE1)
 ```
 
 </MultiLanguageCode>

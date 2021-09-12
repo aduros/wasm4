@@ -40,10 +40,10 @@ if gamepad & BUTTON_RIGHT != 0 {
 ```
 
 ```go
-var gamepad = *GAMEPAD1;
+var gamepad = *w4.GAMEPAD1
 
-if (gamepad & BUTTON_RIGHT != 0) {
-    trace("Right button is down!");
+if gamepad&w4.BUTTON_RIGHT != 0 {
+    w4.Trace("Right button is down!")
 }
 ```
 
@@ -110,18 +110,18 @@ void update () {
 ```
 
 ```go
-var previousGamepad byte;
+var previousGamepad byte
 
 //go:export update
 func update () {
-    var gamepad = *GAMEPAD1;
+    var gamepad = *w4.GAMEPAD1;
 
     // Only the buttons that were pressed down this frame
     var pressedThisFrame = gamepad & (gamepad ^ previousGamepad);
     previousGamepad = gamepad;
 
-    if (pressedThisFrame & BUTTON_RIGHT != 0) {
-        trace("Right button was just pressed!");
+    if pressedThisFrame&w4.BUTTON_RIGHT != 0 {
+        w4.Trace("Right button was just pressed!")
     }
 }
 ```

@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const { spawn } = require("child_process");
 const watch = require("node-watch");
 
@@ -50,7 +51,18 @@ function start () {
     build();
 
     let buildTimeoutId = 0;
-    watch("src", {recursive: true}, (event, file) => {
+    function watchFilter (file, skip) {
+        console.log("watchFilter", file);
+        switch (file) {
+        case ".git": case "node_modules": case "build": case "target":
+            // Don't bother descending into certain dirs
+            return skip;
+        default:
+            // Only trigger on source file changes
+            return /\.(ts|c|cpp|h|rs|go|wat)$/.test(file);
+        }
+    }
+    watch("./", {recursive: true, filter: watchFilter}, (event, file) => {
         if (!currentlyBuilding) {
             clearTimeout(buildTimeoutId);
             buildTimeoutId = setTimeout(build, 50);

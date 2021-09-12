@@ -13,8 +13,6 @@ var smiley = [8]byte{
 	0b11000011,
 }
 
-func main() {}
-
 //go:export update
 func update() {
 	*w4.DRAW_COLORS = 2

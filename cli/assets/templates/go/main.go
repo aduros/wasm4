@@ -1,6 +1,6 @@
 package main
 
-import "cart/src/w4"
+import "cart/w4"
 
 var smiley = [8]byte{
 	0b11000011,

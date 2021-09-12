@@ -10,7 +10,7 @@ WASM_OPT_FLAGS = -Oz --zero-filled-memory --strip-producers
 
 all:
 	@mkdir -p build
-	$(GO) build -o build/cart.wasm -target ./target.json -panic=trap ./src
+	$(GO) build -o build/cart.wasm -target ./target.json -panic=trap ./...
 ifneq ($(DEBUG), 1)
 ifeq (, $(shell which $(WASM_OPT)))
 	@echo Tip: $(WASM_OPT) was not found. Install it from binaryen for smaller builds!

@@ -342,14 +342,9 @@ async function loadCartWasm () {
     window.addEventListener("pointermove", onPointerEvent);
     window.addEventListener("pointerup", onPointerEvent);
 
-    let lastUpdateTime = -Infinity;
-    function loop (now) {
-        const elapsed = now - lastUpdateTime;
-        if (elapsed >= 1000/60) {
-            lastUpdateTime = now;
-            runtime.update();
-        }
+    function loop () {
+        runtime.update();
         requestAnimationFrame(loop);
     }
-    loop(performance.now());
+    loop();
 })();

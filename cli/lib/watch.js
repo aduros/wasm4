@@ -52,7 +52,6 @@ function start () {
 
     let buildTimeoutId = 0;
     function watchFilter (file, skip) {
-        console.log("watchFilter", file);
         switch (file) {
         case ".git": case "node_modules": case "build": case "target":
             // Don't bother descending into certain dirs

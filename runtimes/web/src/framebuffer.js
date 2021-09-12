@@ -39,7 +39,7 @@ export class Framebuffer {
         const dc0 = drawColors & 0xf;
         const dc1 = (drawColors >>> 4) & 0xf;
 
-        if (dc0 != 0) {
+        if (dc0 !== 0) {
             const fillColor = (dc0 - 1) & 0x3;
 
             for (let yy = startY; yy < endY; ++yy) {
@@ -53,32 +53,32 @@ export class Framebuffer {
             }
         }
 
-        if (dc1 != 0) {
+        if (dc1 !== 0) {
             const strokeColor = (dc1 - 1) & 0x3;
 
             // Left edge
             if (x >= 0 && x < WIDTH) {
                 const shift = (x & 0x3) << 1;
-                const mask = 0x3 << shift;
+                const mask = ~(0x3 << shift);
                 const color = strokeColor << shift;
                 const xx = x >>> 2;
 
                 for (let yy = startY; yy < endY; ++yy) {
                     const idx = (WIDTH >>> 2) * yy + xx;
-                    this.bytes[idx] = color | (this.bytes[idx] & ~mask);
+                    this.bytes[idx] = color | (this.bytes[idx] & mask);
                 }
             }
 
             // Right edge
             if (endX > 0 && endX < WIDTH + 1) {
                 const shift = ((endX - 1) & 0x3) << 1;
-                const mask = 0x3 << shift;
+                const mask = ~(0x3 << shift);
                 const color = strokeColor << shift;
                 const xx = (endX - 1) >>> 2;
 
                 for (let yy = startY; yy < endY; ++yy) {
                     const idx = (WIDTH >>> 2) * yy + xx;
-                    this.bytes[idx] = color | (this.bytes[idx] & ~mask);
+                    this.bytes[idx] = color | (this.bytes[idx] & mask);
                 }
             }
 
@@ -110,7 +110,7 @@ export class Framebuffer {
         const drawColors = this.drawColors[0];
         // const dc0 = drawColors & 0xf;
         const dc1 = (drawColors >>> 4) & 0xf;
-        if (dc1 == 0xf) {
+        if (dc1 === 0xf) {
             return;
         }
         const strokeColor = (dc1 - 1) & 0x3;
@@ -166,7 +166,7 @@ export class Framebuffer {
     drawLine (x1, y1, x2, y2) {
         const drawColors = this.drawColors[0];
         const dc0 = drawColors & 0xf;
-        if (dc0 == 0) {
+        if (dc0 === 0) {
             return;
         }
         const strokeColor = (dc0 - 1) & 0x3;
@@ -207,14 +207,14 @@ export class Framebuffer {
         for (let ii = 0, len = charArray.length; ii < len; ++ii) {
             const charCode = charArray[ii];
             switch (charCode) {
-            case 0:
-                return; // Null terminator
-            case 10:
+            case 0:  // \0
+                return;
+            case 10: // \n
                 y += 8;
                 currentX = x;
                 break;
             default:
-                this.blit(FONT, currentX, y, 8, 8, 0, (charCode - 32) * 8, 8);
+                this.blit(FONT, currentX, y, 8, 8, 0, (charCode - 32) << 3, 8);
                 currentX += 8;
                 break;
             }
@@ -278,7 +278,7 @@ export class Framebuffer {
                 // Get the final color using the drawColors indirection
                 // TODO(2021-08-11): Use a lookup table here?
                 const dc = (drawColors >>> (colorIdx << 2)) & 0x0f;
-                if (dc != 0) {
+                if (dc !== 0) {
                     const x = dstX + col;
                     const idx = stride + (x >>> 2);
                     const shift = (x & 0x3) << 1;

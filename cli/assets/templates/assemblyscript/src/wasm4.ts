@@ -135,10 +135,20 @@ export declare function memset (dest: usize, byte: u8, size: u32): usize;
 
 /** Prints a message to the debug console. */
 export function trace (str: string): void {
-    const byteLength = load<u32>(changetype<usize>(str) - 4);
-    traceUtf16(str, byteLength);
+    const ptr = changetype<usize>(str);
+    const byteLength = load<u32>(ptr - 4);
+    traceUtf16(ptr, byteLength);
 }
 
 // @ts-ignore: decorator
 @external("env", "traceUtf16")
-declare function traceUtf16 (str: string, byteLength: u32): void;
+declare function traceUtf16 (str: usize, byteLength: u32): void;
+
+// Pass abort messages to trace()
+export function abortHandler (message: string | null, fileName: string | null, lineNumber: u32, columnNumber: u32) :void {
+    const ptr = changetype<usize>(message);
+    if (ptr != 0) {
+        const byteLength = load<u32>(ptr - 4);
+        traceUtf16(ptr, byteLength);
+    }
+}

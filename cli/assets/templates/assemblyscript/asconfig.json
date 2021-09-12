@@ -16,11 +16,13 @@
     "release": {
       "optimizeLevel": 3,
       "shrinkLevel": 0,
-      "noAssert": true
+      "noAssert": true,
+      "use": "abort="
     },
     "debug": {
       "debug": true,
-      "sourceMap": true
+      "sourceMap": true,
+      "use": "abort=src/wasm4/abortHandler"
     }
   }
 }

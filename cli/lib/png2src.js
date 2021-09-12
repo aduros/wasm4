@@ -26,13 +26,9 @@ const %idiomaticName%: [u8; %length%] = [ %bytes% ];
 `,  
 
     go: 
-`// %name%
-const (
-    %name%Width = %width%
-    %name%Height = %height%
-    %name%Flags = %flags% // %flagsHumanReadable%
-)
-
+`const %name%Width = %width%
+const %name%Height = %height%
+const %name%Flags = %flags% // %flagsHumanReadable%
 var %name% = [%length%]byte { %bytes% }
 `,
 }

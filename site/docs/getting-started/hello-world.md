@@ -35,7 +35,7 @@ fn update () {
 ```go
 package main
 
-import "cart/src/w4"
+import "cart/w4"
 
 func main() {}
 

@@ -120,7 +120,7 @@ func update () {
     var pressedThisFrame = gamepad & (gamepad ^ previousGamepad);
     previousGamepad = gamepad;
 
-    if pressedThisFrame&w4.BUTTON_RIGHT != ) {
+    if pressedThisFrame&w4.BUTTON_RIGHT != 0 {
         w4.Trace("Right button was just pressed!")
     }
 }

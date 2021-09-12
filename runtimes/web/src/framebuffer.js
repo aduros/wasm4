@@ -227,7 +227,7 @@ export class Framebuffer {
         width, height,
         srcX, srcY,
         srcStride,
-        bpp2,
+        bpp2 = false,
         flipX = false,
         flipY = false,
         rotate = false

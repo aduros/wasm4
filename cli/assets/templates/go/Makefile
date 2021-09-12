@@ -5,12 +5,20 @@ WASM_OPT = wasm-opt
 # Whether to build for debugging instead of release
 DEBUG = 0
 
+# Compilation flags
+GOFLAGS = -target ./target.json -panic trap
+ifeq ($(DEBUG), 1)
+	GOFLAGS += -opt 1
+else
+	GOFLAGS += -opt z -no-debug
+endif
+
 # wasm-opt flags
 WASM_OPT_FLAGS = -Oz --zero-filled-memory --strip-producers
 
 all:
 	@mkdir -p build
-	$(GO) build -o build/cart.wasm -target ./target.json -panic=trap ./...
+	$(GO) build $(GOFLAGS) -o build/cart.wasm ./...
 ifneq ($(DEBUG), 1)
 ifeq (, $(shell which $(WASM_OPT)))
 	@echo Tip: $(WASM_OPT) was not found. Install it from binaryen for smaller builds!

@@ -342,9 +342,24 @@ async function loadCartWasm () {
     window.addEventListener("pointermove", onPointerEvent);
     window.addEventListener("pointerup", onPointerEvent);
 
+    // https://gist.github.com/addyosmani/5434533#file-limitloop-js-L60
+
+    const INTERVAL = 1000 / 60;
+
+    // lastFrame is not a real time, it has frame-gap correction
+    let lastFrame = performance.now();
+
     function loop () {
-        runtime.update();
         requestAnimationFrame(loop);
+
+        const now = performance.now();
+        const deltaFrame = now - lastFrame;
+
+        if (deltaFrame >= INTERVAL) {
+            lastFrame = now - (deltaFrame % INTERVAL);
+            runtime.update();
+        }
+
     }
     loop();
 })();

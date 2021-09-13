@@ -22,7 +22,7 @@ const NOISE_LENGTH = 0x8000;
 
 export class APU {
     constructor () {
-        const ctx = new AudioContext();
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
         this.ctx = ctx;
 
         this.nodes = new Array(4);

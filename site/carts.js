@@ -1,5 +1,11 @@
 const CARTS = [
     {
+        slug: "tictactoe",
+        title: "Tic Tac Toe",
+        author: "Christopher Kleine",
+        github: "christopher-kleine",
+    },
+    {
         slug: "pong",
         title: "Pong",
         author: "Fabrizio Vitale",

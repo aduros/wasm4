@@ -98,6 +98,9 @@ const int PIECE_COLORS[] = {
     0x2ce8f4, // I: cyan
 };
 
+#define SPIN_CW 1
+#define SPIN_CCW -1
+
 #define BOARD_WIDTH 10
 #define BOARD_HEIGHT 20
 #define BOARD_OFFSET_X 16
@@ -133,7 +136,7 @@ char PIECE_COORDS[] = {
     -1, 0,
 
     // O
-    -1, -1, 
+    -1, -1,
     -1, 0,
     0, 0,
     0, -1,
@@ -319,7 +322,7 @@ int movePiece (char dx, char dy) {
     return 0;
 }
 
-int spinPiece () {
+int spinPiece (char direction) {
     if (piece.type == O) {
         return 1;
     }
@@ -332,8 +335,8 @@ int spinPiece () {
     for (int n = 0; n < 4; ++n) {
         char cx = piece.coords[2*n];
         char cy = piece.coords[2*n+1];
-        piece.coords[2*n] = -cy;
-        piece.coords[2*n+1] = cx;
+        piece.coords[2*n] = -direction * cy;
+        piece.coords[2*n+1] = direction * cx;
     }
 
     if (movePiece(0, 0)) {
@@ -398,13 +401,17 @@ void update () {
         }
 
     } else {
-        if (pressedThisFrame & BUTTON_1) {
-            if (!spinPiece()) {
+        if (pressedThisFrame & (BUTTON_1 | BUTTON_2 | BUTTON_UP)) {
+            // Button 2 (B) is usually left of Button 1 (A).
+            // Therefore, Button 1 should spins clockwise (to the right) and
+            // Button 2 should spin counter-clockwise (to the left).
+            // The default spin direction is clockwise.
+            if (!spinPiece(pressedThisFrame & BUTTON_2? SPIN_CCW : SPIN_CW)) {
                 tone(210 | (250 << 16), 8, 100, TONE_PULSE1 | TONE_MODE3);
             }
         }
 
-        if (pressedThisFrame & BUTTON_2) {
+        if (pressedThisFrame & BUTTON_DOWN) {
             // Hard drop
             while (!stepGravity()) { }
         }

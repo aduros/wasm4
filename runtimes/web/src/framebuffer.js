@@ -41,14 +41,9 @@ export class Framebuffer {
 
         if (dc0 !== 0) {
             const fillColor = (dc0 - 1) & 0x3;
-
             for (let yy = startY; yy < endY; ++yy) {
-                const stride = (WIDTH >>> 2) * yy;
                 for (let xx = startX; xx < endX; ++xx) {
-                    const idx = stride + (xx >>> 2);
-                    const shift = (xx & 0x3) << 1;
-                    const mask = 0x3 << shift;
-                    this.bytes[idx] = (fillColor << shift) | (this.bytes[idx] & ~mask);
+                    this.drawPoint(fillColor, xx, yy);
                 }
             }
         }
@@ -58,49 +53,29 @@ export class Framebuffer {
 
             // Left edge
             if (x >= 0 && x < WIDTH) {
-                const shift = (x & 0x3) << 1;
-                const mask = ~(0x3 << shift);
-                const color = strokeColor << shift;
-                const xx = x >>> 2;
-
                 for (let yy = startY; yy < endY; ++yy) {
-                    const idx = (WIDTH >>> 2) * yy + xx;
-                    this.bytes[idx] = color | (this.bytes[idx] & mask);
+                    this.drawPoint(strokeColor, x, yy);
                 }
             }
 
             // Right edge
             if (endX > 0 && endX < WIDTH + 1) {
-                const shift = ((endX - 1) & 0x3) << 1;
-                const mask = ~(0x3 << shift);
-                const color = strokeColor << shift;
-                const xx = (endX - 1) >>> 2;
-
                 for (let yy = startY; yy < endY; ++yy) {
-                    const idx = (WIDTH >>> 2) * yy + xx;
-                    this.bytes[idx] = color | (this.bytes[idx] & mask);
+                    this.drawPoint(strokeColor, endX - 1, yy);
                 }
             }
 
             // Top edge
             if (y >= 0 && y < HEIGHT) {
-                const stride = (WIDTH >>> 2) * y;
                 for (let xx = startX; xx < endX; ++xx) {
-                    const idx = stride + (xx >>> 2);
-                    const shift = (xx & 0x3) << 1;
-                    const mask = 0x3 << shift;
-                    this.bytes[idx] = (strokeColor << shift) | (this.bytes[idx] & ~mask);
+                    this.drawPoint(strokeColor, xx, y);
                 }
             }
 
             // Bottom edge
             if (endY > 0 && endY < HEIGHT + 1) {
-                const stride = (WIDTH >>> 2) * (endY - 1);
                 for (let xx = startX; xx < endX; ++xx) {
-                    const idx = stride + (xx >>> 2);
-                    const shift = (xx & 0x3) << 1;
-                    const mask = 0x3 << shift;
-                    this.bytes[idx] = (strokeColor << shift) | (this.bytes[idx] & ~mask);
+                    this.drawPoint(strokeColor, xx, endY - 1);
                 }
             }
         }
@@ -135,6 +110,7 @@ export class Framebuffer {
                 this.drawPointUnclipped(strokeColor, x0 + x, y0 - y); /*  II. Quadrant */
                 this.drawPointUnclipped(strokeColor, x0 - x, y0 + y); /* III. Quadrant */
                 this.drawPointUnclipped(strokeColor, x0 - x, y0 - y); /*  IV. Quadrant */
+
                 y++; sy += aa2; e += dy; dy += aa2;
                 if (2 * e + dx > 0) {
                     x--; sx -= bb2; e += dx; dx += bb2;
@@ -243,7 +219,6 @@ export class Framebuffer {
         }
 
         for (let row = clipYMin; row < clipYMax; ++row) {
-            const stride = (WIDTH >>> 2) * (dstY + row);
             for (let col = clipXMin; col < clipXMax; ++col) {
                 // Determine the local position on the sprite
                 let sx, sy;
@@ -279,11 +254,7 @@ export class Framebuffer {
                 // TODO(2021-08-11): Use a lookup table here?
                 const dc = (drawColors >>> (colorIdx << 2)) & 0x0f;
                 if (dc !== 0) {
-                    const x = dstX + col;
-                    const idx = stride + (x >>> 2);
-                    const shift = (x & 0x3) << 1;
-                    const mask = 0x3 << shift;
-                    this.bytes[idx] = (((dc - 1) & 0x03) << shift) | (this.bytes[idx] & ~mask);
+                    this.drawPoint((dc - 1) & 0x03, dstX + col, dstY + row);
                 }
             }
         }

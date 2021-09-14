@@ -64,7 +64,7 @@ w4 run build/cart.wasm
 
 <TabItem value="language-cpp">
 
-To compile C/C++ projects you will need `clang` installed.
+To compile C/C++ projects you will need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
 
 ```shell
 w4 new --c hello-world

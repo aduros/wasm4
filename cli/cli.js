@@ -17,16 +17,18 @@ program.command("new <directory>")
 
 program.command("watch")
     .description("Rebuild and refresh when source code changes")
-    .action(() => {
+    .option("--open", "Opens the browser")
+    .action(opts => {
         const watch = require("./lib/watch");
-        watch.start();
+        watch.start(opts);
     });
 
 program.command("run <cart>")
     .description("Open a cartridge in the emulator")
-    .action(cart => {
+    .option("--open", "Opens the browser")
+    .action((cart, opts) => {
         const server = require("./lib/server");
-        server.start(cart);
+        server.start(cart, opts);
     });
 
 program.command("png2src <images...>")

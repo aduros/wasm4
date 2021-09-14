@@ -19,9 +19,9 @@ const uint8_t %name%[%length%] = { %bytes% };
 `,
 
     rust: 
-`const %idiomaticName%_WIDTH: u32 = %width%;
-const %idiomaticName%_HEIGHT: u32 = %height%;
-const %idiomaticName%_FLAGS: u32 = %flags%; // %flagsHumanReadable%
+`const %idiomaticName%_WIDTH: usize = %width%;
+const %idiomaticName%_HEIGHT: usize = %height%;
+const %idiomaticName%_FLAGS: usize = %flags%; // %flagsHumanReadable%
 const %idiomaticName%: [u8; %length%] = [ %bytes% ];
 `,  
 

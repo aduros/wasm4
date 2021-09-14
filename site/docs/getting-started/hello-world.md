@@ -37,8 +37,6 @@ package main
 
 import "cart/w4"
 
-func main() {}
-
 //go:export update
 func update () {
     w4.Rect(10, 10, 32, 32)

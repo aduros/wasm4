@@ -121,9 +121,3 @@ WASM_IMPORT("trace") void trace (const char* str);
 /** Prints a message to the debug console. */
 __attribute__((__format__ (__printf__, 1, 2)))
 WASM_IMPORT("tracef") void tracef (const char* fmt, ...);
-
-/** Fills memory at `destPtr` with `size` bytes of the fixed value `value`. */
-WASM_IMPORT("memset") void* memset (void* dest, int c, unsigned long size);
-
-/** Copies `size` bytes from `srcPtr` into `destPtr`. */
-WASM_IMPORT("memcpy") void* memcpy (void* dest, const void* src, unsigned long size);

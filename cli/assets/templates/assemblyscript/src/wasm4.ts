@@ -123,16 +123,6 @@ export declare function diskw (src: usize, size: u32): u32;
 // │                                                                           │
 // └───────────────────────────────────────────────────────────────────────────┘
 
-/** Copies `size` bytes from `srcPtr` into `destPtr`. */
-// @ts-ignore: decorator
-@external("env", "memcpy")
-export declare function memcpy (dest: usize, src: usize, size: u32): usize;
-
-/** Fills memory at `destPtr` with `size` bytes of the fixed value `value`. */
-// @ts-ignore: decorator
-@external("env", "memset")
-export declare function memset (dest: usize, byte: u8, size: u32): usize;
-
 /** Prints a message to the debug console. */
 export function trace (str: string): void {
     const ptr = changetype<usize>(str);

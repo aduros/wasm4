@@ -113,14 +113,6 @@ func DiskW(src unsafe.Pointer, count uint) uint
 // │                                                                           │
 // └───────────────────────────────────────────────────────────────────────────┘
 
-/** Copies `size` bytes from `srcPtr` into `destPtr`. */
-//go:export memcpy
-func MemCpy(dest *byte, src *byte, size uint) uint
-
-/** Fills memory at `destPtr` with `size` bytes of the fixed value `value`. */
-//go:export memset
-func MemSet(dest *byte, b byte, size uint) uint
-
 /** Prints a message to the debug console. */
 //go:export traceUtf8
 func Trace(str string)

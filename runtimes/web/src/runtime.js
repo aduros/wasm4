@@ -114,19 +114,6 @@ export class Runtime {
             traceUtf16: this.traceUtf16.bind(this),
             tracef: this.tracef.bind(this),
 
-            memset: (destPtr, fillByte, length) => {
-                const dest = new Uint8Array(this.memory.buffer, destPtr, length);
-                dest.fill(fillByte);
-                return destPtr;
-            },
-
-            memcpy: (destPtr, srcPtr, length) => {
-                const dest = new Uint8Array(this.memory.buffer, destPtr);
-                const src = new Uint8Array(this.memory.buffer, srcPtr, length);
-                dest.set(src);
-                return destPtr;
-            },
-
             // seed for AssemblyScript random generator
             seed: Date.now,
 

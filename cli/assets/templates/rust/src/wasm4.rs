@@ -143,16 +143,6 @@ extern {
 // │                                                                           │
 // └───────────────────────────────────────────────────────────────────────────┘
 
-extern {
-    /// Copies `size` bytes from `srcPtr` into `destPtr`.
-    #[link_name = "memcpy"]
-    pub fn memcpy (dest: *mut u8, src: *const u8, size: usize) -> usize;
-
-    /// Fills memory at `destPtr` with `size` bytes of the fixed value `value`.
-    #[link_name = "memset"]
-    pub fn memset (dest: *mut u8, byte: u8, size: usize) -> usize;
-}
-
 /// Prints a message to the debug console.
 pub fn trace (text: &str) {
     unsafe { extern_trace(text.as_ptr(), text.len()) }

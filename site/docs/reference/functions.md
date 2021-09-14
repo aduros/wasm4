@@ -154,14 +154,6 @@ Called every frame, about 60 times per second.
 
 ## Other
 
-### `memcpy (destPtr, srcPtr, size)`
-
-Copies `size` bytes from `srcPtr` into `destPtr`.
-
-### `memset (destPtr, value, size)`
-
-Fills memory at `destPtr` with `size` bytes of the fixed value `value`.
-
 ### `trace (str)`
 
 Prints a message to the debug console.

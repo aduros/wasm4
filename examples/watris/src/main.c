@@ -2,7 +2,7 @@
 
 #include "utils.h"
 
-const char PIECE_SPRITES[][8] = {
+const uint8_t PIECE_SPRITES[][8] = {
     // L
     {
         0b11111111,

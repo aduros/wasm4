@@ -1,6 +1,6 @@
 #include "wasm4.h"
 
-const char ARROW[] = {
+const uint8_t ARROW[] = {
     0b00001000,
     0b00001100,
     0b01111110,

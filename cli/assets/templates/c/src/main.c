@@ -1,6 +1,6 @@
 #include "wasm4.h"
 
-const char smiley[] = {
+const uint8_t smiley[] = {
     0b11000011,
     0b10000001,
     0b00100100,
@@ -15,7 +15,7 @@ void update () {
     *DRAW_COLORS = 2;
     text("Hello from C!", 10, 10);
 
-    char gamepad = *GAMEPAD1;
+    uint8_t gamepad = *GAMEPAD1;
     if (gamepad & BUTTON_1) {
         *DRAW_COLORS = 4;
     }

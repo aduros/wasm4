@@ -15,7 +15,7 @@ const %name% = memory.data<u8>([ %bytes% ]);
 `#define %name%Width %width%
 #define %name%Height %height%
 #define %name%Flags %flagsHumanReadable%
-const char %name%[%length%] = { %bytes% };
+const uint8_t %name%[%length%] = { %bytes% };
 `,
 
     rust: 

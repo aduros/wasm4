@@ -24,7 +24,7 @@ if (gamepad & w4.BUTTON_RIGHT) {
 ```
 
 ```c
-unsigned char gamepad = *GAMEPAD1;
+uint8_t gamepad = *GAMEPAD1;
 
 if (gamepad & BUTTON_RIGHT) {
     trace("Right button is down!");
@@ -90,13 +90,13 @@ export function update () {
 ```
 
 ```c
-unsigned char previousGamepad;
+uint8_t previousGamepad;
 
 void update () {
-    unsigned char gamepad = *GAMEPAD1;
+    uint8_t gamepad = *GAMEPAD1;
 
     // Only the buttons that were pressed down this frame
-    unsigned char pressedThisFrame = gamepad & (gamepad ^ previousGamepad);
+    uint8_t pressedThisFrame = gamepad & (gamepad ^ previousGamepad);
     previousGamepad = gamepad;
 
     if (pressedThisFrame & BUTTON_RIGHT) {

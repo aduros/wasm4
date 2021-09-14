@@ -34,7 +34,7 @@ const smiley = memory.data<u8>([
 ```
 
 ```c
-const char smiley[] = {
+const uint8_t smiley[] = {
     0b11000011,
     0b10000001,
     0b00100100,
@@ -174,7 +174,7 @@ Basic template (C):
 #define %name%Width %width%
 #define %name%Height %height%
 #define %name%Flags %flagsHumanReadable%
-const char %name%[%length%] = { %bytes% };
+const uint8_t %name%[%length%] = { %bytes% };
 ```
 
 Where:

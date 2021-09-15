@@ -8,7 +8,7 @@ const open = require("open");
 
 const PORT = 4444;
 
-function start (cartFile) {
+function start (cartFile, opts) {
     const app = express();
     app.get("/cart.wasm", (req, res) => {
         fs.createReadStream(cartFile).pipe(res);
@@ -23,7 +23,9 @@ function start (cartFile) {
         console.log("\n  " + qr.replace(/\n/g, "\n  "));
         console.log(`Open http://localhost:${PORT}, or scan this QR code on your mobile device. Press ctrl-C to exit.`);
 
-        open(`http://localhost:${PORT}`);
+        if (opts.open) {
+            open(`http://localhost:${PORT}`);
+        }
     });
 
     const wsServer = new WebSocketServer({ noServer: true });

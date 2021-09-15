@@ -5,7 +5,7 @@ const watch = require("node-watch");
 
 const server = require("./server");
 
-function start () {
+function start (opts) {
     let buildCommand, buildParams, buildOutput;
 
     if (fs.existsSync("Makefile")) {
@@ -42,7 +42,7 @@ function start () {
             }
             if (serveAfterBuild) {
                 serveAfterBuild = false;
-                server.start(buildOutput);
+                server.start(buildOutput, opts);
             }
         });
     }

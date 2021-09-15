@@ -32,8 +32,10 @@ export class Framebuffer {
     drawRect (x, y, width, height) {
         const startX = Math.max(0, x);
         const startY = Math.max(0, y);
-        const endX = Math.min(x + width, WIDTH);
-        const endY = Math.min(y + height, HEIGHT);
+        const endXUnclamped = x + width;
+        const endYUnclamped = y + height;
+        const endX = Math.min(endXUnclamped, WIDTH);
+        const endY = Math.min(endYUnclamped, HEIGHT);
 
         const drawColors = this.drawColors[0];
         const dc0 = drawColors & 0xf;
@@ -59,7 +61,7 @@ export class Framebuffer {
             }
 
             // Right edge
-            if (endX > 0 && endX < WIDTH + 1) {
+            if (endX > 0 && endXUnclamped < WIDTH + 1) {
                 for (let yy = startY; yy < endY; ++yy) {
                     this.drawPoint(strokeColor, endX - 1, yy);
                 }
@@ -73,7 +75,7 @@ export class Framebuffer {
             }
 
             // Bottom edge
-            if (endY > 0 && endY < HEIGHT + 1) {
+            if (endY > 0 && endYUnclamped < HEIGHT + 1) {
                 for (let xx = startX; xx < endX; ++xx) {
                     this.drawPoint(strokeColor, xx, endY - 1);
                 }

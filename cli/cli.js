@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { program } = require("commander");
+const { program, Option } = require("commander");
 const pkg = require('./package.json');
 const { supportedIconExtensions } = require('./lib/utils/icon');
 
@@ -17,7 +17,11 @@ program.command("new <directory>")
 
 program.command("watch")
     .description("Rebuild and refresh when source code changes")
-    .option("--open", "Opens the browser")
+    .addOption(
+        new Option("-n, --no-open", "Doesn't open the browser")
+        .env("W4_NO_OPEN")
+        .default(false)
+    )
     .action(opts => {
         const watch = require("./lib/watch");
         watch.start(opts);
@@ -25,7 +29,11 @@ program.command("watch")
 
 program.command("run <cart>")
     .description("Open a cartridge in the emulator")
-    .option("--open", "Opens the browser")
+    .addOption(
+        new Option("-n, --no-open", "Doesn't open the browser")
+        .env("W4_NO_OPEN")
+        .default(false)
+    )
     .action((cart, opts) => {
         const server = require("./lib/server");
         server.start(cart, opts);

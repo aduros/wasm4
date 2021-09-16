@@ -2,6 +2,14 @@ const fs = require("fs");
 const path = require("path");
 const pngjs = require("pngjs");
 
+const LANGS={
+    as: "assemblyscript",
+    assemblyscript: "assemblyscript",
+    c: "c",
+    rs: "rust",
+    rust: "rust",
+    go: "go"
+}
 const DEFAULT_LANG = 'assemblyscript';
 const TEMPLATES = {        
     assemblyscript: 
@@ -144,7 +152,7 @@ function run (sourceFile, template) {
 exports.run = run;
 
 function runAll (files, opts) {
-    let template = TEMPLATES[DEFAULT_LANG];
+    let template = TEMPLATES[LANGS[opts.lang]];
 
     if (!opts.template) {
         // iterate over all options and search a key that presented in templates

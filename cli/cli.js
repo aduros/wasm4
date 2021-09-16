@@ -6,10 +6,16 @@ const { supportedIconExtensions } = require('./lib/utils/icon');
 
 program.command("new <directory>")
     .description("Create a new blank project")
-    .option("--as, --assemblyscript", "Create AssemblyScript project")
-    .option("--c", "Create C/C++ project")
-    .option("--rs, --rust", "Create Rust project")
-    .option("--go", "Create Go project")
+    .option("--as, --assemblyscript", "Create AssemblyScript project (Shorthand for --lang as/--lang assemblyscript)")
+    .option("--c", "Create C/C++ project (Shorthand for --lang c)")
+    .option("--rs, --rust", "Create Rust project (Shorthand for --lang rs/--lang rust)")
+    .option("--go", "Create Go project (Shorthand for --lang go)")
+    .addOption(
+        new Option("--lang <lang>", "Use the given language")
+        .env("W4_LANG")
+        .choices(["as", "assemblyscript", "c", "go", "rs", "rust"])
+        .default("as")
+    )
     .action(async (dir, opts) => {
         const newCmd = require("./lib/new");
         newCmd.run(dir, opts);
@@ -41,11 +47,17 @@ program.command("run <cart>")
 
 program.command("png2src <images...>")
     .description("Convert images to source code")
-    .option("--as, --assemblyscript", "Generate AssemblyScript source")
-    .option("--c", "Generate C/C++ source")
-    .option("--rs, --rust", "Generate Rust source")
-    .option("--go", "Generate Go source")
+    .option("--as, --assemblyscript", "Generate AssemblyScript source (Shorthand for --lang as/--lang assemblyscript)")
+    .option("--c", "Generate C/C++ source (Shorthand for --lang c)")
+    .option("--rs, --rust", "Generate Rust source (Shorthand for --lang rs/--lang rust)")
+    .option("--go", "Generate Go source (Shorthand for --lang go)")
     .option("--t, --template <file>", "Template file with a custom output format")
+    .addOption(
+        new Option("--lang <lang>", "Use the given language")
+        .env("W4_LANG")
+        .choices(["as", "assemblyscript", "c", "go", "rs", "rust"])
+        .default("as")
+    )
     .action((images, opts) => {
         const png2src = require("./lib/png2src");
         png2src.runAll(images, opts);

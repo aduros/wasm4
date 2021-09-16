@@ -3,30 +3,32 @@ const path = require("path");
 const fs = require("fs");
 
 const LANGS = {
-    C: "c",
-    ASSEMBLYSCRIPT: "assemblyscript",
-    RUST: "rust",
-    GO: "go",
+    c: "c",
+    as: "assemblyscript",
+    assemblyscript: "assemblyscript",
+    rs: "rust",
+    rust: "rust",
+    go: "go",
 }
 
 const HELP = {
-    [LANGS.C]: {
+    c: {
         name: "C",
         build: "make",
         cart: "build/cart.wasm",
     },
-    [LANGS.ASSEMBLYSCRIPT]: {
+    assemblyscript: {
         name: "AssemblyScript",
         setup: "npm install",
         build: "npm run build",
         cart: "build/cart.wasm",
     },
-    [LANGS.RUST]: {
+    rust: {
         name: "Rust",
         build: "cargo build --release",
         cart: "target/wasm32-unknown-unknown/release/cart.wasm",
     },
-    [LANGS.GO]: {
+    go: {
         name: "Go",
         build: "make",
         cart: "build/cart.wasm",
@@ -34,17 +36,15 @@ const HELP = {
 }
 
 async function run (destDir, opts) {
-    let lang;
+    let lang = LANGS[opts.lang];
     if (opts.assemblyscript) {
-        lang = LANGS.ASSEMBLYSCRIPT;
+        lang = LANGS.assemblyscript;
     } else if (opts.c) {
-        lang = LANGS.C;
+        lang = LANGS.c;
     } else if (opts.rust) {
-        lang = LANGS.RUST;
+        lang = LANGS.rust;
     } else if (opts.go) {
-        lang = LANGS.GO;
-    } else {
-        lang = LANGS.ASSEMBLYSCRIPT;
+        lang = LANGS.go;
     }
 
     const srcDir = path.resolve(__dirname+"/../assets/templates/"+lang);
@@ -72,7 +72,7 @@ async function run (destDir, opts) {
 
 async function init (destDir, lang) {
     switch (lang) {
-        case LANGS.ASSEMBLYSCRIPT:
+        case LANGS.assemblyscript:
             const projectName = path.basename(destDir);
             const file = destDir + "/package.json";
             const json = JSON.parse(fs.readFileSync(file));

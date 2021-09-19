@@ -97,6 +97,9 @@ export class Runtime {
             oval: this.framebuffer.drawOval.bind(this.framebuffer),
             line: this.framebuffer.drawLine.bind(this.framebuffer),
 
+            hline: this.framebuffer.drawHLine.bind(this.framebuffer),
+            vline: this.framebuffer.drawVLine.bind(this.framebuffer),
+
             text: this.text.bind(this),
             textUtf8: this.textUtf8.bind(this),
             textUtf16: this.textUtf16.bind(this),

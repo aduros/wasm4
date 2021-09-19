@@ -40,21 +40,53 @@ pub const BUTTON_DOWN: u8 = 128;
 // └───────────────────────────────────────────────────────────────────────────┘
 
 /// Copies pixels to the framebuffer.
-pub fn blit (sprite: &[u8], x: i32, y: i32, width: u32, height: u32, flags: u32) {
+pub fn blit(sprite: &[u8], x: i32, y: i32, width: u32, height: u32, flags: u32) {
     unsafe { extern_blit(sprite.as_ptr(), x, y, width, height, flags) }
 }
-extern {
+extern "C" {
     #[link_name = "blit"]
-    fn extern_blit (sprite: *const u8, x: i32, y: i32, width: u32, height: u32, flags: u32);
+    fn extern_blit(sprite: *const u8, x: i32, y: i32, width: u32, height: u32, flags: u32);
 }
 
 /// Copies a subregion within a larger sprite atlas to the framebuffer.
-pub fn blit_sub (sprite: &[u8], x: i32, y: i32, width: u32, height: u32, src_x: u32, src_y: u32, stride: u32, flags: u32) {
-    unsafe { extern_blit_sub(sprite.as_ptr(), x, y, width, height, src_x, src_y, stride, flags) }
+pub fn blit_sub(
+    sprite: &[u8],
+    x: i32,
+    y: i32,
+    width: u32,
+    height: u32,
+    src_x: u32,
+    src_y: u32,
+    stride: u32,
+    flags: u32,
+) {
+    unsafe {
+        extern_blit_sub(
+            sprite.as_ptr(),
+            x,
+            y,
+            width,
+            height,
+            src_x,
+            src_y,
+            stride,
+            flags,
+        )
+    }
 }
-extern {
+extern "C" {
     #[link_name = "blitSub"]
-    fn extern_blit_sub (sprite: *const u8, x: i32, y: i32, width: u32, height: u32, src_x: u32, src_y: u32, stride: u32, flags: u32);
+    fn extern_blit_sub(
+        sprite: *const u8,
+        x: i32,
+        y: i32,
+        width: u32,
+        height: u32,
+        src_x: u32,
+        src_y: u32,
+        stride: u32,
+        flags: u32,
+    );
 }
 
 pub const BLIT_2BPP: u32 = 1;
@@ -64,39 +96,63 @@ pub const BLIT_FLIP_Y: u32 = 4;
 pub const BLIT_ROTATE: u32 = 8;
 
 /// Draws a line between two points.
-pub fn line (x1: i32, y1: i32, x2: i32, y2: i32) {
+pub fn line(x1: i32, y1: i32, x2: i32, y2: i32) {
     unsafe { extern_line(x1, y1, x2, y2) }
 }
-extern {
+extern "C" {
     #[link_name = "line"]
-    fn extern_line (x1: i32, y1: i32, x2: i32, y2: i32);
+    fn extern_line(x1: i32, y1: i32, x2: i32, y2: i32);
 }
 
 /// Draws an oval (or circle).
-pub fn oval (x: i32, y: i32, width: u32, height: u32) {
+pub fn oval(x: i32, y: i32, width: u32, height: u32) {
     unsafe { extern_oval(x, y, width, height) }
 }
-extern {
+extern "C" {
     #[link_name = "oval"]
-    fn extern_oval (x: i32, y: i32, width: u32, height: u32);
+    fn extern_oval(x: i32, y: i32, width: u32, height: u32);
 }
 
 /// Draws a rectangle.
-pub fn rect (x: i32, y: i32, width: u32, height: u32) {
+pub fn rect(x: i32, y: i32, width: u32, height: u32) {
     unsafe { extern_rect(x, y, width, height) }
 }
-extern {
+extern "C" {
     #[link_name = "rect"]
-    fn extern_rect (x: i32, y: i32, width: u32, height: u32);
+    fn extern_rect(x: i32, y: i32, width: u32, height: u32);
 }
 
 /// Draws text using the built-in system font.
-pub fn text (text: &str, x: i32, y: i32) {
+pub fn text(text: &str, x: i32, y: i32) {
     unsafe { extern_text(text.as_ptr(), text.len(), x, y) }
 }
-extern {
+extern "C" {
     #[link_name = "textUtf8"]
-    fn extern_text (text: *const u8, length: usize, x: i32, y: i32);
+    fn extern_text(text: *const u8, length: usize, x: i32, y: i32);
+}
+
+/// Draws a vertical line
+pub fn vline(x: i32, y: i32, len: i32) {
+    unsafe {
+        extern_vline(x, y, len);
+    }
+}
+
+extern "C" {
+    #[link_name = "vline"]
+    fn extern_vline(x: i32, y: i32, len: i32);
+}
+
+/// Draws a horizontal line
+pub fn hline(x: i32, y: i32, len: i32) {
+    unsafe {
+        extern_hline(x, y, len);
+    }
+}
+
+extern "C" {
+    #[link_name = "hline"]
+    fn extern_hline(x: i32, y: i32, len: i32);
 }
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
@@ -106,12 +162,12 @@ extern {
 // └───────────────────────────────────────────────────────────────────────────┘
 
 /// Plays a sound tone.
-pub fn tone (frequency: u32, duration: u32, volume: u32, flags: u32) {
+pub fn tone(frequency: u32, duration: u32, volume: u32, flags: u32) {
     unsafe { extern_tone(frequency, duration, volume, flags) }
 }
-extern {
+extern "C" {
     #[link_name = "tone"]
-    fn extern_tone (frequency: u32, duration: u32, volume: u32, flags: u32);
+    fn extern_tone(frequency: u32, duration: u32, volume: u32, flags: u32);
 }
 
 pub const TONE_PULSE1: u32 = 0;
@@ -129,12 +185,12 @@ pub const TONE_MODE4: u32 = 12;
 // │                                                                           │
 // └───────────────────────────────────────────────────────────────────────────┘
 
-extern {
+extern "C" {
     /// Reads up to `size` bytes from persistent storage into the pointer `dest`.
-    pub fn diskr (dest: *mut u8, size: u32) -> u32;
+    pub fn diskr(dest: *mut u8, size: u32) -> u32;
 
     /// Writes up to `size` bytes from the pointer `src` into persistent storage.
-    pub fn diskw (src: *const u8, size: u32) -> u32;
+    pub fn diskw(src: *const u8, size: u32) -> u32;
 }
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
@@ -144,10 +200,10 @@ extern {
 // └───────────────────────────────────────────────────────────────────────────┘
 
 /// Prints a message to the debug console.
-pub fn trace (text: &str) {
+pub fn trace(text: &str) {
     unsafe { extern_trace(text.as_ptr(), text.len()) }
 }
-extern {
+extern "C" {
     #[link_name = "traceUtf8"]
-    fn extern_trace (trace: *const u8, length: usize);
+    fn extern_trace(trace: *const u8, length: usize);
 }

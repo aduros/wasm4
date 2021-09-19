@@ -62,6 +62,14 @@ const BLIT_ROTATE = 8
 //go:export line
 func Line(x1 int, y1 int, x2 int, y2 int)
 
+/** Draws a horizontal line. */
+//go:export hline
+func HLine(x int, y int, len int)
+
+/** Draws a vertical line. */
+//go:export vline
+func VLine(x int, y int, len int)
+
 /** Draws an oval (or circle). */
 //go:export oval
 func Oval(x int, y int, width uint, height uint)

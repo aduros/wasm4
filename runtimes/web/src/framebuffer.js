@@ -6,6 +6,16 @@ import {
     ADDR_DRAW_COLORS
 } from "./constants";
 
+function getStrokeColor(drawColors) {
+    const dc0 = drawColors[0] & 0xf;
+
+    if (dc0 === 0) {
+        return 0;
+    }
+
+    return (dc0 - 1) & 0x3
+}
+
 export class Framebuffer {
     constructor (memory) {
         this.bytes = new Uint8Array(memory, ADDR_FRAMEBUFFER, WIDTH * HEIGHT >>> 2);
@@ -29,7 +39,64 @@ export class Framebuffer {
         }
     }
 
-    drawRect (x, y, width, height) {
+    drawHLineInternal(color, x, y, len) {
+        if (y > HEIGHT || y < 0 || len === 0) {
+            return;
+        }
+        let startX, endX;
+
+        if(len < 0) {
+            startX = Math.max(0, x + len + 1);
+            endX = Math.min(WIDTH, x + 1);
+        } else {
+            startX = Math.max(0, x);
+            endX = Math.min(x + len, WIDTH);
+        }
+
+        for (let xx = startX; xx < endX; ++xx) {
+            this.drawPoint(color, xx, y);
+        }
+    }
+
+    drawVLineInternal(color, x, y, len) {
+        if (x > WIDTH || x < 0 || len === 0) {
+            return;
+        }
+
+        let startY,endY;
+
+        if (len < 0) {
+            startY = Math.max(0, y + len + 1);
+            endY = Math.min(HEIGHT, y + 1);
+        } else {
+            startY = Math.max(0, y);
+            endY = Math.min(HEIGHT, y + len);
+        }
+
+        for (let yy = startY; yy < endY; ++yy) {
+            this.drawPoint(color, x, yy);
+        }
+    }
+
+    drawHLine(x, y, len) {
+        const strokeColor = getStrokeColor(this.drawColors);
+
+        if(strokeColor === 0) {
+            return;
+        }
+        this.drawHLineInternal(strokeColor, x, y, len);
+    }
+
+    drawVLine(x, y, len) {
+        const strokeColor = getStrokeColor(this.drawColors);
+
+        if(strokeColor === 0) {
+            return;
+        }
+        this.drawVLineInternal(strokeColor, x, y, len);
+    }
+
+    drawRect(x, y, width, height) {
         const startX = Math.max(0, x);
         const startY = Math.max(0, y);
         const endXUnclamped = x + width;

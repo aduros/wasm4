@@ -70,6 +70,14 @@ void blitSub (const uint8_t* data, int32_t x, int32_t y, uint32_t width, uint32_
 WASM_IMPORT("line")
 void line (int32_t x, int32_t y, uint32_t width, uint32_t height);
 
+/** Draws a horizontal line. */
+WASM_IMPORT("hline")
+void hline (int32_t x, int32_t y, int32_t len);
+
+/** Draws a horizontal line. */
+WASM_IMPORT("vline")
+void vline (int32_t x, int32_t y, int32_t len);
+
 /** Draws an oval (or circle). */
 WASM_IMPORT("oval")
 void oval (int32_t x, int32_t y, uint32_t width, uint32_t height);

@@ -10,7 +10,7 @@ WASM-4 is still very early in development, but everyone is welcome to contribute
 
 - [Github](https://github.com/aduros/wasm4)
 - [Forums](https://github.com/aduros/wasm4/discussions)
-- [Discord](https://discord.gg/mDsW2bgn)
+- [Discord](https://discord.gg/NFcWMxh4a6)
 
 ## How to Contribute
 

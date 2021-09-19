@@ -16,29 +16,25 @@ const TEMPLATES = {
 `const %name%Width = %width%;
 const %name%Height = %height%;
 const %name%Flags = %flags%; // %flagsHumanReadable%
-const %name% = memory.data<u8>([ %bytes% ]);
-`,
+const %name% = memory.data<u8>([ %bytes% ]);`,
 
     c: 
 `#define %name%Width %width%
 #define %name%Height %height%
 #define %name%Flags %flagsHumanReadable%
-const uint8_t %name%[%length%] = { %bytes% };
-`,
+const uint8_t %name%[%length%] = { %bytes% };`,
 
     rust: 
 `const %idiomaticName%_WIDTH: u32 = %width%;
 const %idiomaticName%_HEIGHT: u32 = %height%;
 const %idiomaticName%_FLAGS: u32 = %flags%; // %flagsHumanReadable%
-const %idiomaticName%: [u8; %length%] = [ %bytes% ];
-`,  
+const %idiomaticName%: [u8; %length%] = [ %bytes% ];`,  
 
     go: 
 `const %name%Width = %width%
 const %name%Height = %height%
 const %name%Flags = %flags% // %flagsHumanReadable%
-var %name% = [%length%]byte { %bytes% }
-`,
+var %name% = [%length%]byte { %bytes% }`,
 }
 
 function run (sourceFile, template) {

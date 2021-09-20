@@ -74,7 +74,7 @@ void line (int32_t x, int32_t y, uint32_t width, uint32_t height);
 WASM_IMPORT("hline")
 void hline (int32_t x, int32_t y, int32_t len);
 
-/** Draws a horizontal line. */
+/** Draws a vertical line. */
 WASM_IMPORT("vline")
 void vline (int32_t x, int32_t y, int32_t len);
 

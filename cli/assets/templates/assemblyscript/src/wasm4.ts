@@ -66,7 +66,7 @@ export declare function line (x1: i32, y1: i32, x2: i32, y2: i32): void;
 @external("env", "hline")
 export declare function hline (x: i32, y: i32, len: i32): void;
 
-/** Draws a horizontal line. */
+/** Draws a vertical line. */
 // @ts-ignore: decorator
 @external("env", "vline")
 export declare function vline (x: i32, y: i32, len: i32): void;

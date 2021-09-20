@@ -155,6 +155,7 @@ async function loadCartWasm () {
     function saveState () {
         savedState = new Uint32Array(runtime.memory.buffer.slice());
     }
+
     function loadState () {
         if (savedState != null) {
             new Uint32Array(runtime.memory.buffer).set(savedState);
@@ -166,7 +167,6 @@ async function loadCartWasm () {
             document.body.requestFullscreen({navigationUI: "hide"});
         }
     }
-
 
     const onMouseEvent = event => {
         // Unhide the cursor if it was hidden by the keyboard handler
@@ -245,6 +245,62 @@ async function loadCartWasm () {
     window.addEventListener("keydown", onKeyboardEvent);
     window.addEventListener("keyup", onKeyboardEvent);
 
+    let gamepads = 0;
+    function processGamepad() {
+        if (gamepads === 0) {
+            return;
+        }
+
+        const gamepad = navigator.getGamepads()[0];
+        if (!gamepad) {
+
+            return;
+        }
+
+        const buttons = gamepad.buttons;
+        const axes = gamepad.axes;
+
+        // https://www.w3.org/TR/gamepad/#remapping
+        // DPAD + AXIS
+        runtime.maskGamepad(0, constants.BUTTON_UP, buttons[12].pressed || axes[1] < -0.5);
+        runtime.maskGamepad(0, constants.BUTTON_DOWN, buttons[13].pressed || axes[1] > 0.5);
+        runtime.maskGamepad(0, constants.BUTTON_LEFT, buttons[14].pressed || axes[0] < -0.5);
+        runtime.maskGamepad(0, constants.BUTTON_RIGHT, buttons[15].pressed || axes[0] > 0.5);
+
+        // X, O + Triggers
+        // NOTE: for XBox360 a triggers is 6 and 7
+        runtime.maskGamepad(0, constants.BUTTON_X, buttons[0].pressed || buttons[6].pressed);
+        runtime.maskGamepad(0, constants.BUTTON_Z, buttons[1].pressed || buttons[7].pressed);
+    }
+
+    window.addEventListener("gamepadconnected", (e) => {
+        const gp = navigator.getGamepads()[e.gamepad.index];
+        console.log(
+          "Gamepad connected at index %d: %s. %d buttons, %d axes.",
+          gp.index,
+          gp.id,
+          gp.buttons.length,
+          gp.axes.length
+        );
+
+        gamepads ++;
+    });
+
+    window.addEventListener('gamepaddisconnected', (e) => {
+        gamepads --;
+
+        // https://www.w3.org/TR/gamepad/#remapping
+        // DPAD + AXIS
+        runtime.maskGamepad(0, constants.BUTTON_UP, false);
+        runtime.maskGamepad(0, constants.BUTTON_DOWN, false);
+        runtime.maskGamepad(0, constants.BUTTON_LEFT, false);
+        runtime.maskGamepad(0, constants.BUTTON_RIGHT, false);
+
+        // X, O + Triggers
+        runtime.maskGamepad(0, constants.BUTTON_X, false);
+        runtime.maskGamepad(0, constants.BUTTON_Z, false);
+    });
+
     const dpad = document.getElementById("gamepad-dpad");
     const action1 = document.getElementById("gamepad-action1");
     const action2 = document.getElementById("gamepad-action2");
@@ -278,7 +334,6 @@ async function loadCartWasm () {
             const DPAD_MAX_DISTANCE = 100;
             const DPAD_DEAD_ZONE = 10;
             const BUTTON_MAX_DISTANCE = 50;
-            const DPAD_ACTIVE_ZONE = 3 / 5; // cos of active angle, greater that cos 60 (1/2)
 
             const dpadBounds = dpad.getBoundingClientRect();
             const dpadX = dpadBounds.x + dpadBounds.width/2;
@@ -292,24 +347,19 @@ async function loadCartWasm () {
             const action2X = action2Bounds.x + action2Bounds.width/2;
             const action2Y = action2Bounds.y + action2Bounds.height/2;
 
-            let x, y, dist, cosX, cosY;
+            let x, y;
             for (let touch of touchEvents.values()) {
                 x = touch.clientX - dpadX;
                 y = touch.clientY - dpadY;
-                dist = Math.sqrt( x*x + y * y );
-
-                if (dist < DPAD_MAX_DISTANCE && dist > DPAD_DEAD_ZONE) {
-                    cosX = x / dist;
-                    cosY = y / dist;
-
-                    if (-cosX > DPAD_ACTIVE_ZONE) {
+                if (x*x + y*y < DPAD_MAX_DISTANCE*DPAD_MAX_DISTANCE) {
+                    if (x < -DPAD_DEAD_ZONE) {
                         buttons |= constants.BUTTON_LEFT;
-                    } else if (cosX > DPAD_ACTIVE_ZONE) {
+                    } else if (x > DPAD_DEAD_ZONE) {
                         buttons |= constants.BUTTON_RIGHT;
                     }
-                    if (-cosY > DPAD_ACTIVE_ZONE) {
+                    if (y < -DPAD_DEAD_ZONE) {
                         buttons |= constants.BUTTON_UP;
-                    } else if (cosY > DPAD_ACTIVE_ZONE) {
+                    } else if (y > DPAD_DEAD_ZONE) {
                         buttons |= constants.BUTTON_DOWN;
                     }
                 }
@@ -356,6 +406,7 @@ async function loadCartWasm () {
     let lastFrame = performance.now();
 
     function loop () {
+        processGamepad();
         requestAnimationFrame(loop);
 
         const now = performance.now();

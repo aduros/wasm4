@@ -288,17 +288,7 @@ async function loadCartWasm () {
 
     window.addEventListener('gamepaddisconnected', (e) => {
         gamepads --;
-
-        // https://www.w3.org/TR/gamepad/#remapping
-        // DPAD + AXIS
-        runtime.maskGamepad(0, constants.BUTTON_UP, false);
-        runtime.maskGamepad(0, constants.BUTTON_DOWN, false);
-        runtime.maskGamepad(0, constants.BUTTON_LEFT, false);
-        runtime.maskGamepad(0, constants.BUTTON_RIGHT, false);
-
-        // X, O + Triggers
-        runtime.maskGamepad(0, constants.BUTTON_X, false);
-        runtime.maskGamepad(0, constants.BUTTON_Z, false);
+        runtime.maskGamepad(0,0, false);
     });
 
     const dpad = document.getElementById("gamepad-dpad");

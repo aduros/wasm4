@@ -334,6 +334,7 @@ async function loadCartWasm () {
             const DPAD_MAX_DISTANCE = 100;
             const DPAD_DEAD_ZONE = 10;
             const BUTTON_MAX_DISTANCE = 50;
+            const DPAD_ACTIVE_ZONE = 3 / 5; // cos of active angle, greater that cos 60 (1/2)
 
             const dpadBounds = dpad.getBoundingClientRect();
             const dpadX = dpadBounds.x + dpadBounds.width/2;
@@ -347,19 +348,24 @@ async function loadCartWasm () {
             const action2X = action2Bounds.x + action2Bounds.width/2;
             const action2Y = action2Bounds.y + action2Bounds.height/2;
 
-            let x, y;
+            let x, y, dist, cosX, cosY;
             for (let touch of touchEvents.values()) {
                 x = touch.clientX - dpadX;
                 y = touch.clientY - dpadY;
-                if (x*x + y*y < DPAD_MAX_DISTANCE*DPAD_MAX_DISTANCE) {
-                    if (x < -DPAD_DEAD_ZONE) {
+                dist = Math.sqrt( x*x + y * y );
+
+                if (dist < DPAD_MAX_DISTANCE && dist > DPAD_DEAD_ZONE) {
+                    cosX = x / dist;
+                    cosY = y / dist;
+
+                    if (-cosX > DPAD_ACTIVE_ZONE) {
                         buttons |= constants.BUTTON_LEFT;
-                    } else if (x > DPAD_DEAD_ZONE) {
+                    } else if (cosX > DPAD_ACTIVE_ZONE) {
                         buttons |= constants.BUTTON_RIGHT;
                     }
-                    if (y < -DPAD_DEAD_ZONE) {
+                    if (-cosY > DPAD_ACTIVE_ZONE) {
                         buttons |= constants.BUTTON_UP;
-                    } else if (y > DPAD_DEAD_ZONE) {
+                    } else if (cosY > DPAD_ACTIVE_ZONE) {
                         buttons |= constants.BUTTON_DOWN;
                     }
                 }

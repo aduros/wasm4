@@ -68,6 +68,22 @@ Draws a rectangle.
 
 `DRAW_COLORS` color 1 is used as the fill color, `DRAW_COLORS` color 2 is used as the outline color.
 
+### `hline(x, y, len)`
+
+Draws a horizontal line from point `(x; y)`.
+
+Draws forward if `len` is greater than 0, from `(x; y)` to `(x + len; y)` excluded.
+
+Draws backwards if `len` is lower than 0, from `(x; y)` to `(x + len; y)` excluded.
+
+### `vline(x, y, len)`
+
+Draws a vertical line from point `(x; y)`, `(x; y)`
+
+Draws forward if `len` is greater than 0, from `(x; y)` to `(x; y + len)` excluded.
+
+Draws backwards if `len` is lower than 0, from `(x; y)` to `(x; y + len)` excluded.
+
 ### `text (str, x, y)`
 
 Draws text using the built-in system font. The string may contain new-line (`\n`) characters.

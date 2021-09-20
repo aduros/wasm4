@@ -8,12 +8,7 @@ import {
 
 function getStrokeColor(drawColors) {
     const dc0 = drawColors[0] & 0xf;
-
-    if (dc0 === 0) {
-        return 0;
-    }
-
-    return (dc0 - 1) & 0x3
+    return dc0 ? (dc0 - 1) & 0x3 : 0;
 }
 
 export class Framebuffer {

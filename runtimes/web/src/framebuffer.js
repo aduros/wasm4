@@ -34,61 +34,42 @@ export class Framebuffer {
         }
     }
 
-    drawHLineInternal(color, x, y, len) {
-        if (y > HEIGHT || y < 0 || len === 0) {
+    drawHLine(x, y, len) {
+        if (x + len <= 0 || y < 0 || y >= HEIGHT) {
+            return;
+        }   
+ 
+        const color = getStrokeColor(this.drawColors);
+
+        if(color === 0) {
             return;
         }
-        let startX, endX;
 
-        if(len < 0) {
-            startX = Math.max(0, x + len + 1);
-            endX = Math.min(WIDTH, x + 1);
-        } else {
-            startX = Math.max(0, x);
-            endX = Math.min(x + len, WIDTH);
-        }
+        const startX = Math.max(0, x);
+        const endX = Math.min(WIDTH, x + len);
 
-        for (let xx = startX; xx < endX; ++xx) {
+        for(let xx = startX; xx < endX; xx++) {
             this.drawPoint(color, xx, y);
         }
     }
 
-    drawVLineInternal(color, x, y, len) {
-        if (x > WIDTH || x < 0 || len === 0) {
+    drawVLine(x, y, len) {
+        if (y + len <= 0 || x < 0 || x >= WIDTH) {
+            return;
+        }          
+ 
+        const color = getStrokeColor(this.drawColors);
+
+        if(color === 0) {
             return;
         }
 
-        let startY,endY;
+        const startY = Math.max(0, y);
+        const endY = Math.min(HEIGHT, y + len);
 
-        if (len < 0) {
-            startY = Math.max(0, y + len + 1);
-            endY = Math.min(HEIGHT, y + 1);
-        } else {
-            startY = Math.max(0, y);
-            endY = Math.min(HEIGHT, y + len);
-        }
-
-        for (let yy = startY; yy < endY; ++yy) {
+        for(let yy = startY; yy < endY; yy++) {
             this.drawPoint(color, x, yy);
         }
-    }
-
-    drawHLine(x, y, len) {
-        const strokeColor = getStrokeColor(this.drawColors);
-
-        if(strokeColor === 0) {
-            return;
-        }
-        this.drawHLineInternal(strokeColor, x, y, len);
-    }
-
-    drawVLine(x, y, len) {
-        const strokeColor = getStrokeColor(this.drawColors);
-
-        if(strokeColor === 0) {
-            return;
-        }
-        this.drawVLineInternal(strokeColor, x, y, len);
     }
 
     drawRect(x, y, width, height) {

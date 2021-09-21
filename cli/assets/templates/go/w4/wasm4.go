@@ -64,11 +64,11 @@ func Line(x1 int, y1 int, x2 int, y2 int)
 
 /** Draws a horizontal line. */
 //go:export hline
-func HLine(x int, y int, len int)
+func HLine(x int, y int, len uint)
 
 /** Draws a vertical line. */
 //go:export vline
-func VLine(x int, y int, len int)
+func VLine(x int, y int, len uint)
 
 /** Draws an oval (or circle). */
 //go:export oval

@@ -70,19 +70,11 @@ Draws a rectangle.
 
 ### `hline(x, y, len)`
 
-Draws a horizontal line from point `(x; y)`.
-
-Draws forward if `len` is greater than 0, from `(x; y)` to `(x + len; y)` excluded.
-
-Draws backwards if `len` is lower than 0, from `(x; y)` to `(x + len; y)` excluded.
+Draws a horizontal line between `(x; y)` and `(x + len - 1; y)`.
 
 ### `vline(x, y, len)`
 
-Draws a vertical line from point `(x; y)`, `(x; y)`
-
-Draws forward if `len` is greater than 0, from `(x; y)` to `(x; y + len)` excluded.
-
-Draws backwards if `len` is lower than 0, from `(x; y)` to `(x; y + len)` excluded.
+Draws a vertical line between `(x; y)` and `(x; y + len - 1)`.
 
 ### `text (str, x, y)`
 

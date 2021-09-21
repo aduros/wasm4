@@ -132,7 +132,7 @@ extern "C" {
 }
 
 /// Draws a vertical line
-pub fn vline(x: i32, y: i32, len: i32) {
+pub fn vline(x: i32, y: i32, len: u32) {
     unsafe {
         extern_vline(x, y, len);
     }
@@ -140,11 +140,11 @@ pub fn vline(x: i32, y: i32, len: i32) {
 
 extern "C" {
     #[link_name = "vline"]
-    fn extern_vline(x: i32, y: i32, len: i32);
+    fn extern_vline(x: i32, y: i32, len: u32);
 }
 
 /// Draws a horizontal line
-pub fn hline(x: i32, y: i32, len: i32) {
+pub fn hline(x: i32, y: i32, len: u32) {
     unsafe {
         extern_hline(x, y, len);
     }
@@ -152,7 +152,7 @@ pub fn hline(x: i32, y: i32, len: i32) {
 
 extern "C" {
     #[link_name = "hline"]
-    fn extern_hline(x: i32, y: i32, len: i32);
+    fn extern_hline(x: i32, y: i32, len: u32);
 }
 
 // ┌───────────────────────────────────────────────────────────────────────────┐

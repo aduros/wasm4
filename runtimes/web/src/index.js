@@ -274,25 +274,24 @@ async function loadCartWasm () {
 
         // https://www.w3.org/TR/gamepad/#remapping
         // DPAD + AXIS
-        const up = +(dpad && buttons[12].pressed || axes[1] < -0.5);
-        const down = +(dpad && buttons[13].pressed || axes[1] > 0.5);
-        const left = +(dpad && buttons[14].pressed || axes[0] < -0.5);
-        const right = +(dpad && buttons[15].pressed || axes[0] > 0.5);
+        const up = dpad && buttons[12].pressed || axes[1] < -0.5;
+        const down = dpad && buttons[13].pressed || axes[1] > 0.5;
+        const left = dpad && buttons[14].pressed || axes[0] < -0.5;
+        const right = dpad && buttons[15].pressed || axes[0] > 0.5;
 
         // X, O + Triggers
         // NOTE: for XBox360 a triggers is 6 and 7
-        const x = +(buttons[0].pressed || buttons[6].pressed);
-        const z = +(buttons[1].pressed || buttons[7].pressed);
-
+        const x = buttons[0].pressed || buttons[6].pressed;
+        const z = buttons[1].pressed || buttons[7].pressed;
 
         let buttonMask = 0;
-        buttonMask |= constants.BUTTON_UP * up;
-        buttonMask |= constants.BUTTON_DOWN * down;
-        buttonMask |= constants.BUTTON_LEFT * left;
-        buttonMask |= constants.BUTTON_RIGHT * right;
+        buttonMask |= constants.BUTTON_UP & -up;
+        buttonMask |= constants.BUTTON_DOWN & -down;
+        buttonMask |= constants.BUTTON_LEFT & -left;
+        buttonMask |= constants.BUTTON_RIGHT & -right;
 
-        buttonMask |= constants.BUTTON_X * x;
-        buttonMask |= constants.BUTTON_Z * z;
+        buttonMask |= constants.BUTTON_X & -x;
+        buttonMask |= constants.BUTTON_Z & -z;
 
         // supress changing if keyboard used
         // we should not reset state but should read it

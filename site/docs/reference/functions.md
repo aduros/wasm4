@@ -68,6 +68,14 @@ Draws a rectangle.
 
 `DRAW_COLORS` color 1 is used as the fill color, `DRAW_COLORS` color 2 is used as the outline color.
 
+### `hline(x, y, len)`
+
+Draws a horizontal line between `(x; y)` and `(x + len - 1; y)`.
+
+### `vline(x, y, len)`
+
+Draws a vertical line between `(x; y)` and `(x; y + len - 1)`.
+
 ### `text (str, x, y)`
 
 Draws text using the built-in system font. The string may contain new-line (`\n`) characters.

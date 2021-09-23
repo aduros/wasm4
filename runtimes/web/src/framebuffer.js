@@ -6,6 +6,11 @@ import {
     ADDR_DRAW_COLORS
 } from "./constants";
 
+function getStrokeColor(drawColors) {
+    const dc0 = drawColors[0] & 0xf;
+    return dc0 ? (dc0 - 1) & 0x3 : 0;
+}
+
 export class Framebuffer {
     constructor (memory) {
         this.bytes = new Uint8Array(memory, ADDR_FRAMEBUFFER, WIDTH * HEIGHT >>> 2);
@@ -29,7 +34,71 @@ export class Framebuffer {
         }
     }
 
-    drawRect (x, y, width, height) {
+    drawHLineInternal(color, startX, y, endX) {
+        const fillEnd = endX - (endX % 4);
+        const fillStart = Math.min((startX + 3) & ~0x03, fillEnd);
+
+        if (fillEnd - fillStart >= 4) {
+            for (let xx = startX; xx < fillStart; xx++) {
+                this.drawPoint(color, xx, y);
+            }
+
+            if (fillEnd - fillStart >= 4) {
+                const from = (WIDTH * y + fillStart) >>> 2;
+                const to = (WIDTH * y + fillEnd) >>> 2;
+                const fillColor =
+                    (color << 6) | (color << 4) | (color << 2) | color;
+
+                this.bytes.fill(fillColor, from, to);
+            }
+
+            for (let xx = fillEnd; xx < endX; xx++) {
+                this.drawPoint(color, xx, y);
+            }
+        } else {
+            for (let xx = startX; xx < endX; xx++) {
+                this.drawPoint(color, xx, y);
+            }
+        }
+    }
+
+    drawHLine(x, y, len) {
+        if (x + len <= 0 || y < 0 || y >= HEIGHT) {
+            return;
+        }
+
+        const color = getStrokeColor(this.drawColors);
+
+        if (color === 0) {
+            return;
+        }
+
+        const startX = Math.max(0, x);
+        const endX = Math.min(WIDTH, x + len);
+
+        this.drawHLineInternal(color, startX, y, endX);
+    }
+
+    drawVLine(x, y, len) {
+        if (y + len <= 0 || x < 0 || x >= WIDTH) {
+            return;
+        }
+
+        const color = getStrokeColor(this.drawColors);
+
+        if (color === 0) {
+            return;
+        }
+
+        const startY = Math.max(0, y);
+        const endY = Math.min(HEIGHT, y + len);
+
+        for (let yy = startY; yy < endY; yy++) {
+            this.drawPoint(color, x, yy);
+        }
+    }
+
+    drawRect(x, y, width, height) {
         const startX = Math.max(0, x);
         const startY = Math.max(0, y);
         const endXUnclamped = x + width;

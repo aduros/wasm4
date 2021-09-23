@@ -125,3 +125,92 @@ drawing a sprite.
 ## Other Shapes
 
 For info on other shape drawing functions like `line()` and `oval()`, see the [Functions](/docs/reference/functions) reference.
+
+## Direct Framebuffer Access
+
+The `FRAMEBUFFER` memory region contains the framebuffer, with each byte containing 4 pixels (2 bits
+per pixel). For example, to clear the entire screen to palette color 3:
+
+<MultiLanguageCode>
+
+```typescript
+memory.fill(w4.FRAMEBUFFER, 3 | (3 << 2) | (3 << 4) | (3 << 6), 160*160/4);
+```
+
+```c
+memset(FRAMEBUFFER, 3 | (3 << 2) | (3 << 4) | (3 << 6), 160*160/4);
+```
+
+```rust
+// Rust example coming soon
+```
+
+```go
+for i := range w4.FRAMEBUFFER {
+    w4.FRAMEBUFFER[i] = 3 | (3 << 2) | (3 << 4) | (3 << 6)
+}
+```
+
+</MultiLanguageCode>
+
+Advanced users can implement their own drawing functions by carefully manipulating the framebuffer.
+For example, to implement a `pixel()` function that draws a single pixel:
+
+<MultiLanguageCode>
+
+```typescript
+function pixel (x: i32, y: i32): void {
+    // The byte index into the framebuffer that contains (x, y)
+    const idx = (y*160 + x) >> 2;
+
+    // Calculate the bits within the byte that corresponds to our position
+    const shift = u8((x & 0b11) << 1);
+    const mask = u8(0b11 << shift);
+
+    // Use the first DRAW_COLOR as the pixel color
+    const color = u8(load<u16>(w4.DRAW_COLORS) & 0b11);
+
+    // Write to the framebuffer
+    store<u8>(w4.FRAMEBUFFER + idx, (color << shift) | (load<u8>(w4.FRAMEBUFFER + idx) & ~mask));
+}
+```
+
+```c
+void pixel (int x, int y) {
+    // The byte index into the framebuffer that contains (x, y)
+    int idx = (y*160 + x) >> 2;
+
+    // Calculate the bits within the byte that corresponds to our position
+    int shift = (x & 0b11) << 1;
+    int mask = 0b11 << shift;
+
+    // Use the first DRAW_COLOR as the pixel color
+    int color = *DRAW_COLORS & 0b11;
+
+    // Write to the framebuffer
+    FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask);
+}
+```
+
+```rust
+// Rust example coming soon
+```
+
+```go
+func pixel (x int, y int) {
+    // The byte index into the framebuffer that contains (x, y)
+    var idx = (y*160 + x) >> 2;
+
+    // Calculate the bits within the byte that corresponds to our position
+    var shift = uint8((x & 0b11) << 1);
+    var mask = uint8(0b11 << shift);
+
+    // Use the first DRAW_COLOR as the pixel color
+    var color = uint8(*w4.DRAW_COLORS & 0b11);
+
+    // Write to the framebuffer
+    w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] & ^mask);
+}
+```
+
+</MultiLanguageCode>

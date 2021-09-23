@@ -142,7 +142,12 @@ memset(FRAMEBUFFER, 3 | (3 << 2) | (3 << 4) | (3 << 6), 160*160/4);
 ```
 
 ```rust
-// Rust example coming soon
+unsafe {
+    FRAMEBUFFER
+        .as_mut()
+        .expect("framebuffer ref")
+        .fill(3 | (3 << 2) | (3 << 4) | (3 << 6));
+}
 ```
 
 ```go
@@ -193,7 +198,21 @@ void pixel (int x, int y) {
 ```
 
 ```rust
-// Rust example coming soon
+fn pixel(x: i32, y: i32) {
+    // The byte index into the framebuffer that contains (x, y)
+    let idx = (y as usize * 160 + x as usize) >> 2;
+
+    // Calculate the bits within the byte that corresponds to our position
+    let shift = (x as u8 & 0b11) << 1;
+    let mask = 0b11 << shift;
+
+    unsafe {
+        let color: u8 = (*DRAW_COLORS & 0x3) as u8;
+        let framebuffer = FRAMEBUFFER.as_mut().expect("framebuffer ref");
+
+        framebuffer[idx] = (color << shift) | (framebuffer[idx] & !mask);
+    }
+}
 ```
 
 ```go

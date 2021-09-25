@@ -43,13 +43,11 @@ export class Framebuffer {
                 this.drawPoint(color, xx, y);
             }
 
-            if (fillEnd - fillStart > 3) {
-                const from = (WIDTH * y + fillStart) >>> 2;
-                const to = (WIDTH * y + fillEnd) >>> 2;
-                const fillColor = color * 0b01010101;
+            const from = (WIDTH * y + fillStart) >>> 2;
+            const to = (WIDTH * y + fillEnd) >>> 2;
+            const fillColor = color * 0b01010101;
 
-                this.bytes.fill(fillColor, from, to);
-            }
+            this.bytes.fill(fillColor, from, to);
             startX = fillEnd;
         }
 

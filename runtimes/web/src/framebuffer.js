@@ -109,13 +109,12 @@ export class Framebuffer {
         const drawColors = this.drawColors[0];
         const dc0 = drawColors & 0xf;
         const dc1 = (drawColors >>> 4) & 0xf;
+        const offset = +(dc1 !== 0)
 
         if (dc0 !== 0) {
             const fillColor = (dc0 - 1) & 0x3;
-            for (let yy = startY; yy < endY; ++yy) {
-                for (let xx = startX; xx < endX; ++xx) {
-                    this.drawPoint(fillColor, xx, yy);
-                }
+            for (let yy = startY + offset; yy < endY - offset; ++yy) {
+                this.drawHLineInternal(fillColor, startX + offset, yy, endX - offset);
             }
         }
 
@@ -124,42 +123,37 @@ export class Framebuffer {
 
             // Left edge
             if (x >= 0 && x < WIDTH) {
-                for (let yy = startY; yy < endY; ++yy) {
+                for (let yy = startY; yy < endY - 1; ++yy) {
                     this.drawPoint(strokeColor, x, yy);
                 }
             }
 
             // Right edge
             if (endX > 0 && endXUnclamped < WIDTH + 1) {
-                for (let yy = startY; yy < endY; ++yy) {
+                for (let yy = startY; yy < endY - 1; ++yy) {
                     this.drawPoint(strokeColor, endX - 1, yy);
                 }
             }
 
             // Top edge
-            if (y >= 0 && y < HEIGHT) {
-                for (let xx = startX; xx < endX; ++xx) {
-                    this.drawPoint(strokeColor, xx, y);
-                }
-            }
+            this.drawHLineInternal (strokeColor, startX, startY, endX);
 
             // Bottom edge
-            if (endY > 0 && endYUnclamped < HEIGHT + 1) {
-                for (let xx = startX; xx < endX; ++xx) {
-                    this.drawPoint(strokeColor, xx, endY - 1);
-                }
-            }
+            this.drawHLineInternal (strokeColor, startX, endY - 1, endX);
         }
     }
 
     drawOval (x, y, width, height) {
         const drawColors = this.drawColors[0];
-        // const dc0 = drawColors & 0xf;
+        const dc0 = drawColors & 0xf;
         const dc1 = (drawColors >>> 4) & 0xf;
+        
         if (dc1 === 0xf) {
             return;
         }
+        
         const strokeColor = (dc1 - 1) & 0x3;
+        const fillColor = (dc0 - 1) & 0x3;
 
         const a = width >>> 1;
         const b = height >>> 1;
@@ -182,6 +176,14 @@ export class Framebuffer {
                 this.drawPointUnclipped(strokeColor, x0 - x, y0 + y); /* III. Quadrant */
                 this.drawPointUnclipped(strokeColor, x0 - x, y0 - y); /*  IV. Quadrant */
 
+                const start = Math.max(x0 - x + 1, 0);
+                const end = Math.min(x0 + x, WIDTH);
+
+                if (dc0 !== 0 && (end - start) > 0) {
+                    this.drawHLineInternal(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
+                    this.drawHLineInternal(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
+                }
+
                 y++; sy += aa2; e += dy; dy += aa2;
                 if (2 * e + dx > 0) {
                     x--; sx -= bb2; e += dx; dx += bb2;
@@ -194,6 +196,7 @@ export class Framebuffer {
             let dx = b * b, dy = (1 - 2 * b) * a * a;
             let sx = 0, sy = aa2 * b;
             let e = 0;
+            let ddx = 0;
 
             while (sy >= sx) {
                 this.drawPointUnclipped(strokeColor, x0 + x, y0 + y); /*   I. Quadrant */
@@ -201,9 +204,20 @@ export class Framebuffer {
                 this.drawPointUnclipped(strokeColor, x0 - x, y0 + y); /* III. Quadrant */
                 this.drawPointUnclipped(strokeColor, x0 - x, y0 - y); /*  IV. Quadrant */
 
-                x++; sx += bb2; e += dx; dx += bb2;
+                x++; sx += bb2; e += dx; dx += bb2; ddx++;
                 if (2 * e + dy > 0) {
-                    y--; sy -= aa2; e += dy; dy += aa2;
+                    if (dc0 !== 0) {
+                        const w = x - ddx - 1;
+                        const start = Math.max(x0 - w, 0);
+                        const end = Math.min(x0 + w + 1, WIDTH);
+                        
+                        if (end - start > 0) {
+                            this.drawHLineInternal(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
+                            this.drawHLineInternal(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
+                        }
+                    }
+
+                    y--; sy -= aa2; e += dy; dy += aa2; ddx = 0;
                 }
             }
         }

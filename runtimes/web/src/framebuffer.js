@@ -109,13 +109,12 @@ export class Framebuffer {
         const drawColors = this.drawColors[0];
         const dc0 = drawColors & 0xf;
         const dc1 = (drawColors >>> 4) & 0xf;
+        const offset = +(dc1 !== 0)
 
         if (dc0 !== 0) {
             const fillColor = (dc0 - 1) & 0x3;
-            for (let yy = startY; yy < endY; ++yy) {
-                for (let xx = startX; xx < endX; ++xx) {
-                    this.drawPoint(fillColor, xx, yy);
-                }
+            for (let yy = startY + offset; yy < endY - offset; ++yy) {
+                this.drawHLineInternal(fillColor, startX + offset, yy, endX - offset);
             }
         }
 
@@ -124,31 +123,23 @@ export class Framebuffer {
 
             // Left edge
             if (x >= 0 && x < WIDTH) {
-                for (let yy = startY; yy < endY; ++yy) {
+                for (let yy = startY; yy < endY - 1; ++yy) {
                     this.drawPoint(strokeColor, x, yy);
                 }
             }
 
             // Right edge
             if (endX > 0 && endXUnclamped < WIDTH + 1) {
-                for (let yy = startY; yy < endY; ++yy) {
+                for (let yy = startY; yy < endY - 1; ++yy) {
                     this.drawPoint(strokeColor, endX - 1, yy);
                 }
             }
 
             // Top edge
-            if (y >= 0 && y < HEIGHT) {
-                for (let xx = startX; xx < endX; ++xx) {
-                    this.drawPoint(strokeColor, xx, y);
-                }
-            }
+            this.drawHLineInternal (strokeColor, startX, startY, endX);
 
             // Bottom edge
-            if (endY > 0 && endYUnclamped < HEIGHT + 1) {
-                for (let xx = startX; xx < endX; ++xx) {
-                    this.drawPoint(strokeColor, xx, endY - 1);
-                }
-            }
+            this.drawHLineInternal (strokeColor, startX, endY - 1, endX);
         }
     }
 

@@ -176,9 +176,12 @@ export class Framebuffer {
                 this.drawPointUnclipped(strokeColor, x0 - x, y0 + y); /* III. Quadrant */
                 this.drawPointUnclipped(strokeColor, x0 - x, y0 - y); /*  IV. Quadrant */
 
-                if (dc0 !== 0) {
-                    this.drawHLineInternal(fillColor, x0 - x + 1, y0 + y, x0 + x); /*   I and III. Quadrant */
-                    this.drawHLineInternal(fillColor, x0 - x + 1, y0 - y, x0 + x); /*  II and IV. Quadrant */
+                const start = Math.max(x0 - x + 1, 0);
+                const end = Math.min(x0 + x, WIDTH);
+
+                if (dc0 !== 0 && (end - start) > 0) {
+                    this.drawHLineInternal(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
+                    this.drawHLineInternal(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
                 }
 
                 y++; sy += aa2; e += dy; dy += aa2;
@@ -203,11 +206,15 @@ export class Framebuffer {
 
                 x++; sx += bb2; e += dx; dx += bb2; ddx++;
                 if (2 * e + dy > 0) {
-
                     if (dc0 !== 0) {
                         const w = x - ddx - 1;
-                        this.drawHLineInternal(fillColor, x0 - w, y0 + y, x0 + w + 1); /*   I and III. Quadrant */
-                        this.drawHLineInternal(fillColor, x0 - w, y0 - y, x0 + w + 1); /*  II and IV. Quadrant */
+                        const start = Math.max(x0 - w, 0);
+                        const end = Math.min(x0 + w + 1, WIDTH);
+                        
+                        if (end - start > 0) {
+                            this.drawHLineInternal(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
+                            this.drawHLineInternal(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
+                        }
                     }
 
                     y--; sy -= aa2; e += dy; dy += aa2; ddx = 0;

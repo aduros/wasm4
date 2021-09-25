@@ -35,30 +35,24 @@ export class Framebuffer {
     }
 
     drawHLineInternal(color, startX, y, endX) {
-        const fillEnd = endX - (endX % 4);
-        const fillStart = Math.min((startX + 3) & ~0x03, fillEnd);
+        const fillEnd = endX - (endX & 3);
+        const fillStart = Math.min((startX + 3) & ~3, fillEnd);
 
-        if (fillEnd - fillStart >= 4) {
+        if (fillEnd - fillStart > 3) {
             for (let xx = startX; xx < fillStart; xx++) {
                 this.drawPoint(color, xx, y);
             }
 
-            if (fillEnd - fillStart >= 4) {
-                const from = (WIDTH * y + fillStart) >>> 2;
-                const to = (WIDTH * y + fillEnd) >>> 2;
-                const fillColor =
-                    (color << 6) | (color << 4) | (color << 2) | color;
+            const from = (WIDTH * y + fillStart) >>> 2;
+            const to = (WIDTH * y + fillEnd) >>> 2;
+            const fillColor = color * 0b01010101;
 
-                this.bytes.fill(fillColor, from, to);
-            }
+            this.bytes.fill(fillColor, from, to);
+            startX = fillEnd;
+        }
 
-            for (let xx = fillEnd; xx < endX; xx++) {
-                this.drawPoint(color, xx, y);
-            }
-        } else {
-            for (let xx = startX; xx < endX; xx++) {
-                this.drawPoint(color, xx, y);
-            }
+        for (let xx = startX; xx < endX; xx++) {
+            this.drawPoint(color, xx, y);
         }
     }
 

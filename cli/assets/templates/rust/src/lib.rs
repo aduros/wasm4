@@ -1,19 +1,14 @@
+#[cfg(feature = "buddy-alloc")]
+mod alloc;
 mod wasm4;
 use wasm4::*;
 
 const SMILEY: [u8; 8] = [
-    0b11000011,
-    0b10000001,
-    0b00100100,
-    0b00100100,
-    0b00000000,
-    0b00100100,
-    0b10011001,
-    0b11000011,
+    0b11000011, 0b10000001, 0b00100100, 0b00100100, 0b00000000, 0b00100100, 0b10011001, 0b11000011,
 ];
 
 #[no_mangle]
-fn update () {
+fn update() {
     unsafe { *DRAW_COLORS = 2 }
     text("Hello from Rust!", 10, 10);
 

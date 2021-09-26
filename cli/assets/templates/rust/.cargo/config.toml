@@ -10,8 +10,8 @@ rustflags = [
     "-C", "link-arg=--initial-memory=65536",
     "-C", "link-arg=--max-memory=65536",
 
-    # Reserve 1024 bytes of stack space, offset from 6580
-    "-C", "link-arg=-zstack-size=7584",
+    # Reserve 1228 bytes of stack space, offset from 6580
+    "-C", "link-arg=-zstack-size=7808",
 
     # Not working? https://github.com/rust-lang/rust/issues/46645#issuecomment-423912553
     # "-C", "link-arg=--global-base=6560",

@@ -123,8 +123,9 @@ extern "C" {
 }
 
 /// Draws text using the built-in system font.
-pub fn text(text: &str, x: i32, y: i32) {
-    unsafe { extern_text(text.as_ptr(), text.len(), x, y) }
+pub fn text<T: AsRef<str>>(text: T, x: i32, y: i32) {
+    let text_ref = text.as_ref();
+    unsafe { extern_text(text_ref.as_ptr(), text_ref.len(), x, y) }
 }
 extern "C" {
     #[link_name = "textUtf8"]
@@ -200,8 +201,9 @@ extern "C" {
 // └───────────────────────────────────────────────────────────────────────────┘
 
 /// Prints a message to the debug console.
-pub fn trace(text: &str) {
-    unsafe { extern_trace(text.as_ptr(), text.len()) }
+pub fn trace<T: AsRef<str>>(text: T) {
+    let text_ref = text.as_ref();
+    unsafe { extern_trace(text_ref.as_ptr(), text_ref.len()) }
 }
 extern "C" {
     #[link_name = "traceUtf8"]

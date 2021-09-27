@@ -10,8 +10,9 @@ rustflags = [
     "-C", "link-arg=--initial-memory=65536",
     "-C", "link-arg=--max-memory=65536",
 
-    # Reserve 1228 bytes of stack space, offset from 6580
-    "-C", "link-arg=-zstack-size=7808",
+    # Reserve 2044 bytes of stack space, offset from 6580.
+    # Bump this value, 16-byte aligned, if the framebuffer gets corrupted.
+    "-C", "link-arg=-zstack-size=8624",
 
     # Not working? https://github.com/rust-lang/rust/issues/46645#issuecomment-423912553
     # "-C", "link-arg=--global-base=6560",

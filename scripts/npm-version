@@ -2,5 +2,5 @@
 
 cd cli
 version=`npm version "$@"`
-git commit package.json package-lock.json -m "Version $version."
-git tag "v$version"
+git commit package.json package-lock.json -m "$version."
+git tag "$version"

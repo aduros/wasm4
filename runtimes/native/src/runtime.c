@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "framebuffer.h"
 #include "wasm.h"
 #include "window.h"
 
@@ -35,14 +36,18 @@ void w4_runtimeInit (uint8_t* memoryBytes) {
     memory->drawColors = 0x1203;
     memory->mouseX = 0x7fff;
     memory->mouseY = 0x7fff;
+
+    w4_framebufferInit(&memory->drawColors, memory->framebuffer);
 }
 
 void w4_runtimeBlit (const uint8_t* sprite, int x, int y, int width, int height, int flags) {
     printf("blit: %p, %d, %d, %d, %d, %d\n", sprite, x, y, width, height, flags);
+    w4_framebufferRect(x, y, width, height);
 }
 
 void w4_runtimeBlitSub (const uint8_t* sprite, int x, int y, int width, int height, int srcX, int srcY, int stride, int flags) {
     printf("blitSub: %p, %d, %d, %d, %d, %d, %d, %d, %d\n", sprite, x, y, width, height, srcX, srcY, stride, flags);
+    w4_framebufferRect(x, y, width, height);
 }
 
 void w4_runtimeLine (int x1, int y1, int x2, int y2) {
@@ -59,10 +64,12 @@ void w4_runtimeVLine (int x, int y, int len) {
 
 void w4_runtimeOval (int x, int y, int width, int height) {
     printf("oval: %d, %d, %d, %d\n", x, y, width, height);
+    w4_framebufferRect(x, y, width, height);
 }
 
 void w4_runtimeRect (int x, int y, int width, int height) {
     printf("rect: %d, %d, %d, %d\n", x, y, width, height);
+    w4_framebufferRect(x, y, width, height);
 }
 
 void w4_runtimeText (const char* str, int x, int y) {

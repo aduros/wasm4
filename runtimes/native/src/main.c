@@ -23,5 +23,5 @@ int main (int argc, const char* argv[]) {
     w4_wasmCallStart();
     w4_wasmCallUpdate();
 
-    w4_windowInit("WASM-4");
+    w4_windowBoot("WASM-4");
 }

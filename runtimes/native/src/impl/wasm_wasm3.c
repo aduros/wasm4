@@ -171,7 +171,7 @@ void w4_wasmLoadModule (const uint8_t* wasmBuffer, int byteLength) {
 
     m3_LinkRawFunction(module, "env", "blit", "v(iiiiii)", blit);
     m3_LinkRawFunction(module, "env", "blitSub", "v(iiiiiiiii)", blitSub);
-    m3_LinkRawFunction(module, "env", "line", "v(ii)", line);
+    m3_LinkRawFunction(module, "env", "line", "v(iiii)", line);
     m3_LinkRawFunction(module, "env", "hline", "v(iii)", hline);
     m3_LinkRawFunction(module, "env", "vline", "v(iii)", vline);
     m3_LinkRawFunction(module, "env", "oval", "v(iiii)", oval);
@@ -206,6 +206,14 @@ void w4_wasmLoadModule (const uint8_t* wasmBuffer, int byteLength) {
     if (func) {
         m3_CallV(func);
     }
+
+#ifndef NDEBUG
+    M3ErrorInfo error;
+    m3_GetErrorInfo(runtime, &error);
+    if (error.result) {
+        printf("Maybe error? %s: %s\n", error.result, error.message);
+    }
+#endif
 }
 
 void w4_wasmCallStart () {

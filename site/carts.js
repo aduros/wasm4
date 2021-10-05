@@ -1,7 +1,7 @@
 const CARTS = [
     {
-        slug: "w4-2048",
-        title: "w4-2048",
+        slug: "2048",
+        title: "2048",
         author: "Peter Hellberg",
         github: "peterhellberg",
     },

@@ -1,5 +1,11 @@
 const CARTS = [
     {
+        slug: "w4-2048",
+        title: "w4-2048",
+        author: "Peter Hellberg",
+        github: "peterhellberg",
+    },
+    {
         slug: "tictactoe",
         title: "Tic Tac Toe",
         author: "Christopher Kleine",
@@ -40,12 +46,6 @@ const CARTS = [
         title: "Raw Assembly Test",
         author: "Bruno Garcia",
         github: "aduros",
-    },
-    {
-        slug: "w4-2048",
-        title: "w4-2048",
-        author: "Peter Hellberg",
-        github: "peterhellberg",
     },
 ];
 

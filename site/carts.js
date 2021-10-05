@@ -41,6 +41,12 @@ const CARTS = [
         author: "Bruno Garcia",
         github: "aduros",
     },
+    {
+        slug: "w4-2048",
+        title: "w4-2048",
+        author: "Peter Hellberg",
+        github: "peterhellberg",
+    },
 ];
 
 module.exports = CARTS;

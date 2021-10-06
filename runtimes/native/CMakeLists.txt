@@ -15,6 +15,8 @@ file(GLOB_RECURSE SOURCES RELATIVE ${CMAKE_SOURCE_DIR}
     "vendor/wasm3/source/*.c")
 add_executable(wasm4 ${SOURCES})
 
+set_property(TARGET wasm4 PROPERTY C_STANDARD 99)
+
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     include(CheckIPOSupported)
     check_ipo_supported()

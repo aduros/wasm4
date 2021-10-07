@@ -40,6 +40,10 @@ void w4_runtimeInit (uint8_t* memoryBytes) {
     w4_framebufferInit(&memory->drawColors, memory->framebuffer);
 }
 
+void w4_runtimeSetGamepad (int idx, uint8_t gamepad) {
+    memory->gamepads[idx] = gamepad;
+}
+
 void w4_runtimeBlit (const uint8_t* sprite, int x, int y, int width, int height, int flags) {
     printf("blit: %p, %d, %d, %d, %d, %d\n", sprite, x, y, width, height, flags);
     w4_framebufferRect(x, y, width, height);

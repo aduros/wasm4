@@ -130,10 +130,11 @@ void w4_windowBoot (const char* title) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-
     GLFWwindow* window = glfwCreateWindow(160, 160, title, NULL, NULL);
     glfwSetFramebufferSizeCallback(window, onFramebufferResized);
     glfwSetWindowAspectRatio(window, 1, 1);
+    glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
+
     glfwMakeContextCurrent(window);
     gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
 
@@ -141,6 +142,27 @@ void w4_windowBoot (const char* title) {
     initLookupTable();
 
     while (!glfwWindowShouldClose(window)) {
+        uint8_t gamepad = 0;
+        if (glfwGetKey(window, GLFW_KEY_X)) {
+            gamepad |= W4_BUTTON_X;
+        }
+        if (glfwGetKey(window, GLFW_KEY_Z)) {
+            gamepad |= W4_BUTTON_Z;
+        }
+        if (glfwGetKey(window, GLFW_KEY_LEFT)) {
+            gamepad |= W4_BUTTON_LEFT;
+        }
+        if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
+            gamepad |= W4_BUTTON_RIGHT;
+        }
+        if (glfwGetKey(window, GLFW_KEY_UP)) {
+            gamepad |= W4_BUTTON_UP;
+        }
+        if (glfwGetKey(window, GLFW_KEY_DOWN)) {
+            gamepad |= W4_BUTTON_DOWN;
+        }
+        w4_runtimeSetGamepad(0, gamepad);
+
         w4_runtimeUpdate();
 
         glfwSwapBuffers(window);

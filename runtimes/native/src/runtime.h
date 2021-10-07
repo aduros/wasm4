@@ -2,7 +2,18 @@
 
 #include <stdint.h>
 
+#define W4_BUTTON_X 1
+#define W4_BUTTON_Z 2
+// #define W4_BUTTON_RESERVED 4
+// #define W4_BUTTON_RESERVED 8
+#define W4_BUTTON_LEFT 16
+#define W4_BUTTON_RIGHT 32
+#define W4_BUTTON_UP 64
+#define W4_BUTTON_DOWN 128
+
 void w4_runtimeInit (uint8_t* memory);
+
+void w4_runtimeSetGamepad (int idx, uint8_t gamepad);
 
 void w4_runtimeBlit (const uint8_t* sprite, int x, int y, int width, int height, int flags);
 void w4_runtimeBlitSub (const uint8_t* sprite, int x, int y, int width, int height, int srcX, int srcY, int stride, int flags);

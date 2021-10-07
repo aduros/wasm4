@@ -12,7 +12,9 @@ add_subdirectory(vendor/portaudio)
 file(GLOB_RECURSE SOURCES RELATIVE ${CMAKE_SOURCE_DIR}
     "src/*.c"
     "src/impl/*.c"
-    "vendor/wasm3/source/*.c")
+    "vendor/wasm3/source/*.c"
+    "vendor/glad/src/*.c"
+)
 add_executable(wasm4 ${SOURCES})
 
 set_property(TARGET wasm4 PROPERTY C_STANDARD 99)
@@ -23,8 +25,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set_property(TARGET wasm4 PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
 
-find_package(OpenGL REQUIRED)
-
-# set(CMAKE_EXE_LINKER_FLAGS "-static")
 target_include_directories(wasm4 PRIVATE "${CMAKE_SOURCE_DIR}/vendor/wasm3/source")
-target_link_libraries(wasm4 glfw OpenGL::GL PortAudio)
+target_include_directories(wasm4 PRIVATE "${CMAKE_SOURCE_DIR}/vendor/glad/include")
+target_link_libraries(wasm4 glfw PortAudio)

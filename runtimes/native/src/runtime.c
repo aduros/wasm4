@@ -46,12 +46,18 @@ void w4_runtimeSetGamepad (int idx, uint8_t gamepad) {
 
 void w4_runtimeBlit (const uint8_t* sprite, int x, int y, int width, int height, int flags) {
     printf("blit: %p, %d, %d, %d, %d, %d\n", sprite, x, y, width, height, flags);
-    w4_framebufferRect(x, y, width, height);
+
+    w4_runtimeBlitSub(sprite, x, y, width, height, 0, 0, width, flags);
 }
 
 void w4_runtimeBlitSub (const uint8_t* sprite, int x, int y, int width, int height, int srcX, int srcY, int stride, int flags) {
     printf("blitSub: %p, %d, %d, %d, %d, %d, %d, %d, %d\n", sprite, x, y, width, height, srcX, srcY, stride, flags);
-    w4_framebufferRect(x, y, width, height);
+
+    bool bpp2 = (flags & 1);
+    bool flipX = (flags & 2);
+    bool flipY = (flags & 4);
+    bool rotate = (flags & 8);
+    w4_framebufferBlit(sprite, x, y, width, height, srcX, srcY, stride, bpp2, flipX, flipY, rotate);
 }
 
 void w4_runtimeLine (int x1, int y1, int x2, int y2) {
@@ -68,11 +74,11 @@ void w4_runtimeVLine (int x, int y, int len) {
 
 void w4_runtimeOval (int x, int y, int width, int height) {
     printf("oval: %d, %d, %d, %d\n", x, y, width, height);
-    w4_framebufferRect(x, y, width, height);
 }
 
 void w4_runtimeRect (int x, int y, int width, int height) {
     printf("rect: %d, %d, %d, %d\n", x, y, width, height);
+
     w4_framebufferRect(x, y, width, height);
 }
 
@@ -120,10 +126,7 @@ void w4_runtimeTracef (const char* str, const void* stack) {
 }
 
 void w4_runtimeUpdate () {
-    // Clear the framebuffer
-    memset(memory->framebuffer, 0, sizeof(memory->framebuffer));
-
+    w4_framebufferClear();
     w4_wasmCallUpdate();
-
     w4_windowComposite(memory->palette, memory->framebuffer);
 }

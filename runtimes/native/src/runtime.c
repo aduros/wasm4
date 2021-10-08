@@ -45,13 +45,13 @@ void w4_runtimeSetGamepad (int idx, uint8_t gamepad) {
 }
 
 void w4_runtimeBlit (const uint8_t* sprite, int x, int y, int width, int height, int flags) {
-    printf("blit: %p, %d, %d, %d, %d, %d\n", sprite, x, y, width, height, flags);
+    // printf("blit: %p, %d, %d, %d, %d, %d\n", sprite, x, y, width, height, flags);
 
     w4_runtimeBlitSub(sprite, x, y, width, height, 0, 0, width, flags);
 }
 
 void w4_runtimeBlitSub (const uint8_t* sprite, int x, int y, int width, int height, int srcX, int srcY, int stride, int flags) {
-    printf("blitSub: %p, %d, %d, %d, %d, %d, %d, %d, %d\n", sprite, x, y, width, height, srcX, srcY, stride, flags);
+    // printf("blitSub: %p, %d, %d, %d, %d, %d, %d, %d, %d\n", sprite, x, y, width, height, srcX, srcY, stride, flags);
 
     bool bpp2 = (flags & 1);
     bool flipX = (flags & 2);
@@ -77,13 +77,13 @@ void w4_runtimeOval (int x, int y, int width, int height) {
 }
 
 void w4_runtimeRect (int x, int y, int width, int height) {
-    printf("rect: %d, %d, %d, %d\n", x, y, width, height);
-
+    // printf("rect: %d, %d, %d, %d\n", x, y, width, height);
     w4_framebufferRect(x, y, width, height);
 }
 
 void w4_runtimeText (const char* str, int x, int y) {
-    printf("text: %s, %d, %d\n", str, x, y);
+    // printf("text: %s, %d, %d\n", str, x, y);
+    w4_framebufferText(str, x, y);
 }
 
 void w4_runtimeTextUtf8 (const uint8_t* str, int byteLength, int x, int y) {

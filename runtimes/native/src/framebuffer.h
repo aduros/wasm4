@@ -12,5 +12,7 @@ void w4_framebufferClear ();
 
 void w4_framebufferRect (int x, int y, int width, int height);
 
+void w4_framebufferText (const char* str, int x, int y);
+
 void w4_framebufferBlit (const uint8_t* sprite, int dstX, int dstY, int width, int height,
     int srcX, int srcY, int srcStride, bool bpp2, bool flipX, bool flipY, bool rotate);

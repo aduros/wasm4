@@ -61,6 +61,7 @@ module.exports = {
                 items: [
                     "tutorials/snake/goal",
                     "tutorials/snake/setup-project",
+                    "tutorials/snake/setting-color-palette",
                 ]
             }
 	    ]

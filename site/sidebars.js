@@ -60,6 +60,7 @@ module.exports = {
                 collapsible: true,
                 items: [
                     "tutorials/snake/goal",
+                    "tutorials/snake/setup-project",
                 ]
             }
 	    ]

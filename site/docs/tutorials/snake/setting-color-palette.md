@@ -183,7 +183,7 @@ export function start (): void {
 ```
 
 ```c
-void update () {
+void start () {
     PALETTE[0] = 0xfbf7f3;
     PALETTE[1] = 0xe5b083;
     PALETTE[2] = 0x426e5d;

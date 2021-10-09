@@ -49,5 +49,20 @@ module.exports = {
             "reference/inspiration",
         ],
     },
+    {
+	    type: "category",
+	    label: "Tutorials",
+	    collapsible: false,
+	    items: [
+            {
+                type: "category",
+                label: "Snake",
+                collapsible: true,
+                items: [
+                    "tutorials/snake/goal",
+                ]
+            }
+	    ]
+    }
   ],
 };

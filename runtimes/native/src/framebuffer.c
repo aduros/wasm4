@@ -22,6 +22,28 @@ static void drawPoint (uint8_t color, int x, int y) {
     framebuffer[idx] = (color << shift) | (framebuffer[idx] & ~mask);
 }
 
+static void drawHLine (uint8_t color, int startX, int y, int endX) {
+    int fillEnd = endX - (endX & 3);
+    int fillStart = min((startX + 3) & ~3, fillEnd);
+
+    if (fillEnd - fillStart > 3) {
+        for (int xx = startX; xx < fillStart; xx++) {
+            drawPoint(color, xx, y);
+        }
+
+        int from = (WIDTH * y + fillStart) >> 2;
+        int to = (WIDTH * y + fillEnd) >> 2;
+        int fillColor = color * 0b01010101;
+
+        memset(framebuffer+from, fillColor, to-from);
+        startX = fillEnd;
+    }
+
+    for (int xx = startX; xx < endX; xx++) {
+        drawPoint(color, xx, y);
+    }
+}
+
 void w4_framebufferInit (const uint16_t* drawColors_, uint8_t* framebuffer_) {
     drawColors = drawColors_;
     framebuffer = framebuffer_;
@@ -32,16 +54,47 @@ void w4_framebufferClear () {
 }
 
 void w4_framebufferRect (int x, int y, int width, int height) {
-    // TODO(2021-09-28): Clipping
-    uint8_t dc0 = *drawColors & 0xf;
+    int startX = max(0, x);
+    int startY = max(0, y);
+    int endXUnclamped = x + width;
+    int endYUnclamped = y + height;
+    int endX = min(endXUnclamped, WIDTH);
+    int endY = min(endYUnclamped, HEIGHT);
 
-    if (dc0) {
-        uint8_t fillColor = dc0 - 1;
-        for (int yy = y; yy < y+height; ++yy) {
-            for (int xx = x; xx < x+width; ++xx) {
-                drawPoint(fillColor, xx, yy);
+    uint16_t dc = *drawColors;
+    uint8_t dc0 = dc & 0xf;
+    uint8_t dc1 = (dc >> 4) & 0xf;
+    int offset = (dc1 != 0) ? 1 : 0;
+
+    if (dc0 != 0) {
+        int fillColor = (dc0 - 1) & 0x3;
+        for (int yy = startY + offset; yy < endY - offset; ++yy) {
+            drawHLine(fillColor, startX + offset, yy, endX - offset);
+        }
+    }
+
+    if (dc1 != 0) {
+        int strokeColor = (dc1 - 1) & 0x3;
+
+        // Left edge
+        if (x >= 0 && x < WIDTH) {
+            for (int yy = startY; yy < endY - 1; ++yy) {
+                drawPoint(strokeColor, x, yy);
             }
         }
+
+        // Right edge
+        if (endX > 0 && endXUnclamped < WIDTH + 1) {
+            for (int yy = startY; yy < endY - 1; ++yy) {
+                drawPoint(strokeColor, endX - 1, yy);
+            }
+        }
+
+        // Top edge
+        drawHLine(strokeColor, startX, startY, endX);
+
+        // Bottom edge
+        drawHLine(strokeColor, startX, endY - 1, endX);
     }
 }
 

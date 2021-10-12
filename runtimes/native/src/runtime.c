@@ -61,19 +61,23 @@ void w4_runtimeBlitSub (const uint8_t* sprite, int x, int y, int width, int heig
 }
 
 void w4_runtimeLine (int x1, int y1, int x2, int y2) {
-    printf("line: %d, %d, %d, %d\n", x1, y1, x2, y2);
+    // printf("line: %d, %d, %d, %d\n", x1, y1, x2, y2);
+    w4_framebufferLine(x1, y1, x2, y2);
 }
 
 void w4_runtimeHLine (int x, int y, int len) {
-    printf("hline: %d, %d, %d\n", x, y, len);
+    // printf("hline: %d, %d, %d\n", x, y, len);
+    w4_framebufferHLine(x, y, len);
 }
 
 void w4_runtimeVLine (int x, int y, int len) {
-    printf("vline: %d, %d, %d\n", x, y, len);
+    // printf("vline: %d, %d, %d\n", x, y, len);
+    w4_framebufferVLine(x, y, len);
 }
 
 void w4_runtimeOval (int x, int y, int width, int height) {
-    printf("oval: %d, %d, %d, %d\n", x, y, width, height);
+    // printf("oval: %d, %d, %d, %d\n", x, y, width, height);
+    w4_framebufferOval(x, y, width, height);
 }
 
 void w4_runtimeRect (int x, int y, int width, int height) {
@@ -87,24 +91,24 @@ void w4_runtimeText (const char* str, int x, int y) {
 }
 
 void w4_runtimeTextUtf8 (const uint8_t* str, int byteLength, int x, int y) {
-    printf("textUtf8: %p, %d, %d, %d\n", str, byteLength, x, y);
+    printf("TODO: textUtf8: %p, %d, %d, %d\n", str, byteLength, x, y);
 }
 
 void w4_runtimeTextUtf16 (const uint8_t* str, int byteLength, int x, int y) {
-    printf("textUtf16: %p, %d, %d, %d\n", str, byteLength, x, y);
+    printf("TODO: textUtf16: %p, %d, %d, %d\n", str, byteLength, x, y);
 }
 
 void w4_runtimeTone (int frequency, int duration, int volume, int flags) {
-    printf("tone: %d, %d, %d, %d\n", frequency, duration, volume, flags);
+    printf("TODO: tone: %d, %d, %d, %d\n", frequency, duration, volume, flags);
 }
 
 int w4_runtimeDiskr (uint8_t* dest, int size) {
-    printf("diskr: %p, %d\n", dest, size);
+    printf("TODO: diskr: %p, %d\n", dest, size);
     return 0;
 }
 
 int w4_runtimeDiskw (const uint8_t* src, int size) {
-    printf("diskw: %p, %d\n", src, size);
+    printf("TODO: diskw: %p, %d\n", src, size);
     return 0;
 }
 
@@ -113,11 +117,11 @@ void w4_runtimeTrace (const char* str) {
 }
 
 void w4_runtimeTraceUtf8 (const uint8_t* str, int byteLength) {
-    printf("traceUtf8: %p, %d\n", str, byteLength);
+    printf("TODO: traceUtf8: %p, %d\n", str, byteLength);
 }
 
 void w4_runtimeTraceUtf16 (const uint8_t* str, int byteLength) {
-    printf("traceUtf16: %p, %d\n", str, byteLength);
+    printf("TODO: traceUtf16: %p, %d\n", str, byteLength);
 }
 
 void w4_runtimeTracef (const char* str, const void* stack) {

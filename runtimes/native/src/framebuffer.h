@@ -10,7 +10,15 @@ void w4_framebufferInit (const uint16_t* drawColors, uint8_t* framebuffer);
 
 void w4_framebufferClear ();
 
+void w4_framebufferHLine (int x, int y, int length);
+
+void w4_framebufferVLine (int x, int y, int length);
+
 void w4_framebufferRect (int x, int y, int width, int height);
+
+void w4_framebufferLine (int x1, int y1, int x2, int y2);
+
+void w4_framebufferOval (int x, int y, int width, int height);
 
 void w4_framebufferText (const char* str, int x, int y);
 

@@ -178,9 +178,15 @@ export class Framebuffer {
                     this.drawHLineInternal(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
                 }
 
-                y++; sy += aa2; e += dy; dy += aa2;
+                y++;
+                sy += aa2;
+                e += dy;
+                dy += aa2;
                 if (2 * e + dx > 0) {
-                    x--; sx -= bb2; e += dx; dx += bb2;
+                    x--;
+                    sx -= bb2;
+                    e += dx;
+                    dx += bb2;
                 }
             }
         }
@@ -198,7 +204,11 @@ export class Framebuffer {
                 this.drawPointUnclipped(strokeColor, x0 - x, y0 + y); /* III. Quadrant */
                 this.drawPointUnclipped(strokeColor, x0 - x, y0 - y); /*  IV. Quadrant */
 
-                x++; sx += bb2; e += dx; dx += bb2; ddx++;
+                x++;
+                sx += bb2;
+                e += dx;
+                dx += bb2;
+                ddx++;
                 if (2 * e + dy > 0) {
                     if (dc0 !== 0) {
                         const w = x - ddx - 1;
@@ -211,7 +221,11 @@ export class Framebuffer {
                         }
                     }
 
-                    y--; sy -= aa2; e += dy; dy += aa2; ddx = 0;
+                    y--;
+                    sy -= aa2;
+                    e += dy;
+                    dy += aa2;
+                    ddx = 0;
                 }
             }
         }

@@ -122,8 +122,19 @@ static void onFramebufferResized (GLFWwindow* window, int width, int height) {
     glViewport(x, y, size, size);
 }
 
+static void onGlfwError(int error, const char* description)
+{
+    fprintf(stderr,"%s\n",description);
+}
+
+
 void w4_windowBoot (const char* title) {
-    glfwInit();
+    if(!glfwInit()){
+        fprintf(stderr,"Failed to initialise GLFW.");
+        return;
+    }
+
+    glfwSetErrorCallback(onGlfwError);
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);

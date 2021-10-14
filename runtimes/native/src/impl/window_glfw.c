@@ -129,7 +129,7 @@ void w4_windowBoot (const char* title) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-    GLFWwindow* window = glfwCreateWindow(160, 160, title, NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(2*160, 2*160, title, NULL, NULL);
     glfwSetFramebufferSizeCallback(window, onFramebufferResized);
     glfwSetWindowAspectRatio(window, 1, 1);
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);

@@ -186,8 +186,8 @@ uint8_t* w4_wasmInit () {
 }
 
 void w4_wasmLoadModule (const uint8_t* wasmBuffer, int byteLength) {
-    m3_ParseModule(env, &module, wasmBuffer, byteLength);
-    m3_LoadModule(runtime, module);
+    check(m3_ParseModule(env, &module, wasmBuffer, byteLength));
+    check(m3_LoadModule(runtime, module));
 
     m3_LinkRawFunction(module, "env", "blit", "v(iiiiii)", blit);
     m3_LinkRawFunction(module, "env", "blitSub", "v(iiiiiiiii)", blitSub);

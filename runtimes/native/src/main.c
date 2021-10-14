@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "runtime.h"
 #include "window.h"
@@ -10,16 +11,24 @@ int main (int argc, const char* argv[]) {
         return 1;
     }
 
+    FILE* file = fopen(argv[1], "rb");
+    if (file == NULL) {
+        fprintf(stderr, "Error opening %s\n", argv[1]);
+        return 1;
+    }
+
+    fseek(file, 0, SEEK_END);
+    size_t size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    char* wasmBuffer = malloc(size);
+    size = fread(wasmBuffer, 1, size, file);
+    fclose(file);
+
     uint8_t* memory = w4_wasmInit();
 
     w4_runtimeInit(memory);
-
-    FILE* fp = fopen(argv[1], "r");
-    char wasmBuffer[1 << 16];
-    size_t size = fread(wasmBuffer, 1, sizeof(wasmBuffer), fp);
-    fclose(fp);
-
     w4_wasmLoadModule(wasmBuffer, size);
+
     w4_wasmCallStart();
     w4_wasmCallUpdate();
 

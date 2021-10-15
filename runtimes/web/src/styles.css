@@ -1,5 +1,7 @@
 * {
   box-sizing: border-box;
+  user-selected:none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html, body {

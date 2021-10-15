@@ -125,8 +125,8 @@ void w4_runtimeTraceUtf16 (const uint8_t* str, int byteLength) {
 }
 
 void w4_runtimeTracef (const char* str, const void* stack) {
-    // TODO(2021-09-27): Call printf with stack
-    puts(str);
+    vprintf(str, (void*)&stack);
+    putchar('\n');
 }
 
 void w4_runtimeUpdate () {

@@ -33,7 +33,8 @@ static GLuint createShader (GLenum type, const char* source) {
     if (status == GL_FALSE) {
         char log[1024];
         glGetShaderInfoLog(shader, sizeof(log), NULL, log);
-        printf("gl shader error: %s\n", log);
+        fprintf(stderr, "OpenGL shader compile error: %s\n", log);
+        exit(1);
     }
 #endif
 
@@ -76,7 +77,8 @@ static void initOpenGL () {
     if (status == GL_FALSE) {
         char log[1024];
         glGetProgramInfoLog(program, sizeof(log), NULL, log);
-        printf("gl program link error: %s\n", log);
+        fprintf(stderr, "OpenGL program link error: %s\n", log);
+        exit(1);
     }
 #endif
 
@@ -211,7 +213,8 @@ void w4_windowComposite (const uint32_t* palette, const uint8_t* framebuffer) {
 #ifndef NDEBUG
     GLuint error = glGetError();
     if (error) {
-        printf("GL error: %d\n", error);
+        fprintf(stderr, "glGetError() returned %d\n", error);
+        exit(1);
     }
 #endif
 }

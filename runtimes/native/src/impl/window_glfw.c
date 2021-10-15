@@ -43,6 +43,7 @@ static GLuint createShader (GLenum type, const char* source) {
 
 static void initOpenGL () {
     GLuint vertexShader = createShader(GL_VERTEX_SHADER,
+        "#version 120\n"
         "attribute vec2 pos;\n"
         "varying vec2 framebufferCoord;\n"
 
@@ -52,7 +53,10 @@ static void initOpenGL () {
         "}\n");
 
     GLuint fragmentShader = createShader(GL_FRAGMENT_SHADER,
+        "#version 120\n"
+        "#ifdef GL_ES\n"
         "precision mediump float;\n"
+        "#endif\n"
         "uniform vec3 palette[4];\n"
         "uniform sampler2D framebuffer;\n"
         "varying vec2 framebufferCoord;\n"
@@ -137,10 +141,6 @@ void w4_windowBoot (const char* title) {
     }
 
     glfwSetErrorCallback(onGlfwError);
-
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
     GLFWwindow* window = glfwCreateWindow(2*160, 2*160, title, NULL, NULL);
     glfwSetFramebufferSizeCallback(window, onFramebufferResized);

@@ -51,7 +51,11 @@ static void initOpenGL () {
         "}\n");
 
     GLuint fragmentShader = createShader(GL_FRAGMENT_SHADER,
+#if defined(__APPLE__) && defined(__MACH__)
+        "float;\n"
+#else
         "precision mediump float;\n"
+#endif
         "uniform vec3 palette[4];\n"
         "uniform sampler2D framebuffer;\n"
         "varying vec2 framebufferCoord;\n"
@@ -127,7 +131,6 @@ static void onGlfwError(int error, const char* description)
     fprintf(stderr,"%s\n",description);
 }
 
-
 void w4_windowBoot (const char* title) {
     if(!glfwInit()){
         fprintf(stderr,"Failed to initialise GLFW.");
@@ -136,9 +139,12 @@ void w4_windowBoot (const char* title) {
 
     glfwSetErrorCallback(onGlfwError);
 
+#if !defined(__APPLE__) && !defined(__MACH__)
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+#else
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0); 
+#endif
 
     GLFWwindow* window = glfwCreateWindow(2*160, 2*160, title, NULL, NULL);
     glfwSetFramebufferSizeCallback(window, onFramebufferResized);

@@ -16,6 +16,10 @@ static int max (int a, int b) {
     return a > b ? a : b;
 }
 
+static int bounds (int a, int lower, int upper) {
+    return a < upper ? (a > lower ? a : lower): upper;
+}
+
 static void drawPoint (uint8_t color, int x, int y) {
     int idx = (WIDTH * y + x) >> 2;
     int shift = (x & 0x3) << 1;
@@ -176,8 +180,8 @@ void w4_framebufferOval (int x, int y, int width, int height) {
             int end = min(x0 + x, WIDTH);
 
             if (dc0 != 0 && (end - start) > 0) {
-                drawHLine(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
-                drawHLine(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
+                drawHLine(fillColor, start, bounds(y0 + y, 0, HEIGHT-1), end); /*   I and III. Quadrant */
+                drawHLine(fillColor, start, bounds(y0 - y, 0, HEIGHT-1), end); /*  II and IV. Quadrant */
             }
 
             y++;
@@ -218,8 +222,8 @@ void w4_framebufferOval (int x, int y, int width, int height) {
                     int end = min(x0 + w + 1, WIDTH);
 
                     if (end - start > 0) {
-                        drawHLine(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
-                        drawHLine(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
+                        drawHLine(fillColor, start, bounds(y0 + y, 0, HEIGHT-1), end); /*   I and III. Quadrant */
+                        drawHLine(fillColor, start, bounds(y0 - y, 0, HEIGHT-1), end); /*  II and IV. Quadrant */
                     }
                 }
 

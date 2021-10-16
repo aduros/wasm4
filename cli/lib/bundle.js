@@ -23,18 +23,13 @@ async function compileTemplate() {
     return Handlebars.compile(templateSource);
 }
 
-async function bundle(cartFile, opts) {
+async function bundleHtml (cartFile, htmlFile, opts) {
     const runtimeDir = path.resolve(__dirname, '../assets/runtime');
     const wasm4CssFilepath = path.resolve(runtimeDir, './wasm4.css');
     const wasm4jsFilepath = path.resolve(runtimeDir, './wasm4.js');
 
-    const outFile = opts.html;
-    if (outFile == null) {
-        throw new Error('You must specify one or more bundle outputs.');
-    }
-
-    if (!require('fs').existsSync(outFile)) {
-        await fs.mkdir(path.dirname(outFile), {
+    if (!require('fs').existsSync(htmlFile)) {
+        await fs.mkdir(path.dirname(htmlFile), {
             recursive: true,
         });
     }
@@ -71,7 +66,7 @@ async function bundle(cartFile, opts) {
 
     const bundleTemplate = await compileTemplate();
 
-    const outFileContent = bundleTemplate({
+    const htmlFileContent = bundleTemplate({
         html: {
             title: opts.title,
             description: opts.description,
@@ -84,9 +79,54 @@ async function bundle(cartFile, opts) {
         opts,
     });
 
-    await fs.writeFile(outFile, outFileContent);
+    await fs.writeFile(htmlFile, htmlFileContent);
 
-    console.log(`OK! Bundled ${outFile}.`);
+    console.log(`OK! Bundled ${htmlFile}.`);
+}
+
+async function bundleExecutable (cartFile, outputFile, opts) {
+    const sourceFile = process.env.W4_NATIVE_BINARY;
+    if (!sourceFile) {
+        throw new Error("Currently to bundle for native platforms you must set $W4_NATIVE_BINARY to the path of the prebuilt native binary.");
+    }
+
+    const [source, cart] = await Promise.all([
+        fs.readFile(sourceFile),
+        fs.readFile(cartFile),
+    ]);
+
+    // FileFooter metadata for the native runtime to read
+    const footer = Buffer.alloc(136);
+    footer.writeInt32LE(1414676803, 0); // magic
+    footer.write(opts.title, 4, 127); // title
+    footer.writeInt32LE(cart.length, 132); // cartLength
+
+    const output = Buffer.concat([source, cart, footer]);
+    await fs.writeFile(outputFile, output);
+
+    // Make sure it's executable
+    await fs.chmod(outputFile, "775");
+
+    console.log(`OK! Bundled ${outputFile}.`);
+}
+
+async function bundle(cartFile, opts) {
+    if (!opts.html && !opts.windows && !opts.mac && !opts.linux) {
+        throw new Error('You must specify one or more bundle outputs.');
+    }
+
+    if (opts.html) {
+        await bundleHtml(cartFile, opts.html, opts);
+    }
+    if (opts.windows) {
+        await bundleExecutable(cartFile, opts.windows, opts);
+    }
+    if (opts.mac) {
+        await bundleExecutable(cartFile, opts.mac, opts);
+    }
+    if (opts.linux) {
+        await bundleExecutable(cartFile, opts.linux, opts);
+    }
 }
 
 exports.run = bundle;

@@ -34,7 +34,7 @@ int main (int argc, const char* argv[]) {
 
         // Make sure the title is null terminated
         footer.title[sizeof(footer.title)-1] = '\0';
-        title = footer.title;
+        title = (char*)footer.title;
 
         cartBytes = malloc(footer.cartLength);
         fseek(file, -sizeof(FileFooter) - footer.cartLength, SEEK_END);
@@ -60,7 +60,7 @@ int main (int argc, const char* argv[]) {
     uint8_t* memory = w4_wasmInit();
     w4_runtimeInit(memory);
 
-    w4_wasmLoadModule(cartBytes, cartLength);
+    w4_wasmLoadModule((const uint8_t*)cartBytes, cartLength);
 
     w4_wasmCallStart();
     w4_wasmCallUpdate();

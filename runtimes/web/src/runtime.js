@@ -248,10 +248,20 @@ export class Runtime {
                     argPtr += 4;
                     break;
                 case 115: // s
-                    throw new Error("TODO(2021-07-16): Implement printf %s");
+                    let stringAddr = this.data.getUint32(argPtr, true);
+					argPtr += 4;
+                        do {
+                            let sValue = this.data.getUint8(stringAddr, true);
+                            if (sValue === 0) {
+                                break;
+                            }
+                            output += String.fromCharCode(sValue);
+                            stringAddr += 1;
+                        } while (true);
                     break;
                 case 102: // f
-                    throw new Error("TODO(2021-07-16): Implement printf %f");
+                    output += this.data.getFloat64(argPtr, true).toString();
+                    argPtr += 8;
                     break;
                 }
             } else {

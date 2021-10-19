@@ -10,14 +10,14 @@ typedef struct {
     uint32_t magic;
 
     // Window title
-    uint8_t title[128];
+    char title[128];
 
     // Length of the cart.wasm bytes used to offset backwards from the footer
     uint32_t cartLength;
 } FileFooter;
 
 int main (int argc, const char* argv[]) {
-    char* cartBytes;
+    uint8_t* cartBytes;
     size_t cartLength;
     const char* title = "WASM-4";
 

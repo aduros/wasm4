@@ -87,8 +87,6 @@ async function loadCartWasm () {
                 const wasmBuffer = await loadCartWasm();
                 if (event.data == "reload") {
                     runtime.reset(true);
-                } else {
-                    runtime.reset(false);
                 }
                 await runtime.load(wasmBuffer);
                 runtime.start();

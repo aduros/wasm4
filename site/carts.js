@@ -48,6 +48,12 @@ const CARTS = [
         github: "aduros",
     },
     {
+        slug: "palette-previewer",
+        title: "Palette Previewer",
+        author: "David Sims",
+        github: "thedavesims",
+    },
+    {
         slug: "sound-demo",
         title: "Sound Demo",
         author: "Bruno Garcia",

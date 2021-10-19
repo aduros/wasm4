@@ -65,6 +65,12 @@ const CARTS = [
         author: "Bruno Garcia",
         github: "aduros",
     },
+    {
+        slug: "plasma-cube",
+        title: "Plasma Cube",
+        author: "unnick",
+        github: "kcinnu",
+    },
 ];
 
 module.exports = CARTS;

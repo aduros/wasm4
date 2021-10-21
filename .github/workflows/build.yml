@@ -25,7 +25,7 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - if: matrix.config.os == "ubuntu-latest"
+            - if: matrix.config.os == 'ubuntu-latest'
               name: Install Local Dependencies
               run: |
                   sudo apt update

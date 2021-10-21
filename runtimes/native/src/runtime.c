@@ -91,17 +91,19 @@ void w4_runtimeRect (int x, int y, int width, int height) {
     w4_framebufferRect(x, y, width, height);
 }
 
-void w4_runtimeText (const char* str, int x, int y) {
+void w4_runtimeText (const uint8_t* str, int x, int y) {
     // printf("text: %s, %d, %d\n", str, x, y);
     w4_framebufferText(str, x, y);
 }
 
 void w4_runtimeTextUtf8 (const uint8_t* str, int byteLength, int x, int y) {
-    printf("TODO: textUtf8: %p, %d, %d, %d\n", str, byteLength, x, y);
+    // printf("textUtf8: %p, %d, %d, %d\n", str, byteLength, x, y);
+    w4_framebufferTextUtf8(str, byteLength, x, y);
 }
 
-void w4_runtimeTextUtf16 (const uint8_t* str, int byteLength, int x, int y) {
-    printf("TODO: textUtf16: %p, %d, %d, %d\n", str, byteLength, x, y);
+void w4_runtimeTextUtf16 (const uint16_t* str, int byteLength, int x, int y) {
+    // printf("textUtf16: %p, %d, %d, %d\n", str, byteLength, x, y);
+    w4_framebufferTextUtf16(str, byteLength, x, y);
 }
 
 void w4_runtimeTone (int frequency, int duration, int volume, int flags) {
@@ -118,19 +120,19 @@ int w4_runtimeDiskw (const uint8_t* src, int size) {
     return 0;
 }
 
-void w4_runtimeTrace (const char* str) {
+void w4_runtimeTrace (const uint8_t* str) {
     puts(str);
 }
 
 void w4_runtimeTraceUtf8 (const uint8_t* str, int byteLength) {
-    printf("TODO: traceUtf8: %p, %d\n", str, byteLength);
+    printf("%.*s\n", byteLength, str);
 }
 
-void w4_runtimeTraceUtf16 (const uint8_t* str, int byteLength) {
+void w4_runtimeTraceUtf16 (const uint16_t* str, int byteLength) {
     printf("TODO: traceUtf16: %p, %d\n", str, byteLength);
 }
 
-void w4_runtimeTracef (const char* str, const void* stack) {
+void w4_runtimeTracef (const uint8_t* str, const void* stack) {
     vprintf(str, (void*)&stack);
     putchar('\n');
 }

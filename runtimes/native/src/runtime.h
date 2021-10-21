@@ -27,18 +27,18 @@ void w4_runtimeHLine (int x, int y, int len);
 void w4_runtimeVLine (int x, int y, int len);
 void w4_runtimeOval (int x, int y, int width, int height);
 void w4_runtimeRect (int x, int y, int width, int height);
-void w4_runtimeText (const char* str, int x, int y);
+void w4_runtimeText (const uint8_t* str, int x, int y);
 void w4_runtimeTextUtf8 (const uint8_t* str, int byteLength, int x, int y);
-void w4_runtimeTextUtf16 (const uint8_t* str, int byteLength, int x, int y);
+void w4_runtimeTextUtf16 (const uint16_t* str, int byteLength, int x, int y);
 
 void w4_runtimeTone (int frequency, int duration, int volume, int flags);
 
 int w4_runtimeDiskr (uint8_t* dest, int size);
 int w4_runtimeDiskw (const uint8_t* src, int size);
 
-void w4_runtimeTrace (const char* str);
+void w4_runtimeTrace (const uint8_t* str);
 void w4_runtimeTraceUtf8 (const uint8_t* str, int byteLength);
-void w4_runtimeTraceUtf16 (const uint8_t* str, int byteLength);
-void w4_runtimeTracef (const char* str, const void* stack);
+void w4_runtimeTraceUtf16 (const uint16_t* str, int byteLength);
+void w4_runtimeTracef (const uint8_t* str, const void* stack);
 
 void w4_runtimeUpdate ();

@@ -97,7 +97,7 @@ static m3ApiRawFunction (textUtf8) {
 }
 
 static m3ApiRawFunction (textUtf16) {
-    m3ApiGetArgMem(const uint8_t*, str);
+    m3ApiGetArgMem(const uint16_t*, str);
     m3ApiGetArg(int, byteLength);
     m3ApiGetArg(int, x);
     m3ApiGetArg(int, y);
@@ -142,7 +142,7 @@ static m3ApiRawFunction (traceUtf8) {
 }
 
 static m3ApiRawFunction (traceUtf16) {
-    m3ApiGetArgMem(const uint8_t*, str);
+    m3ApiGetArgMem(const uint16_t*, str);
     m3ApiGetArg(int, byteLength);
     w4_runtimeTraceUtf16(str, byteLength);
     m3ApiSuccess();

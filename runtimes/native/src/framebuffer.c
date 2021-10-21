@@ -271,24 +271,42 @@ void w4_framebufferLine (int x1, int y1, int x2, int y2) {
     }
 }
 
-void w4_framebufferText (const char* str, int x, int y) {
-    int currentX = x;
-    while (*str) {
-        switch (*str) {
-        case 0:
-            return;
-        case 10:
+void w4_framebufferText (const uint8_t* str, int x, int y) {
+    for (int currentX = x; *str != '\0'; ++str) {
+        if (*str == 10) {
             y += 8;
             currentX = x;
-            break;
-        default:
+        } else {
             w4_framebufferBlit(font, currentX, y, 8, 8, 0, (*str - 32) << 3, 8,
                 false, false, false, false);
             currentX += 8;
-            break;
         }
+    }
+}
 
-        ++str;
+void w4_framebufferTextUtf8 (const uint8_t* str, int byteLength, int x, int y) {
+    for (int currentX = x; byteLength > 0; ++str, --byteLength) {
+        if (*str == 10) {
+            y += 8;
+            currentX = x;
+        } else {
+            w4_framebufferBlit(font, currentX, y, 8, 8, 0, (*str - 32) << 3, 8,
+                false, false, false, false);
+            currentX += 8;
+        }
+    }
+}
+
+void w4_framebufferTextUtf16 (const uint16_t* str, int byteLength, int x, int y) {
+    for (int currentX = x; byteLength > 0; ++str, byteLength -= 2) {
+        if (*str == 10) {
+            y += 8;
+            currentX = x;
+        } else {
+            w4_framebufferBlit(font, currentX, y, 8, 8, 0, (*str - 32) << 3, 8,
+                false, false, false, false);
+            currentX += 8;
+        }
     }
 }
 

@@ -20,7 +20,9 @@ void w4_framebufferLine (int x1, int y1, int x2, int y2);
 
 void w4_framebufferOval (int x, int y, int width, int height);
 
-void w4_framebufferText (const char* str, int x, int y);
+void w4_framebufferText (const uint8_t* str, int x, int y);
+void w4_framebufferTextUtf8 (const uint8_t* str, int byteLength, int x, int y);
+void w4_framebufferTextUtf16 (const uint16_t* str, int byteLength, int x, int y);
 
 void w4_framebufferBlit (const uint8_t* sprite, int dstX, int dstY, int width, int height,
     int srcX, int srcY, int srcStride, bool bpp2, bool flipX, bool flipY, bool rotate);

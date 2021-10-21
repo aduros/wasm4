@@ -9,12 +9,15 @@ jobs:
                 config:
                     - os: windows-latest
                       artifact: "windows"
+                      executable: runtimes/native/instdir/bin/wasm4.exe
 
                     - os: macos-latest
                       artifact: "mac"
+                      executable: runtimes/native/instdir/bin/wasm4
 
                     - os: ubuntu-latest
                       artifact: "linux"
+                      executable: runtimes/native/instdir/bin/wasm4
 
         name: Build Native Runtime (${{ matrix.config.artifact }})
         runs-on: ${{ matrix.config.os }}
@@ -51,7 +54,7 @@ jobs:
             - name: Upload Artifact
               uses: actions/upload-artifact@v1
               with:
-                  path: "runtimes/native/instdir/bin/wasm4${{ matrix.config.artifact == 'windows' ? '.exe' : '' }}"
+                  path: ${{ matrix.config.executable }}
                   name: ${{ matrix.config.artifact }}
 
     build-web-runtime:

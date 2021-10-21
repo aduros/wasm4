@@ -16,7 +16,7 @@ jobs:
                     - os: ubuntu-latest
                       artifact: "linux"
 
-        name: Native ${{ matrix.config.artifact }} Runtime
+        name: Build Native Runtime (${{ matrix.config.artifact }})
         runs-on: ${{ matrix.config.os }}
         defaults:
              run:
@@ -33,6 +33,9 @@ jobs:
 
             # - if: matrix.os == "windows-latest"
             #   run: choco install cmake
+
+            - name: Get Dependencies
+              run: git submodule update --init
 
             - name: Build
               run: |

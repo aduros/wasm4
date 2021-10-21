@@ -8,11 +8,11 @@ static const uint8_t font[1792] = { 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xc7
 static const uint16_t* drawColors;
 static uint8_t* framebuffer;
 
-static int min (int a, int b) {
+static int w4_min (int a, int b) {
     return a < b ? a : b;
 }
 
-static int max (int a, int b) {
+static int w4_max (int a, int b) {
     return a > b ? a : b;
 }
 
@@ -31,7 +31,7 @@ static void drawPointUnclipped (uint8_t color, int x, int y) {
 
 static void drawHLine (uint8_t color, int startX, int y, int endX) {
     int fillEnd = endX - (endX & 3);
-    int fillStart = min((startX + 3) & ~3, fillEnd);
+    int fillStart = w4_min((startX + 3) & ~3, fillEnd);
 
     if (fillEnd - fillStart > 3) {
         for (int xx = startX; xx < fillStart; xx++) {
@@ -70,8 +70,8 @@ void w4_framebufferHLine (int x, int y, int len) {
         return;
     }
 
-    int startX = max(0, x);
-    int endX = min(WIDTH, x + len);
+    int startX = w4_max(0, x);
+    int endX = w4_min(WIDTH, x + len);
     uint8_t strokeColor = (dc0 - 1) & 0x3;
     drawHLine(strokeColor, startX, y, endX);
 }
@@ -86,8 +86,8 @@ void w4_framebufferVLine (int x, int y, int len) {
         return;
     }
 
-    int startY = max(0, y);
-    int endY = min(HEIGHT, y + len);
+    int startY = w4_max(0, y);
+    int endY = w4_min(HEIGHT, y + len);
     uint8_t strokeColor = (dc0 - 1) & 0x3;
     for (int yy = startY; yy < endY; yy++) {
         drawPoint(strokeColor, x, yy);
@@ -95,12 +95,12 @@ void w4_framebufferVLine (int x, int y, int len) {
 }
 
 void w4_framebufferRect (int x, int y, int width, int height) {
-    int startX = max(0, x);
-    int startY = max(0, y);
+    int startX = w4_max(0, x);
+    int startY = w4_max(0, y);
     int endXUnclamped = x + width;
     int endYUnclamped = y + height;
-    int endX = min(endXUnclamped, WIDTH);
-    int endY = min(endYUnclamped, HEIGHT);
+    int endX = w4_min(endXUnclamped, WIDTH);
+    int endY = w4_min(endYUnclamped, HEIGHT);
 
     uint16_t dc = *drawColors;
     uint8_t dc0 = dc & 0xf;
@@ -172,8 +172,8 @@ void w4_framebufferOval (int x, int y, int width, int height) {
             drawPointUnclipped(strokeColor, x0 - x, y0 + y); /* III. Quadrant */
             drawPointUnclipped(strokeColor, x0 - x, y0 - y); /*  IV. Quadrant */
 
-            int start = max(x0 - x + 1, 0);
-            int end = min(x0 + x, WIDTH);
+            int start = w4_max(x0 - x + 1, 0);
+            int end = w4_min(x0 + x, WIDTH);
 
             if (dc0 != 0 && (end - start) > 0) {
                 drawHLine(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
@@ -214,8 +214,8 @@ void w4_framebufferOval (int x, int y, int width, int height) {
             if (2 * e + dy > 0) {
                 if (dc0 != 0) {
                     int w = x - ddx - 1;
-                    int start = max(x0 - w, 0);
-                    int end = min(x0 + w + 1, WIDTH);
+                    int start = w4_max(x0 - w, 0);
+                    int end = w4_min(x0 + w + 1, WIDTH);
 
                     if (end - start > 0) {
                         drawHLine(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
@@ -313,10 +313,10 @@ void w4_framebufferTextUtf16 (const uint16_t* str, int byteLength, int x, int y)
 void w4_framebufferBlit (const uint8_t* sprite, int dstX, int dstY, int width, int height,
     int srcX, int srcY, int srcStride, bool bpp2, bool flipX, bool flipY, bool rotate) {
 
-    int clipXMin = max(0, dstX) - dstX;
-    int clipYMin = max(0, dstY) - dstY;
-    int clipXMax = min(width, WIDTH - dstX);
-    int clipYMax = min(height, HEIGHT - dstY);
+    int clipXMin = w4_max(0, dstX) - dstX;
+    int clipYMin = w4_max(0, dstY) - dstY;
+    int clipXMax = w4_min(width, WIDTH - dstX);
+    int clipYMax = w4_min(height, HEIGHT - dstY);
     uint16_t colors = *drawColors;
 
     if (rotate) {

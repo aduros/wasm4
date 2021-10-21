@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.9)
 project(WASM4)
 
+# Prevent BUILD_SHARED_LIBS and other options from being cleared by vendor CMakeLists
+# https://stackoverflow.com/a/66342383
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+
 set(BUILD_SHARED_LIBS OFF)
 # set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 # set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)

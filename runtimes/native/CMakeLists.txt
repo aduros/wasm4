@@ -25,6 +25,9 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set_property(TARGET wasm4 PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
 
+# Required for Windows
+target_compile_definitions(wasm4 PRIVATE NOMAXMIN)
+
 target_include_directories(wasm4 PRIVATE "${CMAKE_SOURCE_DIR}/vendor/wasm3/source")
 target_include_directories(wasm4 PRIVATE "${CMAKE_SOURCE_DIR}/vendor/glad/include")
 target_link_libraries(wasm4 glfw PortAudio)

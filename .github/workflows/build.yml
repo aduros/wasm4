@@ -25,8 +25,11 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            # - if: matrix.os == "ubuntu-latest"
-            #   run: sudo apt-get install cmake
+            - if: matrix.os == "ubuntu-latest"
+              name: Install Local Dependencies
+              run: |
+                  sudo apt update
+                  sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
 
             # - if: matrix.os == "macos-latest"
             #   run: brew install cmake
@@ -34,7 +37,7 @@ jobs:
             # - if: matrix.os == "windows-latest"
             #   run: choco install cmake
 
-            - name: Get Dependencies
+            - name: Get Vendor Dependencies
               run: git submodule update --init
 
             - name: Build
@@ -48,11 +51,11 @@ jobs:
             - name: Upload Artifact
               uses: actions/upload-artifact@v1
               with:
-                  path: ./instdir/bin/wasm4
+                  path: runtimes/native/instdir/bin/wasm4
                   name: ${{ matrix.config.artifact }}
 
     build-web-runtime:
-        name: Web Runtime
+        name: Build Web Runtime
         runs-on: ubuntu-latest
         defaults:
             run:

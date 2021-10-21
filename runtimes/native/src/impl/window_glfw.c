@@ -11,6 +11,10 @@
 static uint32_t table[256];
 static GLuint paletteLocation;
 
+// Position and size of the viewport within the window, which may be smaller than the window size if
+// the window was forced to a non-square resolution
+int contentX, contentY, contentSize;
+
 static void initLookupTable () {
     // Create a lookup table for each byte mapping to 4 bytes:
     // 0bxxyyzzww --> 0bxx000000_yy000000_zz000000_ww000000
@@ -127,6 +131,10 @@ static void onFramebufferResized (GLFWwindow* window, int width, int height) {
     int x = width/2 - size/2;
     int y = height/2 - size/2;
     glViewport(x, y, size, size);
+
+    contentX = x;
+    contentY = y;
+    contentSize = size;
 }
 
 static void onGlfwError(int error, const char* description)
@@ -147,6 +155,7 @@ void w4_windowBoot (const char* title) {
     glfwSetFramebufferSizeCallback(window, onFramebufferResized);
     glfwSetWindowAspectRatio(window, 1, 1);
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
+    glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 
     glfwMakeContextCurrent(window);
     gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
@@ -155,6 +164,7 @@ void w4_windowBoot (const char* title) {
     initLookupTable();
 
     while (!glfwWindowShouldClose(window)) {
+        // Keyboard handling
         uint8_t gamepad = 0;
         if (glfwGetKey(window, GLFW_KEY_X)) {
             gamepad |= W4_BUTTON_X;
@@ -175,6 +185,21 @@ void w4_windowBoot (const char* title) {
             gamepad |= W4_BUTTON_DOWN;
         }
         w4_runtimeSetGamepad(0, gamepad);
+
+        // Mouse handling
+        double mouseX, mouseY;
+        uint8_t mouseButtons = 0;
+        glfwGetCursorPos(window, &mouseX, &mouseY);
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)) {
+            mouseButtons |= W4_MOUSE_LEFT;
+        }
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT)) {
+            mouseButtons |= W4_MOUSE_RIGHT;
+        }
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE)) {
+            mouseButtons |= W4_MOUSE_MIDDLE;
+        }
+        w4_runtimeSetMouse(160*(mouseX-contentX)/contentSize, 160*(mouseY-contentY)/contentSize, mouseButtons);
 
         w4_runtimeUpdate();
 

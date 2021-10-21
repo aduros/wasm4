@@ -11,9 +11,14 @@
 #define W4_BUTTON_UP 64
 #define W4_BUTTON_DOWN 128
 
+#define W4_MOUSE_LEFT 1
+#define W4_MOUSE_RIGHT 2
+#define W4_MOUSE_MIDDLE 4
+
 void w4_runtimeInit (uint8_t* memory);
 
 void w4_runtimeSetGamepad (int idx, uint8_t gamepad);
+void w4_runtimeSetMouse (int16_t x, int16_t y, uint8_t buttons);
 
 void w4_runtimeBlit (const uint8_t* sprite, int x, int y, int width, int height, int flags);
 void w4_runtimeBlitSub (const uint8_t* sprite, int x, int y, int width, int height, int srcX, int srcY, int stride, int flags);

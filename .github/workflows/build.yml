@@ -51,7 +51,7 @@ jobs:
             - name: Upload Artifact
               uses: actions/upload-artifact@v1
               with:
-                  path: runtimes/native/instdir/bin/wasm4${{ matrix.config.artifact == 'windows' ? '.exe' : '' }}
+                  path: "runtimes/native/instdir/bin/wasm4${{ matrix.config.artifact == 'windows' ? '.exe' : '' }}"
                   name: ${{ matrix.config.artifact }}
 
     build-web-runtime:

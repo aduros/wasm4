@@ -1,0 +1,89 @@
+name: Build
+on: [push, pull_request]
+
+jobs:
+    build-native-runtime:
+        strategy:
+            fail-fast: false
+            matrix:
+                config:
+                    - os: windows-latest
+                      artifact: "windows"
+
+                    - os: macos-latest
+                      artifact: "mac"
+
+                    - os: ubuntu-latest
+                      artifact: "linux"
+
+        name: Native ${{ matrix.config.artifact }} Runtime
+        runs-on: ${{ matrix.config.os }}
+        defaults:
+             run:
+                 working-directory: runtimes/native
+
+        steps:
+            - uses: actions/checkout@v2
+
+            # - if: matrix.os == "ubuntu-latest"
+            #   run: sudo apt-get install cmake
+
+            # - if: matrix.os == "macos-latest"
+            #   run: brew install cmake
+
+            # - if: matrix.os == "windows-latest"
+            #   run: choco install cmake
+
+            - name: Build
+              run: |
+                  cmake -B build -DCMAKE_BUILD_TYPE=Release
+                  cmake --build build --config Release
+
+            - name: Install
+              run: cmake --install build --prefix instdir --config Release --strip
+
+            - name: Upload Artifact
+              uses: actions/upload-artifact@v1
+              with:
+                  path: ./instdir/bin/wasm4
+                  name: ${{ matrix.config.artifact }}
+
+    build-web-runtime:
+        name: Web Runtime
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: runtimes/web
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Build
+              run: |
+                  npm ci
+                  npm run build
+
+    # release:
+    #     if: startsWith(github.ref, "refs/tags/v")
+    #     runs-on: ubuntu-latest
+    #     needs: [build-web-runtime, build-native-runtime]
+
+    #     steps:
+    #         - name: Package release
+    #           run: |
+    #               rm -rf cli/runtime
+    #               cp -r runtimes/web/dist cli/runtime
+    #               cp README.md LICENSE.txt cli
+
+    #         - name: Deploy Standalone
+    #           run: |
+    #               npm install -g pkg
+    #               pkg --compress GZip --out-path build --targets node12-win,node12-mac,node12-linux
+    #               mkdir build/wasm4-${GITHUB_REF#refs/tags/}-{windows,macos,linux}
+    #               mv build/wasm4-${GITHUB_REF#refs/tags/}-windows
+
+    #         - name: Deploy NPM
+    #           run: echo npm publish cli --dry-run
+
+    #         - name: Deploy Github
+    #           uses: softprops/action-gh-release@v1

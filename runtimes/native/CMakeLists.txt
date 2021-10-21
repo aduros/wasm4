@@ -28,3 +28,5 @@ endif ()
 target_include_directories(wasm4 PRIVATE "${CMAKE_SOURCE_DIR}/vendor/wasm3/source")
 target_include_directories(wasm4 PRIVATE "${CMAKE_SOURCE_DIR}/vendor/glad/include")
 target_link_libraries(wasm4 glfw PortAudio)
+
+install(TARGETS wasm4 RUNTIME DESTINATION bin)

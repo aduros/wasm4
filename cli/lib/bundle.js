@@ -84,12 +84,7 @@ async function bundleHtml (cartFile, htmlFile, opts) {
     console.log(`OK! Bundled ${htmlFile}.`);
 }
 
-async function bundleExecutable (cartFile, outputFile, opts) {
-    const sourceFile = process.env.W4_NATIVE_BINARY;
-    if (!sourceFile) {
-        throw new Error("Currently to bundle for native platforms you must set $W4_NATIVE_BINARY to the path of the prebuilt native binary.");
-    }
-
+async function bundleExecutable (cartFile, sourceFile, outputFile, opts) {
     const [source, cart] = await Promise.all([
         fs.readFile(sourceFile),
         fs.readFile(cartFile),
@@ -118,14 +113,16 @@ async function bundle(cartFile, opts) {
     if (opts.html) {
         await bundleHtml(cartFile, opts.html, opts);
     }
+
+    const nativesDir = path.resolve(__dirname, "../assets/natives");
     if (opts.windows) {
-        await bundleExecutable(cartFile, opts.windows, opts);
+        await bundleExecutable(cartFile, nativesDir+"/wasm4-windows.exe", opts.windows, opts);
     }
     if (opts.mac) {
-        await bundleExecutable(cartFile, opts.mac, opts);
+        await bundleExecutable(cartFile, nativesDir+"/wasm4-mac", opts.mac, opts);
     }
     if (opts.linux) {
-        await bundleExecutable(cartFile, opts.linux, opts);
+        await bundleExecutable(cartFile, nativesDir+"/wasm4-linux", opts.linux, opts);
     }
 }
 

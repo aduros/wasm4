@@ -90,7 +90,7 @@ jobs:
               run: |
                   npm ci
                   npm install -g pkg
-                  pkg --compress GZip --out-path ../pkgdir --targets node12-win,node12-mac,node12-linux .
+                  pkg --debug --compress GZip --out-path ../pkgdir --targets node12-win,node12-mac,node12-linux .
 
             - name: Upload artifact
               uses: actions/upload-artifact@v2

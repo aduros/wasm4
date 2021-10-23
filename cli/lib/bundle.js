@@ -113,16 +113,17 @@ async function bundle(cartFile, opts) {
     if (opts.html) {
         await bundleHtml(cartFile, opts.html, opts);
     }
-
-    const nativesDir = path.resolve(__dirname, "../assets/natives");
     if (opts.windows) {
-        await bundleExecutable(cartFile, nativesDir+"/wasm4-windows.exe", opts.windows, opts);
+        await bundleExecutable(cartFile,
+            path.resolve(__dirname, "../assets/natives/wasm4-windows.exe"), opts.windows, opts);
     }
     if (opts.mac) {
-        await bundleExecutable(cartFile, nativesDir+"/wasm4-mac", opts.mac, opts);
+        await bundleExecutable(cartFile,
+            path.resolve(__dirname, "../assets/natives/wasm4-mac"), opts.mac, opts);
     }
     if (opts.linux) {
-        await bundleExecutable(cartFile, nativesDir+"/wasm4-linux", opts.linux, opts);
+        await bundleExecutable(cartFile,
+            path.resolve(__dirname, "../assets/natives/wasm4-linux"), opts.linux, opts);
     }
 }
 

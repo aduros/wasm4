@@ -149,6 +149,8 @@ void w4_windowBoot (const char* title) {
         return;
     }
 
+    glfwSwapBuffers(0);
+    
     glfwSetErrorCallback(onGlfwError);
 
     GLFWwindow* window = glfwCreateWindow(2*160, 2*160, title, NULL, NULL);
@@ -163,48 +165,62 @@ void w4_windowBoot (const char* title) {
     initOpenGL();
     initLookupTable();
 
+    double frameStep = 1.0 / 60.0;
+    double now = 0;
+    double previous = glfwGetTime();
+    double drawFrame = 0;
+
     while (!glfwWindowShouldClose(window)) {
-        // Keyboard handling
-        uint8_t gamepad = 0;
-        if (glfwGetKey(window, GLFW_KEY_X)) {
-            gamepad |= W4_BUTTON_X;
-        }
-        if (glfwGetKey(window, GLFW_KEY_Z)) {
-            gamepad |= W4_BUTTON_Z;
-        }
-        if (glfwGetKey(window, GLFW_KEY_LEFT)) {
-            gamepad |= W4_BUTTON_LEFT;
-        }
-        if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
-            gamepad |= W4_BUTTON_RIGHT;
-        }
-        if (glfwGetKey(window, GLFW_KEY_UP)) {
-            gamepad |= W4_BUTTON_UP;
-        }
-        if (glfwGetKey(window, GLFW_KEY_DOWN)) {
-            gamepad |= W4_BUTTON_DOWN;
-        }
-        w4_runtimeSetGamepad(0, gamepad);
 
-        // Mouse handling
-        double mouseX, mouseY;
-        uint8_t mouseButtons = 0;
-        glfwGetCursorPos(window, &mouseX, &mouseY);
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)) {
-            mouseButtons |= W4_MOUSE_LEFT;
-        }
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT)) {
-            mouseButtons |= W4_MOUSE_RIGHT;
-        }
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE)) {
-            mouseButtons |= W4_MOUSE_MIDDLE;
-        }
-        w4_runtimeSetMouse(160*(mouseX-contentX)/contentSize, 160*(mouseY-contentY)/contentSize, mouseButtons);
+        now = glfwGetTime();
+        drawFrame += (now - previous)/frameStep;
+        previous = now;
 
-        w4_runtimeUpdate();
+        if (drawFrame > 1.0) {
+            drawFrame -= 1;
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+            // Keyboard handling
+            uint8_t gamepad = 0;
+            if (glfwGetKey(window, GLFW_KEY_X)) {
+                gamepad |= W4_BUTTON_X;
+            }
+            if (glfwGetKey(window, GLFW_KEY_Z)) {
+                gamepad |= W4_BUTTON_Z;
+            }
+            if (glfwGetKey(window, GLFW_KEY_LEFT)) {
+                gamepad |= W4_BUTTON_LEFT;
+            }
+            if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
+                gamepad |= W4_BUTTON_RIGHT;
+            }
+            if (glfwGetKey(window, GLFW_KEY_UP)) {
+                gamepad |= W4_BUTTON_UP;
+            }
+            if (glfwGetKey(window, GLFW_KEY_DOWN)) {
+                gamepad |= W4_BUTTON_DOWN;
+            }
+            w4_runtimeSetGamepad(0, gamepad);
+
+            // Mouse handling
+            double mouseX, mouseY;
+            uint8_t mouseButtons = 0;
+            glfwGetCursorPos(window, &mouseX, &mouseY);
+            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)) {
+                mouseButtons |= W4_MOUSE_LEFT;
+            }
+            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT)) {
+                mouseButtons |= W4_MOUSE_RIGHT;
+            }
+            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE)) {
+                mouseButtons |= W4_MOUSE_MIDDLE;
+            }
+            w4_runtimeSetMouse(160*(mouseX-contentX)/contentSize, 160*(mouseY-contentY)/contentSize, mouseButtons);
+
+            w4_runtimeUpdate();
+
+            glfwSwapBuffers(window);
+            glfwPollEvents();
+        }
     }
 
     glfwDestroyWindow(window);

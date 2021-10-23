@@ -71,6 +71,12 @@ const CARTS = [
         author: "unnick",
         github: "kcinnu",
     },
+    {
+        slug: "minesweeper",
+        title: "Minesweeper",
+        author: "Claudio Mattera",
+        github: "claudiomattera",
+    },
 ];
 
 module.exports = CARTS;

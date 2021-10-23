@@ -133,8 +133,11 @@ void w4_runtimeTraceUtf16 (const uint16_t* str, int byteLength) {
 }
 
 void w4_runtimeTracef (const uint8_t* str, const void* stack) {
-    vprintf(str, (void*)&stack);
-    putchar('\n');
+    puts(str);
+
+    // This seems to crash on Linux release builds
+    // vprintf(str, (void*)&stack);
+    // putchar('\n');
 }
 
 void w4_runtimeUpdate () {

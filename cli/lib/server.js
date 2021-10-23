@@ -47,7 +47,7 @@ function start (cartFile, opts) {
             reloadTimeoutId = setTimeout(() => {
                 let sentReload = false;
                 for (let client of wsServer.clients) {
-                    client.send("hotswap");
+                    client.send("reload");
                     sentReload = true;
                 }
                 if (sentReload) {

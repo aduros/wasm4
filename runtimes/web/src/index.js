@@ -83,11 +83,9 @@ async function loadCartWasm () {
     if (websocket != null) {
         websocket.addEventListener("message", async event => {
             switch (event.data) {
-            case "reload": case "hotswap":
+            case "reload":
                 const wasmBuffer = await loadCartWasm();
-                if (event.data == "reload") {
-                    runtime.reset(true);
-                }
+                runtime.reset(true);
                 await runtime.load(wasmBuffer);
                 runtime.start();
                 break;

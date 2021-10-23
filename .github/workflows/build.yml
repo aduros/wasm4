@@ -136,6 +136,6 @@ jobs:
             - name: Publish to NPM
               run: |
                   npm config set //registry.npmjs.org/:_authToken=$NPM_TOKEN
-                  npm publish artifacts/wasm4-npm.tar.gz
+                  npm publish ./artifacts/wasm4-npm.tar.gz
               env:
                   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -94,7 +94,7 @@ export class Framebuffer {
         const endY = Math.min(HEIGHT, y + len);
         const strokeColor = (dc0 - 1) & 0x3;
         for (let yy = startY; yy < endY; yy++) {
-            this.drawPoint(color, x, yy);
+            this.drawPoint(strokeColor, x, yy);
         }
     }
 

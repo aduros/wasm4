@@ -1,5 +1,11 @@
 const CARTS = [
     {
+        slug: "minesweeper",
+        title: "Minesweeper",
+        author: "Claudio Mattera",
+        github: "claudiomattera",
+    },
+    {
         slug: "wormhole",
         title: "Wormhole",
         author: "David Sims",
@@ -70,12 +76,6 @@ const CARTS = [
         title: "Plasma Cube",
         author: "unnick",
         github: "kcinnu",
-    },
-    {
-        slug: "minesweeper",
-        title: "Minesweeper",
-        author: "Claudio Mattera",
-        github: "claudiomattera",
     },
 ];
 

@@ -88,8 +88,10 @@ jobs:
 
             - name: Build CLI
               run: |
+                  cp ../README.md ../LICENSE.txt .
                   mkdir -p ../cli-build
                   mv `npm pack` ../cli-build/wasm4-npm.tar.gz
+
                   npm ci
                   npm install -g pkg
                   pkg --compress GZip --out-path ../cli-build --targets node12-win,node12-mac,node12-linux .

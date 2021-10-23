@@ -115,21 +115,21 @@ jobs:
 
             - name: Create release zips
               run: |
-                  VERSION=${GITHUB_REF#refs/tags/}
-                  echo wasm4-$VERSION
                   chmod +x artifacts/wasm4-*
-                  mkdir -p wasm4-$VERSION-windows wasm4-$VERSION-mac wasm4-$VERSION-linux
-                  mv artifacts/wasm4-win.exe wasm4-$VERSION-windows/w4.exe
-                  mv artifacts/wasm4-macos wasm4-$VERSION-mac/w4
-                  mv artifacts/wasm4-linux wasm4-$VERSION-linux/w4
-                  zip -r wasm4-$VERSION-windows.zip wasm4-$VERSION-windows
-                  zip -r wasm4-$VERSION-mac.zip wasm4-$VERSION-mac
-                  zip -r wasm4-$VERSION-linux.zip wasm4-$VERSION-linux
+
+                  mv artifacts/wasm4-win.exe w4.exe
+                  zip w4-windows.zip w4.exe
+
+                  mv artifacts/wasm4-macos w4
+                  zip w4-mac.zip w4
+
+                  mv artifacts/wasm4-linux w4
+                  zip w4-linux.zip w4
 
             - name: Publish GitHub release
               uses: softprops/action-gh-release@v1
               with:
-                  files: wasm4-*.zip
+                  files: w4-*.zip
 
             - name: Publish to NPM
               run: |

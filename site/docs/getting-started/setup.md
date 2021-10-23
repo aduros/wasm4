@@ -6,9 +6,9 @@ import TabItem from '@theme/TabItem';
 Download WASM-4:
 
 <p>
-<a href="pathname:///download/wasm4-windows.zip" className="button button--primary button--outline button--lg margin--md">📥 Windows</a>
-<a href="pathname:///download/wasm4-macos.zip" className="button button--primary button--outline button--lg margin--md">📥 macOS</a>
-<a href="pathname:///download/wasm4-linux.zip" className="button button--primary button--outline button--lg margin--md">📥 Linux</a>
+<a href="https://github.com/aduros/wasm4/releases/latest/download/w4-windows.zip" className="button button--primary button--outline button--lg margin--md">📥 Windows</a>
+<a href="https://github.com/aduros/wasm4/releases/latest/download/w4-mac.zip" className="button button--primary button--outline button--lg margin--md">📥 macOS</a>
+<a href="https://github.com/aduros/wasm4/releases/latest/download/w4-linux.zip" className="button button--primary button--outline button--lg margin--md">📥 Linux</a>
 </p>
 
 <Button/>

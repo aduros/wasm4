@@ -9,34 +9,6 @@ cd "$runtime"
 npm ci
 npm run build
 
-# Build standalone w4
-cd "$cli"
-npm ci
-
-download="$site/static/download"
-rm -rf "$download"
-mkdir "$download"
-npm install -g pkg
-pkg --compress GZip --out-path "$download/bin" --targets node12-win,node12-mac,node12-linux "$cli"
-cd "$download"
-
-mkdir wasm4-linux
-mv bin/wasm4-linux wasm4-linux/w4
-zip -r wasm4-linux.zip wasm4-linux
-rm -rf wasm4-linux
-
-mkdir wasm4-macos
-mv bin/wasm4-macos wasm4-macos/w4
-zip -r wasm4-macos.zip wasm4-macos
-rm -rf wasm4-macos
-
-mkdir wasm4-windows
-mv bin/wasm4-win.exe wasm4-windows/w4.exe
-zip -r wasm4-windows.zip wasm4-windows
-rm -rf wasm4-windows
-
-rm -rf bin
-
 # Build and deploy site
 cd "$site"
 rm -rf static/embed

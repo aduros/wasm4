@@ -51,6 +51,20 @@ static void drawHLine (uint8_t color, int startX, int y, int endX) {
     }
 }
 
+static void drawHLineUnclipped (uint8_t color, int startX, int y, int endX) {
+    if (y >= 0 && y < HEIGHT) {
+        if (startX < 0) {
+            startX = 0;
+        }
+        if (endX > WIDTH) {
+            endX = WIDTH;
+        }
+        if (startX < endX) {
+            drawHLine(color, startX, y, endX);
+        }
+    }
+}
+
 void w4_framebufferInit (const uint16_t* drawColors_, uint8_t* framebuffer_) {
     drawColors = drawColors_;
     framebuffer = framebuffer_;
@@ -61,19 +75,13 @@ void w4_framebufferClear () {
 }
 
 void w4_framebufferHLine (int x, int y, int len) {
-    if (x + len <= 0 || y < 0 || y >= HEIGHT) {
-        return;
-    }
-
     uint8_t dc0 = *drawColors & 0xf;
     if (dc0 == 0) {
         return;
     }
 
-    int startX = w4_max(0, x);
-    int endX = w4_min(WIDTH, x + len);
     uint8_t strokeColor = (dc0 - 1) & 0x3;
-    drawHLine(strokeColor, startX, y, endX);
+    drawHLineUnclipped(strokeColor, x, y, x + len);
 }
 
 void w4_framebufferVLine (int x, int y, int len) {
@@ -172,12 +180,11 @@ void w4_framebufferOval (int x, int y, int width, int height) {
             drawPointUnclipped(strokeColor, x0 - x, y0 + y); /* III. Quadrant */
             drawPointUnclipped(strokeColor, x0 - x, y0 - y); /*  IV. Quadrant */
 
-            int start = w4_max(x0 - x + 1, 0);
-            int end = w4_min(x0 + x, WIDTH);
-
-            if (dc0 != 0 && (end - start) > 0) {
-                drawHLine(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
-                drawHLine(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
+            if (dc0 != 0) {
+                int start = x0 - x + 1;
+                int end = x0 + x;
+                drawHLineUnclipped(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
+                drawHLineUnclipped(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
             }
 
             y++;
@@ -214,13 +221,10 @@ void w4_framebufferOval (int x, int y, int width, int height) {
             if (2 * e + dy > 0) {
                 if (dc0 != 0) {
                     int w = x - ddx - 1;
-                    int start = w4_max(x0 - w, 0);
-                    int end = w4_min(x0 + w + 1, WIDTH);
-
-                    if (end - start > 0) {
-                        drawHLine(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
-                        drawHLine(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
-                    }
+                    int start = x0 - w;
+                    int end = x0 + w + 1;
+                    drawHLineUnclipped(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
+                    drawHLineUnclipped(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
                 }
 
                 y--;

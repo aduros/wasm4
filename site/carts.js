@@ -60,6 +60,12 @@ const CARTS = [
         github: "thedavesims",
     },
     {
+        slug: "mouse-demo",
+        title: "Mouse Demo",
+        author: "David Sims",
+        github: "thedavesims",
+    },
+    {
         slug: "sound-demo",
         title: "Sound Demo",
         author: "Bruno Garcia",

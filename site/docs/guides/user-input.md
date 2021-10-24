@@ -106,7 +106,24 @@ void update () {
 ```
 
 ```rust
-// Rust example coming soon 🦀
+static mut PREVIOUS_GAMEPAD: u8 = 0;
+
+#[no_mangle]
+fn update() {
+    let (pressed_this_frame, ..) = unsafe {
+        let previous = PREVIOUS_GAMEPAD;
+        let gamepad = *GAMEPAD1;
+        // Only the buttons that were pressed down this frame
+        let pressed_this_frame = gamepad & (gamepad ^ previous);
+        PREVIOUS_GAMEPAD = gamepad;
+
+        (pressed_this_frame, gamepad, previous)
+    };
+
+    if pressed_this_frame & BUTTON_RIGHT != 0 {
+        trace("Right button was just pressed!");
+    }
+}
 ```
 
 ```go

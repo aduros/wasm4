@@ -63,7 +63,6 @@ int main (int argc, const char* argv[]) {
     w4_wasmLoadModule(cartBytes, cartLength);
 
     w4_wasmCallStart();
-    w4_wasmCallUpdate();
 
     w4_windowBoot(title);
 }

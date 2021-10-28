@@ -27,15 +27,14 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
+              with:
+                  submodules: true
 
             - if: matrix.config.os == 'ubuntu-latest'
               name: Install local dependencies
               run: |
                   sudo apt update
                   sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
-
-            - name: Get vendor dependencies
-              run: git submodule update --init
 
             - name: Build
               run: |

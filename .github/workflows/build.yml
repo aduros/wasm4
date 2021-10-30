@@ -10,7 +10,7 @@ jobs:
                     - os: windows-latest
                       artifact: "windows"
                       wasm4: bin/wasm4.exe
-                      libretro: lib/wasm4_libretro.dll
+                      libretro: bin/wasm4_libretro.dll
 
                     - os: macos-latest
                       artifact: "mac"

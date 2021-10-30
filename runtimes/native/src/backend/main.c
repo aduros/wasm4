@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "runtime.h"
-#include "window.h"
-#include "wasm.h"
+#include "../runtime.h"
+#include "../window.h"
+#include "../wasm.h"
 
 typedef struct {
     // Should be the 4 byte ASCII string "CART" (1414676803)

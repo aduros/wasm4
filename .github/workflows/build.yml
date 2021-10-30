@@ -8,16 +8,19 @@ jobs:
             matrix:
                 config:
                     - os: windows-latest
-                      artifact: "runtime-windows"
-                      executable: runtimes/native/instdir/bin/wasm4.exe
+                      artifact: "windows"
+                      wasm4: bin/wasm4.exe
+                      libretro: lib/wasm4_libretro.dll
 
                     - os: macos-latest
-                      artifact: "runtime-mac"
-                      executable: runtimes/native/instdir/bin/wasm4
+                      artifact: "mac"
+                      wasm4: bin/wasm4
+                      libretro: lib/wasm4_libretro.dylib
 
                     - os: ubuntu-latest
-                      artifact: "runtime-linux"
-                      executable: runtimes/native/instdir/bin/wasm4
+                      artifact: "linux"
+                      wasm4: bin/wasm4
+                      libretro: lib/wasm4_libretro.so
 
         name: Build ${{ matrix.config.artifact }}
         runs-on: ${{ matrix.config.os }}
@@ -44,11 +47,17 @@ jobs:
             - name: Install
               run: cmake --install build --prefix instdir --config Release --strip
 
-            - name: Upload artifact
+            - name: Upload wasm4 artifact
               uses: actions/upload-artifact@v2
               with:
-                  path: ${{ matrix.config.executable }}
-                  name: ${{ matrix.config.artifact }}
+                  path: runtimes/native/instdir/${{ matrix.config.wasm4 }}
+                  name: wasm4-${{ matrix.config.artifact }}
+
+            - name: Upload libretro artifact
+              uses: actions/upload-artifact@v2
+              with:
+                  path: runtimes/native/instdir/${{ matrix.config.libretro }}
+                  name: wasm4-libretro-${{ matrix.config.artifact }}
 
     build-cli:
         name: Build w4 CLI
@@ -81,9 +90,9 @@ jobs:
               run: |
                   mkdir -p assets/natives
                   ls -R ../artifacts
-                  mv ../artifacts/runtime-windows/wasm4.exe assets/natives/wasm4-windows.exe
-                  mv ../artifacts/runtime-mac/wasm4 assets/natives/wasm4-mac
-                  mv ../artifacts/runtime-linux/wasm4 assets/natives/wasm4-linux
+                  mv ../artifacts/wasm4-windows/wasm4.exe assets/natives/wasm4-windows.exe
+                  mv ../artifacts/wasm4-mac/wasm4 assets/natives/wasm4-mac
+                  mv ../artifacts/wasm4-linux/wasm4 assets/natives/wasm4-linux
 
             - name: Build CLI
               run: |

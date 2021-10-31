@@ -20,12 +20,19 @@ typedef struct {
     uint8_t mouseButtons;
     uint8_t _reserved[129];
     uint8_t framebuffer[WIDTH*HEIGHT>>2];
+    uint8_t _user[58975];
 } Memory;
 
 typedef struct {
     uint16_t size;
     uint8_t data[1024];
 } Disk;
+
+typedef struct {
+    Memory memory;
+    Disk disk;
+    bool firstFrame;
+} SerializedState;
 
 static Memory* memory;
 static Disk* disk;
@@ -173,4 +180,22 @@ void w4_runtimeUpdate () {
     }
     w4_wasmCallUpdate();
     w4_windowComposite(memory->palette, memory->framebuffer);
+}
+
+int w4_runtimeSerializeSize () {
+    return sizeof(SerializedState);
+}
+
+void w4_runtimeSerialize (void* dest) {
+    SerializedState* state = dest;
+    memcpy(&state->memory, memory, 0xffff);
+    memcpy(&state->disk, disk, sizeof(Disk));
+    state->firstFrame = firstFrame;
+}
+
+void w4_runtimeUnserialize (const void* src) {
+    const SerializedState* state = src;
+    memcpy(memory, &state->memory, 0xffff);
+    memcpy(disk, &state->disk, sizeof(Disk));
+    firstFrame = state->firstFrame;
 }

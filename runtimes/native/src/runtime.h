@@ -42,3 +42,7 @@ void w4_runtimeTraceUtf16 (const uint16_t* str, int byteLength);
 void w4_runtimeTracef (const uint8_t* str, const void* stack);
 
 void w4_runtimeUpdate ();
+
+int w4_runtimeSerializeSize ();
+void w4_runtimeSerialize (void* dest);
+void w4_runtimeUnserialize (const void* src);

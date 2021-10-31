@@ -60,15 +60,23 @@ void retro_set_controller_port_device (unsigned port, unsigned device) {
 }
 
 size_t retro_serialize_size () {
-    return 0;
+    return w4_runtimeSerializeSize();
 }
 
-bool retro_serialize (void* data, size_t size) {
-    return false;
+bool retro_serialize (void* dest, size_t size) {
+    if (size < w4_runtimeSerializeSize()) {
+        return false;
+    }
+    w4_runtimeSerialize(dest);
+    return true;
 }
 
-bool retro_unserialize (const void* data, size_t size) {
-    return false;
+bool retro_unserialize (const void* src, size_t size) {
+    if (size < w4_runtimeSerializeSize()) {
+        return false;
+    }
+    w4_runtimeUnserialize(src);
+    return true;
 }
 
 void retro_cheat_reset () {

@@ -16,8 +16,6 @@ static uint8_t* wasmCopy = NULL;
 // 1024 bytes plus the 2 byte size header
 static uint8_t disk[1026] = { 0 };
 
-static bool firstFrame = false;
-
 unsigned retro_api_version () {
     return RETRO_API_VERSION;
 }
@@ -126,8 +124,6 @@ bool retro_load_game (const struct retro_game_info* game) {
     w4_runtimeInit(memory, disk);
     w4_wasmLoadModule(data, game->size);
 
-    firstFrame = true;
-
     return true;
 }
 
@@ -163,12 +159,6 @@ void retro_get_system_av_info (struct retro_system_av_info* info) {
 }
 
 void retro_run () {
-    // start() needs to be deferred to retro_run(), after retro_get_memory*() is set up
-    if (firstFrame) {
-        firstFrame = false;
-        w4_wasmCallStart();
-    }
-
     input_poll_cb();
 
     // Gamepad handling

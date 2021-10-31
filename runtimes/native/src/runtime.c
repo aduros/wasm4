@@ -29,10 +29,12 @@ typedef struct {
 
 static Memory* memory;
 static Disk* disk;
+static bool firstFrame;
 
 void w4_runtimeInit (uint8_t* memoryBytes, uint8_t* diskBytes) {
     memory = (Memory*)memoryBytes;
     disk = (Disk*)diskBytes;
+    firstFrame = true;
 
     // Set memory to initial state
     memset(memory, 0, 0xffff);
@@ -163,7 +165,12 @@ void w4_runtimeTracef (const uint8_t* str, const void* stack) {
 }
 
 void w4_runtimeUpdate () {
-    w4_framebufferClear();
+    if (firstFrame) {
+        firstFrame = false;
+        w4_wasmCallStart();
+    } else {
+        w4_framebufferClear();
+    }
     w4_wasmCallUpdate();
     w4_windowComposite(memory->palette, memory->framebuffer);
 }

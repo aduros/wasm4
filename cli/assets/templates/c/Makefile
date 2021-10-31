@@ -2,8 +2,8 @@ ifndef WASI_SDK_PATH
 $(error Download the WASI SDK (https://github.com/WebAssembly/wasi-sdk) and set $$WASI_SDK_PATH)
 endif
 
-CC = $(WASI_SDK_PATH)/bin/clang --sysroot=$(WASI_SDK_PATH)/share/wasi-sysroot
-CXX = $(WASI_SDK_PATH)/bin/clang++ --sysroot=$(WASI_SDK_PATH)/share/wasi-sysroot
+CC = $(WASI_SDK_PATH)/bin/clang --sysroot="$(WASI_SDK_PATH)/share/wasi-sysroot"
+CXX = $(WASI_SDK_PATH)/bin/clang++ --sysroot="$(WASI_SDK_PATH)/share/wasi-sysroot"
 
 # Optional dependency from binaryen for smaller builds
 WASM_OPT = wasm-opt
@@ -33,6 +33,14 @@ OBJECTS = $(patsubst src/%.c, build/%.o, $(wildcard src/*.c))
 OBJECTS += $(patsubst src/%.cpp, build/%.o, $(wildcard src/*.cpp))
 DEPS = $(OBJECTS:.o=.d)
 
+ifeq ($(OS), Windows_NT)
+	MKDIR = md
+	RMDIR = rd /s /q
+else
+	MKDIR = mkdir -p
+	RMDIR = rm -rf
+endif
+
 all: build/cart.wasm
 
 # Link cart.wasm from all object files and run wasm-opt
@@ -48,16 +56,16 @@ endif
 
 # Compile C sources
 build/%.o: src/%.c
-	@mkdir -p build
+	@$(MKDIR) build
 	$(CC) -c $< -o $@ $(CFLAGS)
 
 # Compile C++ sources
 build/%.o: src/%.cpp
-	@mkdir -p build
+	@$(MKDIR) build
 	$(CXX) -c $< -o $@ $(CFLAGS)
 
 .PHONY: clean
 clean:
-	rm -rf build
+	$(RMDIR) build
 
 -include $(DEPS)

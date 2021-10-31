@@ -22,10 +22,17 @@ typedef struct {
     uint8_t framebuffer[WIDTH*HEIGHT>>2];
 } Memory;
 
-static Memory* memory;
+typedef struct {
+    uint16_t size;
+    uint8_t data[1024];
+} Disk;
 
-void w4_runtimeInit (uint8_t* memoryBytes) {
+static Memory* memory;
+static Disk* disk;
+
+void w4_runtimeInit (uint8_t* memoryBytes, uint8_t* diskBytes) {
     memory = (Memory*)memoryBytes;
+    disk = (Disk*)diskBytes;
 
     // Set memory to initial state
     memset(memory, 0, 0xffff);
@@ -111,13 +118,28 @@ void w4_runtimeTone (int frequency, int duration, int volume, int flags) {
 }
 
 int w4_runtimeDiskr (uint8_t* dest, int size) {
-    printf("TODO: diskr: %p, %d\n", dest, size);
-    return 0;
+    if (!disk) {
+        return 0;
+    }
+
+    if (size > disk->size) {
+        size = disk->size;
+    }
+    memcpy(dest, disk->data, size);
+    return size;
 }
 
 int w4_runtimeDiskw (const uint8_t* src, int size) {
-    printf("TODO: diskw: %p, %d\n", src, size);
-    return 0;
+    if (!disk) {
+        return 0;
+    }
+
+    if (size > 1024) {
+        size = 1024;
+    }
+    disk->size = size;
+    memcpy(disk->data, src, size);
+    return size;
 }
 
 void w4_runtimeTrace (const uint8_t* str) {

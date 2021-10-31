@@ -13,6 +13,11 @@ static retro_input_state_t input_state_cb;
 
 static uint8_t* wasmCopy = NULL;
 
+// 1024 bytes plus the 2 byte size header
+static uint8_t disk[1026] = { 0 };
+
+static bool firstFrame = false;
+
 unsigned retro_api_version () {
     return RETRO_API_VERSION;
 }
@@ -75,11 +80,11 @@ void retro_cheat_set (unsigned index, bool enabled, const char *code) {
 }
 
 void* retro_get_memory_data (unsigned id) {
-    return NULL;
+    return (id == RETRO_MEMORY_SAVE_RAM) ? disk : NULL;
 }
 
 size_t retro_get_memory_size (unsigned id) {
-    return 0;
+    return (id == RETRO_MEMORY_SAVE_RAM) ? sizeof(disk) : 0;
 }
 
 void retro_get_system_info (struct retro_system_info* info) {
@@ -118,9 +123,10 @@ bool retro_load_game (const struct retro_game_info* game) {
     }
 
     uint8_t* memory = w4_wasmInit();
-    w4_runtimeInit(memory);
+    w4_runtimeInit(memory, disk);
     w4_wasmLoadModule(data, game->size);
-    w4_wasmCallStart();
+
+    firstFrame = true;
 
     return true;
 }
@@ -157,6 +163,12 @@ void retro_get_system_av_info (struct retro_system_av_info* info) {
 }
 
 void retro_run () {
+    // start() needs to be deferred to retro_run(), after retro_get_memory*() is set up
+    if (firstFrame) {
+        firstFrame = false;
+        w4_wasmCallStart();
+    }
+
     input_poll_cb();
 
     // Gamepad handling

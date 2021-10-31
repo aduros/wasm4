@@ -58,7 +58,7 @@ int main (int argc, const char* argv[]) {
     }
 
     uint8_t* memory = w4_wasmInit();
-    w4_runtimeInit(memory);
+    w4_runtimeInit(memory, NULL);
 
     w4_wasmLoadModule(cartBytes, cartLength);
 

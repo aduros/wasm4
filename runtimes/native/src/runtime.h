@@ -15,7 +15,7 @@
 #define W4_MOUSE_RIGHT 2
 #define W4_MOUSE_MIDDLE 4
 
-void w4_runtimeInit (uint8_t* memory);
+void w4_runtimeInit (uint8_t* memory, uint8_t* disk);
 
 void w4_runtimeSetGamepad (int idx, uint8_t gamepad);
 void w4_runtimeSetMouse (int16_t x, int16_t y, uint8_t buttons);

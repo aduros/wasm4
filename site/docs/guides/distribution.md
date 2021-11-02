@@ -18,12 +18,12 @@ Coming soon!
 
 Send a PR on Github to feature your game on the site!
 
-1. Fork the repository.
-2. Edit [`/site/carts.js`](https://github.com/aduros/wasm4/blob/main/site/carts.js) and insert an entry
+1. Fork the [wasm4 repository](https://github.com/aduros/wasm4).
+2. In your fork, edit [`/site/carts.js`](https://github.com/aduros/wasm4/blob/main/site/carts.js) and insert an entry
    for your game at the top of the list. It should have a unique slug for the URL.
-3. Add your `<slug>.wasm` (cart) and `<slug>.png` (160x160 screenshot) to
-   [`/site/static/carts`](https://github.com/aduros/wasm4/tree/main/site/static/carts).
-4. Open a pull request!
+3. Copy your `<slug>.wasm` (cart) and `<slug>.png` (160x160 screenshot) to the
+   [`/site/static/carts`](https://github.com/aduros/wasm4/tree/main/site/static/carts) directory.
+4. Commit your changes and open a pull request!
 
 :::tip
 You can take a 160x160 screenshot of your game by pressing F9 in the emulator.

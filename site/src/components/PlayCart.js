@@ -58,6 +58,8 @@ export default function PlayCart ({ cart }) {
 
                 <p>Controls: Arrow Keys, X, Z/Y/C</p>
 
+                <a className="button button--primary button--outline" href={`/carts/${slug.wasm}`}>Download this game </a>
+
                 <Giscus
                     repo="aduros/wasm4"
                     repoId="MDEwOlJlcG9zaXRvcnkzOTMxOTY4MjI="

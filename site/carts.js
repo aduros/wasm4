@@ -1,5 +1,11 @@
 const CARTS = [
     {
+        slug: "endless-runner",
+        title: "Endless Runner",
+        author: "Richard McCormack",
+        github: "DenialAdams",
+    },
+    {
         slug: "lakeshooter",
         title: "Lake Shooter",
         author: "Jimmy Cartrette",

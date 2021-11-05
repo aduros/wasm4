@@ -198,6 +198,18 @@ export class Runtime {
         return bytesWritten;
     }
 
+    getCString (ptr) {
+        let str = "";
+        for (;;) {
+            const c = this.data.getUint8(ptr++);
+            if (c == 0) {
+                break;
+            }
+            str += String.fromCharCode(c);
+        }
+        return str;
+    }
+
     print (str) {
         console.log(str);
         if (websocket != null && websocket.readyState == 1) {
@@ -206,15 +218,7 @@ export class Runtime {
     }
 
     trace (cstrPtr) {
-        let str = "";
-        for (;;) {
-            const c = this.data.getUint8(cstrPtr++);
-            if (c == 0) {
-                break;
-            }
-            str += String.fromCharCode(c);
-        }
-        this.print(str);
+        this.print(this.getCString(cstrPtr));
     }
 
     traceUtf8 (strUtf8Ptr, byteLength) {
@@ -248,10 +252,13 @@ export class Runtime {
                     argPtr += 4;
                     break;
                 case 115: // s
-                    throw new Error("TODO(2021-07-16): Implement printf %s");
+                    let cstrPtr = this.data.getUint32(argPtr, true);
+                    output += this.getCString(cstrPtr);
+					argPtr += 4;
                     break;
                 case 102: // f
-                    throw new Error("TODO(2021-07-16): Implement printf %f");
+                    output += this.data.getFloat64(argPtr, true);
+                    argPtr += 8;
                     break;
                 }
             } else {

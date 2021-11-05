@@ -3,12 +3,17 @@
 #include <GLFW/glfw3.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "../window.h"
 #include "../runtime.h"
 
 static uint32_t table[256];
 static GLuint paletteLocation;
+
+// Position and size of the viewport within the window, which may be smaller than the window size if
+// the window was forced to a non-square resolution
+int contentX, contentY, contentSize;
 
 static void initLookupTable () {
     // Create a lookup table for each byte mapping to 4 bytes:
@@ -33,7 +38,8 @@ static GLuint createShader (GLenum type, const char* source) {
     if (status == GL_FALSE) {
         char log[1024];
         glGetShaderInfoLog(shader, sizeof(log), NULL, log);
-        printf("gl shader error: %s\n", log);
+        fprintf(stderr, "OpenGL shader compile error: %s\n", log);
+        exit(1);
     }
 #endif
 
@@ -42,6 +48,7 @@ static GLuint createShader (GLenum type, const char* source) {
 
 static void initOpenGL () {
     GLuint vertexShader = createShader(GL_VERTEX_SHADER,
+        "#version 120\n"
         "attribute vec2 pos;\n"
         "varying vec2 framebufferCoord;\n"
 
@@ -51,7 +58,10 @@ static void initOpenGL () {
         "}\n");
 
     GLuint fragmentShader = createShader(GL_FRAGMENT_SHADER,
+        "#version 120\n"
+        "#ifdef GL_ES\n"
         "precision mediump float;\n"
+        "#endif\n"
         "uniform vec3 palette[4];\n"
         "uniform sampler2D framebuffer;\n"
         "varying vec2 framebufferCoord;\n"
@@ -76,7 +86,8 @@ static void initOpenGL () {
     if (status == GL_FALSE) {
         char log[1024];
         glGetProgramInfoLog(program, sizeof(log), NULL, log);
-        printf("gl program link error: %s\n", log);
+        fprintf(stderr, "OpenGL program link error: %s\n", log);
+        exit(1);
     }
 #endif
 
@@ -120,52 +131,91 @@ static void onFramebufferResized (GLFWwindow* window, int width, int height) {
     int x = width/2 - size/2;
     int y = height/2 - size/2;
     glViewport(x, y, size, size);
+
+    contentX = x;
+    contentY = y;
+    contentSize = size;
+}
+
+static void onGlfwError(int error, const char* description)
+{
+    fprintf(stderr,"%s\n",description);
+}
+
+static void update (GLFWwindow* window) {
+    // Keyboard handling
+    uint8_t gamepad = 0;
+    if (glfwGetKey(window, GLFW_KEY_X)) {
+        gamepad |= W4_BUTTON_X;
+    }
+    if (glfwGetKey(window, GLFW_KEY_Z)) {
+        gamepad |= W4_BUTTON_Z;
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT)) {
+        gamepad |= W4_BUTTON_LEFT;
+    }
+    if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
+        gamepad |= W4_BUTTON_RIGHT;
+    }
+    if (glfwGetKey(window, GLFW_KEY_UP)) {
+        gamepad |= W4_BUTTON_UP;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN)) {
+        gamepad |= W4_BUTTON_DOWN;
+    }
+    w4_runtimeSetGamepad(0, gamepad);
+
+    // Mouse handling
+    double mouseX, mouseY;
+    uint8_t mouseButtons = 0;
+    glfwGetCursorPos(window, &mouseX, &mouseY);
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)) {
+        mouseButtons |= W4_MOUSE_LEFT;
+    }
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT)) {
+        mouseButtons |= W4_MOUSE_RIGHT;
+    }
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE)) {
+        mouseButtons |= W4_MOUSE_MIDDLE;
+    }
+    w4_runtimeSetMouse(160*(mouseX-contentX)/contentSize, 160*(mouseY-contentY)/contentSize, mouseButtons);
+
+    w4_runtimeUpdate();
 }
 
 void w4_windowBoot (const char* title) {
-    glfwInit();
+    if(!glfwInit()){
+        fprintf(stderr,"Failed to initialise GLFW.");
+        return;
+    }
 
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwSetErrorCallback(onGlfwError);
 
-    GLFWwindow* window = glfwCreateWindow(160, 160, title, NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(2*160, 2*160, title, NULL, NULL);
     glfwSetFramebufferSizeCallback(window, onFramebufferResized);
     glfwSetWindowAspectRatio(window, 1, 1);
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
+    glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(0);
     gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
 
     initOpenGL();
     initLookupTable();
 
     while (!glfwWindowShouldClose(window)) {
-        uint8_t gamepad = 0;
-        if (glfwGetKey(window, GLFW_KEY_X)) {
-            gamepad |= W4_BUTTON_X;
-        }
-        if (glfwGetKey(window, GLFW_KEY_Z)) {
-            gamepad |= W4_BUTTON_Z;
-        }
-        if (glfwGetKey(window, GLFW_KEY_LEFT)) {
-            gamepad |= W4_BUTTON_LEFT;
-        }
-        if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
-            gamepad |= W4_BUTTON_RIGHT;
-        }
-        if (glfwGetKey(window, GLFW_KEY_UP)) {
-            gamepad |= W4_BUTTON_UP;
-        }
-        if (glfwGetKey(window, GLFW_KEY_DOWN)) {
-            gamepad |= W4_BUTTON_DOWN;
-        }
-        w4_runtimeSetGamepad(0, gamepad);
+        double timeStart = glfwGetTime();
+        double timeEnd = timeStart + 1.0/60.0;
 
-        w4_runtimeUpdate();
-
+        update(window);
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        double timeRemaining;
+        while ((timeRemaining = timeEnd - glfwGetTime()) > 0) {
+            glfwWaitEventsTimeout(timeRemaining);
+        }
     }
 
     glfwDestroyWindow(window);
@@ -200,7 +250,8 @@ void w4_windowComposite (const uint32_t* palette, const uint8_t* framebuffer) {
 #ifndef NDEBUG
     GLuint error = glGetError();
     if (error) {
-        printf("GL error: %d\n", error);
+        fprintf(stderr, "glGetError() returned %d\n", error);
+        exit(1);
     }
 #endif
 }

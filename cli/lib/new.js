@@ -48,7 +48,7 @@ async function run (destDir, opts) {
     }
 
     const srcDir = path.resolve(__dirname+"/../assets/templates/"+lang);
-    await copy(srcDir, destDir);
+    await copy(srcDir, destDir, { dot: true });
     await init(destDir, lang);
 
     const help = HELP[lang];

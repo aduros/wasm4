@@ -1,5 +1,17 @@
 const CARTS = [
     {
+        slug: "lakeshooter",
+        title: "Lake Shooter",
+        author: "Jimmy Cartrette",
+        github: "jimmycartrette",
+    },
+    {
+        slug: "minesweeper",
+        title: "Minesweeper",
+        author: "Claudio Mattera",
+        github: "claudiomattera",
+    },
+    {
         slug: "wormhole",
         title: "Wormhole",
         author: "David Sims",
@@ -48,6 +60,18 @@ const CARTS = [
         github: "aduros",
     },
     {
+        slug: "palette-previewer",
+        title: "Palette Previewer",
+        author: "David Sims",
+        github: "thedavesims",
+    },
+    {
+        slug: "mouse-demo",
+        title: "Mouse Demo",
+        author: "David Sims",
+        github: "thedavesims",
+    },
+    {
         slug: "sound-demo",
         title: "Sound Demo",
         author: "Bruno Garcia",
@@ -58,6 +82,12 @@ const CARTS = [
         title: "Raw Assembly Test",
         author: "Bruno Garcia",
         github: "aduros",
+    },
+    {
+        slug: "plasma-cube",
+        title: "Plasma Cube",
+        author: "unnick",
+        github: "kcinnu",
     },
 ];
 

@@ -34,7 +34,7 @@ export class Framebuffer {
         }
     }
 
-    drawHLineInternal(color, startX, y, endX) {
+    drawHLineFast(color, startX, y, endX) {
         const fillEnd = endX - (endX & 3);
         const fillStart = Math.min((startX + 3) & ~3, fillEnd);
 
@@ -56,21 +56,28 @@ export class Framebuffer {
         }
     }
 
+    drawHLineUnclipped(color, startX, y, endX) {
+        if (y >= 0 && y < HEIGHT) {
+            if (startX < 0) {
+                startX = 0;
+            }
+            if (endX > WIDTH) {
+                endX = WIDTH;
+            }
+            if (startX < endX) {
+                this.drawHLineFast(color, startX, y, endX);
+            }
+        }
+    }
+
     drawHLine(x, y, len) {
-        if (x + len <= 0 || y < 0 || y >= HEIGHT) {
+        const dc0 = this.drawColors[0] & 0xf;
+        if (dc0 == 0) {
             return;
         }
 
-        const color = getStrokeColor(this.drawColors);
-
-        if (color === 0) {
-            return;
-        }
-
-        const startX = Math.max(0, x);
-        const endX = Math.min(WIDTH, x + len);
-
-        this.drawHLineInternal(color, startX, y, endX);
+        const strokeColor = (dc0 - 1) & 0x3;
+        this.drawHLineUnclipped(strokeColor, x, y, x + len);
     }
 
     drawVLine(x, y, len) {
@@ -78,17 +85,16 @@ export class Framebuffer {
             return;
         }
 
-        const color = getStrokeColor(this.drawColors);
-
-        if (color === 0) {
+        const dc0 = this.drawColors[0] & 0xf;
+        if (dc0 == 0) {
             return;
         }
 
         const startY = Math.max(0, y);
         const endY = Math.min(HEIGHT, y + len);
-
+        const strokeColor = (dc0 - 1) & 0x3;
         for (let yy = startY; yy < endY; yy++) {
-            this.drawPoint(color, x, yy);
+            this.drawPoint(strokeColor, x, yy);
         }
     }
 
@@ -108,7 +114,7 @@ export class Framebuffer {
         if (dc0 !== 0) {
             const fillColor = (dc0 - 1) & 0x3;
             for (let yy = startY + offset; yy < endY - offset; ++yy) {
-                this.drawHLineInternal(fillColor, startX + offset, yy, endX - offset);
+                this.drawHLineFast(fillColor, startX + offset, yy, endX - offset);
             }
         }
 
@@ -130,10 +136,10 @@ export class Framebuffer {
             }
 
             // Top edge
-            this.drawHLineInternal (strokeColor, startX, startY, endX);
+            this.drawHLineFast(strokeColor, startX, startY, endX);
 
             // Bottom edge
-            this.drawHLineInternal (strokeColor, startX, endY - 1, endX);
+            this.drawHLineFast(strokeColor, startX, endY - 1, endX);
         }
     }
 
@@ -170,17 +176,22 @@ export class Framebuffer {
                 this.drawPointUnclipped(strokeColor, x0 - x, y0 + y); /* III. Quadrant */
                 this.drawPointUnclipped(strokeColor, x0 - x, y0 - y); /*  IV. Quadrant */
 
-                const start = Math.max(x0 - x + 1, 0);
-                const end = Math.min(x0 + x, WIDTH);
-
-                if (dc0 !== 0 && (end - start) > 0) {
-                    this.drawHLineInternal(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
-                    this.drawHLineInternal(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
+                if (dc0 !== 0) {
+                    const start = x0 - x + 1;
+                    const end = x0 + x;
+                    this.drawHLineFast(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
+                    this.drawHLineFast(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
                 }
 
-                y++; sy += aa2; e += dy; dy += aa2;
+                y++;
+                sy += aa2;
+                e += dy;
+                dy += aa2;
                 if (2 * e + dx > 0) {
-                    x--; sx -= bb2; e += dx; dx += bb2;
+                    x--;
+                    sx -= bb2;
+                    e += dx;
+                    dx += bb2;
                 }
             }
         }
@@ -198,20 +209,25 @@ export class Framebuffer {
                 this.drawPointUnclipped(strokeColor, x0 - x, y0 + y); /* III. Quadrant */
                 this.drawPointUnclipped(strokeColor, x0 - x, y0 - y); /*  IV. Quadrant */
 
-                x++; sx += bb2; e += dx; dx += bb2; ddx++;
+                x++;
+                sx += bb2;
+                e += dx;
+                dx += bb2;
+                ddx++;
                 if (2 * e + dy > 0) {
                     if (dc0 !== 0) {
                         const w = x - ddx - 1;
-                        const start = Math.max(x0 - w, 0);
-                        const end = Math.min(x0 + w + 1, WIDTH);
-                        
-                        if (end - start > 0) {
-                            this.drawHLineInternal(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
-                            this.drawHLineInternal(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
-                        }
+                        const start = x0 - w;
+                        const end = x0 + w + 1;
+                        this.drawHLineUnclipped(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
+                        this.drawHLineUnclipped(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
                     }
 
-                    y--; sy -= aa2; e += dy; dy += aa2; ddx = 0;
+                    y--;
+                    sy -= aa2;
+                    e += dy;
+                    dy += aa2;
+                    ddx = 0;
                 }
             }
         }

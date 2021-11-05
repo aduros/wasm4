@@ -20,12 +20,28 @@ typedef struct {
     uint8_t mouseButtons;
     uint8_t _reserved[129];
     uint8_t framebuffer[WIDTH*HEIGHT>>2];
+    uint8_t _user[58975];
 } Memory;
 
-static Memory* memory;
+typedef struct {
+    uint16_t size;
+    uint8_t data[1024];
+} Disk;
 
-void w4_runtimeInit (uint8_t* memoryBytes) {
+typedef struct {
+    Memory memory;
+    Disk disk;
+    bool firstFrame;
+} SerializedState;
+
+static Memory* memory;
+static Disk* disk;
+static bool firstFrame;
+
+void w4_runtimeInit (uint8_t* memoryBytes, uint8_t* diskBytes) {
     memory = (Memory*)memoryBytes;
+    disk = (Disk*)diskBytes;
+    firstFrame = true;
 
     // Set memory to initial state
     memset(memory, 0, 0xffff);
@@ -42,6 +58,12 @@ void w4_runtimeInit (uint8_t* memoryBytes) {
 
 void w4_runtimeSetGamepad (int idx, uint8_t gamepad) {
     memory->gamepads[idx] = gamepad;
+}
+
+void w4_runtimeSetMouse (int16_t x, int16_t y, uint8_t buttons) {
+    memory->mouseX = x;
+    memory->mouseY = y;
+    memory->mouseButtons = buttons;
 }
 
 void w4_runtimeBlit (const uint8_t* sprite, int x, int y, int width, int height, int flags) {
@@ -61,19 +83,23 @@ void w4_runtimeBlitSub (const uint8_t* sprite, int x, int y, int width, int heig
 }
 
 void w4_runtimeLine (int x1, int y1, int x2, int y2) {
-    printf("line: %d, %d, %d, %d\n", x1, y1, x2, y2);
+    // printf("line: %d, %d, %d, %d\n", x1, y1, x2, y2);
+    w4_framebufferLine(x1, y1, x2, y2);
 }
 
 void w4_runtimeHLine (int x, int y, int len) {
-    printf("hline: %d, %d, %d\n", x, y, len);
+    // printf("hline: %d, %d, %d\n", x, y, len);
+    w4_framebufferHLine(x, y, len);
 }
 
 void w4_runtimeVLine (int x, int y, int len) {
-    printf("vline: %d, %d, %d\n", x, y, len);
+    // printf("vline: %d, %d, %d\n", x, y, len);
+    w4_framebufferVLine(x, y, len);
 }
 
 void w4_runtimeOval (int x, int y, int width, int height) {
-    printf("oval: %d, %d, %d, %d\n", x, y, width, height);
+    // printf("oval: %d, %d, %d, %d\n", x, y, width, height);
+    w4_framebufferOval(x, y, width, height);
 }
 
 void w4_runtimeRect (int x, int y, int width, int height) {
@@ -81,52 +107,95 @@ void w4_runtimeRect (int x, int y, int width, int height) {
     w4_framebufferRect(x, y, width, height);
 }
 
-void w4_runtimeText (const char* str, int x, int y) {
+void w4_runtimeText (const uint8_t* str, int x, int y) {
     // printf("text: %s, %d, %d\n", str, x, y);
     w4_framebufferText(str, x, y);
 }
 
 void w4_runtimeTextUtf8 (const uint8_t* str, int byteLength, int x, int y) {
-    printf("textUtf8: %p, %d, %d, %d\n", str, byteLength, x, y);
+    // printf("textUtf8: %p, %d, %d, %d\n", str, byteLength, x, y);
+    w4_framebufferTextUtf8(str, byteLength, x, y);
 }
 
-void w4_runtimeTextUtf16 (const uint8_t* str, int byteLength, int x, int y) {
-    printf("textUtf16: %p, %d, %d, %d\n", str, byteLength, x, y);
+void w4_runtimeTextUtf16 (const uint16_t* str, int byteLength, int x, int y) {
+    // printf("textUtf16: %p, %d, %d, %d\n", str, byteLength, x, y);
+    w4_framebufferTextUtf16(str, byteLength, x, y);
 }
 
 void w4_runtimeTone (int frequency, int duration, int volume, int flags) {
-    printf("tone: %d, %d, %d, %d\n", frequency, duration, volume, flags);
+    printf("TODO: tone: %d, %d, %d, %d\n", frequency, duration, volume, flags);
 }
 
 int w4_runtimeDiskr (uint8_t* dest, int size) {
-    printf("diskr: %p, %d\n", dest, size);
-    return 0;
+    if (!disk) {
+        return 0;
+    }
+
+    if (size > disk->size) {
+        size = disk->size;
+    }
+    memcpy(dest, disk->data, size);
+    return size;
 }
 
 int w4_runtimeDiskw (const uint8_t* src, int size) {
-    printf("diskw: %p, %d\n", src, size);
-    return 0;
+    if (!disk) {
+        return 0;
+    }
+
+    if (size > 1024) {
+        size = 1024;
+    }
+    disk->size = size;
+    memcpy(disk->data, src, size);
+    return size;
 }
 
-void w4_runtimeTrace (const char* str) {
+void w4_runtimeTrace (const uint8_t* str) {
     puts(str);
 }
 
 void w4_runtimeTraceUtf8 (const uint8_t* str, int byteLength) {
-    printf("traceUtf8: %p, %d\n", str, byteLength);
+    printf("%.*s\n", byteLength, str);
 }
 
-void w4_runtimeTraceUtf16 (const uint8_t* str, int byteLength) {
-    printf("traceUtf16: %p, %d\n", str, byteLength);
+void w4_runtimeTraceUtf16 (const uint16_t* str, int byteLength) {
+    printf("TODO: traceUtf16: %p, %d\n", str, byteLength);
 }
 
-void w4_runtimeTracef (const char* str, const void* stack) {
-    // TODO(2021-09-27): Call printf with stack
+void w4_runtimeTracef (const uint8_t* str, const void* stack) {
     puts(str);
+
+    // This seems to crash on Linux release builds
+    // vprintf(str, (void*)&stack);
+    // putchar('\n');
 }
 
 void w4_runtimeUpdate () {
-    w4_framebufferClear();
+    if (firstFrame) {
+        firstFrame = false;
+        w4_wasmCallStart();
+    } else {
+        w4_framebufferClear();
+    }
     w4_wasmCallUpdate();
     w4_windowComposite(memory->palette, memory->framebuffer);
+}
+
+int w4_runtimeSerializeSize () {
+    return sizeof(SerializedState);
+}
+
+void w4_runtimeSerialize (void* dest) {
+    SerializedState* state = dest;
+    memcpy(&state->memory, memory, 0xffff);
+    memcpy(&state->disk, disk, sizeof(Disk));
+    state->firstFrame = firstFrame;
+}
+
+void w4_runtimeUnserialize (const void* src) {
+    const SerializedState* state = src;
+    memcpy(memory, &state->memory, 0xffff);
+    memcpy(disk, &state->disk, sizeof(Disk));
+    firstFrame = state->firstFrame;
 }

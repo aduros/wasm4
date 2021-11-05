@@ -97,7 +97,7 @@ static m3ApiRawFunction (textUtf8) {
 }
 
 static m3ApiRawFunction (textUtf16) {
-    m3ApiGetArgMem(const uint8_t*, str);
+    m3ApiGetArgMem(const uint16_t*, str);
     m3ApiGetArg(int, byteLength);
     m3ApiGetArg(int, x);
     m3ApiGetArg(int, y);
@@ -115,16 +115,16 @@ static m3ApiRawFunction (tone) {
 }
 
 static m3ApiRawFunction (diskr) {
+    m3ApiReturnType(int);
     m3ApiGetArgMem(uint8_t*, dest);
     m3ApiGetArg(int, size);
-    m3ApiReturnType(int);
     m3ApiReturn(w4_runtimeDiskr(dest, size));
 }
 
 static m3ApiRawFunction (diskw) {
+    m3ApiReturnType(int);
     m3ApiGetArgMem(const uint8_t*, src);
     m3ApiGetArg(int, size);
-    m3ApiReturnType(int);
     m3ApiReturn(w4_runtimeDiskw(src, size));
 }
 
@@ -142,7 +142,7 @@ static m3ApiRawFunction (traceUtf8) {
 }
 
 static m3ApiRawFunction (traceUtf16) {
-    m3ApiGetArgMem(const uint8_t*, str);
+    m3ApiGetArgMem(const uint16_t*, str);
     m3ApiGetArg(int, byteLength);
     w4_runtimeTraceUtf16(str, byteLength);
     m3ApiSuccess();
@@ -155,9 +155,29 @@ static m3ApiRawFunction (tracef) {
     m3ApiSuccess();
 }
 
+static m3ApiRawFunction (abort_) {
+    printf("Called abort!\n");
+    m3ApiSuccess();
+}
+
+static m3ApiRawFunction (seed) {
+    printf("Called seed!\n");
+    m3ApiReturnType(double);
+    m3ApiReturn(0.0);
+}
+
+static void check (M3Result result) {
+    if (result != m3Err_none) {
+        M3ErrorInfo info;
+        m3_GetErrorInfo(runtime, &info);
+        fprintf(stderr, "WASM error: %s (%s)\n", result, info.message);
+        exit(1);
+    }
+}
+
 uint8_t* w4_wasmInit () {
     env = m3_NewEnvironment();
-    runtime = m3_NewRuntime(env, 1024, NULL);
+    runtime = m3_NewRuntime(env, 4096, NULL);
 
     runtime->memory.maxPages = 1;
     ResizeMemory(runtime, 1);
@@ -166,8 +186,8 @@ uint8_t* w4_wasmInit () {
 }
 
 void w4_wasmLoadModule (const uint8_t* wasmBuffer, int byteLength) {
-    m3_ParseModule(env, &module, wasmBuffer, byteLength);
-    m3_LoadModule(runtime, module);
+    check(m3_ParseModule(env, &module, wasmBuffer, byteLength));
+    check(m3_LoadModule(runtime, module));
 
     m3_LinkRawFunction(module, "env", "blit", "v(iiiiii)", blit);
     m3_LinkRawFunction(module, "env", "blitSub", "v(iiiiiiiii)", blitSub);
@@ -190,40 +210,43 @@ void w4_wasmLoadModule (const uint8_t* wasmBuffer, int byteLength) {
     m3_LinkRawFunction(module, "env", "traceUtf16", "v(ii)", traceUtf16);
     m3_LinkRawFunction(module, "env", "tracef", "v(ii)", tracef);
 
-    m3_FindFunction(&start, runtime, "start");
-    m3_FindFunction(&update, runtime, "update");
-
-    // First call wasm built-in start
-    m3_RunStart(module);
-
-    // Call WASI start functions
-    M3Function* func;
-    m3_FindFunction(&func, runtime, "_start");
-    if (func) {
-        m3_CallV(func);
-    }
-    m3_FindFunction(&func, runtime, "_initialize");
-    if (func) {
-        m3_CallV(func);
-    }
+    m3_LinkRawFunction(module, "env", "abort", "v(iiii)", abort_);
+    m3_LinkRawFunction(module, "env", "seed", "F()", seed);
 
 #ifndef NDEBUG
     M3ErrorInfo error;
     m3_GetErrorInfo(runtime, &error);
     if (error.result) {
-        printf("Maybe error? %s: %s\n", error.result, error.message);
+        fprintf(stderr, "Error in load: %s: %s\n", error.result, error.message);
     }
 #endif
+
+    m3_FindFunction(&start, runtime, "start");
+    m3_FindFunction(&update, runtime, "update");
+
+    // First call wasm built-in start
+    check(m3_RunStart(module));
+
+    // Call WASI start functions
+    M3Function* func;
+    m3_FindFunction(&func, runtime, "_start");
+    if (func) {
+        check(m3_CallV(func));
+    }
+    m3_FindFunction(&func, runtime, "_initialize");
+    if (func) {
+        check(m3_CallV(func));
+    }
 }
 
 void w4_wasmCallStart () {
     if (start) {
-        m3_CallV(start);
+        check(m3_CallV(start));
     }
 }
 
 void w4_wasmCallUpdate () {
     if (update) {
-        m3_CallV(update);
+        check(m3_CallV(update));
     }
 }

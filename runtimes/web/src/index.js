@@ -56,7 +56,7 @@ async function loadCartWasm () {
     const runtime = new Runtime();
     const canvas = runtime.canvas;
     document.getElementById("content").appendChild(canvas);
-    const wasmBuffer = await loadCartWasm();
+    let wasmBuffer = await loadCartWasm();
     await runtime.load(wasmBuffer);
 
     if (screenshot != null) {
@@ -83,13 +83,9 @@ async function loadCartWasm () {
     if (websocket != null) {
         websocket.addEventListener("message", async event => {
             switch (event.data) {
-            case "reload": case "hotswap":
-                const wasmBuffer = await loadCartWasm();
-                if (event.data == "reload") {
-                    runtime.reset(true);
-                }
-                await runtime.load(wasmBuffer);
-                runtime.start();
+            case "reload":
+                wasmBuffer = await loadCartWasm();
+                reboot();
                 break;
             }
         });

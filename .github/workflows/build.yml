@@ -1,0 +1,149 @@
+name: Build
+on: [push, pull_request]
+
+jobs:
+    build-native-runtime:
+        strategy:
+            fail-fast: false
+            matrix:
+                config:
+                    - os: windows-latest
+                      artifact: "windows"
+                      wasm4: bin/wasm4.exe
+                      libretro: bin/wasm4_libretro.dll
+
+                    - os: macos-latest
+                      artifact: "mac"
+                      wasm4: bin/wasm4
+                      libretro: lib/wasm4_libretro.dylib
+
+                    - os: ubuntu-latest
+                      artifact: "linux"
+                      wasm4: bin/wasm4
+                      libretro: lib/wasm4_libretro.so
+
+        name: Build ${{ matrix.config.artifact }}
+        runs-on: ${{ matrix.config.os }}
+        defaults:
+             run:
+                 working-directory: runtimes/native
+
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  submodules: true
+
+            - if: matrix.config.os == 'ubuntu-latest'
+              name: Install local dependencies
+              run: |
+                  sudo apt update
+                  sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+
+            - name: Build
+              run: |
+                  cmake -B build -DCMAKE_BUILD_TYPE=Release
+                  cmake --build build --config Release --parallel
+
+            - name: Install
+              run: cmake --install build --prefix instdir --config Release --strip
+
+            - name: Upload wasm4 artifact
+              uses: actions/upload-artifact@v2
+              with:
+                  path: runtimes/native/instdir/${{ matrix.config.wasm4 }}
+                  name: wasm4-${{ matrix.config.artifact }}
+
+            - name: Upload libretro artifact
+              uses: actions/upload-artifact@v2
+              with:
+                  path: runtimes/native/instdir/${{ matrix.config.libretro }}
+                  name: wasm4-libretro-${{ matrix.config.artifact }}
+
+    build-cli:
+        name: Build w4 CLI
+        runs-on: ubuntu-latest
+        needs: build-native-runtime
+        defaults:
+            run:
+                working-directory: cli
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Build web runtime
+              working-directory: runtimes/web
+              run: |
+                  npm ci
+                  npm run build
+
+            - name: Import web runtime
+              run: |
+                  rm -f assets/runtime
+                  cp -r ../runtimes/web/dist assets/runtime
+
+            - name: Download artifacts
+              uses: actions/download-artifact@v2
+              with:
+                  path: artifacts
+
+            - name: Import native runtimes
+              run: |
+                  mkdir -p assets/natives
+                  ls -R ../artifacts
+                  mv ../artifacts/wasm4-windows/wasm4.exe assets/natives/wasm4-windows.exe
+                  mv ../artifacts/wasm4-mac/wasm4 assets/natives/wasm4-mac
+                  mv ../artifacts/wasm4-linux/wasm4 assets/natives/wasm4-linux
+
+            - name: Build CLI
+              run: |
+                  cp ../README.md ../LICENSE.txt .
+                  mkdir -p ../cli-build
+                  mv `npm pack` ../cli-build/wasm4-npm.tar.gz
+
+                  npm ci
+                  npm install -g pkg
+                  pkg --compress GZip --out-path ../cli-build --targets node12-win,node12-mac,node12-linux .
+
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v2
+              with:
+                  path: cli-build
+                  name: w4
+
+    release:
+        if: startsWith(github.ref, 'refs/tags/v')
+        name: Release
+        runs-on: ubuntu-latest
+        needs: build-cli
+
+        steps:
+            - name: Download artifacts
+              uses: actions/download-artifact@v2
+              with:
+                  path: artifacts
+                  name: w4
+
+            - name: Create release zips
+              run: |
+                  chmod +x artifacts/wasm4-*
+
+                  mv artifacts/wasm4-win.exe w4.exe
+                  zip w4-windows.zip w4.exe
+
+                  mv artifacts/wasm4-macos w4
+                  zip w4-mac.zip w4
+
+                  mv artifacts/wasm4-linux w4
+                  zip w4-linux.zip w4
+
+            - name: Publish GitHub release
+              uses: softprops/action-gh-release@v1
+              with:
+                  files: w4-*.zip
+
+            - name: Publish to NPM
+              run: |
+                  npm config set //registry.npmjs.org/:_authToken=$NPM_TOKEN
+                  npm publish ./artifacts/wasm4-npm.tar.gz
+              env:
+                  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

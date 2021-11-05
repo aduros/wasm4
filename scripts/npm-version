@@ -1,6 +1,0 @@
-#!/bin/sh -e
-
-cd cli
-version=`npm version "$@"`
-git commit package.json package-lock.json -m "$version."
-git tag "$version"

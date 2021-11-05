@@ -2,7 +2,76 @@
 sidebar_label: Publish your game
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Publish your game
+
+## Create a publish version
+
+You need a version of your game that you can publish. You'll also need a cover-image.
+
+While your game runs in the browser, press `F9` on your keyboard. This will generate a screenshot in PNG format. You can use this as a cover-image.
+
+Now let's compile your game.
+
+<Tabs
+    groupId="code-language"
+    defaultValue="language-typescript"
+    values={[
+        {label: 'AssemblyScript', value: 'language-typescript'},
+        {label: 'C / C++', value: 'language-cpp'},
+        {label: 'Rust', value: 'language-rust'},
+        {label: 'Go', value: 'language-go'},
+    ]}>
+
+<TabItem value="language-typescript">
+
+```shell
+npm run build
+```
+
+Your game will be here: `build/cart.wasm`
+
+</TabItem>
+
+<TabItem value="language-cpp">
+
+```shell
+make
+```
+
+Your game will be here: `build/cart.wasm`
+
+</TabItem>
+
+<TabItem value="language-rust">
+
+```shell
+cargo build --release
+```
+
+Your game will be here: `target/wasm32-unknown-unknown/release/cart.wasm`
+
+</TabItem>
+
+<TabItem value="language-go">
+
+```shell
+make
+```
+
+Your game will be here: `build/cart.wasm`
+
+</TabItem>
+
+</Tabs>
+
+## Your account
+
+:::note Early version
+The WASM-4 project is still in it's early stages. The process of submitting your game onto the website is still not finished and a little rough around the edges.
+:::
 
 WASM-4 and it's website are stored in a Git-Repo (short for Repository) hosted on GitHub.
 

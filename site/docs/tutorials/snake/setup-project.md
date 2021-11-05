@@ -16,7 +16,7 @@ Work is often easier on a terminal. For this step, open your terminal/powershell
 
 For the sake of having the same base, I assume the projects-folder is here: `~/Projects/`.  
 On Linux and macOS this is usually `/home/[YOUR USERNAME]/Projects`.  
-On Windwos this is usually `C:\Users\[YOUR USERNAME]\Projects\`.
+On Windows this is usually `C:\Users\[YOUR USERNAME]\Projects\`.
 
 Below you'll find instructions for your language.
 
@@ -54,9 +54,8 @@ npm run build
 Run it in WASM-4 with:
 
 ```shell
-w4 run build/cart.wasm
+w4 watch
 ```
-
 </TabItem>
 
 <TabItem value="language-cpp">
@@ -77,7 +76,7 @@ make
 Run it in WASM-4 with:
 
 ```shell
-w4 run build/cart.wasm
+w4 watch
 ```
 
 </TabItem>
@@ -101,7 +100,7 @@ cargo build --release
 Run it in WASM-4 with:
 
 ```shell
-w4 run target/wasm32-unknown-unknown/release/cart.wasm
+w4 watch
 ```
 
 </TabItem>
@@ -124,9 +123,35 @@ make
 Run it in WASM-4 with:
 
 ```shell
-w4 run build/cart.wasm
+w4 watch
 ```
 
 </TabItem>
 
 </Tabs>
+
+:::note Prevent Browser from opening
+If you don't want the browser to open a new tab for you, you can prevent this by using the `-n` or `--no-browser` option. You can also set an environment variable called `W4_NO_BROWSER`.
+
+Examples:
+```shell
+w4 watch --no-browser
+```
+or
+```shell
+W4_NO_BROWSER=1 w4 watch
+```
+:::
+
+:::note Setting a default language
+You can set a default language by setting the environment variable `W4_LANG` to one of the supported languages.
+It's possible to override it with the CLI parameter later on.
+:::
+
+## Current state
+
+For now, your game should look this:
+
+![Hello World](images/helloworld.webp)
+
+The color changes if you press `Button 1` (X or Space).

@@ -36,63 +36,21 @@ This palette provides enough "green" for the snake and a "not green" for the fru
 
 ## Setting in source
 
-Once you've picked a color palette, it's time to actually set it. Let's look at the `hello world` example:
+Unlike most other fantasy consoles, pretty much everything is done in code. Setting the color palette belongs to this category. But before you go and mess with the code, you should remove most of the existing code.
 
 <MultiLanguageCode>
 
 ```typescript
 import * as w4 from "./wasm4";
 
-const smiley = memory.data<u8>([
-    0b11000011,
-    0b10000001,
-    0b00100100,
-    0b00100100,
-    0b00000000,
-    0b00100100,
-    0b10011001,
-    0b11000011,
-]);
-
 export function update (): void {
-    store<u16>(w4.DRAW_COLORS, 2);
-    w4.text("Hello from\nAssemblyScript!", 10, 10);
-
-    const gamepad = load<u8>(w4.GAMEPAD1);
-    if (gamepad & w4.BUTTON_1) {
-        store<u16>(w4.DRAW_COLORS, 4);
-    }
-
-    w4.blit(smiley, 76, 76, 8, 8, w4.BLIT_1BPP);
-    w4.text("Press X to blink", 16, 90);
 }
 ```
 
 ```c
 #include "wasm4.h"
 
-const uint8_t smiley[] = {
-    0b11000011,
-    0b10000001,
-    0b00100100,
-    0b00100100,
-    0b00000000,
-    0b00100100,
-    0b10011001,
-    0b11000011,
-};
-
 void update () {
-    *DRAW_COLORS = 2;
-    text("Hello from C!", 10, 10);
-
-    uint8_t gamepad = *GAMEPAD1;
-    if (gamepad & BUTTON_1) {
-        *DRAW_COLORS = 4;
-    }
-
-    blit(smiley, 76, 76, 8, 8, BLIT_1BPP);
-    text("Press X to blink", 16, 90);
 }
 ```
 
@@ -102,30 +60,8 @@ mod alloc;
 mod wasm4;
 use wasm4::*;
 
-#[rustfmt::skip]
-const SMILEY: [u8; 8] = [
-    0b11000011,
-    0b10000001,
-    0b00100100,
-    0b00100100,
-    0b00000000,
-    0b00100100,
-    0b10011001,
-    0b11000011,
-];
-
 #[no_mangle]
 fn update() {
-    unsafe { *DRAW_COLORS = 2 }
-    text("Hello from Rust!", 10, 10);
-
-    let gamepad = unsafe { *GAMEPAD1 };
-    if gamepad & BUTTON_1 != 0 {
-        unsafe { *DRAW_COLORS = 4 }
-    }
-
-    blit(&SMILEY, 76, 76, 8, 8, BLIT_1BPP);
-    text("Press X to blink", 16, 90);
 }
 ```
 
@@ -134,42 +70,16 @@ package main
 
 import "cart/w4"
 
-var smiley = [8]byte{
-	0b11000011,
-	0b10000001,
-	0b00100100,
-	0b00100100,
-	0b00000000,
-	0b00100100,
-	0b10011001,
-	0b11000011,
-}
-
 //go:export update
 func update() {
-	*w4.DRAW_COLORS = 2
-	w4.Text("Hello from Go!", 10, 10)
-
-	var gamepad = *w4.GAMEPAD1
-	if gamepad&w4.BUTTON_1 != 0 {
-		*w4.DRAW_COLORS = 4
-	}
-
-	w4.Blit(&smiley[0], 76, 76, 8, 8, w4.BLIT_1BPP)
-	w4.Text("Press X to blink", 16, 90)
 }
 ```
 
 </MultiLanguageCode>
 
-There's a lot going on. First it defines a sprite. And in the update-function:
-- Set the draw color to 2
-- Print some text
-- If "Button 1" on "Gamepad 1" is pressed, change the draw color to 4
-- Draw the smiley
-- Print some more text
+The update function is required. Or WASM-4 won't be able to show anything. To set up the color palette, it's usually enough to do this once at the start of the game.
 
-To change the color palette, we can use the "start" function of WASM-4:
+So in most cases, you'd add a "start" function and export it too. WASM-4 will execute it once at the start.
 
 <MultiLanguageCode>
 

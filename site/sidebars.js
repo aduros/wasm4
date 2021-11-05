@@ -62,6 +62,14 @@ module.exports = {
                     "tutorials/snake/goal",
                     "tutorials/snake/setup-project",
                     "tutorials/snake/setting-color-palette",
+                    "tutorials/snake/creating-the-snake",
+                    "tutorials/snake/drawing-the-snake",
+                    "tutorials/snake/moving-the-snake",
+                    "tutorials/snake/handling-user-input",
+                    "tutorials/snake/placing-the-fruit",
+                    "tutorials/snake/collision-detection",
+                    "tutorials/snake/further-ideas",
+                    "tutorials/snake/publish-your-game",
                 ]
             }
 	    ]

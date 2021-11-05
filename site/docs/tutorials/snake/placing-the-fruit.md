@@ -100,7 +100,7 @@ Since the standard `time` is not an option, how about you use something that is 
 
 Works. But since this is the `start`-function, `frameCount` is pretty much always `0`. That's why here's a small exercise for you: change the seed after the first key was pressed.
 
-:::note Check the for nil
+:::tip Check the for nil
 Keep in mind, that the value of `rnd` is `nil` if it wasn't initialized yet.
 :::
 
@@ -141,9 +141,11 @@ Indexed PNG files can be created by several image apps like [Aseprite](https://w
 
 The image we import is a 8x8 PNG file with exactly 4 colors. And it's this image here:
 
-![Zoomed Fruit](images/fruit-zoomed.webp)
-
+![Zoomed Fruit](images/fruit-zoomed.webp)  
 This image is zoomed by 800%.
+
+![Zoomed Fruit](images/fruit.png)  
+This image is the original image. You can download it to proceed.
 
 Now you need to import the image. For this, the WASM-4 CLI tool `w4` comes with another tool: `png2src`. You can use it like this:
 

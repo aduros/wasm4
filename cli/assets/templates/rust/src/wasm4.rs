@@ -24,6 +24,7 @@ pub const GAMEPAD4: *const u8 = 0x19 as *const u8;
 pub const MOUSE_X: *const i16 = 0x1a as *const i16;
 pub const MOUSE_Y: *const i16 = 0x1c as *const i16;
 pub const MOUSE_BUTTONS: *const u8 = 0x1e as *const u8;
+pub const SYSTEM_FLAGS: *mut u8 = 0x1f as *mut u8;
 pub static mut FRAMEBUFFER: *mut [u8; 6400] = 0xa0 as *mut [u8; 6400];
 
 pub const BUTTON_1: u8 = 1;
@@ -36,6 +37,9 @@ pub const BUTTON_DOWN: u8 = 128;
 pub const MOUSE_LEFT: u8 = 1;
 pub const MOUSE_RIGHT: u8 = 2;
 pub const MOUSE_MIDDLE: u8 = 4;
+
+pub const SYSTEM_PRESERVE_FRAMEBUFFER: u8 = 1;
+pub const SYSTEM_HIDE_GAMEPAD_OVERLAY: u8 = 2;
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │

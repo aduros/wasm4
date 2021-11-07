@@ -28,6 +28,7 @@ var GAMEPAD4 = (*uint8)(unsafe.Pointer(uintptr(0x19)))
 var MOUSE_X = (*int16)(unsafe.Pointer(uintptr(0x1a)))
 var MOUSE_Y = (*int16)(unsafe.Pointer(uintptr(0x1c)))
 var MOUSE_BUTTONS = (*uint8)(unsafe.Pointer(uintptr(0x1e)))
+var SYSTEM_FLAGS = (*uint8)(unsafe.Pointer(uintptr(0x1f)));
 var FRAMEBUFFER = (*[6400]uint8)(unsafe.Pointer(uintptr(0xa0)))
 
 const BUTTON_1 byte = 1
@@ -40,6 +41,9 @@ const BUTTON_DOWN byte = 128
 const MOUSE_LEFT byte = 1
 const MOUSE_RIGHT byte = 2
 const MOUSE_MIDDLE byte = 4
+
+const SYSTEM_PRESERVE_FRAMEBUFFER byte = 1
+const SYSTEM_HIDE_GAMEPAD_OVERLAY byte = 2
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │

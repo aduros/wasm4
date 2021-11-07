@@ -4,12 +4,15 @@ WASM-4 uses a fixed memory layout of 64 KB.
 
 | Address | Size (Bytes) | Description                     |
 | ---     | ---          | ---                             |
+| `$0000` | 4            | *Unused*                        |
 | `$0004` | 16           | [PALETTE](#palette)             |
 | `$0014` | 2            | [DRAW_COLORS](#draw_colors)     |
 | `$0016` | 4            | [GAMEPADS](#gamepads)           |
 | `$001a` | 2            | [MOUSE_X](#mouse_x)             |
 | `$001c` | 2            | [MOUSE_Y](#mouse_y)             |
 | `$001e` | 1            | [MOUSE_BUTTONS](#mouse_buttons) |
+| `$001f` | 1            | [SYSTEM_FLAGS](#system_flags)   |
+| `$0020` | 128          | Reserved for future use         |
 | `$00a0` | 6400         | [FRAMEBUFFER](#framebuffer)     |
 | `$19a0` | 58975        | Available program memory        |
 
@@ -22,7 +25,7 @@ WASM-4 uses a fixed memory layout of 64 KB.
 | 0 - 7   | Blue channel          |
 | 8 - 15  | Green channel         |
 | 16 - 23 | Red channel           |
-| 24 - 31 | -                     |
+| 24 - 31 | *Unused*              |
 
 ### DRAW_COLORS
 
@@ -50,16 +53,16 @@ Example:
 
 4 gamepads, with each gamepad represented by a single byte.
 
-| Bit | Description   |
-| --- | ---           |
-| 0   | X button      |
-| 1   | Z button      |
-| 2   | -             |
-| 3   | -             |
-| 4   | D-pad left    |
-| 5   | D-pad right   |
-| 6   | D-pad up      |
-| 7   | D-pad down    |
+| Bit | Name           | Description |
+| --- | ---            | ---         |
+| 0   | `BUTTON_1`     | X button    |
+| 1   | `BUTTON_2`     | Z button    |
+| 2   |                | *Unused*    |
+| 3   |                | *Unused*    |
+| 4   | `BUTTON_LEFT`  | D-pad left  |
+| 5   | `BUTTON_RIGHT` | D-pad right |
+| 6   | `BUTTON_UP`    | D-pad up    |
+| 7   | `BUTTON_DOWN`  | D-pad down  |
 
 ### MOUSE_X
 
@@ -73,11 +76,20 @@ Signed 16 bit integer containing the Y position of the mouse.
 
 Byte containing the mouse buttons state.
 
-| Bit | Description   |
-| --- | ---           |
-| 0   | Left button   |
-| 1   | Right button  |
-| 2   | Middle button |
+| Bit | Name           | Description         |
+| --- | ---            | ---                 |
+| 0   | `MOUSE_LEFT`   | Left mouse button   |
+| 1   | `MOUSE_RIGHT`  | Right mouse button  |
+| 2   | `MOUSE_MIDDLE` | Middle mouse button |
+
+### SYSTEM_FLAGS
+
+Byte containing flags that modify WASM-4's operation. By default all flags are off.
+
+| Bit | Name                          | Description                                       |
+| --- | ---                           | ---                                               |
+| 0   | `SYSTEM_PRESERVE_FRAMEBUFFER` | Prevent clearing the framebuffer between frames.  |
+| 1   | `SYSTEM_HIDE_GAMEPAD_OVERLAY` | Hide the gamepad UI overlay on mobile.            |
 
 ### FRAMEBUFFER
 

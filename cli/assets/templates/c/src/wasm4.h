@@ -34,6 +34,7 @@ WASM_EXPORT("update") void update ();
 #define MOUSE_X ((const int16_t*)0x1a)
 #define MOUSE_Y ((const int16_t*)0x1c)
 #define MOUSE_BUTTONS ((const uint8_t*)0x1e)
+#define SYSTEM_FLAGS ((uint8_t*)0x1f)
 #define FRAMEBUFFER ((uint8_t*)0xa0)
 
 #define BUTTON_1 1
@@ -48,6 +49,9 @@ WASM_EXPORT("update") void update ();
 #define MOUSE_LEFT 1
 #define MOUSE_RIGHT 2
 #define MOUSE_MIDDLE 4
+
+#define SYSTEM_PRESERVE_FRAMEBUFFER 1
+#define SYSTEM_HIDE_GAMEPAD_OVERLAY 2
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │

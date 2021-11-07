@@ -25,6 +25,7 @@ export const ADDR_GAMEPAD4 = 0x19;
 export const ADDR_MOUSE_X = 0x1a;
 export const ADDR_MOUSE_Y = 0x1c;
 export const ADDR_MOUSE_BUTTONS = 0x1e;
+export const ADDR_SYSTEM_FLAGS = 0x1f;
 export const ADDR_FRAMEBUFFER = 0xa0;
 
 export const BUTTON_X = 1;
@@ -35,6 +36,13 @@ export const BUTTON_LEFT = 16;
 export const BUTTON_RIGHT = 32;
 export const BUTTON_UP = 64;
 export const BUTTON_DOWN = 128;
+
+export const MOUSE_LEFT = 1;
+export const MOUSE_RIGHT = 2;
+export const MOUSE_MIDDLE = 4;
+
+export const SYSTEM_PRESERVE_FRAMEBUFFER = 1;
+export const SYSTEM_HIDE_GAMEPAD_OVERLAY = 2;
 
 export const FONT = Uint8Array.of(
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,

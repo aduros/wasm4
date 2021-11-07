@@ -24,6 +24,7 @@ export const GAMEPAD4: usize = 0x19;
 export const MOUSE_X: usize = 0x1a;
 export const MOUSE_Y: usize = 0x1c;
 export const MOUSE_BUTTONS: usize = 0x1e;
+export const SYSTEM_FLAGS: usize = 0x1f;
 export const FRAMEBUFFER: usize = 0xa0;
 
 export const BUTTON_1: u8 = 1;
@@ -36,6 +37,9 @@ export const BUTTON_DOWN: u8 = 128;
 export const MOUSE_LEFT: u8 = 1;
 export const MOUSE_RIGHT: u8 = 2;
 export const MOUSE_MIDDLE: u8 = 4;
+
+export const SYSTEM_PRESERVE_FRAMEBUFFER = 1;
+export const SYSTEM_HIDE_GAMEPAD_OVERLAY = 2;
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │

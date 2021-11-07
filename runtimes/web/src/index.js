@@ -429,6 +429,8 @@ async function loadCartWasm () {
     window.addEventListener("pointermove", onPointerEvent);
     window.addEventListener("pointerup", onPointerEvent);
 
+    const gamepadOverlay = document.getElementById("gamepad");
+
     // https://gist.github.com/addyosmani/5434533#file-limitloop-js-L60
 
     const INTERVAL = 1000 / 60;
@@ -446,6 +448,9 @@ async function loadCartWasm () {
         if (deltaFrame >= INTERVAL) {
             lastFrame = now - (deltaFrame % INTERVAL);
             runtime.update();
+
+            gamepadOverlay.style.display = runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY)
+                ? "none" : "";
         }
 
     }

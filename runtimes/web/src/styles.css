@@ -34,7 +34,7 @@ body {
 }
 
 @media (pointer: fine) {
-  .gamepad {
+  #gamepad {
     display: none;
   }
 }
@@ -43,11 +43,11 @@ body.focus .infobox, body.focus #screenshot {
   display: none;
 }
 
-body:not(.focus) .gamepad {
+body:not(.focus) #gamepad {
   display: none;
 }
 
-.gamepad {
+#gamepad {
   pointer-events: none;
 }
 

@@ -45,6 +45,10 @@ WASM_EXPORT("update") void update ();
 #define BUTTON_UP 64
 #define BUTTON_DOWN 128
 
+#define MOUSE_LEFT 1
+#define MOUSE_RIGHT 2
+#define MOUSE_MIDDLE 4
+
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │
 // │ Drawing Functions                                                         │

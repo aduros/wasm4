@@ -37,6 +37,10 @@ const BUTTON_RIGHT byte = 32
 const BUTTON_UP byte = 64
 const BUTTON_DOWN byte = 128
 
+const MOUSE_LEFT byte = 1
+const MOUSE_RIGHT byte = 2
+const MOUSE_MIDDLE byte = 4
+
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │
 // │ Drawing Functions                                                         │

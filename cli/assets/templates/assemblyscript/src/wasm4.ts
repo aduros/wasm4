@@ -33,6 +33,10 @@ export const BUTTON_RIGHT: u8 = 32;
 export const BUTTON_UP: u8 = 64;
 export const BUTTON_DOWN: u8 = 128;
 
+export const MOUSE_LEFT: u8 = 1;
+export const MOUSE_RIGHT: u8 = 2;
+export const MOUSE_MIDDLE: u8 = 4;
+
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │
 // │ Drawing Functions                                                         │

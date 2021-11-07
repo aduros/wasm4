@@ -45,6 +45,10 @@ export class Runtime {
         return this.data.getUint8(constants.ADDR_GAMEPAD1 + idx);
     }
 
+    getSystemFlag (mask) {
+        return this.data.getUint8(constants.ADDR_SYSTEM_FLAGS) & mask;
+    }
+
     maskGamepad (idx, mask, down) {
         const addr = constants.ADDR_GAMEPAD1 + idx;
         let buttons = this.data.getUint8(addr);
@@ -279,7 +283,10 @@ export class Runtime {
             return;
         }
 
-        this.framebuffer.clear();
+        if (!this.getSystemFlag(constants.SYSTEM_PRESERVE_FRAMEBUFFER)) {
+            this.framebuffer.clear();
+        }
+
         if (this.wasm.exports.update != null) {
             this.wasm.exports.update();
         }

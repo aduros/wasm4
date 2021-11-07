@@ -1,7 +1,8 @@
 #include <libretro.h>
 #include <stdint.h>
-#include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "../wasm.h"
 #include "../runtime.h"
@@ -11,7 +12,9 @@ static retro_video_refresh_t video_cb;
 static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
 
-static uint8_t* wasmCopy = NULL;
+static uint8_t* wasmData;
+static size_t wasmLength;
+static bool wasmCopy = false;
 
 static uint8_t* memory;
 
@@ -121,27 +124,32 @@ unsigned retro_get_region () {
 }
 
 void retro_init () {
+    // printf("WASM4 init\n");
 }
 
 void retro_deinit () {
+    // printf("WASM4 deinit\n");
 }
 
 bool retro_load_game (const struct retro_game_info* game) {
+    // printf("WASM4 load_game\n");
+
     bool persistent_data = false;
     struct retro_game_info_ext* ext;
     if (environ_cb(RETRO_ENVIRONMENT_GET_GAME_INFO_EXT, &ext)) {
         persistent_data = ext->persistent_data;
     }
 
-    const uint8_t* data;
+    wasmLength = game->size;
     if (persistent_data) {
         // We can use the game data directly if libretro will not free it
-        data = game->data;
+        wasmData = (uint8_t*)game->data;
+        wasmCopy = false;
     } else {
         // Otherwise we need to manage our own copy
-        wasmCopy = malloc(game->size);
-        memcpy(wasmCopy, game->data, game->size);
-        data = wasmCopy;
+        wasmData = malloc(wasmLength);
+        wasmCopy = true;
+        memcpy(wasmData, game->data, wasmLength);
     }
 
     // Set input descriptors
@@ -180,7 +188,7 @@ bool retro_load_game (const struct retro_game_info* game) {
 
     memory = w4_wasmInit();
     w4_runtimeInit(memory, disk);
-    w4_wasmLoadModule(data, game->size);
+    w4_wasmLoadModule(wasmData, wasmLength);
 
     return true;
 }
@@ -190,12 +198,15 @@ bool retro_load_game_special (unsigned type, const struct retro_game_info *info,
 }
 
 void retro_unload_game () {
+    w4_wasmDestroy();
     if (wasmCopy) {
-        free(wasmCopy);
+        free(wasmData);
     }
 }
 
 void retro_reset () {
+    w4_runtimeInit(memory, disk);
+    w4_wasmLoadModule(wasmData, wasmLength);
 }
 
 void retro_get_system_av_info (struct retro_system_av_info* info) {

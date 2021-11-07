@@ -185,6 +185,11 @@ uint8_t* w4_wasmInit () {
     return m3_GetMemory(runtime, NULL, 0);
 }
 
+void w4_wasmDestroy () {
+    m3_FreeRuntime(runtime);
+    m3_FreeEnvironment(env);
+}
+
 void w4_wasmLoadModule (const uint8_t* wasmBuffer, int byteLength) {
     check(m3_ParseModule(env, &module, wasmBuffer, byteLength));
     check(m3_LoadModule(runtime, module));

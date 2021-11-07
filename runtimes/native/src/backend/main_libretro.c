@@ -13,6 +13,8 @@ static retro_input_state_t input_state_cb;
 
 static uint8_t* wasmCopy = NULL;
 
+static uint8_t* memory;
+
 // 1024 bytes plus the 2 byte size header
 static uint8_t disk[1026] = { 0 };
 
@@ -86,11 +88,25 @@ void retro_cheat_set (unsigned index, bool enabled, const char *code) {
 }
 
 void* retro_get_memory_data (unsigned id) {
-    return (id == RETRO_MEMORY_SAVE_RAM) ? disk : NULL;
+    switch (id) {
+    case RETRO_MEMORY_SAVE_RAM:
+        return disk;
+    case RETRO_MEMORY_SYSTEM_RAM:
+        return memory;
+    default:
+        return NULL;
+    }
 }
 
 size_t retro_get_memory_size (unsigned id) {
-    return (id == RETRO_MEMORY_SAVE_RAM) ? sizeof(disk) : 0;
+    switch (id) {
+    case RETRO_MEMORY_SAVE_RAM:
+        return sizeof(disk);
+    case RETRO_MEMORY_SYSTEM_RAM:
+        return 0xffff;
+    default:
+        return 0;
+    }
 }
 
 void retro_get_system_info (struct retro_system_info* info) {
@@ -128,7 +144,7 @@ bool retro_load_game (const struct retro_game_info* game) {
         data = wasmCopy;
     }
 
-    uint8_t* memory = w4_wasmInit();
+    memory = w4_wasmInit();
     w4_runtimeInit(memory, disk);
     w4_wasmLoadModule(data, game->size);
 

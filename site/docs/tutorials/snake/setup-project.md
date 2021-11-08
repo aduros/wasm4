@@ -148,7 +148,7 @@ You can set a default language by setting the environment variable `W4_LANG` to 
 It's possible to override it with the CLI parameter later on.
 :::
 
-## Current state
+## Current State
 
 For now, your game should look this:
 

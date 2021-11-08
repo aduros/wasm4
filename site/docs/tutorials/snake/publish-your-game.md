@@ -83,7 +83,7 @@ Now you need to "fork" the repo. For this, go to the [original GitHub Repo of WA
 
 At the top you will find some "actions" you can take: `Watch/Unwatch`, `Star/Unstar`, `Fork`. The last one is what you're looking for.
 
-## Uploading your game
+## Uploading Your Game
 
 Once you've forked the repo, visit your version and navigate to the folder `site/static/carts/`. There you can upload your cart.wasm and a 160x160 cover-image of the game. A screenshot is an easy way. Simply press F9 while your game is running.
 

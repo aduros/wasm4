@@ -73,7 +73,7 @@ Now you're almost done. Only "Game Over" is left to finish this game.
 
 </Tabs>
 
-## ... with itself
+## Collision Detection with Itself
 
 <Tabs
     groupId="code-language"

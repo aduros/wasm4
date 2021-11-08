@@ -7,7 +7,7 @@ import TabItem from '@theme/TabItem';
 
 # Publish Your Game
 
-## Create a publish version
+## Create a Publish Version
 
 You need a version of your game that you can publish. You'll also need a cover-image.
 

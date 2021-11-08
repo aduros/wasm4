@@ -43,7 +43,7 @@ This should cover QWERTY, QWERTZ and Dvorak layouts.
 
 The gamepads for the players 2, 3 and 4 are currently not implemented.
 
-## Detecting `just pressed`
+## Detecting `justPressed`
 
 Since the current state of the gamepad is stored in a single variable, you need to compare it to the previous state.
 

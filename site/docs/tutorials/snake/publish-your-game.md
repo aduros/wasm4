@@ -116,7 +116,7 @@ Your fork is now ready. Switch to the `Pull Requests` tab and press on "New pull
 
 Add some comment if you want. And then press "Make pull request" at the bottom. You're done!
 
-## Wait a bit
+## Wait a Bit
 
 Since this procedure is currently involving the interaction of humans, your PR (short for Pull Request) needs to be verified by an authorized person such as `aduros`. Your PR will also cause a notification in our discord channel to let him know sooner rather than later.
 

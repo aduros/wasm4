@@ -32,7 +32,7 @@ If you want to check if Button 1 is pressed, simply use the binary AND:
 
 This is true for all other buttons too.
 
-## Keyboard-Layout
+## Keyboard Layout
 
 For the player side of things, WASM-4 tries to cover most keyboard-layouts:
 

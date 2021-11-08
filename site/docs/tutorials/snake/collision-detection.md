@@ -9,7 +9,7 @@ import TabItem from '@theme/TabItem';
 
 Your game is progressing nicely. Only two more things and you're done: Growing the snake and "Game Over". For the first, you need to check if the snake collides with the fruit. For the second, you need to check if the snake collides with itself.
 
-## ... with the fruit
+## Collision Detection with the Fruit
 
 <Tabs
     groupId="code-language"

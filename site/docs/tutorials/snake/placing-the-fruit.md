@@ -42,7 +42,7 @@ To place (and eat) a fruit, you first need to make a variable for this. Since it
 
 </Tabs>
 
-## Random numbers
+## Random Numbers
 
 <Tabs
     groupId="code-language"

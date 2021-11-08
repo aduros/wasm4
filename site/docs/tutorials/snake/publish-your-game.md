@@ -67,7 +67,7 @@ Your game will be here: `build/cart.wasm`
 
 </Tabs>
 
-## Your account
+## Your Account
 
 :::note Early version
 The WASM-4 project is still in it's early stages. The process of submitting your game onto the website is still not finished and a little rough around the edges.

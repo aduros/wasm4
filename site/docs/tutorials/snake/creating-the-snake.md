@@ -5,7 +5,7 @@ sidebar_label: Creating the snake
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Creating the snake
+# Creating the Snake
 
 Let's take a look at the main component of the game: The snake. There are several ways to implement one.
 

@@ -91,7 +91,7 @@ Also: Rename your cart.wasm to something meaningful. Like `snake-spartan-edition
 
 Commit the changes and you're done with this folder.
 
-## Changing the list of games
+## Changing the List of Games
 
 Now that your game and the cover-image are uploaded, it's time to add them to the list of games. Navigate to `site/` and open the file `cart.js`.
 

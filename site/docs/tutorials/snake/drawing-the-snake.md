@@ -7,7 +7,7 @@ import TabItem from '@theme/TabItem';
 
 # Drawing the Snake
 
-## Drawing the body
+## Drawing the Body
 
 <Tabs
     groupId="code-language"

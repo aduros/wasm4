@@ -34,7 +34,7 @@ This is true for all other buttons too.
 
 ## Keyboard Layout
 
-For the player side of things, WASM-4 tries to cover most keyboard-layouts:
+For the player side of things, WASM-4 tries to cover most keyboard layouts:
 
 - X and Space = Button 1
 - Y, C and Z = Button 2

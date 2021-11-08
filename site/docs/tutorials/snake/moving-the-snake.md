@@ -5,7 +5,7 @@ sidebar_label: Moving the snake
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Moving the snake
+# Moving the Snake
 
 To move the snake, you have to change the X and Y position of every body-part of the snake.
 

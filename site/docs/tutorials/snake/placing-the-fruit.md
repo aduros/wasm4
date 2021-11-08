@@ -5,7 +5,7 @@ sidebar_label: Placing the fruit
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Placing the fruit
+# Placing the Fruit
 
 A freely moving snake is nice. But it get's a bit dull if that's all there is. To make it a bit more of a challenge, you'd need to add something to change the snake. The classic approach is to let the snake "eat" fruits. That's a good place to start.
 

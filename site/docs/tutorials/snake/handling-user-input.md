@@ -39,7 +39,7 @@ For the player side of things, WASM-4 tries to cover most keyboard-layouts:
 - X and Space = Button 1
 - Y, C and Z = Button 2
 
-This should cover QWERTY, QWERTZ and Dovrak layouts.
+This should cover QWERTY, QWERTZ and Dvorak layouts.
 
 The gamepads for the players 2, 3 and 4 are currently not implemented.
 

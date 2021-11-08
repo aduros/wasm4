@@ -5,7 +5,7 @@ sidebar_label: Publish your game
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Publish your game
+# Publish Your Game
 
 ## Create a publish version
 

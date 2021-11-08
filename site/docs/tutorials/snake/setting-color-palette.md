@@ -17,7 +17,7 @@ In WASM-4, you can set 4 colors to your liking. The default color palette looks 
     <div className="col col--2" style={{padding: "1.5rem", background: "#071821", color: "#fff"}}>Color 4: #071821</div>
 </div>
 
-It's inspired by the color palette of the original gameboy. But you can set your own palette too.
+It's inspired by the color palette of the original Gameboy. But you can set your own palette too.
 
 ## Picking a color palette
 

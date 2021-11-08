@@ -5,7 +5,7 @@ sidebar_label: Collision detection
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Collision detection ...
+# Collision Detection
 
 Your game is progressing nicely. Only two more things and you're done: Growing the snake and "Game Over". For the first, you need to check if the snake collides with the fruit. For the second, you need to check if the snake collides with itself.
 

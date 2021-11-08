@@ -28,7 +28,7 @@ WASM-4 provides 4 variables that represent the current state of the respective g
 
 So if the player presses "Right" and "Button 1", the value would be 33. Now are all values "a power of two", meaning you can set and check them using binary operators.
 
-If you wnt to check if Button 1 is pressed, simply use the binary AND:
+If you want to check if Button 1 is pressed, simply use the binary AND:
 
 This is true for all other buttons too.
 

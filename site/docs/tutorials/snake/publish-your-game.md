@@ -77,7 +77,7 @@ WASM-4 and it's website are stored in a Git-Repo (short for Repository) hosted o
 
 To publish your game, you *need* a GitHub Account. If you don't have one already, [create one](https://github.com/join). In case you already have one, [login](https://github.com/login).
 
-## Forking the repo
+## Forking the Repo
 
 Now you need to "fork" the repo. For this, go to the [original GitHub Repo of WASM-4](https://github.com/aduros/wasm4).
 

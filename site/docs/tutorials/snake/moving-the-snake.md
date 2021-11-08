@@ -24,7 +24,7 @@ Keep in mind: This is not what the player sees. This is:
 ![](images/snake_move_rendered.webp)
 
 
-## Moving the body
+## Moving the Body
 
 <Tabs
     groupId="code-language"

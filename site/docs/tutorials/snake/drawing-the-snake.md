@@ -102,7 +102,7 @@ You should see some green blocks at the top.
 
 </Tabs>
 
-## Drawing the head
+## Drawing the Head
 
 <Tabs
     groupId="code-language"

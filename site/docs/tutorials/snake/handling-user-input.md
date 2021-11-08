@@ -13,7 +13,7 @@ That's it.
 
 But first, you need to understand how WASM-4 handles it's user input.
 
-## Gamepad basics
+## Gamepad Basics
 
 WASM-4 provides 4 variables that represent the current state of the respective gamepad. It's `0` (Zero) if nothing is pressed right now. Otherwise it contains a sum of those values:
 

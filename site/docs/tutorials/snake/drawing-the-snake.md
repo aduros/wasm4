@@ -5,7 +5,7 @@ sidebar_label: Drawing the snake
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Drawing the snake
+# Drawing the Snake
 
 ## Drawing the body
 

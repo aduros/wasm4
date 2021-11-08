@@ -6,7 +6,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 
-# Setup your project
+# Setup Your Project
 
 Before you can begin, you need a project to work with. The CLI-Tool of WASM-4 includes templates for several programing languages like AssemblyScript, C, Go and Rust. More languages are sure to come in the future.
 

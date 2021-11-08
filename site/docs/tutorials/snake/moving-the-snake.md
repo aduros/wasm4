@@ -124,7 +124,7 @@ That's it. Now you should see the snake running from left to right. Maybe a litt
 
 </Tabs>
 
-## Slowing down
+## Slowing Down
 
 By default WASM-4 runs at 60 FPS. This means your little snake moves 60 fields in each second. That is 3 times the whole screen.
 There are several ways to slow the snake down.

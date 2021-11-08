@@ -2,7 +2,7 @@
 sidebar_label: Further ideas
 ---
 
-# Further ideas
+# Further Ideas
 
 There are certainly a lot of possible aspects to improve upon. Like: Did you notice you can - if you're fast enough - make a 180° turn? Even though you blocked the easy one, this can still happen.
 

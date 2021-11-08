@@ -1,4 +1,5 @@
 #include <MiniFB.h>
+#include <stdio.h>
 
 #include "../window.h"
 #include "../runtime.h"

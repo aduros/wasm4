@@ -108,7 +108,7 @@ Keep in mind, that the value of `rnd` is `nil` if it wasn't initialized yet.
 
 </Tabs>
 
-## Importing PNG files
+## Importing PNG Files
 
 <Tabs
     groupId="code-language"

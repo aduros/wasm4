@@ -6,7 +6,7 @@ import MultiLanguageCode from '@site/src/components/MultiLanguageCode';
 
 # Setting Color Palette
 
-## The default color palette
+## The Default Color Palette
 
 In WASM-4, you can set 4 colors to your liking. The default color palette looks like this:
 

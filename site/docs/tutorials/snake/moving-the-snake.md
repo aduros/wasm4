@@ -74,7 +74,7 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 
 </Tabs>
 
-## Moving the head
+## Moving the Head
 
 <Tabs
     groupId="code-language"

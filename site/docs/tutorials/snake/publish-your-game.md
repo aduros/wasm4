@@ -108,7 +108,7 @@ Here is what each property is used for:
 
 Once you've done this, commit those changes too.
 
-## Letting WASM-4 know
+## Letting WASM-4 Know
 
 Your fork is now ready. Switch to the `Pull Requests` tab and press on "New pull request".
 

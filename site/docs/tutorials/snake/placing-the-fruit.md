@@ -180,7 +180,7 @@ With that out of the way, it's time to actually render the newly imported sprite
 
 </Tabs>
 
-## Rendering a PNG file
+## Rendering a PNG File
 
 <Tabs
     groupId="code-language"

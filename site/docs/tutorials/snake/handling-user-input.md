@@ -146,7 +146,7 @@ Result: No new key was pressed this frame.
 
 ```
 
-## Changing directions
+## Changing Directions
 
 Now that you know how to detect if a key was pressed in the current frame, it's time you let the player change the direction of the snake.
 

@@ -7,7 +7,7 @@ import TabItem from '@theme/TabItem';
 
 # Handling user input
 
-With a moving snake, you've done a good part of the game. This part let's you give the control into the players hands. If the player presses a certain button, you just have to change the values of the "Direction"-Property of your snake.
+With a moving snake, you've done a good part of the game. This part lets you give the control into the players hands. If the player presses a certain button, you just have to change the values of the "Direction"-Property of your snake.
 
 That's it.
 

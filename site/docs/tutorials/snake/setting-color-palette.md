@@ -19,7 +19,7 @@ In WASM-4, you can set 4 colors to your liking. The default color palette looks 
 
 It's inspired by the color palette of the original Gameboy. But you can set your own palette too.
 
-## Picking a color palette
+## Picking a Color Palette
 
 There are a lot of different color palettes available. One of the most famous is probably https://lospec.com/palette-list.
 

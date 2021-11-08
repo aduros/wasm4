@@ -13,7 +13,7 @@ static GLuint paletteLocation;
 
 // Position and size of the viewport within the window, which may be smaller than the window size if
 // the window was forced to a non-square resolution
-int contentX, contentY, contentSize;
+static int contentX, contentY, contentSize;
 
 static void initLookupTable () {
     // Create a lookup table for each byte mapping to 4 bytes:

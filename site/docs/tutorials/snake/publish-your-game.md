@@ -1,7 +1,3 @@
----
-sidebar_label: Publish your game
----
-
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 

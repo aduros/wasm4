@@ -1,7 +1,3 @@
----
-sidebar_label: Handling user input
----
-
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -60,6 +56,20 @@ You can achieve this by using the bitwise XOR operator. To make it short, here i
     ]}>
 
 <TabItem value="language-typescript">
+
+```typescript
+const gamepad = load<u8>(w4.GAMEPAD1);
+const justPressed = gamepad & (gamepad ^ prevState)
+```
+
+The constant `justPressed` now holds all buttons that were pressed this frame. You can check the state of a single button like this:
+
+```go
+if (justPressed & w4.BUTTON_UP) {
+	// Do something
+}
+```
+
 </TabItem>
 
 <TabItem value="language-cpp">
@@ -165,6 +175,17 @@ For this, you need to change the update function of in the main file. Remember, 
     ]}>
 
 <TabItem value="language-typescript">
+
+```typescript
+export function update(): void {
+	frameCount++
+    if (frameCount % 15 == 0) {
+        snake.update()
+    }
+    snake.draw()
+}
+```
+
 </TabItem>
 
 <TabItem value="language-cpp">
@@ -203,6 +224,102 @@ The classic processing loop goes like this: Input, Process the input, output the
     ]}>
 
 <TabItem value="language-typescript">
+
+It's a good idea to handle the input in it's own function. Something like this could be on your mind:
+
+```diff
++function input() :void {
++   const gamepad = load<u8>(w4.GAMEPAD1);
++   const justPressed = gamepad & (gamepad ^ prevState)
++
++   if (justPressed & w4.BUTTON_UP) {
++       // Do something
++   }
++}
++
+export function update(): void {
+    frameCount++
++
++   input()
++
+	if frameCount%15 == 0 {
+		snake.Update()
+	}
+	snake.Draw()
+}
+```
+
+If you try to compile this, you should get an error: `ERROR TS2304: Cannot find name 'prevState'.`. This is easily fixed. Just place the prevState into the var-section:
+
+```diff
+ var snake = new Snake()
+ var frameCount = 0
++var prevState : u8
+```
+
+To notice any change in the gamepad, you have to store the *current state* at the end of the input. This will make it the *previous state*. And while you're at it, why not add the other 3 directions along the way:
+
+```diff
+function input() : void {
+    const gamepad = load<u8>(w4.GAMEPAD1);
+    const justPressed = gamepad & (gamepad ^ prevState)
+
+    if (justPressed & w4.BUTTON_LEFT) {
+        // Do something
+    }
++   if (justPressed & w4.BUTTON_RIGHT) {
++       // Do something
++   }
++   if (justPressed & w4.BUTTON_UP) {
++       // Do something
++   }
++   if (justPressed & w4.BUTTON_DOWN) {
++       // Do something
++   }
++
++	prevState = gamepad
+}
+```
+
+If you want to check if it works: Use the `trace` function provided by WASM-4. Here's an example:
+
+```typescript
+    if (justPressed & w4.BUTTON_DOWN) {
+        w4.trace("Down")
+    }
+```
+
+If you use `trace` in each if-statement, you should see the corresponding output in the console.
+
+Now, instead of using `trace` to confirm everything works as intended, you should replace it with something like this:
+
+```go
+	if justPressed&w4.BUTTON_DOWN != 0 {
+		snake.down()
+	}
+```
+
+I'll leave it to you, to finish the other 3 directions.
+
+You'll be - once again - rewarded with error messages:
+
+```
+ERROR TS2339: Property 'up' does not exist on type 'src/snake/Snake'.
+ERROR TS2339: Property 'down' does not exist on type 'src/snake/Snake'.
+ERROR TS2339: Property 'left' does not exist on type 'src/snake/Snake'.
+ERROR TS2339: Property 'right' does not exist on type 'src/snake/Snake'.
+```
+
+To fix this, add those functions to your snake. Here's an example for `down`:
+
+```typescript
+    public down() : void {
+        if (this.direction.Y == 0) {
+            this.direction = new Point(0, 1)
+        }
+    }
+```
+
 </TabItem>
 
 <TabItem value="language-cpp">
@@ -319,12 +436,12 @@ func (s *Snake) Down() {
 }
 ```
 
-First, it checks if the direction is already changing the Y-Direction. Only if it isn't allow the change. And then change the Y-Direction to 1. The `Up` direction requires a Y-Direction of `-1`. `Left` and `Right` don't check the Y, but the X and change it accordingly (Left: -1, Right: 1).
-
-With this knowledge, you should be able to implement them. If you're unsure, check the source in the repository.
-
 </TabItem>
 
 </Tabs>
+
+First, it checks if the direction is already changing the Y-Direction. Only if it isn't allow the change. And then change the Y-Direction to 1. The `Up` direction requires a Y-Direction of `-1`. `Left` and `Right` don't check the Y, but the X and change it accordingly (Left: -1, Right: 1).
+
+With this knowledge, you should be able to implement them. If you're unsure, check the source in the repository.
 
 ![Controlled Snake](images/snake-move-controlled.webp)

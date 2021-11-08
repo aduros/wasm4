@@ -1,7 +1,3 @@
----
-sidebar_label: Setting Color Palette
----
-
 import MultiLanguageCode from '@site/src/components/MultiLanguageCode';
 
 # Setting Color Palette

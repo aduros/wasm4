@@ -1,7 +1,3 @@
----
-sidebar_label: Creating the snake
----
-
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -20,6 +16,40 @@ Let's take a look at the main component of the game: The snake. There are severa
     ]}>
 
 <TabItem value="language-typescript">
+
+
+To keep things tidy, I recommend you'd create a new file called `snake.ts`. This file contains two classes:
+
+- The `Point` - Holding X and Y coordinates
+- The `Snake` - The actual snake implementation
+
+The content is rather simple:
+
+```typescript
+export class Point {
+    public X : i16
+    public Y : i16
+
+    constructor(X : i16, Y : i16) {
+        this.X = X
+        this.Y = Y
+    }
+}
+
+export class Snake {
+    public body : Array<Point>
+    public direction : Point
+
+    constructor () {
+        this.parts = new Array<Point>()
+        this.direction = new Point(1, 0)
+    }
+}
+```
+
+The snake class contains the body and the current direction of the snake instance.
+But it lacks any functionality for now.
+
 </TabItem>
 
 <TabItem value="language-cpp">

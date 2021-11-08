@@ -1,8 +1,4 @@
----
-sidebar_label: Inspiration & Goal
----
-
-# Inspiration and Goals
+# Inspiration & Goals
 
 Snake is a simple game. You can implement it in pretty any language or engine. It also allows for real-time user interaction and is a challenging game in itself.
 
@@ -17,7 +13,7 @@ During this tutorial you will learn how to ...
 - ... pick a color to draw
 - ... draw primitives (rectangles)
 - ... convert a sprite-image to source and draw it
-- ... handle user-input
+- ... handle user input
 - ... publish your game
 
 ## Preview

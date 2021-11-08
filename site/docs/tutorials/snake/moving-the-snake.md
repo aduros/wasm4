@@ -1,7 +1,3 @@
----
-sidebar_label: Moving the snake
----
-
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -37,6 +33,30 @@ Keep in mind: This is not what the player sees. This is:
     ]}>
 
 <TabItem value="language-typescript">
+
+To achieve the first step (moving the body, excluding the head), a simple loop is all you need:
+
+```typescript
+    public update() : void {
+        for (let i = this.body.length-1; i > 0; i--) {
+            this.body[i] = new Point(this.body[i-1].X, this.body[i-1].Y)
+        }
+    }
+```
+
+Don't forget to call the new function in the main-loop:
+
+```diff
+export function update(): void {
++   snake.update()
+    snake.draw()
+}
+```
+
+Now if you execute this, you'd notice that you can't see much. In fact, you might see the snake for a short moment before the head is all that's left.
+
+![](images/snake_move_head_only.webp)
+
 </TabItem>
 
 <TabItem value="language-cpp">
@@ -46,6 +66,7 @@ Keep in mind: This is not what the player sees. This is:
 </TabItem>
 
 <TabItem value="language-go">
+
 To achieve the first step (moving the body, excluding the head), a simple loop is all you need:
 
 ```go
@@ -87,6 +108,26 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
     ]}>
 
 <TabItem value="language-typescript">
+
+This isn't hard either. Simple add the add the direction to the current head. And then make sure the head stays within the boundaries:
+
+```diff
+    public update() : void {
+        for (let i = this.body.length-1; i > 0; i--) {
+            this.body[i] = new Point(this.body[i-1].X, this.body[i-1].Y)
+        }
++
++       this.body[0].X = (this.body[0].X + this.direction.X) % 20
++       this.body[0].Y = (this.body[0].Y + this.direction.Y) % 20
++       if (this.body[0].X < 0) {
++           this.body[0].X = 19
++       }
++       if (this.body[0].Y < 0) {
++           this.body[0].Y = 19
++       }
++   }
+```
+
 </TabItem>
 
 <TabItem value="language-cpp">
@@ -116,13 +157,14 @@ func (s *Snake) Update() {
 }
 ```
 
+</TabItem>
+
+</Tabs>
+
 That's it. Now you should see the snake running from left to right. Maybe a little too fast, though.
 
 ![Moving Snake (fast)](images/snake-motion-fast.webp)
 
-</TabItem>
-
-</Tabs>
 
 ## Slowing Down
 
@@ -142,6 +184,41 @@ The easiest way is probably to count the frames and update the snake only every 
     ]}>
 
 <TabItem value="language-typescript">
+
+For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
+
+```diff
+ var snake = new Snake()
++var frameCount = 0
+```
+
+This variable in main.ts keeps track of all frames so far. Just increase it's value in the main-update function:
+
+```diff
+export function update(): void {
++   frameCount++
+    snake.update()
+    snake.draw()
+}
+```
+
+Now all you need is to check if the passed frames are dividable by X:
+
+```diff
+export function update(): void {
+    frameCount++
+-   snake.update()
++   if (frameCount % 15 == 0) {
++      snake.update()
++   }
+    snake.draw()
+}
+```
+
+That's it. Your snake should be quite a bit slower now. This reduces the snake from 60 units per second to 4 units per second (60/15 = 4).
+
+![Moving Snake (slow)](images/snake-motion-slow.webp)
+
 </TabItem>
 
 <TabItem value="language-cpp">
@@ -168,7 +245,7 @@ var (
 )
 ```
 
-This variable in he main.go keeps track of all frames so far. Just increase it's value in the main-update function:
+This variable in main.go keeps track of all frames so far. Just increase it's value in the main-update function:
 
 ```diff
 //go:export update

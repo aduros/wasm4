@@ -73,9 +73,15 @@ if (justPressed & w4.BUTTON_UP) {
 </TabItem>
 
 <TabItem value="language-cpp">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-rust">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-go">
@@ -189,9 +195,15 @@ export function update(): void {
 </TabItem>
 
 <TabItem value="language-cpp">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-rust">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-go">
@@ -323,9 +335,15 @@ To fix this, add those functions to your snake. Here's an example for `down`:
 </TabItem>
 
 <TabItem value="language-cpp">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-rust">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-go">

@@ -43,24 +43,6 @@ export function update (): void {
 }
 ```
 
-```c
-#include "wasm4.h"
-
-void update () {
-}
-```
-
-```rust
-#[cfg(feature = "buddy-alloc")]
-mod alloc;
-mod wasm4;
-use wasm4::*;
-
-#[no_mangle]
-fn update() {
-}
-```
-
 ```go
 package main
 
@@ -85,29 +67,6 @@ export function start (): void {
     store<u32>(w4.PALETTE, 0xe5b083, 1 * sizeof<u32>());
     store<u32>(w4.PALETTE, 0x426e5d, 2 * sizeof<u32>());
     store<u32>(w4.PALETTE, 0x20283d, 3 * sizeof<u32>());
-}
-```
-
-```c
-void start () {
-    PALETTE[0] = 0xfbf7f3;
-    PALETTE[1] = 0xe5b083;
-    PALETTE[2] = 0x426e5d;
-    PALETTE[3] = 0x20283d;
-}
-```
-
-```rust
-#[no_mangle]
-fn start() {
-    unsafe {
-        *PALETTE = [
-            0xfbf7f3,
-            0xe5b083,
-            0x426e5d,
-            0x20283d,
-        ];
-    }
 }
 ```
 

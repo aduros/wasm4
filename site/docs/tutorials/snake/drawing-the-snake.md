@@ -75,9 +75,15 @@ You should see some green blocks at the top.
 </TabItem>
 
 <TabItem value="language-cpp">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-rust">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-go">
@@ -242,9 +248,15 @@ This changes the color back and adds the darker green as it's outline.
 </TabItem>
 
 <TabItem value="language-cpp">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-rust">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-go">

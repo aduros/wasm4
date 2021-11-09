@@ -28,9 +28,15 @@ To place (and eat) a fruit, you first need to make a variable for this. Since it
 </TabItem>
 
 <TabItem value="language-cpp">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-rust">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-go">
@@ -89,9 +95,15 @@ If you want to learn more about that, check out the examples of the other langua
 </TabItem>
 
 <TabItem value="language-cpp">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-rust">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-go">
@@ -202,9 +214,15 @@ With that out of the way, it's time to actually render the newly imported sprite
 </TabItem>
 
 <TabItem value="language-cpp">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-rust">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-go">
@@ -294,9 +312,15 @@ This way, w4 uses the color palette in it's default configuration. Except for on
 </TabItem>
 
 <TabItem value="language-cpp">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-rust">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-go">

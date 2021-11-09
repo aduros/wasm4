@@ -60,9 +60,15 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 </TabItem>
 
 <TabItem value="language-cpp">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-rust">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-go">
@@ -131,9 +137,15 @@ This isn't hard either. Simple add the add the direction to the current head. An
 </TabItem>
 
 <TabItem value="language-cpp">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-rust">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-go">
@@ -222,9 +234,15 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 </TabItem>
 
 <TabItem value="language-cpp">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-rust">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-go">

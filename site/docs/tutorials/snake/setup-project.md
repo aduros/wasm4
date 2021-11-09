@@ -56,6 +56,10 @@ w4 watch
 
 <TabItem value="language-cpp">
 
+:::note Work in Progress
+The tutorial for C/C++ is currently a Work-in-Progress. Most of the language specific instructions are currently missing.
+:::
+
 To compile C/C++ projects you will need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
 
 ```shell
@@ -78,6 +82,10 @@ w4 watch
 </TabItem>
 
 <TabItem value="language-rust">
+
+:::note Work in Progress
+The tutorial for Rust is currently a Work-in-Progress. Most of the language specific instructions are currently missing.
+:::
 
 To compile Rust projects you will need `cargo` installed. You will also need the wasm32 target,
 which can be installed with `rustup target add wasm32-unknown-unknown`.

@@ -63,9 +63,15 @@ Now you're almost done. Only "Game Over" is left to finish this game.
 </TabItem>
 
 <TabItem value="language-cpp">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-rust">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-go">
@@ -163,9 +169,15 @@ What you do, is up to you. You could stop the game and show the score. Or you co
 </TabItem>
 
 <TabItem value="language-cpp">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-rust">
+
+// TODO
+
 </TabItem>
 
 <TabItem value="language-go">

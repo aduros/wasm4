@@ -25,12 +25,12 @@ Copies pixels to the framebuffer.
 * `height`: Height of the sprite.
 * `flags`: Flags that modify behavior:
 
-| Flag bits | Description                                      |
-| ---       | ---                                              |
-| 0         | Sprite pixel format: 2BPP if set, otherwise 1BPP |
-| 1         | Flip sprite horizontally                         |
-| 2         | Flip sprite vertically                           |
-| 3         | Rotate sprite anti-clockwise 90 degrees          |
+| Flag bits | Name          | Description                                      |
+| ---       | ---           | ---                                              |
+| 0         | `BLIT_2BPP`   | Sprite pixel format: 2BPP if set, otherwise 1BPP |
+| 1         | `BLIT_FLIP_X` | Flip sprite horizontally                         |
+| 2         | `BLIT_FLIP_Y` | Flip sprite vertically                           |
+| 3         | `BLIT_ROTATE` | Rotate sprite anti-clockwise 90 degrees          |
 
 A 1BPP sprite uses 1 bit for each pixel and can contain up to 2 colors. A 2BPP sprite uses 2 bits per
 pixel and can contain up to 4 colors.

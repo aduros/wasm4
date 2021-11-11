@@ -39,8 +39,6 @@ WASM_EXPORT("update") void update ();
 
 #define BUTTON_1 1
 #define BUTTON_2 2
-#define BUTTON_ENTER 4
-#define BUTTON_UNUSED 8
 #define BUTTON_LEFT 16
 #define BUTTON_RIGHT 32
 #define BUTTON_UP 64

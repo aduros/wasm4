@@ -13,7 +13,7 @@ set(BUILD_SHARED_LIBS OFF)
 # MiniFB options
 set(MINIFB_BUILD_EXAMPLES OFF)
 set(USE_OPENGL_API OFF)
-set(USE_METAL_API OFF)
+# set(USE_METAL_API OFF)
 
 add_subdirectory(vendor/glfw)
 add_subdirectory(vendor/minifb)

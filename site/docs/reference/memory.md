@@ -33,10 +33,10 @@ Indexes into the color palette used by all drawing functions.
 
 | Bits    | Description   |
 | ---     | ---           |
-| 0 - 3   | Draw color 0 |
-| 4 - 7   | Draw color 1 |
-| 8 - 11  | Draw color 2 |
-| 12 - 15 | Draw color 3 |
+| 0 - 3   | Draw color 1 |
+| 4 - 7   | Draw color 2 |
+| 8 - 11  | Draw color 3 |
+| 12 - 15 | Draw color 4 |
 
 Each draw color can be a value between 1 and 4 representing a palette color, or 0 to signify
 transparency.

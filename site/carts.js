@@ -1,5 +1,11 @@
 const CARTS = [
     {
+        slug: "skipahead",
+        title: "Skip Ahead",
+        author: "Dennis Ranke",
+        github: "exoticorn",
+    },
+    {
         slug: "endless-runner",
         title: "Endless Runner",
         author: "Richard McCormack",

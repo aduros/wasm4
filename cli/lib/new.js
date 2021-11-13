@@ -26,8 +26,8 @@ const HELP = {
     },
     d: {
         name: "D",
-        build: "dub build",
-        cart: "build/cart.wasm",
+        build: "make",
+        cart: "cart.wasm",
     },
     go: {
         name: "Go",

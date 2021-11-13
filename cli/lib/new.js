@@ -3,35 +3,41 @@ const path = require("path");
 const fs = require("fs");
 
 const LANGS = {
-    c: "c",
     as: "assemblyscript",
     assemblyscript: "assemblyscript",
+    c: "c",
+    d: "d",
+    go: "go",
     rs: "rust",
     rust: "rust",
-    go: "go",
 }
 
 const HELP = {
-    c: {
-        name: "C",
-        build: "make",
-        cart: "build/cart.wasm",
-    },
     assemblyscript: {
         name: "AssemblyScript",
         setup: "npm install",
         build: "npm run build",
         cart: "build/cart.wasm",
     },
-    rust: {
-        name: "Rust",
-        build: "cargo build --release",
-        cart: "target/wasm32-unknown-unknown/release/cart.wasm",
+    c: {
+        name: "C",
+        build: "make",
+        cart: "build/cart.wasm",
+    },
+    d: {
+        name: "D",
+        build: "make",
+        cart: "cart.wasm",
     },
     go: {
         name: "Go",
         build: "make",
         cart: "build/cart.wasm",
+    },
+    rust: {
+        name: "Rust",
+        build: "cargo build --release",
+        cart: "target/wasm32-unknown-unknown/release/cart.wasm",
     },
 }
 
@@ -41,10 +47,12 @@ async function run (destDir, opts) {
         lang = LANGS.assemblyscript;
     } else if (opts.c) {
         lang = LANGS.c;
-    } else if (opts.rust) {
-        lang = LANGS.rust;
+    } else if (opts.d) {
+        lang = LANGS.d;
     } else if (opts.go) {
         lang = LANGS.go;
+    } else if (opts.rust) {
+        lang = LANGS.rust;
     }
 
     const srcDir = path.resolve(__dirname+"/../assets/templates/"+lang);

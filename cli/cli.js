@@ -8,12 +8,13 @@ let blankProject = (cmd) =>
     cmd
         .option("--as, --assemblyscript", "Create AssemblyScript project (Shorthand for --lang as/--lang assemblyscript)")
         .option("--c", "Create C/C++ project (Shorthand for --lang c)")
-        .option("--rs, --rust", "Create Rust project (Shorthand for --lang rs/--lang rust)")
+        .option("--d", "Create D project (Shorthand for --lang d)")
         .option("--go", "Create Go project (Shorthand for --lang go)")
+        .option("--rs, --rust", "Create Rust project (Shorthand for --lang rs/--lang rust)")
         .addOption(
             new Option("--lang <lang>", "Use the given language")
                 .env("W4_LANG")
-                .choices(["as", "assemblyscript", "c", "go", "rs", "rust"])
+                .choices(["as", "assemblyscript", "c", "d", "go", "rs", "rust"])
                 .default("as")
         )
 
@@ -65,13 +66,14 @@ program.command("png2src <images...>")
     .description("Convert images to source code")
     .option("--as, --assemblyscript", "Generate AssemblyScript source (Shorthand for --lang as/--lang assemblyscript)")
     .option("--c", "Generate C/C++ source (Shorthand for --lang c)")
+    .option("--d", "Generate D source (Shorthand for --lang d)")
     .option("--rs, --rust", "Generate Rust source (Shorthand for --lang rs/--lang rust)")
     .option("--go", "Generate Go source (Shorthand for --lang go)")
     .option("--t, --template <file>", "Template file with a custom output format")
     .addOption(
         new Option("--lang <lang>", "Use the given language")
             .env("W4_LANG")
-            .choices(["as", "assemblyscript", "c", "go", "rs", "rust"])
+            .choices(["as", "assemblyscript", "c", "d", "go", "rs", "rust"])
             .default("as")
     )
     .action((images, opts) => {

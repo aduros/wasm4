@@ -5,6 +5,7 @@ import CodeBlock from '@theme/CodeBlock';
 
 const LABELS = {
     "language-cpp": "C / C++",
+    "language-d": "D",
     "language-typescript": "AssemblyScript",
     "language-rust": "Rust",
     "language-go": "Go",

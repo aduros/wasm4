@@ -6,9 +6,10 @@ const LANGS={
     as: "assemblyscript",
     assemblyscript: "assemblyscript",
     c: "c",
+    d: "d",
+    go: "go",
     rs: "rust",
     rust: "rust",
-    go: "go"
 }
 const DEFAULT_LANG = 'assemblyscript';
 const TEMPLATES = {        
@@ -24,17 +25,23 @@ const %name% = memory.data<u8>([ %bytes% ]);`,
 #define %name%Flags %flagsHumanReadable%
 const uint8_t %name%[%length%] = { %bytes% };`,
 
-    rust: 
-`const %idiomaticName%_WIDTH: u32 = %width%;
-const %idiomaticName%_HEIGHT: u32 = %height%;
-const %idiomaticName%_FLAGS: u32 = %flags%; // %flagsHumanReadable%
-const %idiomaticName%: [u8; %length%] = [ %bytes% ];`,  
+    d: 
+`enum %name%Width = %width%;
+enum %name%Height = %height%;
+enum %name%Flags = %flagsHumanReadable%;
+immutable ubyte[] %name% = { %bytes% };`,
 
     go: 
 `const %name%Width = %width%
 const %name%Height = %height%
 const %name%Flags = %flags% // %flagsHumanReadable%
 var %name% = [%length%]byte { %bytes% }`,
+
+    rust: 
+`const %idiomaticName%_WIDTH: u32 = %width%;
+const %idiomaticName%_HEIGHT: u32 = %height%;
+const %idiomaticName%_FLAGS: u32 = %flags%; // %flagsHumanReadable%
+const %idiomaticName%: [u8; %length%] = [ %bytes% ];`,  
 }
 
 function run (sourceFile, template) {

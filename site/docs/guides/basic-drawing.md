@@ -24,6 +24,20 @@ PALETTE[2] = 0xeb6b6f;
 PALETTE[3] = 0x7c3f58;
 ```
 
+```d
+w4.palette[0] = 0xfff6d3;
+w4.palette[1] = 0xf9a875;
+w4.palette[2] = 0xeb6b6f;
+w4.palette[3] = 0x7c3f58;
+```
+
+```go
+w4.PALETTE[0] = 0xfff6d3
+w4.PALETTE[1] = 0xf9a875
+w4.PALETTE[2] = 0xeb6b6f
+w4.PALETTE[3] = 0x7c3f58
+```
+
 ```rust
 unsafe {
     *PALETTE = [
@@ -33,13 +47,6 @@ unsafe {
         0x7c3f58,
     ];
 }
-```
-
-```go
-w4.PALETTE[0] = 0xfff6d3
-w4.PALETTE[1] = 0xf9a875
-w4.PALETTE[2] = 0xeb6b6f
-w4.PALETTE[3] = 0x7c3f58
 ```
 
 </MultiLanguageCode>
@@ -75,14 +82,19 @@ w4.rect(10, 10, 32, 32);
 rect(10, 10, 32, 32);
 ```
 
-```rust
-unsafe { *DRAW_COLORS = 0x42 }
-rect(10, 10, 32, 32);
+```d
+*w4.drawColors = 0x42;
+w4.rect(10, 10, 32, 32);
 ```
 
 ```go
 *w4.DRAW_COLORS = 0x42
 w4.Rect(10, 10, 32, 32)
+```
+
+```rust
+unsafe { *DRAW_COLORS = 0x42 }
+rect(10, 10, 32, 32);
 ```
 
 </MultiLanguageCode>
@@ -104,12 +116,16 @@ w4.text("Hello world!", 10, 10);
 text("Hello world!", 10, 10);
 ```
 
-```rust
-text("Hello world!", 10, 10);
+```d
+w4.text("Hello world!", 10, 10);
 ```
 
 ```go
 w4.Text("Hello world!", 10, 10)
+```
+
+```rust
+text("Hello world!", 10, 10);
 ```
 
 </MultiLanguageCode>
@@ -141,18 +157,24 @@ memory.fill(w4.FRAMEBUFFER, 3 | (3 << 2) | (3 << 4) | (3 << 6), 160*160/4);
 memset(FRAMEBUFFER, 3 | (3 << 2) | (3 << 4) | (3 << 6), 160*160/4);
 ```
 
+```d
+// Requires WASI_SDK_PATH to be set!
+import core.stdc.string;
+memset(w4.framebuffer, 3 | (3 << 2) | (3 << 4) | (3 << 6), 160*160/4);
+```
+
+```go
+for i := range w4.FRAMEBUFFER {
+    w4.FRAMEBUFFER[i] = 3 | (3 << 2) | (3 << 4) | (3 << 6)
+}
+```
+
 ```rust
 unsafe {
     FRAMEBUFFER
         .as_mut()
         .expect("framebuffer ref")
         .fill(3 | (3 << 2) | (3 << 4) | (3 << 6));
-}
-```
-
-```go
-for i := range w4.FRAMEBUFFER {
-    w4.FRAMEBUFFER[i] = 3 | (3 << 2) | (3 << 4) | (3 << 6)
 }
 ```
 
@@ -197,21 +219,21 @@ void pixel (int x, int y) {
 }
 ```
 
-```rust
-fn pixel(x: i32, y: i32) {
+```d
+void pixel(int x, int y) {
     // The byte index into the framebuffer that contains (x, y)
-    let idx = (y as usize * 160 + x as usize) >> 2;
+    int idx = (y * w4.screenSize + x) >> 2;
 
     // Calculate the bits within the byte that corresponds to our position
-    let shift = (x as u8 & 0b11) << 1;
-    let mask = 0b11 << shift;
+    int shift = (x & 0b11) << 1;
+    int mask = 0b11 << shift;
 
-    unsafe {
-        let color: u8 = (*DRAW_COLORS & 0x3) as u8;
-        let framebuffer = FRAMEBUFFER.as_mut().expect("framebuffer ref");
+    // Use the first draw color as the pixel color
+    int color = *w4.drawColors & 0b11;
 
-        framebuffer[idx] = (color << shift) | (framebuffer[idx] & !mask);
-    }
+    // Write to the framebuffer
+    w4.framebuffer[idx] =
+        cast(ubyte)((color << shift) | (w4.framebuffer[idx] & ~mask));
 }
 ```
 
@@ -229,6 +251,24 @@ func pixel (x int, y int) {
 
     // Write to the framebuffer
     w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] & ^mask);
+}
+```
+
+```rust
+fn pixel(x: i32, y: i32) {
+    // The byte index into the framebuffer that contains (x, y)
+    let idx = (y as usize * 160 + x as usize) >> 2;
+
+    // Calculate the bits within the byte that corresponds to our position
+    let shift = (x as u8 & 0b11) << 1;
+    let mask = 0b11 << shift;
+
+    unsafe {
+        let color: u8 = (*DRAW_COLORS & 0x3) as u8;
+        let framebuffer = FRAMEBUFFER.as_mut().expect("framebuffer ref");
+
+        framebuffer[idx] = (color << shift) | (framebuffer[idx] & !mask);
+    }
 }
 ```
 

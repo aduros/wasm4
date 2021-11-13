@@ -58,7 +58,7 @@ function start (opts) {
             return skip;
         default:
             // Only trigger on source file changes
-            return /\.(ts|c|cpp|h|rs|go|wat)$/.test(file);
+            return /\.(c|cpp|d|go|h|rs|ts|wat)$/.test(file);
         }
     }
     watch("./", {recursive: true, filter: watchFilter}, (event, file) => {

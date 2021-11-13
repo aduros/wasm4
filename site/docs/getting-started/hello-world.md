@@ -22,13 +22,11 @@ void update () {
 }
 ```
 
-```rust
-mod wasm4;
-use wasm4::*;
+```d
+import w4 = wasm4;
 
-#[no_mangle]
-fn update () {
-    rect(10, 10, 32, 32);
+extern(C) void update() {
+    w4.rect(10, 10, 32, 32);
 }
 ```
 
@@ -40,6 +38,16 @@ import "cart/w4"
 //go:export update
 func update () {
     w4.Rect(10, 10, 32, 32)
+}
+```
+
+```rust
+mod wasm4;
+use wasm4::*;
+
+#[no_mangle]
+fn update () {
+    rect(10, 10, 32, 32);
 }
 ```
 
@@ -77,16 +85,22 @@ w4.rect(10, 10, 32, 32);
 rect(10, 10, 32, 32);
 ```
 
-```rust
-unsafe { *DRAW_COLORS = 2 }
+```d
+*w4.drawColors = 2;
 
-rect(10, 10, 32, 32);
+w4.rect(10, 10, 32, 32)
 ```
 
 ```go
 *w4.DRAW_COLORS = 2
 
 w4.Rect(10, 10, 32, 32)
+```
+
+```rust
+unsafe { *DRAW_COLORS = 2 }
+
+rect(10, 10, 32, 32);
 ```
 
 </MultiLanguageCode>
@@ -105,12 +119,16 @@ w4.trace("Hello world!");
 trace("Hello world!");
 ```
 
-```rust
-trace("Hello world!");
+```d
+w4.trace("Hello world!");
 ```
 
 ```go
 w4.Trace("Hello world!")
+```
+
+```rust
+trace("Hello world!");
 ```
 
 </MultiLanguageCode>

@@ -65,6 +65,8 @@ generate((name, addr) => `export const ADDR_${name} = ${addr};`);
 console.log("// C");
 generate((name, addr) => `#define ${name} ((${cTypes[name] || "const uint8_t"}*)${addr})`);
 
+// TODO D
+
 console.log("// AssemblyScript");
 generate((name, addr) => `export const ${name}: usize = ${addr};`);
 

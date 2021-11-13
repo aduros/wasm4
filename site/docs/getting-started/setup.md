@@ -29,8 +29,9 @@ Let's go over creating a new project called `hello-world` for your chosen langua
     values={[
         {label: 'AssemblyScript', value: 'language-typescript'},
         {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
+        {label: 'D', value: 'language-d'},
         {label: 'Go', value: 'language-go'},
+        {label: 'Rust', value: 'language-rust'},
     ]}>
 
 <TabItem value="language-typescript">
@@ -85,26 +86,25 @@ w4 run build/cart.wasm
 
 </TabItem>
 
-<TabItem value="language-rust">
+<TabItem value="language-d">
 
-To compile Rust projects you will need `cargo` installed. You will also need the wasm32 target,
-which can be installed with `rustup target add wasm32-unknown-unknown`.
+To compile D projects you will need `ldc` installed.
 
 ```shell
-w4 new --rust hello-world
+w4 new --d hello-world
 cd hello-world
 ```
 
 Compile the .wasm cartridge:
 
 ```shell
-cargo build --release
+dub build
 ```
 
 Run it in WASM-4 with:
 
 ```shell
-w4 run target/wasm32-unknown-unknown/release/cart.wasm
+w4 run build/cart.wasm
 ```
 
 </TabItem>
@@ -128,6 +128,30 @@ Run it in WASM-4 with:
 
 ```shell
 w4 run build/cart.wasm
+```
+
+</TabItem>
+
+<TabItem value="language-rust">
+
+To compile Rust projects you will need `cargo` installed. You will also need the wasm32 target,
+which can be installed with `rustup target add wasm32-unknown-unknown`.
+
+```shell
+w4 new --rust hello-world
+cd hello-world
+```
+
+Compile the .wasm cartridge:
+
+```shell
+cargo build --release
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 run target/wasm32-unknown-unknown/release/cart.wasm
 ```
 
 </TabItem>

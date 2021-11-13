@@ -25,6 +25,7 @@ enum gamepad4 = cast(const ubyte*)0x19;
 enum mouseX = cast(const short*)0x1a;
 enum mouseY = cast(const short*)0x1c;
 enum mouseButtons = cast(const ubyte*)0x1e;
+enum systemFlags = cast(const ubyte*)0x1f;
 enum framebuffer = cast(ubyte*)0xa0;
 
 enum button1 = 1;
@@ -33,6 +34,13 @@ enum buttonLeft = 16;
 enum buttonRight = 32;
 enum buttonUp = 64;
 enum buttonDown = 128;
+
+enum mouseLeft = 1;
+enum mouseRight = 2;
+enum mouseMiddle = 4;
+
+enum systemPreserveFramebuffer = 1;
+enum systemHideGamepadOverlay = 2;
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │

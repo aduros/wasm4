@@ -26,7 +26,7 @@ diskw(&gameData, sizeof(gameData));
 
 ```d
 int gameData = 1337;
-w4.diskw(&gameData, sizeof(gameData));
+w4.diskw(&gameData, gameData.sizeof);
 ```
 
 ```go
@@ -71,7 +71,7 @@ diskr(&gameData, sizeof(gameData));
 
 ```d
 int gameData;
-w4.diskr(&gameData, sizeof(gameData));
+w4.diskr(&gameData, gameData.sizeof);
 ```
 
 ```go

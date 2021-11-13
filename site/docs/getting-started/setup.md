@@ -88,7 +88,7 @@ w4 run build/cart.wasm
 
 <TabItem value="language-d">
 
-To compile D projects you will need `ldc` installed.
+To compile D projects you will need `ldc` installed. To use libc, you also need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
 
 ```shell
 w4 new --d hello-world

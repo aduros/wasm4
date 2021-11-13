@@ -24,13 +24,9 @@ int gameData = 1337;
 diskw(&gameData, sizeof(gameData));
 ```
 
-```rust
-let game_data: i32 = 1337;
-
-unsafe {
-    let game_data_bytes = game_data.to_le_bytes();
-    diskw(game_data_bytes.as_ptr(), core::mem::size_of::<i32>() as u32);
-}
+```d
+int gameData = 1337;
+w4.diskw(&gameData, sizeof(gameData));
 ```
 
 ```go
@@ -39,6 +35,15 @@ import "unsafe"
 
 var gameData int32 = 1337
 w4.DiskW(unsafe.Pointer(&gameData), unsafe.Sizeof(gameData))
+```
+
+```rust
+let game_data: i32 = 1337;
+
+unsafe {
+    let game_data_bytes = game_data.to_le_bytes();
+    diskw(game_data_bytes.as_ptr(), core::mem::size_of::<i32>() as u32);
+}
 ```
 
 </MultiLanguageCode>
@@ -64,14 +69,9 @@ int gameData;
 diskr(&gameData, sizeof(gameData));
 ```
 
-```rust
-let game_data = unsafe {
-    let mut buffer = [0u8; core::mem::size_of::<i32>()];
-
-    diskr(buffer.as_mut_ptr(), buffer.len() as u32);
-
-    i32::from_le_bytes(buffer)
-};
+```d
+int gameData;
+w4.diskr(&gameData, sizeof(gameData));
 ```
 
 ```go
@@ -80,6 +80,16 @@ import "unsafe"
 
 var gameData int32
 w4.DiskR(unsafe.Pointer(&gameData), unsafe.Sizeof(gameData))
+```
+
+```rust
+let game_data = unsafe {
+    let mut buffer = [0u8; core::mem::size_of::<i32>()];
+
+    diskr(buffer.as_mut_ptr(), buffer.len() as u32);
+
+    i32::from_le_bytes(buffer)
+};
 ```
 
 </MultiLanguageCode>

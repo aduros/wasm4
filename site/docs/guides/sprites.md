@@ -46,8 +46,8 @@ const uint8_t smiley[] = {
 };
 ```
 
-```rust
-const smiley: [u8; 8] = [
+```d
+immutable ubyte[] smiley = [
     0b11000011,
     0b10000001,
     0b00100100,
@@ -72,6 +72,19 @@ var smiley = [8]byte {
 }
 ```
 
+```rust
+const smiley: [u8; 8] = [
+    0b11000011,
+    0b10000001,
+    0b00100100,
+    0b00100100,
+    0b00000000,
+    0b00100100,
+    0b10011001,
+    0b11000011,
+];
+```
+
 </MultiLanguageCode>
 
 Now that we have our sprite data, we can blit it to the screen at position (10, 10).
@@ -86,12 +99,16 @@ w4.blit(smiley, 10, 10, 8, 8, w4.BLIT_1BPP);
 blit(smiley, 10, 10, 8, 8, BLIT_1BPP);
 ```
 
-```rust
-blit(&smiley, 10, 10, 8, 8, BLIT_1BPP);
+```d
+w4.blit(smiley.ptr, 10, 10, 8, 8, w4.blit1Bpp);
 ```
 
 ```go
 w4.Blit(&smiley[0], 10, 10, 8, 8, w4.BLIT_1BPP)
+```
+
+```rust
+blit(&smiley, 10, 10, 8, 8, BLIT_1BPP);
 ```
 
 </MultiLanguageCode>
@@ -112,12 +129,16 @@ w4.blit(smiley, 10, 10, 8, 8, w4.BLIT_1BPP | w4.BLIT_FLIP_Y);
 blit(smiley, 10, 10, 8, 8, BLIT_1BPP | BLIT_FLIP_Y);
 ```
 
-```rust
-blit(&smiley, 10, 10, 8, 8, BLIT_1BPP | BLIT_FLIP_Y);
+```d
+w4.blit(smiley.ptr, 10, 10, 8, 8, w4.blit1Bpp | w4.blitFlipY);
 ```
 
 ```go
 w4.Blit(&smiley[0], 10, 10, 8, 8, w4.BLIT_1BPP | w4.BLIT_FLIP_Y)
+```
+
+```rust
+blit(&smiley, 10, 10, 8, 8, BLIT_1BPP | BLIT_FLIP_Y);
 ```
 
 </MultiLanguageCode>

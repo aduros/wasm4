@@ -31,11 +31,11 @@ if (gamepad & BUTTON_RIGHT) {
 }
 ```
 
-```rust
-let gamepad = unsafe { *GAMEPAD1 };
+```d
+ubyte gamepad = *w4.GAMEPAD1;
 
-if gamepad & BUTTON_RIGHT != 0 {
-    trace("Right button is down!");
+if (gamepad & w4.buttonRight) {
+    w4.trace("Right button is down!");
 }
 ```
 
@@ -44,6 +44,14 @@ var gamepad = *w4.GAMEPAD1
 
 if gamepad&w4.BUTTON_RIGHT != 0 {
     w4.Trace("Right button is down!")
+}
+```
+
+```rust
+let gamepad = unsafe { *GAMEPAD1 };
+
+if gamepad & BUTTON_RIGHT != 0 {
+    trace("Right button is down!");
 }
 ```
 

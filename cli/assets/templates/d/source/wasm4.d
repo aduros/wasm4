@@ -29,8 +29,6 @@ enum framebuffer = cast(ubyte*)0xa0;
 
 enum button1 = 1;
 enum button2 = 2;
-enum buttonEnter = 4;
-enum buttonUnused = 8;
 enum buttonLeft = 16;
 enum buttonRight = 32;
 enum buttonUp = 64;

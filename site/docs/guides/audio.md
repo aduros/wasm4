@@ -37,7 +37,7 @@ tone(262, 60, 100, TONE_PULSE1);
 ```
 
 ```d
-w4.tone(262, 60, 100, w4.tonePulse1)
+w4.tone(262, 60, 100, w4.tonePulse1);
 ```
 
 ```go
@@ -106,7 +106,7 @@ w4.tone(262 | (523 << 16), 60, 100, w4.TONE_PULSE1);
 tone(262 | (523 << 16), 60, 100, TONE_PULSE1);
 ```
 
-```c
+```d
 w4.tone(262 | (523 << 16), 60, 100, w4.tonePulse1);
 ```
 

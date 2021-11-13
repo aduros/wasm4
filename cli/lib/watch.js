@@ -8,10 +8,14 @@ const server = require("./server");
 function start (opts) {
     let buildCommand, buildParams, buildOutput;
 
-    if (fs.existsSync("Makefile")) {
+	if (fs.existsSync("Makefile")) {
         buildCommand = "make";
         buildParams = ["--silent", "DEBUG=1"];
-        buildOutput = "build/cart.wasm";
+		if (fs.existsSync("dub.json")) {
+			buildOutput = "cart.wasm"; // Special case for D
+		} else {
+			buildOutput = "build/cart.wasm";
+		}
 
     } else if (fs.existsSync("Cargo.toml")) {
         buildCommand = "cargo";

@@ -8,6 +8,7 @@
 				"-betterC"
 			],
 			"lflags": [
+				"--strip-all",
 				"--allow-undefined",
 				"--global-base=6560",
 				"--import-memory",
@@ -25,6 +26,7 @@
 				"$WASI_SDK_PATH/share/wasi-sysroot"
 			],
 			"lflags": [
+				"--strip-all",
 				"--allow-undefined",
 				"--global-base=6560",
 				"--import-memory",

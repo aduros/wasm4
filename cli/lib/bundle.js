@@ -7,21 +7,8 @@ const {
     stringifyForJSONScript,
 } = require('./utils/html-escape');
 const { iconToBase64DataUrl } = require('./utils/icon');
-const Handlebars = require('handlebars');
+const Mustache = require('mustache');
 const pkg = require('../package.json');
-
-function createGeneratorContent() {
-    return `WASM-4 ${pkg.version}`;
-}
-
-async function compileTemplate() {
-    const templateSource = await fs.readFile(
-        path.resolve(__dirname, '../assets/bundle/html-page.hbs'),
-        { encoding: 'utf-8' }
-    );
-
-    return Handlebars.compile(templateSource);
-}
 
 async function bundleHtml (cartFile, htmlFile, opts) {
     const runtimeDir = path.resolve(__dirname, '../assets/runtime');
@@ -55,7 +42,7 @@ async function bundleHtml (cartFile, htmlFile, opts) {
         WASM4_CART_SIZE: cart.length,
     });
 
-    const metadata = [{ content: createGeneratorContent(), name: 'generator' }];
+    const metadata = [{ content: `WASM-4 ${pkg.version}`, name: 'generator' }];
 
     if (opts.timestamp) {
         metadata.push({
@@ -64,9 +51,12 @@ async function bundleHtml (cartFile, htmlFile, opts) {
         });
     }
 
-    const bundleTemplate = await compileTemplate();
+    const template = await fs.readFile(
+        path.resolve(__dirname, '../assets/bundle/template.html'),
+        { encoding: 'utf-8' }
+    );
 
-    const htmlFileContent = bundleTemplate({
+    const htmlFileContent = Mustache.render(template, {
         html: {
             title: opts.title,
             description: opts.description,

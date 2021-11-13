@@ -1,3 +1,4 @@
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -5,15 +6,15 @@
       name="viewport"
       content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"
     />
-    {{#each html.metadata}}
-    <meta name="{{this.name}}" content="{{this.content}}" />
-    {{/each}}
-    {{#if html.description}}
+    {{#html.metadata}}
+    <meta name="{{name}}" content="{{content}}" />
+    {{/html.metadata}}
+    {{#html.description}}
     <meta name="description" content="{{html.description}}" />
-    {{/if}}
-    {{#if html.iconUrl}}
+    {{/html.description}}
+    {{#html.iconUrl}}
     <link rel="shortcut icon" href="{{html.iconUrl}}" />
-    {{/if}}
+    {{/html.iconUrl}}
     <title>{{html.title}}</title>
     <style type="text/css" id="wasm4-css">{{{html.wasm4Css}}}</style>
   </head>

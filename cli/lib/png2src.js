@@ -28,8 +28,8 @@ const uint8_t %name%[%length%] = { %bytes% };`,
     d: 
 `enum %name%Width = %width%;
 enum %name%Height = %height%;
-enum %name%Flags = %flagsHumanReadable%;
-immutable ubyte[] %name% = { %bytes% };`,
+enum %name%Flags = %flags%; // %flagsHumanReadable%
+immutable ubyte[] %name% = [ %bytes% ];`,
 
     go: 
 `const %name%Width = %width%

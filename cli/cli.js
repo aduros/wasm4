@@ -51,7 +51,7 @@ program.command("watch")
     });
 
 program.command("run <cart>")
-    .description("Open a cartridge in the emulator")
+    .description("Open a cartridge in the web runtime")
     .addOption(
         new Option("-n, --no-open", "Doesn't open the browser")
             .env("W4_NO_OPEN")
@@ -60,6 +60,13 @@ program.command("run <cart>")
     .action((cart, opts) => {
         const server = require("./lib/server");
         server.start(cart, opts);
+    });
+
+program.command("run-native <cart>")
+    .description("Open a cartridge in the native desktop runtime")
+    .action((cart, opts) => {
+        const runNative = require("./lib/run-native");
+        runNative.run(cart, opts);
     });
 
 program.command("png2src <images...>")

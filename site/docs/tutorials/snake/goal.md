@@ -16,6 +16,13 @@ During this tutorial you will learn how to ...
 - ... handle user input
 - ... publish your game
 
+## Code for the game
+
+If you're stuck, check out [the source code](https://github.com/christopher-kleine/wasm-4-tutorial-games/branches).
+Simply pick the game in the language you want.
+
+![GitHub Branches](images/pick-source.png)
+
 ## Preview
 
 At the end of this tutorial, your snake game will look like this:

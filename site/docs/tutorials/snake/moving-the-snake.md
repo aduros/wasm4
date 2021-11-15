@@ -37,19 +37,20 @@ Keep in mind: This is not what the player sees. This is:
 To achieve the first step (moving the body, excluding the head), a simple loop is all you need:
 
 ```typescript
-    public update() : void {
-        for (let i = this.body.length-1; i > 0; i--) {
-            this.body[i] = new Point(this.body[i-1].X, this.body[i-1].Y)
-        }
-    }
+	public update() : void {
+		for (let i = this.body.length-1; i > 0; i--) {
+			this.body[i] = new Point(this.body[i-1].X, this.body[i-1].Y)
+		}
+	}
 ```
 
 Don't forget to call the new function in the main-loop:
 
-```diff
+```typescript {2}
 export function update(): void {
-+   snake.update()
-    snake.draw()
+	snake.update()
+
+	snake.draw()
 }
 ```
 
@@ -85,10 +86,11 @@ func (s *Snake) Update() {
 
 Don't forget to call the new function in the main-loop:
 
-```diff
+```go {3}
 //go:export update
 func update() {
-+	snake.Update()
+	snake.Update()
+
 	snake.Draw()
 }
 ```
@@ -117,21 +119,21 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 
 This isn't hard either. Simple add the add the direction to the current head. And then make sure the head stays within the boundaries:
 
-```diff
-    public update() : void {
-        for (let i = this.body.length-1; i > 0; i--) {
-            this.body[i] = new Point(this.body[i-1].X, this.body[i-1].Y)
-        }
-+
-+       this.body[0].X = (this.body[0].X + this.direction.X) % 20
-+       this.body[0].Y = (this.body[0].Y + this.direction.Y) % 20
-+       if (this.body[0].X < 0) {
-+           this.body[0].X = 19
-+       }
-+       if (this.body[0].Y < 0) {
-+           this.body[0].Y = 19
-+       }
-+   }
+```typescript {6-13}
+	public update() : void {
+		for (let i = this.body.length-1; i > 0; i--) {
+			this.body[i] = new Point(this.body[i-1].X, this.body[i-1].Y)
+		}
+
+		this.body[0].X = (this.body[0].X + this.direction.X) % 20
+		this.body[0].Y = (this.body[0].Y + this.direction.Y) % 20
+		if (this.body[0].X < 0) {
+			this.body[0].X = 19
+		}
+		if (this.body[0].Y < 0) {
+			this.body[0].Y = 19
+		}
+	}
 ```
 
 </TabItem>
@@ -152,20 +154,20 @@ This isn't hard either. Simple add the add the direction to the current head. An
 
 This isn't hard either. Simple add the add the direction to the current head. And then make sure the head stays within the boundaries:
 
-```diff
+```go {6-13}
 func (s *Snake) Update() {
 	for i := len(s.Body) - 1; i > 0; i-- {
 		s.Body[i] = s.Body[i-1]
 	}
-+
-+	s.Body[0].X = (s.Body[0].X + s.Direction.X) % 20
-+	s.Body[0].Y = (s.Body[0].Y + s.Direction.Y) % 20
-+	if (s.Body[0].X < 0) {
-+		s.Body[0].X = 19
-+	}
-+	if (s.Body[0].Y < 0) {
-+		s.Body[0].Y = 19
-+	}
+
+	s.Body[0].X = (s.Body[0].X + s.Direction.X) % 20
+	s.Body[0].Y = (s.Body[0].Y + s.Direction.Y) % 20
+	if (s.Body[0].X < 0) {
+		s.Body[0].X = 19
+	}
+	if (s.Body[0].Y < 0) {
+		s.Body[0].Y = 19
+	}
 }
 ```
 
@@ -199,31 +201,34 @@ The easiest way is probably to count the frames and update the snake only every 
 
 For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
 
-```diff
- var snake = new Snake()
-+var frameCount = 0
+```typescript {2}
+var snake = new Snake()
+var frameCount = 0
 ```
 
 This variable in main.ts keeps track of all frames so far. Just increase it's value in the main-update function:
 
-```diff
+```typescript {2}
 export function update(): void {
-+   frameCount++
-    snake.update()
-    snake.draw()
+	frameCount++
+
+	snake.update()
+
+	snake.draw()
 }
 ```
 
 Now all you need is to check if the passed frames are dividable by X:
 
-```diff
+```typescript {4-6}
 export function update(): void {
-    frameCount++
--   snake.update()
-+   if (frameCount % 15 == 0) {
-+      snake.update()
-+   }
-    snake.draw()
+	frameCount++
+
+	if (frameCount % 15 == 0) {
+		snake.update()
+	}
+
+	snake.draw()
 }
 ```
 
@@ -249,41 +254,44 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 
 For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
 
-```diff
+```go {10}
 var (
 	snake = &Snake{
-		Body: []image.Point{
+		Body: []Point{
 			{X: 2, Y: 0},
 			{X: 1, Y: 0},
 			{X: 0, Y: 0},
 		},
-		Direction: image.Pt(1, 0),
+		Direction: Point{X: 1, Y: 0},
 	}
-+	frameCount = 0
+	frameCount = 0
 )
 ```
 
 This variable in main.go keeps track of all frames so far. Just increase it's value in the main-update function:
 
-```diff
+```go {3}
 //go:export update
 func update() {
-+	frameCount++
+	frameCount++
+
 	snake.Update()
+
 	snake.Draw()
 }
 ```
 
 Now all you need is to check if the passed frames are dividable by X:
 
-```diff
+```go {5-7}
 //go:export update
 func update() {
 	frameCount++
--	snake.Update()
-+	if frameCount%15 == 0 {
-+		snake.Update()
-+	}
+
+	if frameCount%15 == 0 {
+		snake.Update()
+	}
+
 	snake.Draw()
 }
 ```

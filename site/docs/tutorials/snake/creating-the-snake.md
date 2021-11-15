@@ -73,18 +73,24 @@ For this, create a new file an call it `snake.go`. Then fill it with th code-sni
 ```go
 package main
 
-import (
-	"image"
-)
+type Point struct {
+    X int
+    Y int
+}
 
 type Snake struct {
-	Body      []image.Point
-	Direction image.Point
+	Body      []Point
+	Direction Point
 }
 ```
 
 The snake type contains the body and the current direction of the snake instance.
 But it lacks any functionality for now.
+
+:::note BuiltIn Type
+Go offers a buildIn type for points. It's in `image`.
+Creating our own type reduces the size of the cart.
+:::
 
 </TabItem>
 

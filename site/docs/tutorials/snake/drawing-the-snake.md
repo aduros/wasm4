@@ -41,26 +41,26 @@ Keep in mind you need to import `w4` in case your editor doesn't do this for you
 
 That's all fine, but since there is no instance of the snake, nothing can be drawn. To fix this, simply create a new variable in main and call it's draw function:
 
-```diff
-+import { Point, Snake } from "./snake"
+```typescript {1,4,12-15,19}
+import { Point, Snake } from "./snake"
 import * as w4 from "./wasm4"
 
-+var snake = new Snake()
-+
+var snake = new Snake()
+
 export function start(): void {
     store<u32>(w4.PALETTE, 0xfbf7f3, 0 * sizeof<u32>())
     store<u32>(w4.PALETTE, 0xe5b083, 1 * sizeof<u32>())
     store<u32>(w4.PALETTE, 0x426e5d, 2 * sizeof<u32>())
     store<u32>(w4.PALETTE, 0x20283d, 3 * sizeof<u32>())
-+
-+    snake.body.push(new Point(2, 0))
-+    snake.body.push(new Point(1, 0))
-+    snake.body.push(new Point(0, 0))
-+    snake.direction = new Point(1, 0)
+
+    snake.body.push(new Point(2, 0))
+    snake.body.push(new Point(1, 0))
+    snake.body.push(new Point(0, 0))
+    snake.direction = new Point(1, 0)
 }
 
 export function update(): void {
-+    snake.draw()
+    snake.draw()
 }
 ```
 
@@ -114,7 +114,7 @@ Keep in mind you need to import `cart/w4` in case your editor doesn't do this fo
 
 That's all fine, but since there is no instance of the snake, nothing can be drawn. To fix this, simply create a new variable in main and call it's draw function:
 
-```diff
+```go {9-18,30}
 package main
 
 import (
@@ -123,17 +123,17 @@ import (
 	"cart/w4"
 )
 
-+var (
-+	snake = &Snake{
-+		Body: []image.Point{
-+			{X: 2, Y: 0},
-+			{X: 1, Y: 0},
-+			{X: 0, Y: 0},
-+		},
-+		Direction: image.Point{X: 1, Y: 0},
-+	}
-+)
-+
+var (
+	snake = &Snake{
+		Body: []Point{
+			{X: 2, Y: 0},
+			{X: 1, Y: 0},
+			{X: 0, Y: 0},
+		},
+		Direction: Point{X: 1, Y: 0},
+	}
+)
+
 //go:export start
 func start() {
 	w4.PALETTE[0] = 0xfbf7f3
@@ -144,7 +144,7 @@ func start() {
 
 //go:export update
 func update() {
-+	snake.Draw()
+	snake.Draw()
 }
 ```
 
@@ -186,7 +186,7 @@ Since the body is drawn, head is not much of a problem. Simply use the `rect` fu
 
 The draw function should now look like this:
 
-```typescript
+```typescript {4}
 public draw() : void {
 	this.body.forEach(part => w4.rect(part.X*8, part.Y*8, 8, 8))
 
@@ -216,7 +216,7 @@ The snippet above reads like this: "Color 1 uses Color 4 of the color palette, C
 
 If you change the source to
 
-```typescript
+```typescript {4}
 public draw() : void {
 	this.body.forEach(part => w4.rect(part.X*8, part.Y*8, 8, 8))
 
@@ -231,9 +231,9 @@ Result:
 
 You'll see a change. The snake changed color. Not only the head, but the complete snake! Once you've set a color, it stays that way. So if you want to change only the head, you have to change Color 1 again. Right before you draw the body.
 
-```diff
+```typescript {2}
 public draw() : void {
-+	store<u16>(w4.DRAW_COLORS, 0x0043)
+	store<u16>(w4.DRAW_COLORS, 0x0043)
 	this.body.forEach(part => w4.rect(part.X*8, part.Y*8, 8, 8))
  
 	store<u16>(w4.DRAW_COLORS, 0x0004)
@@ -273,7 +273,7 @@ Since the body is drawn, head is not much of a problem. Simply use the `Rect` fu
 
 The draw function should now look like this:
 
-```go
+```go {6}
 func (s *Snake) Draw() {
 	for _, part := range s.Body {
 		w4.Rect(part.X*8, part.Y*8, 8, 8)
@@ -305,7 +305,7 @@ The snippet above reads like this: "Color 1 uses Color 4 of the color palette, C
 
 If you change the source to
 
-```go
+```go {6}
 func (s *Snake) Draw() {
 	for _, part := range s.Body {
 		w4.Rect(part.X*8, part.Y*8, 8, 8)
@@ -322,9 +322,9 @@ Result:
 
 You'll see a change. The snake changed color. Not only the head, but the complete snake! Once you've set a color, it stays that way. So if you want to change only the head, you have to change Color 1 again. Right before you draw the body.
 
-```diff
+```go {2}
 func (s *Snake) Draw() {
-+	*w4.DRAW_COLORS = 0x0043
+	*w4.DRAW_COLORS = 0x0043
 	for _, part := range s.Body {
 		w4.Rect(part.X*8, part.Y*8, 8, 8)
 	}

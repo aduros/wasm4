@@ -45,16 +45,16 @@ fruit.Y = rnd(20)
 
 In it's final form, it could look like this:
 
-```diff
+```typescript {4-9}
 	if (frameCount%15 == 0) {
 		snake.update()
-+
-+		if (snake.body[0].X == fruit.X && snake.body[0].Y == fruit.Y) {
-+			let p = snake.body[snake.body.length-1]
-+			snake.body.push(new Point(p.X, p.Y))
-+			fruit.X = rnd(20)
-+			fruit.Y = rnd(20)
-+		}
+
+		if (snake.body[0].X == fruit.X && snake.body[0].Y == fruit.Y) {
+			let p = snake.body[snake.body.length-1]
+			snake.body.push(new Point(p.X, p.Y))
+			fruit.X = rnd(20)
+			fruit.Y = rnd(20)
+		}
 	}
 ```
 
@@ -99,15 +99,15 @@ fruit.Y = rnd(20)
 
 In it's final form, it could look like this:
 
-```diff
+```go {4-8}
 	if frameCount%15 == 0 {
 		snake.Update()
-+
-+		if snake.Body[0].X == fruit.X && snake.Body[0].Y == fruit.Y {
-+			snake.Body = append(snake.Body, snake.Body[len(snake.Body)-1])
-+			fruit.X = rnd.Intn(20)
-+			fruit.Y = rnd.Intn(20)
-+		}
+
+		if snake.Body[0].X == fruit.X && snake.Body[0].Y == fruit.Y {
+			snake.Body = append(snake.Body, snake.Body[len(snake.Body)-1])
+			fruit.X = rnd(20)
+			fruit.Y = rnd(20)
+		}
 	}
 ```
 
@@ -147,13 +147,13 @@ For the player to have any sense of "danger", the game needs a possibility for t
 
 Now you can call this function to check if the snake died in this frame:
 
-```diff
+```typescript {4-6}
 	if (frameCount%15 == 0) {
 		snake.update()
-+
-+		if (snake.isDead()) {
-+			// Do something
-+		}
+
+		if (snake.isDead()) {
+			// Do something
+		}
  
 		if (snake.body[0].X == fruit.X && snake.body[0].Y == fruit.Y) {
 			let p = snake.body[snake.body.length-1]
@@ -196,18 +196,18 @@ func (s *Snake) IsDead() bool {
 
 Now you can call this function to check if the snake died in this frame:
 
-```diff
+```go {4-6}
 	if frameCount%15 == 0 {
 		snake.Update()
 
-+		if snake.IsDead() {
-+			// Do something
-+		}
+		if snake.IsDead() {
+			// Do something
+		}
 
 		if snake.Body[0].X == fruit.X && snake.Body[0].Y == fruit.Y {
 			snake.Body = append(snake.Body, snake.Body[len(snake.Body)-1])
-			fruit.X = rnd.Intn(20)
-			fruit.Y = rnd.Intn(20)
+			fruit.X = rnd(20)
+			fruit.Y = rnd(20)
 		}
 	}
 ```

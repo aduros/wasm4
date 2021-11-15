@@ -185,10 +185,12 @@ For this, you need to change the update function of in the main file. Remember, 
 ```typescript
 export function update(): void {
 	frameCount++
-    if (frameCount % 15 == 0) {
-        snake.update()
-    }
-    snake.draw()
+
+	if (frameCount % 15 == 0) {
+		snake.update()
+	}
+
+	snake.draw()
 }
 ```
 
@@ -212,9 +214,11 @@ export function update(): void {
 //go:export update
 func update() {
 	frameCount++
+
 	if frameCount%15 == 0 {
 		snake.Update()
 	}
+
 	snake.Draw()
 }
 ```
@@ -239,66 +243,67 @@ The classic processing loop goes like this: Input, Process the input, output the
 
 It's a good idea to handle the input in it's own function. Something like this could be on your mind:
 
-```diff
-+function input() :void {
-+   const gamepad = load<u8>(w4.GAMEPAD1);
-+   const justPressed = gamepad & (gamepad ^ prevState)
-+
-+   if (justPressed & w4.BUTTON_UP) {
-+       // Do something
-+   }
-+}
-+
+```typescript {1-8,13}
+function input() :void {
+	const gamepad = load<u8>(w4.GAMEPAD1);
+	const justPressed = gamepad & (gamepad ^ prevState)
+
+	if (justPressed & w4.BUTTON_UP) {
+		// Do something
+	}
+}
+
 export function update(): void {
-    frameCount++
-+
-+   input()
-+
+	frameCount++
+
+	input()
+
 	if frameCount%15 == 0 {
 		snake.Update()
 	}
+
 	snake.Draw()
 }
 ```
 
 If you try to compile this, you should get an error: `ERROR TS2304: Cannot find name 'prevState'.`. This is easily fixed. Just place the prevState into the var-section:
 
-```diff
- var snake = new Snake()
- var frameCount = 0
-+var prevState : u8
+```typescript {3}
+var snake = new Snake()
+var frameCount = 0
+var prevState : u8
 ```
 
 To notice any change in the gamepad, you have to store the *current state* at the end of the input. This will make it the *previous state*. And while you're at it, why not add the other 3 directions along the way:
 
-```diff
+```typescript {8-18}
 function input() : void {
-    const gamepad = load<u8>(w4.GAMEPAD1);
-    const justPressed = gamepad & (gamepad ^ prevState)
+	const gamepad = load<u8>(w4.GAMEPAD1);
+	const justPressed = gamepad & (gamepad ^ prevState)
 
-    if (justPressed & w4.BUTTON_LEFT) {
-        // Do something
-    }
-+   if (justPressed & w4.BUTTON_RIGHT) {
-+       // Do something
-+   }
-+   if (justPressed & w4.BUTTON_UP) {
-+       // Do something
-+   }
-+   if (justPressed & w4.BUTTON_DOWN) {
-+       // Do something
-+   }
-+
-+	prevState = gamepad
+	if (justPressed & w4.BUTTON_LEFT) {
+		// Do something
+	}
+	if (justPressed & w4.BUTTON_RIGHT) {
+		// Do something
+	}
+	if (justPressed & w4.BUTTON_UP) {
+		// Do something
+	}
+	if (justPressed & w4.BUTTON_DOWN) {
+		// Do something
+	}
+
+	prevState = gamepad
 }
 ```
 
 If you want to check if it works: Use the `trace` function provided by WASM-4. Here's an example:
 
 ```typescript
-    if (justPressed & w4.BUTTON_DOWN) {
-        w4.trace("Down")
-    }
+	if (justPressed & w4.BUTTON_DOWN) {
+		w4.trace("Down")
+	}
 ```
 
 If you use `trace` in each if-statement, you should see the corresponding output in the console.
@@ -325,11 +330,11 @@ ERROR TS2339: Property 'right' does not exist on type 'src/snake/Snake'.
 To fix this, add those functions to your snake. Here's an example for `down`:
 
 ```typescript
-    public down() : void {
-        if (this.direction.Y == 0) {
-            this.direction = new Point(0, 1)
-        }
-    }
+	public down() : void {
+		if (this.direction.Y == 0) {
+			this.direction = new Point(0, 1)
+		}
+	}
 ```
 
 </TabItem>
@@ -350,68 +355,66 @@ To fix this, add those functions to your snake. Here's an example for `down`:
 
 It's a good idea to handle the input in it's own function. Something like this could be on your mind:
 
-```diff
-+func input() {
-+	justPressed := *w4.GAMEPAD1 & (*w4.GAMEPAD1 ^ prevState)
-+
-+	if justPressed&w4.BUTTON_UP != 0 {
-+		// Do something
-+	}
-+}
-+
-//go:export update
-func update() {
-	frameCount++
-+
-+	input()
-+
-	if frameCount%15 == 0 {
-		snake.Update()
-	}
-	snake.Draw()
-}
-```
-
-If you try to compile this, you should get an error: `undeclared name: prevState`. This is easily fixed. Just place the prevState into the var-section:
-
-```diff
-var (
-	snake = &Snake{
-		Body: []image.Point{
-			{X: 2, Y: 0},
-			{X: 1, Y: 0},
-			{X: 0, Y: 0},
-		},
-		Direction: image.Pt(1, 0),
-	}
-	frameCount = 0
-+	prevState  uint8
-)
-```
-
-To notice any change in the gamepad, you have to store the *current state* at the end of the input. This will make it the *previous state*. And while you're at it, why not add the other 3 directions along the way:
-
-```diff
+```go {1-7,13}
 func input() {
 	justPressed := *w4.GAMEPAD1 & (*w4.GAMEPAD1 ^ prevState)
 
 	if justPressed&w4.BUTTON_UP != 0 {
 		// Do something
 	}
-+
-+	if justPressed&w4.BUTTON_DOWN != 0 {
-+		// Do something
-+	}
-+
-+	if justPressed&w4.BUTTON_LEFT != 0 {
-+		// Do something
-+	}
-+
-+	if justPressed&w4.BUTTON_RIGHT != 0 {
-+		// Do something
-+	}
-+
-+	prevState = *w4.GAMEPAD1
+}
+
+//go:export update
+func update() {
+	frameCount++
+
+	input()
+
+	if frameCount%15 == 0 {
+		snake.Update()
+	}
+
+	snake.Draw()
+}
+```
+
+If you try to compile this, you should get an error: `undeclared name: prevState`. This is easily fixed. Just place the prevState into the var-section:
+
+```go {11}
+var (
+	snake = &Snake{
+		Body: []Point{
+			{X: 2, Y: 0},
+			{X: 1, Y: 0},
+			{X: 0, Y: 0},
+		},
+		Direction: Point{X: 1, Y: 0},
+	}
+	frameCount = 0
+	prevState  uint8
+)
+```
+
+To notice any change in the gamepad, you have to store the *current state* at the end of the input. This will make it the *previous state*. And while you're at it, why not add the other 3 directions along the way:
+
+```go {7-17}
+func input() {
+	justPressed := *w4.GAMEPAD1 & (*w4.GAMEPAD1 ^ prevState)
+
+	if justPressed&w4.BUTTON_UP != 0 {
+		// Do something
+	}
+	if justPressed&w4.BUTTON_DOWN != 0 {
+		// Do something
+	}
+	if justPressed&w4.BUTTON_LEFT != 0 {
+		// Do something
+	}
+	if justPressed&w4.BUTTON_RIGHT != 0 {
+		// Do something
+	}
+
+	prevState = *w4.GAMEPAD1
 }
 ```
 
@@ -449,7 +452,7 @@ To fix this, add those functions to your snake. Here's an example for `Down`:
 ```go
 func (s *Snake) Down() {
 	if s.Direction.Y == 0 {
-		s.Direction = image.Pt(0, 1)
+		s.Direction = Point{X: 0, Y: 1}
 	}
 }
 ```

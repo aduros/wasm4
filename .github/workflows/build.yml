@@ -10,16 +10,19 @@ jobs:
                     - os: windows-latest
                       artifact: "windows"
                       wasm4: bin/wasm4.exe
+                      wasm4_minifb: bin/wasm4_minifb.exe
                       libretro: bin/wasm4_libretro.dll
 
                     - os: macos-latest
                       artifact: "mac"
                       wasm4: bin/wasm4
+                      wasm4_minifb: bin/wasm4_minifb
                       libretro: lib/wasm4_libretro.dylib
 
                     - os: ubuntu-latest
                       artifact: "linux"
                       wasm4: bin/wasm4
+                      wasm4_minifb: bin/wasm4_minifb
                       libretro: lib/wasm4_libretro.so
 
         name: Build ${{ matrix.config.artifact }}
@@ -52,6 +55,12 @@ jobs:
               with:
                   path: runtimes/native/instdir/${{ matrix.config.wasm4 }}
                   name: wasm4-${{ matrix.config.artifact }}
+
+            - name: Upload wasm4_minifb artifact
+              uses: actions/upload-artifact@v2
+              with:
+                  path: runtimes/native/instdir/${{ matrix.config.wasm4_minifb }}
+                  name: wasm4-minifb-${{ matrix.config.artifact }}
 
             - name: Upload libretro artifact
               uses: actions/upload-artifact@v2

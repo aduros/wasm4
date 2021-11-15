@@ -18,10 +18,8 @@ During this tutorial you will learn how to ...
 
 ## Code for the game
 
-If you're stuck, check out [the source code](https://github.com/christopher-kleine/wasm-4-tutorial-games/branches).
-Simply pick the game in the language you want.
-
-![GitHub Branches](images/pick-source.png)
+If you're stuck, check out [the source code](https://github.com/christopher-kleine/wasm-4-tutorial-games).
+You'll find all completed implementations in the various languages.
 
 ## Preview
 

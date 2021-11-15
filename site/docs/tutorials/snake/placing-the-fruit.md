@@ -18,11 +18,11 @@ A freely moving snake is nice. But it get's a bit dull if that's all there is. T
 <TabItem value="language-typescript">
 To place (and eat) a fruit, you first need to make a variable for this. Since it's simply a point on the grid, `Point` will do:
 
-```diff
- var snake = new Snake()
- var frameCount = 0
- var prevState : u8
-+var fruit : Point
+```typescript {4}
+var snake = new Snake()
+var frameCount = 0
+var prevState : u8
+var fruit : Point
 ```
 
 </TabItem>
@@ -41,12 +41,12 @@ To place (and eat) a fruit, you first need to make a variable for this. Since it
 
 <TabItem value="language-go">
 
-To place (and eat) a fruit, you first need to make a variable for this. Since it's simply a point on the grid, `image.Point` will do:
+To place (and eat) a fruit, you first need to make a variable for this. Since it's simply a point on the grid, `Point` will do:
 
-```diff
+```go {3}
 	frameCount = 0
 	prevState  uint8
-+	fruit      image.Point
+	fruit      Point
 ```
 
 </TabItem>
@@ -71,18 +71,17 @@ AssemblyScript provides us with the `Math.random` function. It returns a floatin
 
 ```typescript
 function rnd(n : u16) : u16 {
-    return u16(Math.floor(Math.random()*n));
+	return u16(Math.floor(Math.random()*n));
 }
 ```
 
 This allows you to call `rnd(20)` to get a number between `0` and `19`. Now you can change the fruit declaration:
 
-```diff
- var snake = new Snake()
- var frameCount = 0
- var prevState : u8
--var fruit : Point
-+var fruit = new Point(rnd(20), rnd(20))
+```typescript {4}
+var snake = new Snake()
+var frameCount = 0
+var prevState : u8
+var fruit = new Point(rnd(20), rnd(20))
 ```
 
 :::tip Use deterministic random numbers
@@ -111,24 +110,24 @@ If you want to learn more about that, check out the examples of the other langua
 Go provides us with pretty much everything we could need to create random numbers. The package `math/rand` contains a handy function: `Intn(n int) int`. It takes an integer and returns a random value between 0 and n-1. If you think, placing something like this in `start` would be a good idea:
 
 ```go
-	fruit.X = rand.Intn(20)
-	fruit.Y = rand.Intn(20)
+	fruit.X = rand(20)
+	fruit.Y = rand(20)
 ```
 
 You'd be surprised that this pretty much crashes. So we can't use the standard random-functions of Go? No, we can. We just have to make our own instance of the number generator:
 
-```diff
+```go {4}
 	frameCount = 0
 	prevState  uint8
-	fruit      image.Point
-+	rnd        func(int) int
+	fruit      Point
+	rnd        func(int) int
 ```
 
 Now you can use it like this:
 ```go
 	rnd = rand.New(rand.NewSource(1)).Intn
-	fruit.X = rnd.Intn(20)
-	fruit.Y = rnd.Intn(20)
+	fruit.X = rnd(20)
+	fruit.Y = rnd(20)
 ```
 
 The `1` is the seed. But having a fixed seed is not a good idea. You might be tempted to use `time.Now().Unix()`. But this will crash the came with a nice `field 'runtime.ticks' is not a Function`.
@@ -137,8 +136,8 @@ Since the standard `time` is not an option, how about you use something that is 
 
 ```go
 	rnd = rand.New(rand.NewSource(int64(frameCount))).Intn
-	fruit.X = rnd.Intn(20)
-	fruit.Y = rnd.Intn(20)
+	fruit.X = rnd(20)
+	fruit.Y = rnd(20)
 ```
 
 Works. But since this is the `start`-function, `frameCount` is pretty much always `0`. That's why here's a small exercise for you: change the seed after the first key was pressed.
@@ -201,12 +200,12 @@ To get it into a an existing file, use the `>>` operator. Like this:
 
 This will add the previous lines to your `main.ts` and causes an error because "fruit" already exists. Just rename the new fruit to `fruitSprite` and move it somewhere else. Also: You can remove the other stuff added, you won't need it for this project:
 
-```diff
- var snake = new Snake()
- var frameCount = 0
- var prevState : u8
- var fruit = new Point(rnd(20), rnd(20))
-+const fruitSprite = memory.data<u8>([ 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0 ]);
+```typescript {5}
+var snake = new Snake()
+var frameCount = 0
+var prevState : u8
+var fruit = new Point(rnd(20), rnd(20))
+const fruitSprite = memory.data<u8>([ 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0 ]);
 ```
 
 With that out of the way, it's time to actually render the newly imported sprite.
@@ -246,12 +245,12 @@ To get it into a an existing file, use the `>>` operator. Like this:
 
 This will add the previous lines to your `main.go` and causes an error because "fruit" already exists. Just rename the new fruit to `fruitSprite` and move it somewhere else. Also: You can remove the other stuff added, you won't need it for this project:
 
-```diff
+```go {5}
 	frameCount  = 0
 	prevState   uint8
-	fruit       image.Point
-	rnd         *rand.Rand
-+	fruitSprite = [16]byte{0x00, 0xa0, 0x02, 0x00, 0x0e, 0xf0, 0x36, 0x5c, 0xd6, 0x57, 0xd5, 0x57, 0x35, 0x5c, 0x0f, 0xf0}
+	fruit       Point
+	rnd         func(int) int
+	fruitSprite = [16]byte{0x00, 0xa0, 0x02, 0x00, 0x0e, 0xf0, 0x36, 0x5c, 0xd6, 0x57, 0xd5, 0x57, 0x35, 0x5c, 0x0f, 0xf0}
 ```
 
 With that out of the way, it's time to actually render the newly imported sprite.
@@ -285,26 +284,26 @@ In practice it looks like this:
 
 ```typescript
 export function update(): void {
-    frameCount++
+	frameCount++
 
-    input()
+	input()
 
-    if (frameCount % 15 == 0) {
-        snake.update()
-    }
-    snake.draw()
+	if (frameCount % 15 == 0) {
+		snake.update()
+	}
+	snake.draw()
 
-    w4.blit(fruitSprite, fruit.X*8, fruit.Y*8, 8, 8, w4.BLIT_2BPP)
+	w4.blit(fruitSprite, fruit.X*8, fruit.Y*8, 8, 8, w4.BLIT_2BPP)
 }
 ```
 
 But since you set the drawing colors, you need to change the drawing colors too:
 
-```diff
+```typescript {3}
 	snaked.draw()
-+
-+   store<u16>(w4.DRAW_COLORS, 0x4320)
-    w4.blit(fruitSprite, fruit.X*8, fruit.Y*8, 8, 8, w4.BLIT_2BPP)
+
+	store<u16>(w4.DRAW_COLORS, 0x4320)
+	w4.blit(fruitSprite, fruit.X*8, fruit.Y*8, 8, 8, w4.BLIT_2BPP)
 ```
 
 This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.
@@ -334,7 +333,7 @@ func Blit(sprite *byte, x, y int, width, height, flags uint)
 
 In practice it looks like this:
 
-```go
+```go {13}
 //go:export update
 func update() {
 	frameCount++
@@ -344,16 +343,19 @@ func update() {
 	if frameCount%15 == 0 {
 		snake.Update()
 	}
+
 	snake.Draw()
+
 	w4.Blit(&fruitSprite[0], fruit.X*8, fruit.Y*8, 8, 8, w4.BLIT_2BPP)
 }
 ```
 
 But since you set the drawing colors, you need to change the drawing colors too:
 
-```diff
+```go {3}
 	snake.Draw()
-+	*w4.DRAW_COLORS = 0x4320
+
+	*w4.DRAW_COLORS = 0x4320
 	w4.Blit(&fruitSprite[0], fruit.X*8, fruit.Y*8, 8, 8, w4.BLIT_2BPP)
 ```
 

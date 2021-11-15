@@ -15,7 +15,6 @@ static void onResize (struct mfb_window* window, int width, int height) {
     viewportX = width/2 - viewportSize/2;
     viewportY = height/2 - viewportSize/2;
 
-    printf("Resized %d %d\n", width, height);
     mfb_set_viewport(window, viewportX, viewportY, viewportSize, viewportSize);
 }
 
@@ -64,15 +63,12 @@ void w4_windowBoot (const char* title) {
         int mouseY = mfb_get_mouse_y(window);
         w4_runtimeSetMouse(160*(mouseX-viewportX)/viewportSize, 160*(mouseY-viewportY)/viewportSize, mouseButtons);
 
-        // printf("TICK\n");
         w4_runtimeUpdate();
 
         if (mfb_update_ex(window, pixels, 160, 160) < 0) {
-            printf("Closed\n");
             break;
         }
     } while (mfb_wait_sync(window));
-    printf("Done\n");
 }
 
 void w4_windowComposite (const uint32_t* palette, const uint8_t* framebuffer) {

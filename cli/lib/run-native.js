@@ -1,22 +1,32 @@
+const fs = require("fs");
+const os = require("os");
 const path = require("path");
 const { spawn } = require("child_process");
 
 /** Opens a cart in the native runtime. */
 function run (cart, opts) {
-    let cmd;
+    let executable;
     switch (process.platform) {
     case "win32":
-        cmd = path.resolve(__dirname, "../assets/natives/wasm4-windows.exe");
+        executable = path.resolve(__dirname, "../assets/natives/wasm4-windows.exe");
         break;
     case "darwin":
-        cmd = path.resolve(__dirname, "../assets/natives/wasm4-mac");
+        executable = path.resolve(__dirname, "../assets/natives/wasm4-mac");
         break;
     case "linux":
-        cmd = path.resolve(__dirname, "../assets/natives/wasm4-linux");
+        executable = path.resolve(__dirname, "../assets/natives/wasm4-linux");
         break;
     default:
         throw new Error(`Unsupported platform: ${process.platform}`);
     }
-    spawn(cmd, [cart], {stdio: "inherit"});
+
+    // If running under the pkg bundle, we need to copy it out to the filesystem
+    if (process.pkg) {
+        const tmp = path.join(os.tmpdir(), path.basename(executable));
+        fs.copyFileSync(executable, tmp);
+        executable = tmp;
+    }
+
+    spawn(executable, [cart], {stdio: "inherit"});
 }
 exports.run = run;

@@ -5,14 +5,27 @@
 When you're ready to distribute your game, you can bundle it into a standalone HTML file with `w4 bundle`:
 
 ```shell
-w4 bundle cart.wasm --html my-awesome-game.html
+w4 bundle cart.wasm --title "My Game" --html my-game.html
 ```
 
 The bundled HTML contains no external dependencies, works offline, and can be easily shared on sites like [itch.io](https://itch.io/).
 
 ## Bundle to Windows/Mac/Linux executable
 
-Coming soon!
+Native executables for multiple platforms can also be bundled:
+
+```shell
+w4 bundle cart.wasm --title "My Game" \
+    --windows my-game-windows.exe \
+    --mac my-game-mac \
+    --linux my-game-linux
+```
+
+This creates tiny (~200 KB) executables that run natively, no web browser required!
+
+:::caution
+Audio is not yet implemented in the native runtime.
+:::
 
 ## Publish on wasm4.org
 

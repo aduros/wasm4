@@ -23,7 +23,8 @@ function run (cart, opts) {
     // If running under the pkg bundle, we need to copy it out to the filesystem
     if (process.pkg) {
         const tmp = path.join(os.tmpdir(), path.basename(executable));
-        fs.copyFileSync(executable, tmp);
+        fs.writeFileSync(tmp, fs.readFileSync(executable));
+        fs.chmodSync(tmp, "775");
         executable = tmp;
     }
 

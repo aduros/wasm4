@@ -123,7 +123,7 @@ w4.Blit(&smiley[0], 10, 10, 8, 8, w4.BLIT_1BPP)
 ```odin
 // BLIT_1BPP is the default.
 // To use BLIT_2BPP:
-// w4.blit(&smiley[0], 10, 10, 8, 8, { .Use_2BPP })
+// w4.blit(&smiley[0], 10, 10, 8, 8, { .USE_2BPP })
 w4.blit(&smiley[0], 10, 10, 8, 8)
 ```
 
@@ -160,8 +160,8 @@ w4.Blit(&smiley[0], 10, 10, 8, 8, w4.BLIT_1BPP | w4.BLIT_FLIP_Y)
 ```odin
 // Again: BLIT_1BPP is the default.
 // To use BLIT_2BPP:
-// w4.blit(&smiley[0], 10, 10, 8, 8, { .Use_2BPP | .FlipY })
-w4.blit(&smiley[0], 10, 10, 8, 8, { .FlipY })
+// w4.blit(&smiley[0], 10, 10, 8, 8, { .USE_2BPP | .FLIPY })
+w4.blit(&smiley[0], 10, 10, 8, 8, { .FLIPY })
 ```
 
 ```rust

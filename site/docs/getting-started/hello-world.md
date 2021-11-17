@@ -44,11 +44,11 @@ func update () {
 ```odin
 package main
 
-import "cart/w4"
+import "cart:w4"
 
 @export
-func update () {
-    w4.Rect(10, 10, 32, 32)
+update :: proc "c" () {
+    w4.rect(10, 10, 32, 32)
 }
 ```
 

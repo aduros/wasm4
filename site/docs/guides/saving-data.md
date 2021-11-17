@@ -37,6 +37,11 @@ var gameData int32 = 1337
 w4.DiskW(unsafe.Pointer(&gameData), unsafe.Sizeof(gameData))
 ```
 
+```odin
+game_data : i32 = 1337
+w4.diskw(&game_data, size_of(game_data))
+```
+
 ```rust
 let game_data: i32 = 1337;
 
@@ -80,6 +85,11 @@ import "unsafe"
 
 var gameData int32
 w4.DiskR(unsafe.Pointer(&gameData), unsafe.Sizeof(gameData))
+```
+
+```odin
+game_data : i32
+w4.diskr(&game_data, size_of(game_data))
 ```
 
 ```rust

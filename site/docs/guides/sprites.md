@@ -72,6 +72,19 @@ var smiley = [8]byte {
 }
 ```
 
+```odin
+var smiley = [8]u8 {
+    0b11000011,
+    0b10000001,
+    0b00100100,
+    0b00100100,
+    0b00000000,
+    0b00100100,
+    0b10011001,
+    0b11000011,
+}
+```
+
 ```rust
 const smiley: [u8; 8] = [
     0b11000011,
@@ -107,6 +120,13 @@ w4.blit(smiley.ptr, 10, 10, 8, 8, w4.blit1Bpp);
 w4.Blit(&smiley[0], 10, 10, 8, 8, w4.BLIT_1BPP)
 ```
 
+```odin
+// BLIT_1BPP is the default.
+// To use BLIT_2BPP:
+// w4.blit(&smiley[0], 10, 10, 8, 8, { .Use_2BPP })
+w4.blit(&smiley[0], 10, 10, 8, 8)
+```
+
 ```rust
 blit(&smiley, 10, 10, 8, 8, BLIT_1BPP);
 ```
@@ -135,6 +155,13 @@ w4.blit(smiley.ptr, 10, 10, 8, 8, w4.blit1Bpp | w4.blitFlipY);
 
 ```go
 w4.Blit(&smiley[0], 10, 10, 8, 8, w4.BLIT_1BPP | w4.BLIT_FLIP_Y)
+```
+
+```odin
+// Again: BLIT_1BPP is the default.
+// To use BLIT_2BPP:
+// w4.blit(&smiley[0], 10, 10, 8, 8, { .Use_2BPP | .FlipY })
+w4.blit(&smiley[0], 10, 10, 8, 8, { .FlipY })
 ```
 
 ```rust

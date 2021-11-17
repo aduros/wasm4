@@ -44,6 +44,10 @@ w4.tone(262, 60, 100, w4.tonePulse1);
 w4.Tone(262, 60, 100, w4.TONE_PULSE1)
 ```
 
+```odin
+w4.tone(262, 60, 100, .Pulse1)
+```
+
 ```rust
 tone(262, 60, 100, TONE_PULSE1);
 ```
@@ -82,6 +86,10 @@ w4.tone(262, 60, 100, w4.tonePulse1 | w4.toneMode3);
 w4.Tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_MODE3)
 ```
 
+```odin
+w4.tone(262, 60, 100, .Pulse1, .Half)
+```
+
 ```rust
 tone(262, 60, 100, TONE_PULSE1 | TONE_MODE3);
 ```
@@ -112,6 +120,10 @@ w4.tone(262 | (523 << 16), 60, 100, w4.tonePulse1);
 
 ```go
 w4.Tone(262 | (523 << 16), 60, 100, w4.TONE_PULSE1)
+```
+
+```odin
+w4.tone(262 | (523 << 16), 60, 100, .Pulse1)
 ```
 
 ```rust
@@ -153,6 +165,10 @@ w4.tone(262, 60 | (30 << 8), 100, w4.tonePulse1);
 
 ```go
 w4.Tone(262, 60 | (30 << 8), 100, w4.TONE_PULSE1)
+```
+
+```odin
+w4.Tone(262, 60 | (30 << 8), 100, .Pulse1)
 ```
 
 ```rust

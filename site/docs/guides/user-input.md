@@ -32,7 +32,7 @@ if (gamepad & BUTTON_RIGHT) {
 ```
 
 ```d
-ubyte gamepad = *w4.GAMEPAD1;
+ubyte gamepad = *w4.gamepad1;
 
 if (gamepad & w4.buttonRight) {
     w4.trace("Right button is down!");
@@ -113,23 +113,18 @@ void update () {
 }
 ```
 
-```rust
-static mut PREVIOUS_GAMEPAD: u8 = 0;
+```d
+ubyte previousGamepad;
 
-#[no_mangle]
-fn update() {
-    let (pressed_this_frame, ..) = unsafe {
-        let previous = PREVIOUS_GAMEPAD;
-        let gamepad = *GAMEPAD1;
-        // Only the buttons that were pressed down this frame
-        let pressed_this_frame = gamepad & (gamepad ^ previous);
-        PREVIOUS_GAMEPAD = gamepad;
+void update() {
+    ubyte gamepad = *w4.gamepad1;
 
-        (pressed_this_frame, gamepad, previous)
-    };
+    // Only the buttons that were pressed down this frame
+    ubyte pressedThisFrame = gamepad & (gamepad ^ previousGamepad);
+    previousGamepad = gamepad;
 
-    if pressed_this_frame & BUTTON_RIGHT != 0 {
-        trace("Right button was just pressed!");
+    if (pressedThisFrame & w4.buttonRight) {
+        w4.trace("Right button was just pressed!");
     }
 }
 ```
@@ -147,6 +142,27 @@ func update () {
 
     if pressedThisFrame&w4.BUTTON_RIGHT != 0 {
         w4.Trace("Right button was just pressed!")
+    }
+}
+```
+
+```rust
+static mut PREVIOUS_GAMEPAD: u8 = 0;
+
+#[no_mangle]
+fn update() {
+    let (pressed_this_frame, ..) = unsafe {
+        let previous = PREVIOUS_GAMEPAD;
+        let gamepad = *GAMEPAD1;
+        // Only the buttons that were pressed down this frame
+        let pressed_this_frame = gamepad & (gamepad ^ previous);
+        PREVIOUS_GAMEPAD = gamepad;
+
+        (pressed_this_frame, gamepad, previous)
+    };
+
+    if pressed_this_frame & BUTTON_RIGHT != 0 {
+        trace("Right button was just pressed!");
     }
 }
 ```

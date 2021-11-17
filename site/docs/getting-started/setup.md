@@ -98,13 +98,13 @@ cd hello-world
 Compile the .wasm cartridge:
 
 ```shell
-dub build
+make
 ```
 
 Run it in WASM-4 with:
 
 ```shell
-w4 run build/cart.wasm
+w4 run cart.wasm
 ```
 
 </TabItem>

@@ -42,7 +42,7 @@ var %name% = [%length%]byte { %bytes% }`,
 `%odinName%_width : u32 : %width%
 %odinName%_height : u32 : %height%
 %odinName%_flags : w4.Blit_Flags : %odinFlags% // %flagsHumanReadable%
-%odinName% : [%length%]u8 : { %bytes% }`,
+%odinName% := [%length%]u8{ %bytes% }`,
 
     rust: 
 `const %rustName%_WIDTH: u32 = %width%;

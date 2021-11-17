@@ -73,7 +73,7 @@ var smiley = [8]byte {
 ```
 
 ```odin
-smiley : [8]u8 : {
+smiley := [8]u8 {
     0b11000011,
     0b10000001,
     0b00100100,

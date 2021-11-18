@@ -11,10 +11,11 @@ let blankProject = (cmd) =>
         .option("--d", "Create D project (Shorthand for --lang d)")
         .option("--go", "Create Go project (Shorthand for --lang go)")
         .option("--rs, --rust", "Create Rust project (Shorthand for --lang rs/--lang rust)")
+        .option("--zig", "Create Zig project (Shorthand for --lang zig)")
         .addOption(
             new Option("--lang <lang>", "Use the given language")
                 .env("W4_LANG")
-                .choices(["as", "assemblyscript", "c", "d", "go", "rs", "rust"])
+                .choices(["as", "assemblyscript", "c", "d", "go", "rs", "rust", "zig"])
                 .default("as")
         )
 

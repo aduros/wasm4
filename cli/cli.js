@@ -10,7 +10,7 @@ let blankProject = (cmd) =>
         .option("--c", "Create C/C++ project (Shorthand for --lang c)")
         .option("--d", "Create D project (Shorthand for --lang d)")
         .option("--go", "Create Go project (Shorthand for --lang go)")
-        .option("--odin", "Create Go project (Shorthand for --lang odin)")
+        .option("--odin", "Create Odin project (Shorthand for --lang odin)")
         .option("--rs, --rust", "Create Rust project (Shorthand for --lang rs/--lang rust)")
         .addOption(
             new Option("--lang <lang>", "Use the given language")
@@ -76,7 +76,7 @@ program.command("png2src <images...>")
     .option("--c", "Generate C/C++ source (Shorthand for --lang c)")
     .option("--d", "Generate D source (Shorthand for --lang d)")
     .option("--go", "Generate Go source (Shorthand for --lang go)")
-    .option("--odin", "Generate Go source (Shorthand for --lang odin)")
+    .option("--odin", "Generate Odin source (Shorthand for --lang odin)")
     .option("--rs, --rust", "Generate Rust source (Shorthand for --lang rs/--lang rust)")
     .option("--t, --template <file>", "Template file with a custom output format")
     .addOption(

@@ -44,7 +44,7 @@ func update () {
 ```odin
 package main
 
-import "cart:w4"
+import "w4"
 
 @export
 update :: proc "c" () {

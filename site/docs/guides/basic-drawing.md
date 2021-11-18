@@ -277,7 +277,7 @@ func pixel (x int, y int) {
 ```
 
 ```odin
-pixel :: proc "c" (x int, y int) {
+pixel :: proc "c" (x : int, y : int) {
     // The byte index into the framebuffer that contains (x, y)
     idx := (y*160 + x) >> 2
 
@@ -286,7 +286,7 @@ pixel :: proc "c" (x int, y int) {
     mask := u8(0b11 << shift)
 
     // Use the first DRAW_COLOR as the pixel color
-    color = u8(w4.DRAW_COLORS^ & 0b11)
+    color := u8(w4.DRAW_COLORS^ & 0b11)
 
     // Write to the framebuffer
     w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &~ mask)

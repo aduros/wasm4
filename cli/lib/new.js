@@ -10,6 +10,7 @@ const LANGS = {
     go: "go",
     rs: "rust",
     rust: "rust",
+    zig: 'zig',
 }
 
 const HELP = {
@@ -39,6 +40,11 @@ const HELP = {
         build: "cargo build --release",
         cart: "target/wasm32-unknown-unknown/release/cart.wasm",
     },
+    zig: {
+      name: 'Zig',
+      build: 'zig build',
+      cart: 'zig-out/lib/cart.wasm',
+    },
 }
 
 async function run (destDir, opts) {
@@ -53,6 +59,8 @@ async function run (destDir, opts) {
         lang = LANGS.go;
     } else if (opts.rust) {
         lang = LANGS.rust;
+    } else if (opts.zig) {
+        lang = LANGS.zig;
     }
 
     const srcDir = path.resolve(__dirname+"/../assets/templates/"+lang);
@@ -87,7 +95,7 @@ async function init (destDir, lang) {
             json.name = projectName;
             fs.writeFileSync(file, JSON.stringify(json, null, '  '));
             break;
-    }    
+    }
 }
 
 exports.run = run;

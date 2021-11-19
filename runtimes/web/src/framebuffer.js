@@ -147,11 +147,11 @@ export class Framebuffer {
         const drawColors = this.drawColors[0];
         const dc0 = drawColors & 0xf;
         const dc1 = (drawColors >>> 4) & 0xf;
-        
+
         if (dc1 === 0xf) {
             return;
         }
-        
+
         const strokeColor = (dc1 - 1) & 0x3;
         const fillColor = (dc0 - 1) & 0x3;
 

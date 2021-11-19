@@ -117,7 +117,7 @@ static void initOpenGL () {
     GLuint positionBuffer;
     glGenBuffers(1, &positionBuffer);
     float positionData[] = {
-        -1, -1, -1, +1, +1, +1, 
+        -1, -1, -1, +1, +1, +1,
         +1, +1, +1, -1, -1, -1,
     };
     glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);

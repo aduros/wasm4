@@ -264,7 +264,7 @@ async function loadCartWasm () {
 
         const buttons = gamepad.buttons;
         const axes = gamepad.axes;
-        
+
         // not all gamepads map DPAD to 12,13, 14, 15 buttos
         const dpad = buttons.length > 12;
 
@@ -314,7 +314,7 @@ async function loadCartWasm () {
             return;
         }
 
-        // reset 
+        // reset
         usedGamepad = -1;
         runtime.setGamepad(0, 0);
 

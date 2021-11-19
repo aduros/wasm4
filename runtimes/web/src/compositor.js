@@ -56,7 +56,7 @@ export class WebGLCompositor {
             }
         `);
 
-        const lookupBlock = Array.from({length: PALETTE_SIZE - 1}, 
+        const lookupBlock = Array.from({length: PALETTE_SIZE - 1},
                 (_, i) => {
                     return `p = mix(p, palette[${i + 1}],  step(${((i + 1) / PALETTE_SIZE).toFixed(2)}, index));`
                 }).join('\n');
@@ -108,7 +108,7 @@ export class WebGLCompositor {
         const positionAttrib = gl.getAttribLocation(program, "pos");
         const positionBuffer = gl.createBuffer();
         const positionData = new Float32Array([
-            -1, -1, -1, +1, +1, +1, 
+            -1, -1, -1, +1, +1, +1,
             +1, +1, +1, -1, -1, -1,
         ]);
         gl.bindBuffer(GL.ARRAY_BUFFER, positionBuffer);
@@ -119,14 +119,14 @@ export class WebGLCompositor {
 
     composite (palette, framebuffer) {
         const gl = this.gl;
-        const 
+        const
             bytes = framebuffer.bytes,
             colorBuffer = this.colorBuffer,
             table = this.table,
             lastPalette = this.lastPalette,
             rgb = this.paletteBuffer;
 
-        // Upload palette when needed 
+        // Upload palette when needed
         let syncPalette = false;
 
         for (let ii = 0, n = 0; ii < PALETTE_SIZE; ++ii) {

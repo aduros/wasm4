@@ -13,42 +13,42 @@ const LANGS={
     zig: "zig",
 }
 const DEFAULT_LANG = 'assemblyscript';
-const TEMPLATES = {        
-    assemblyscript: 
+const TEMPLATES = {
+    assemblyscript:
 `const %name%Width = %width%;
 const %name%Height = %height%;
 const %name%Flags = %flags%; // %flagsHumanReadable%
 const %name% = memory.data<u8>([ %bytes% ]);`,
 
-    c: 
+    c:
 `#define %name%Width %width%
 #define %name%Height %height%
 #define %name%Flags %flagsHumanReadable%
 const uint8_t %name%[%length%] = { %bytes% };`,
 
-    d: 
+    d:
 `enum %name%Width = %width%;
 enum %name%Height = %height%;
 enum %name%Flags = %flags%; // %flagsHumanReadable%
 immutable ubyte[] %name% = [ %bytes% ];`,
 
-    go: 
+    go:
 `const %name%Width = %width%
 const %name%Height = %height%
 const %name%Flags = %flags% // %flagsHumanReadable%
 var %name% = [%length%]byte { %bytes% }`,
 
-    rust: 
+    rust:
 `const %idiomaticName%_WIDTH: u32 = %width%;
 const %idiomaticName%_HEIGHT: u32 = %height%;
 const %idiomaticName%_FLAGS: u32 = %flags%; // %flagsHumanReadable%
-const %idiomaticName%: [u8; %length%] = [ %bytes% ];`,  
+const %idiomaticName%: [u8; %length%] = [ %bytes% ];`,
 
-    zig: 
+    zig:
 `const %name%Width = %width%;
 const %name%Height = %height%;
 const %name%Flags = %flags%; // %flagsHumanReadable%
-const %name% = [%length%]u8{ %bytes% };`,  
+const %name% = [%length%]u8{ %bytes% };`,
 }
 
 function run (sourceFile, template) {
@@ -155,7 +155,7 @@ function run (sourceFile, template) {
         .replace(/%flags%/gi, flags)
         .replace(/%flagsHumanReadable%/gi, flagsHumanReadable)
         .replace(/%bytes%/gi,data);
-   
+
     console.log(output);
 }
 
@@ -167,7 +167,7 @@ function runAll (files, opts) {
     if (!opts.template) {
         // iterate over all options and search a key that presented in templates
         for(let key in opts) {
-            if (key in TEMPLATES) {        
+            if (key in TEMPLATES) {
                 template = TEMPLATES[key]
                 break;
             }

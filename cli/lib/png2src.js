@@ -10,6 +10,7 @@ const LANGS={
     go: "go",
     rs: "rust",
     rust: "rust",
+    zig: "zig",
 }
 const DEFAULT_LANG = 'assemblyscript';
 const TEMPLATES = {        
@@ -42,6 +43,12 @@ var %name% = [%length%]byte { %bytes% }`,
 const %idiomaticName%_HEIGHT: u32 = %height%;
 const %idiomaticName%_FLAGS: u32 = %flags%; // %flagsHumanReadable%
 const %idiomaticName%: [u8; %length%] = [ %bytes% ];`,  
+
+    zig: 
+`const %name%Width = %width%;
+const %name%Height = %height%;
+const %name%Flags = %flags%; // %flagsHumanReadable%
+const %name% = [%length%]u8{ %bytes% };`,  
 }
 
 function run (sourceFile, template) {

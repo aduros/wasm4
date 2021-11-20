@@ -55,6 +55,14 @@ if gamepad & BUTTON_RIGHT != 0 {
 }
 ```
 
+```zig
+const gamepad = w4.GAMEPAD1.*;
+
+if (gamepad & w4.BUTTON_RIGHT != 0) {
+    w4.trace("Right button is down!");
+}
+```
+
 </MultiLanguageCode>
 
 | Gamepad Bit | Button                |
@@ -163,6 +171,21 @@ fn update() {
 
     if pressed_this_frame & BUTTON_RIGHT != 0 {
         trace("Right button was just pressed!");
+    }
+}
+```
+
+```zig
+var previous_gamepad: u8 = 0;
+
+export fn update() void {
+    const gamepad = w4.GAMEPAD1.*;
+
+    const pressed_this_frame = gamepad & (gamepad ^ previous_gamepad);
+    previous_gamepad = gamepad;
+
+    if (pressed_this_frame & w4.BUTTON_RIGHT != 0) {
+        w4.trace("Right button was just pressed!");
     }
 }
 ```

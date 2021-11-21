@@ -135,8 +135,9 @@ For the player to have any sense of "danger", the game needs a possibility for t
 
 ```typescript
   isDead(): bool {
+    const head = this.body[0]
     for (let i = 1, len = this.body.length; i < len; i++) {
-      if (this.body[i].equals(this.body[0])) {
+      if (this.body[i].equals(head)) {
         return true
       }
     }

@@ -217,3 +217,13 @@ extern "C" {
     #[link_name = "traceUtf8"]
     fn extern_trace(trace: *const u8, length: usize);
 }
+
+/// Returns a random `u64`.
+pub fn seed() -> u64 {
+    unsafe { extern_seed() as u64 }
+}
+
+extern "C" {
+    #[link_name = "seed"]
+    fn extern_seed() -> f64;
+}

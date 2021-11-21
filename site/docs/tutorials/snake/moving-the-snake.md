@@ -120,20 +120,22 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 This isn't hard either. Simple add the add the direction to the current head. And then make sure the head stays within the boundaries:
 
 ```typescript {6-13}
-	public update() : void {
-		for (let i = this.body.length-1; i > 0; i--) {
-			this.body[i] = new Point(this.body[i-1].X, this.body[i-1].Y)
-		}
+  update(): void {
+    for (let i = this.body.length - 1; i > 0; i--) {
+      unchecked(body[i].x = body[i - 1].x)
+      unchecked(body[i].y = body[i - 1].y)
+    }
 
-		this.body[0].X = (this.body[0].X + this.direction.X) % 20
-		this.body[0].Y = (this.body[0].Y + this.direction.Y) % 20
-		if (this.body[0].X < 0) {
-			this.body[0].X = 19
-		}
-		if (this.body[0].Y < 0) {
-			this.body[0].Y = 19
-		}
-	}
+    this.body[0].x = (this.body[0].x + this.direction.x) % 20
+    this.body[0].y = (this.body[0].y + this.direction.y) % 20
+
+    if (this.body[0].x < 0) {
+      this.body[0].x = 19
+    }
+    if (this.body[0].y < 0) {
+      this.body[0].y = 19
+    }
+  }
 ```
 
 </TabItem>

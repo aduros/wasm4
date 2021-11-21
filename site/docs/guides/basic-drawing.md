@@ -38,6 +38,13 @@ w4.PALETTE[2] = 0xeb6b6f
 w4.PALETTE[3] = 0x7c3f58
 ```
 
+```nim
+PALETTE[0] = 0xfff6d3
+PALETTE[1] = 0xf9a875
+PALETTE[2] = 0xeb6b6f
+PALETTE[3] = 0x7c3f58
+```
+
 ```rust
 unsafe {
     *PALETTE = [
@@ -92,6 +99,11 @@ w4.rect(10, 10, 32, 32);
 w4.Rect(10, 10, 32, 32)
 ```
 
+```nim
+DRAW_COLORS[] = 0x42
+rect(10, 10, 32, 32)
+```
+
 ```rust
 unsafe { *DRAW_COLORS = 0x42 }
 rect(10, 10, 32, 32);
@@ -122,6 +134,10 @@ w4.text("Hello world!", 10, 10);
 
 ```go
 w4.Text("Hello world!", 10, 10)
+```
+
+```nim
+text("Hello world!", 10, 10)
 ```
 
 ```rust
@@ -252,6 +268,21 @@ func pixel (x int, y int) {
     // Write to the framebuffer
     w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] & ^mask);
 }
+```
+
+```nim
+proc pixel(x, y: int32) =
+  # The byte index into the framebuffer that contains (x, y)
+  let idx = (y * SCREEN_SIZE + x) shr 2
+
+  # Calculate the bits within the byte that corresponds to our position
+  let shift = (x and 0b11) shl 1
+  let mask = uint8(0b11 shl shift)
+
+  let color = uint8(DRAW_COLORS[] and 0b11)
+
+  # Write to the framebuffer
+  FRAMEBUFFER[idx] = uint8((color shl shift) or (FRAMEBUFFER[idx] and not mask))
 ```
 
 ```rust

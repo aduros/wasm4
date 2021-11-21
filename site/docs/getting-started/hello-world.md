@@ -104,6 +104,12 @@ w4.rect(10, 10, 32, 32)
 w4.Rect(10, 10, 32, 32)
 ```
 
+```nim
+DRAW_COLORS[] = 2
+
+rect(10, 10, 32, 32)
+```
+
 ```rust
 unsafe { *DRAW_COLORS = 2 }
 
@@ -132,6 +138,10 @@ w4.trace("Hello world!");
 
 ```go
 w4.Trace("Hello world!")
+```
+
+```nim
+trace("Hello world!")
 ```
 
 ```rust

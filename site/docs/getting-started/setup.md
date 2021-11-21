@@ -135,7 +135,7 @@ w4 run build/cart.wasm
 
 <TabItem value="language-nim">
 
-To compile Rust projects you will need `nim` installed. You will also need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
+To compile Nim projects you will need `nimble` installed. You will also need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
 
 ```shell
 w4 new --nim hello-world

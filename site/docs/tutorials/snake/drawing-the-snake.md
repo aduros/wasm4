@@ -17,19 +17,19 @@ import TabItem from '@theme/TabItem';
 
 <TabItem value="language-typescript">
 
-To draw the snake, you can take advantage of AssemblyScripts `forEach` function.  
+To draw the snake, you can take advantage of AssemblyScripts `forEach` function.
 To make it a little easier, it's a good idea to use the `rect` function of WASM-4:
 
 ```typescript
 // rect draws a rectangle. It uses color 1 to fill and color 2 for the outline
-function rect (x: i32, y: i32, width: u32, height: u32): void;
+function rect(x: i32, y: i32, width: u32, height: u32): void;
 ```
 
 With that out the way, let's see what a first draft could look like.
 
 ```typescript
-public draw() : void {
-	this.body.forEach(part => w4.rect(part.X*8, part.Y*8, 8, 8))
+draw(): void {
+  this.body.forEach(part => w4.rect(part.x * 8, part.y * 8, 8, 8))
 }
 ```
 
@@ -45,22 +45,17 @@ That's all fine, but since there is no instance of the snake, nothing can be dra
 import { Point, Snake } from "./snake"
 import * as w4 from "./wasm4"
 
-var snake = new Snake()
+const snake = new Snake()
 
 export function start(): void {
-    store<u32>(w4.PALETTE, 0xfbf7f3, 0 * sizeof<u32>())
-    store<u32>(w4.PALETTE, 0xe5b083, 1 * sizeof<u32>())
-    store<u32>(w4.PALETTE, 0x426e5d, 2 * sizeof<u32>())
-    store<u32>(w4.PALETTE, 0x20283d, 3 * sizeof<u32>())
-
-    snake.body.push(new Point(2, 0))
-    snake.body.push(new Point(1, 0))
-    snake.body.push(new Point(0, 0))
-    snake.direction = new Point(1, 0)
+  store<u32>(w4.PALETTE, 0xfbf7f3, 0 * sizeof<u32>())
+  store<u32>(w4.PALETTE, 0xe5b083, 1 * sizeof<u32>())
+  store<u32>(w4.PALETTE, 0x426e5d, 2 * sizeof<u32>())
+  store<u32>(w4.PALETTE, 0x20283d, 3 * sizeof<u32>())
 }
 
 export function update(): void {
-    snake.draw()
+  snake.draw()
 }
 ```
 
@@ -68,7 +63,7 @@ Creating a global instance of a snake with some default values.
 
 After that, simply call the `draw` function of the snake.
 
-You should see some green blocks at the top. 
+You should see some green blocks at the top.
 
 ![Snake Body](images/draw-body.webp)
 
@@ -119,7 +114,7 @@ package main
 
 import (
 	"image"
- 
+
 	"cart/w4"
 )
 
@@ -152,7 +147,7 @@ Creating a global instance of a snake with some default values.
 
 After that, simply call the "Draw" function of the snake.
 
-You should see some green blocks at the top. 
+You should see some green blocks at the top.
 
 ![Snake Body](images/draw-body.webp)
 
@@ -181,16 +176,15 @@ I think it's easier to pick `[0]`.
 Since the body is drawn, head is not much of a problem. Simply use the `rect` function again. But use a specific part instead:
 
 ```typescript
-	w4.rect(this.body[0].X*8, w4.rect(this.body[0].Y*8, 8, 8)
+  w4.rect(this.body[0].x * 8, this.body[0].y * 8, 8, 8)
 ```
 
 The draw function should now look like this:
 
 ```typescript {4}
-public draw() : void {
-	this.body.forEach(part => w4.rect(part.X*8, part.Y*8, 8, 8))
-
-	w4.rect(this.body[0].X*8, w4.rect(this.body[0].Y*8, 8, 8)
+draw(): void {
+  this.body.forEach(part => w4.rect(part.x * 8, part.y * 8, 8, 8))
+  w4.rect(this.body[0].x * 8, this.body[0].y * 8, 8, 8)
 }
 ```
 
@@ -207,8 +201,8 @@ You can set the colors with this variable. You can look at this variable like a 
 The value for each digit can be  0 up to 4:
 
 - 0 = Use transparency
-- 1 = Use the 1st color from the color palette 
-- 2 = Use the 2nd color from the color palette 
+- 1 = Use the 1st color from the color palette
+- 2 = Use the 2nd color from the color palette
 - 3 = Use the 3rd color from the color palette
 - 4 = Use the 4th color from the color palette
 
@@ -217,11 +211,11 @@ The snippet above reads like this: "Color 1 uses Color 4 of the color palette, C
 If you change the source to
 
 ```typescript {4}
-public draw() : void {
-	this.body.forEach(part => w4.rect(part.X*8, part.Y*8, 8, 8))
+draw(): void {
+  this.body.forEach(part => w4.rect(part.x * 8, part.y * 8, 8, 8))
 
-	store<u16>(w4.DRAW_COLORS, 0x0004)
-	w4.rect(this.body[0].X*8, w4.rect(this.body[0].Y*8, 8, 8)
+  store<u16>(w4.DRAW_COLORS, 0x0004)
+  w4.rect(this.body[0].x * 8, this.body[0].y * 8, 8, 8)
 }
 ```
 
@@ -232,12 +226,12 @@ Result:
 You'll see a change. The snake changed color. Not only the head, but the complete snake! Once you've set a color, it stays that way. So if you want to change only the head, you have to change Color 1 again. Right before you draw the body.
 
 ```typescript {2}
-public draw() : void {
-	store<u16>(w4.DRAW_COLORS, 0x0043)
-	this.body.forEach(part => w4.rect(part.X*8, part.Y*8, 8, 8))
- 
-	store<u16>(w4.DRAW_COLORS, 0x0004)
-	w4.rect(this.body[0].X*8, w4.rect(this.body[0].Y*8, 8, 8)
+draw(): void {
+  store<u16>(w4.DRAW_COLORS, 0x0043)
+  this.body.forEach(part => w4.rect(part.x * 8, part.y * 8, 8, 8))
+
+  store<u16>(w4.DRAW_COLORS, 0x0004)
+  w4.rect(this.body[0].x * 8, this.body[0].y * 8, 8, 8)
 }
 ```
 
@@ -296,8 +290,8 @@ You can set the colors with this variable. You can look at this variable like a 
 The value for each digit can be  0 up to 4:
 
 - 0 = Use transparency
-- 1 = Use the 1st color from the color palette 
-- 2 = Use the 2nd color from the color palette 
+- 1 = Use the 1st color from the color palette
+- 2 = Use the 2nd color from the color palette
 - 3 = Use the 3rd color from the color palette
 - 4 = Use the 4th color from the color palette
 

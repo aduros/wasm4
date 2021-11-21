@@ -185,6 +185,11 @@ for i := range w4.FRAMEBUFFER {
 }
 ```
 
+```nim
+for i in 0..<len(FRAMEBUFFER[]):
+  FRAMEBUFFER[i] = 3 or (3 shl 2) or (3 shl 4) or (3 shl 6)
+```
+
 ```rust
 unsafe {
     FRAMEBUFFER
@@ -278,7 +283,8 @@ proc pixel(x, y: int32) =
   # Calculate the bits within the byte that corresponds to our position
   let shift = (x and 0b11) shl 1
   let mask = uint8(0b11 shl shift)
-
+  
+  # Use the first DRAW_COLOR as the pixel color
   let color = uint8(DRAW_COLORS[] and 0b11)
 
   # Write to the framebuffer

@@ -227,4 +227,4 @@ Where:
 - `%length%` - count of bytes (integer)
 - `%bytes%` - comma separated series of bytes (string)
 - `%firstByte%` - first byte of the sprite (string)
-- '%restBytes%' - comma-separated series of bytes excluding the first one (string)
+- `%restBytes%` - comma-separated series of bytes excluding the first one (string)

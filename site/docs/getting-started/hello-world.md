@@ -41,6 +41,13 @@ func update () {
 }
 ```
 
+```nim
+import cart/wasm4
+
+proc update {.exportWasm.} = 
+  rect(10, 10, 32, 32)
+```
+
 ```rust
 mod wasm4;
 use wasm4::*;

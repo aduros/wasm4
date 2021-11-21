@@ -8,6 +8,7 @@ const LANGS={
     c: "c",
     d: "d",
     go: "go",
+    nim: "nim",
     rs: "rust",
     rust: "rust",
     zig: "zig",
@@ -31,6 +32,12 @@ const uint8_t %name%[%length%] = { %bytes% };`,
 enum %name%Height = %height%;
 enum %name%Flags = %flags%; // %flagsHumanReadable%
 immutable ubyte[] %name% = [ %bytes% ];`,
+
+    nim:
+`const %name%Width = %width%
+const %name%Height = %height%
+const %name%Flags = %flagsHumanReadable%
+var %name%: array[uint8, %length%] = [%firstByte%'u8,%restBytes%]`,
 
     go:
 `const %name%Width = %width%
@@ -142,9 +149,9 @@ function run (sourceFile, template) {
         .replace(/[A-Z]/g, l => '_' + l))
         .toLocaleUpperCase()
 
-    const data = [...bytes]
+    const dataBytes = [...bytes]
             .map((b) => "0x" + b.toString(16).padStart(2, "0"))
-            .join(',')
+    const data = dataBytes.join(',')
 
     const output = template
         .replace(/%name%/gi, varName)
@@ -154,7 +161,9 @@ function run (sourceFile, template) {
         .replace(/%length%/gi, bytes.length)
         .replace(/%flags%/gi, flags)
         .replace(/%flagsHumanReadable%/gi, flagsHumanReadable)
-        .replace(/%bytes%/gi,data);
+        .replace(/%bytes%/gi,data)
+        .replace(/%firstByte%/gi, dataBytes[0])
+        .replace(/%restBytes%/gi, dataBytes.slice(1).join(','));
 
     console.log(output);
 }

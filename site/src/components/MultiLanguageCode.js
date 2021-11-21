@@ -7,6 +7,7 @@ const LABELS = {
     "language-cpp": "C / C++",
     "language-d": "D",
     "language-typescript": "AssemblyScript",
+    "language-nim": "Nim",
     "language-rust": "Rust",
     "language-go": "Go",
 };

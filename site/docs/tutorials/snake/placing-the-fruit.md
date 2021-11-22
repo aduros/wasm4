@@ -18,11 +18,11 @@ A freely moving snake is nice. But it get's a bit dull if that's all there is. T
 <TabItem value="language-typescript">
 To place (and eat) a fruit, you first need to make a variable for this. Since it's simply a point on the grid, `Point` will do:
 
-```typescript {4}
-var snake = new Snake()
-var frameCount = 0
-var prevState : u8
-var fruit : Point
+```typescript {2}
+const snake = new Snake()
+let fruit: Point
+let prevState: u8
+let frameCount = 0
 ```
 
 </TabItem>
@@ -83,13 +83,6 @@ const fruit = new Point(rnd(20), rnd(20))
 let prevState: u8
 let frameCount = 0
 ```
-
-:::tip Use deterministic random numbers
-One of the available runtimes is `libretro`. Libretro allows for multiplayer games using `netplay`.
-But the condition is that the state of the game has to be deterministic.
-Other languages such as Go have no choice but to use a deterministic approach.
-If you want to learn more about that, check out the examples of the other languages.
-:::
 
 </TabItem>
 

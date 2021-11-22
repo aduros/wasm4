@@ -49,6 +49,15 @@ unsafe {
 }
 ```
 
+```zig
+w4.PALETTE.* = .{
+    0xfff6d3,
+    0xf9a875,
+    0xeb6b6f,
+    0x7c3f58,
+};
+```
+
 </MultiLanguageCode>
 
 The default Gameboy-ish palette looks like this:
@@ -97,6 +106,11 @@ unsafe { *DRAW_COLORS = 0x42 }
 rect(10, 10, 32, 32);
 ```
 
+```zig
+w4.DRAW_COLORS.* = 0x42;
+w4.rect(10, 10, 32, 32);
+```
+
 </MultiLanguageCode>
 
 A value of `0` in a draw color means it will be transparent. For example, to
@@ -126,6 +140,10 @@ w4.Text("Hello world!", 10, 10)
 
 ```rust
 text("Hello world!", 10, 10);
+```
+
+```zig
+w4.text("Hello world!", 10, 10);
 ```
 
 </MultiLanguageCode>
@@ -175,6 +193,12 @@ unsafe {
         .as_mut()
         .expect("framebuffer ref")
         .fill(3 | (3 << 2) | (3 << 4) | (3 << 6));
+}
+```
+
+```zig
+for (w4.FRAMEBUFFER) |*x| {
+    x.* = 3 | (3 << 2) | (3 << 4) | (3 << 6);
 }
 ```
 
@@ -269,6 +293,23 @@ fn pixel(x: i32, y: i32) {
 
         framebuffer[idx] = (color << shift) | (framebuffer[idx] & !mask);
     }
+}
+```
+
+```zig
+fn pixel(x: i32, y: i32) void {
+    // The byte index into the framebuffer that contains (x, y)
+    const idx = (@intCast(usize, y) * 160 + @intCast(usize, x)) >> 2;
+
+    // Calculate the bits within the byte that corresponds to our position
+    const shift = @intCast(u3, (x & 0b11) * 2);
+    const mask = @as(u8, 0b11) << shift;
+
+    // Use the first DRAW_COLOR as the pixel color
+    const color = @intCast(u8, w4.DRAW_COLORS.* & 0b11);
+
+    // Write to the framebuffer
+    w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] & ~mask);
 }
 ```
 

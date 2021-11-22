@@ -33,7 +33,7 @@ draw(): void {
 }
 ```
 
-Simply loop through the body and draw it at `X*8` and `Y*8`. 8 is the width and the height of a single part. On a 160x160 screen, it's big enough to fit snake that is 20*20=400 parts long.
+Simply loop through the body and draw it at `x * 8` and `y * 8`. 8 is the width and the height of a single part. On a 160x160 screen, it's big enough to fit snake that is 20*20=400 parts long.
 
 :::note Importing w4
 Keep in mind you need to import `w4` in case your editor doesn't do this for you.
@@ -169,7 +169,7 @@ You should see some green blocks at the top.
 
 <TabItem value="language-typescript">
 
-But where is the head? You can pick a side. Either position `[0]` or position `[this.body.length-1]`.
+But where is the head? You can pick a side. Either position `[0]` or position `[this.body.length - 1]`.
 
 I think it's easier to pick `[0]`.
 
@@ -181,7 +181,7 @@ Since the body is drawn, head is not much of a problem. Simply use the `rect` fu
 
 The draw function should now look like this:
 
-```typescript {4}
+```typescript {3}
 draw(): void {
   this.body.forEach(part => w4.rect(part.x * 8, part.y * 8, 8, 8))
   w4.rect(this.body[0].x * 8, this.body[0].y * 8, 8, 8)

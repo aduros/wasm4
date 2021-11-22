@@ -77,7 +77,7 @@ function rnd(n: i32 = 20): u16 {
 
 This allows you to call `rnd(20)` to get a number between `0` and `19`. Now you can change the fruit declaration:
 
-```typescript {4}
+```typescript {2}
 const snake = new Snake()
 const fruit = new Point(rnd(20), rnd(20))
 let prevState: u8

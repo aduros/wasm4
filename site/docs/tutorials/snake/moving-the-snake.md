@@ -119,7 +119,7 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 
 This isn't hard either. Simple add the add the direction to the current head. And then make sure the head stays within the boundaries:
 
-```typescript {6-13}
+```typescript {7-15}
   update(): void {
     for (let i = this.body.length - 1; i > 0; i--) {
       unchecked(body[i].x = body[i - 1].x)

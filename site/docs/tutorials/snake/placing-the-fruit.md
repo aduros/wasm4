@@ -200,7 +200,7 @@ To get it into a an existing file, use the `>>` operator. Like this:
 
 This will add the previous lines to your `main.ts` and causes an error because "fruit" already exists. Just rename the new fruit to `fruitSprite` and move it somewhere else. Also: You can remove the other stuff added, you won't need it for this project:
 
-```typescript {5}
+```typescript {2}
 const snake = new Snake()
 const fruit = new Point(rnd(20), rnd(20))
 let frameCount = 0

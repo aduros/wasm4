@@ -268,7 +268,7 @@ export function update(): void {
 
 If you try to compile this, you should get an error: `ERROR TS2304: Cannot find name 'prevState'.`. This is easily fixed. Just place the prevState into the var-section:
 
-```typescript {3}
+```typescript {2}
 const snake = new Snake()
 let prevState: u8
 let frameCount = 0

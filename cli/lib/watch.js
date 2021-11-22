@@ -27,6 +27,11 @@ function start (opts) {
         buildParams = ["--silent", "run", "build:debug"];
         buildOutput = "build/cart.wasm";
 
+    } else if (fs.existsSync("build.zig")) {
+        buildCommand = "zig";
+        buildParams = ["build", "--prominent-compile-errors"];
+        buildOutput = "zig-out/lib/cart.wasm";
+
     } else {
         console.error("This directory doesn't look like a WASM-4 project.");
         process.exit(1);
@@ -57,12 +62,12 @@ function start (opts) {
     let buildTimeoutId = 0;
     function watchFilter (file, skip) {
         switch (file) {
-        case ".git": case "node_modules": case "build": case "target":
+        case ".git": case "node_modules": case "build": case "target": case "zig-cache": case "zig-out":
             // Don't bother descending into certain dirs
             return skip;
         default:
             // Only trigger on source file changes
-            return /\.(c|cpp|d|go|h|odin|rs|ts|wat)$/.test(file);
+            return /\.(c|cpp|d|go|h|odin|rs|ts|wat|zig)$/.test(file);
         }
     }
     watch("./", {recursive: true, filter: watchFilter}, (event, file) => {

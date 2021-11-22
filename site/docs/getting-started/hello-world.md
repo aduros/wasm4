@@ -62,6 +62,14 @@ fn update () {
 }
 ```
 
+```zig
+const w4 = @import("wasm4.zig");
+
+export fn update() void {
+    w4.rect(10, 10, 32, 32);
+}
+```
+
 </MultiLanguageCode>
 
 The first line imports the WASM-4 API definitions. This is a stub source file included with all
@@ -120,6 +128,12 @@ unsafe { *DRAW_COLORS = 2 }
 rect(10, 10, 32, 32);
 ```
 
+```zig
+w4.DRAW_COLORS.* = 2;
+
+w4.rect(10, 10, 32, 32);
+```
+
 </MultiLanguageCode>
 
 ## Debugging
@@ -150,6 +164,10 @@ w4.trace("Hello world!")
 
 ```rust
 trace("Hello world!");
+```
+
+```zig
+w4.trace("Hello world!");
 ```
 
 </MultiLanguageCode>

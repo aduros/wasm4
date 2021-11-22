@@ -52,6 +52,10 @@ w4.tone(262, 60, 100, .Pulse1)
 tone(262, 60, 100, TONE_PULSE1);
 ```
 
+```zig
+w4.tone(262, 60, 100, w4.TONE_PULSE1);
+```
+
 </MultiLanguageCode>
 
 ## Duty Cycle
@@ -94,6 +98,10 @@ w4.tone(262, 60, 100, .Pulse1, .Half)
 tone(262, 60, 100, TONE_PULSE1 | TONE_MODE3);
 ```
 
+```zig
+w4.tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_MODE3);
+```
+
 </MultiLanguageCode>
 
 ## Frequency Slide
@@ -128,6 +136,10 @@ w4.tone(262 | (523 << 16), 60, 100, .Pulse1)
 
 ```rust
 tone(262 | (523 << 16), 60, 100, TONE_PULSE1);
+```
+
+```zig
+w4.tone(262 | (523 << 16), 60, 100, w4.TONE_PULSE1);
 ```
 
 </MultiLanguageCode>
@@ -173,6 +185,10 @@ w4.tone(262, 60 | (30 << 8), 100, .Pulse1)
 
 ```rust
 tone(262, 60 | (30 << 8), 100, TONE_PULSE1);
+```
+
+```zig
+w4.tone(262, 60 | (30 << 8), 100, w4.TONE_PULSE1);
 ```
 
 </MultiLanguageCode>

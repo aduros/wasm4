@@ -51,6 +51,11 @@ unsafe {
 }
 ```
 
+```zig
+var game_data: i32 = 1337;
+_ = w4.diskw(@ptrCast([*]u8, &game_data), @sizeOf(@TypeOf(game_data)));
+```
+
 </MultiLanguageCode>
 
 ## Reading Data from Disk
@@ -100,6 +105,11 @@ let game_data = unsafe {
 
     i32::from_le_bytes(buffer)
 };
+```
+
+```zig
+var game_data: i32 = undefined;
+_ = w4.diskr(@ptrCast([*]u8, &game_data), @sizeOf(@TypeOf(game_data)));
 ```
 
 </MultiLanguageCode>

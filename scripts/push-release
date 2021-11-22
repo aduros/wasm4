@@ -5,4 +5,4 @@ cd cli
 version=`npm version "${1:-patch}"`
 git commit package.json package-lock.json -m "Release $version."
 git tag "$version"
-git push --follow-tags
+git push --tags

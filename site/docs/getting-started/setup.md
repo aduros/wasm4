@@ -33,6 +33,7 @@ Let's go over creating a new project called `hello-world` for your chosen langua
         {label: 'Go', value: 'language-go'},
         {label: 'Odin', value: 'language-odin'},
         {label: 'Rust', value: 'language-rust'},
+        {label: 'Zig', value: 'language-zig'},
     ]}>
 
 <TabItem value="language-typescript">
@@ -176,6 +177,29 @@ Run it in WASM-4 with:
 
 ```shell
 w4 run target/wasm32-unknown-unknown/release/cart.wasm
+```
+
+</TabItem>
+
+<TabItem value="language-zig">
+
+To compile Zig projects you will need a recent build of `zig` installed.
+
+```shell
+w4 new --zig hello-world
+cd hello-world
+```
+
+Compile the .wasm cartridge:
+
+```shell
+zig build
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 run zig-out/lib/cart.wasm
 ```
 
 </TabItem>

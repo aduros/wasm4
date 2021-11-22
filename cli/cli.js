@@ -12,10 +12,11 @@ let blankProject = (cmd) =>
         .option("--go", "Create Go project (Shorthand for --lang go)")
         .option("--odin", "Create Odin project (Shorthand for --lang odin)")
         .option("--rs, --rust", "Create Rust project (Shorthand for --lang rs/--lang rust)")
+        .option("--zig", "Create Zig project (Shorthand for --lang zig)")
         .addOption(
             new Option("--lang <lang>", "Use the given language")
                 .env("W4_LANG")
-                .choices(["as", "assemblyscript", "c", "d", "go", "odin", "rs", "rust"])
+                .choices(["as", "assemblyscript", "c", "d", "go", "odin", "rs", "rust", "zig"])
                 .default("as")
         )
 
@@ -78,6 +79,7 @@ program.command("png2src <images...>")
     .option("--go", "Generate Go source (Shorthand for --lang go)")
     .option("--odin", "Generate Odin source (Shorthand for --lang odin)")
     .option("--rs, --rust", "Generate Rust source (Shorthand for --lang rs/--lang rust)")
+    .option("--zig", "Generate Zig source (Shorthand for --lang zig)")
     .option("--t, --template <file>", "Template file with a custom output format")
     .addOption(
         new Option("--lang <lang>", "Use the given language")

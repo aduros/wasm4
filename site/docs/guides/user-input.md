@@ -47,6 +47,12 @@ if gamepad&w4.BUTTON_RIGHT != 0 {
 }
 ```
 
+```odin
+if .RIGHT in w4.GAMEPAD1^ {
+    w4.trace("Right button is down!")
+}
+```
+
 ```rust
 let gamepad = unsafe { *GAMEPAD1 };
 
@@ -142,16 +148,32 @@ var previousGamepad byte
 
 //go:export update
 func update () {
-    var gamepad = *w4.GAMEPAD1;
+    var gamepad = *w4.GAMEPAD1
 
     // Only the buttons that were pressed down this frame
-    var pressedThisFrame = gamepad & (gamepad ^ previousGamepad);
-    previousGamepad = gamepad;
+    var pressedThisFrame = gamepad & (gamepad ^ previousGamepad)
+    previousGamepad = gamepad
 
     if pressedThisFrame&w4.BUTTON_RIGHT != 0 {
         w4.Trace("Right button was just pressed!")
     }
 }
+```
+
+```odin
+previous_gamepad : w4.Buttons
+
+@export
+update :: proc "c" () {
+    gamepad := w4.GAMEPAD1^
+
+    // Only the buttons that were pressed down this frame
+    pressed_this_frame := gamepad & (gamepad ~ previous_gamepad)
+    previous_gamepad = gamepad
+
+    if .RIGHT in pressed_this_frame {
+        w4.trace("Right button was just pressed!")
+    }
 ```
 
 ```rust

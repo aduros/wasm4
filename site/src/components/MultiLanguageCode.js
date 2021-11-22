@@ -9,6 +9,7 @@ const LABELS = {
     "language-typescript": "AssemblyScript",
     "language-rust": "Rust",
     "language-go": "Go",
+    "language-odin": "Odin",
     "language-zig": "Zig",
 };
 

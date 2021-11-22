@@ -8,6 +8,7 @@ const LANGS = {
     c: "c",
     d: "d",
     go: "go",
+    odin: "odin",
     rs: "rust",
     rust: "rust",
     zig: 'zig',
@@ -35,6 +36,11 @@ const HELP = {
         build: "make",
         cart: "build/cart.wasm",
     },
+    odin: {
+        name: "Odin",
+        build: "make",
+        cart: "build/cart.wasm",
+    },
     rust: {
         name: "Rust",
         build: "cargo build --release",
@@ -57,6 +63,8 @@ async function run (destDir, opts) {
         lang = LANGS.d;
     } else if (opts.go) {
         lang = LANGS.go;
+    } else if (opts.odin) {
+        lang = LANGS.odin;
     } else if (opts.rust) {
         lang = LANGS.rust;
     } else if (opts.zig) {

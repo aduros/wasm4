@@ -38,6 +38,13 @@ w4.PALETTE[2] = 0xeb6b6f
 w4.PALETTE[3] = 0x7c3f58
 ```
 
+```odin
+w4.PALETTE[0] = 0xfff6d3
+w4.PALETTE[1] = 0xf9a875
+w4.PALETTE[2] = 0xeb6b6f
+w4.PALETTE[3] = 0x7c3f58
+```
+
 ```rust
 unsafe {
     *PALETTE = [
@@ -101,6 +108,11 @@ w4.rect(10, 10, 32, 32);
 w4.Rect(10, 10, 32, 32)
 ```
 
+```odin
+w4.DRAW_COLORS^ = 0x42
+w4.rect(10, 10, 32, 32)
+```
+
 ```rust
 unsafe { *DRAW_COLORS = 0x42 }
 rect(10, 10, 32, 32);
@@ -136,6 +148,10 @@ w4.text("Hello world!", 10, 10);
 
 ```go
 w4.Text("Hello world!", 10, 10)
+```
+
+```odin
+w4.text("Hello world!", 10, 10)
 ```
 
 ```rust
@@ -183,6 +199,12 @@ memset(w4.framebuffer, 3 | (3 << 2) | (3 << 4) | (3 << 6), 160*160/4);
 
 ```go
 for i := range w4.FRAMEBUFFER {
+    w4.FRAMEBUFFER[i] = 3 | (3 << 2) | (3 << 4) | (3 << 6)
+}
+```
+
+```odin
+for _, i in w4.FRAMEBUFFER {
     w4.FRAMEBUFFER[i] = 3 | (3 << 2) | (3 << 4) | (3 << 6)
 }
 ```
@@ -264,17 +286,34 @@ void pixel(int x, int y) {
 ```go
 func pixel (x int, y int) {
     // The byte index into the framebuffer that contains (x, y)
-    var idx = (y*160 + x) >> 2;
+    var idx = (y*160 + x) >> 2
 
     // Calculate the bits within the byte that corresponds to our position
-    var shift = uint8((x & 0b11) << 1);
-    var mask = uint8(0b11 << shift);
+    var shift = uint8((x & 0b11) << 1)
+    var mask = uint8(0b11 << shift)
 
     // Use the first DRAW_COLOR as the pixel color
-    var color = uint8(*w4.DRAW_COLORS & 0b11);
+    var color = uint8(*w4.DRAW_COLORS & 0b11)
 
     // Write to the framebuffer
-    w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] & ^mask);
+    w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &^ mask)
+}
+```
+
+```odin
+pixel :: proc "c" (x : int, y : int) {
+    // The byte index into the framebuffer that contains (x, y)
+    idx := (y*160 + x) >> 2
+
+    // Calculate the bits within the byte that corresponds to our position
+    shift := u8((x & 0b11) << 1)
+    mask := u8(0b11 << shift)
+
+    // Use the first DRAW_COLOR as the pixel color
+    color := u8(w4.DRAW_COLORS^ & 0b11)
+
+    // Write to the framebuffer
+    w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &~ mask)
 }
 ```
 

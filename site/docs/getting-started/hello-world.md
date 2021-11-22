@@ -41,6 +41,17 @@ func update () {
 }
 ```
 
+```odin
+package main
+
+import "w4"
+
+@export
+update :: proc "c" () {
+    w4.rect(10, 10, 32, 32)
+}
+```
+
 ```rust
 mod wasm4;
 use wasm4::*;
@@ -105,6 +116,12 @@ w4.rect(10, 10, 32, 32)
 w4.Rect(10, 10, 32, 32)
 ```
 
+```odin
+w4.DRAW_COLORS^ = 2
+
+w4.rect(10, 10, 32, 32)
+```
+
 ```rust
 unsafe { *DRAW_COLORS = 2 }
 
@@ -139,6 +156,10 @@ w4.trace("Hello world!");
 
 ```go
 w4.Trace("Hello world!")
+```
+
+```odin
+w4.trace("Hello world!")
 ```
 
 ```rust

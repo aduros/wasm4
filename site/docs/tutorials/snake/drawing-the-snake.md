@@ -41,7 +41,7 @@ Keep in mind you need to import `w4` in case your editor doesn't do this for you
 
 That's all fine, but since there is no instance of the snake, nothing can be drawn. To fix this, simply create a new variable in main and call it's draw function:
 
-```typescript {1,4,12-15,19}
+```typescript {1,4,14}
 import { Point, Snake } from "./snake"
 import * as w4 from "./wasm4"
 

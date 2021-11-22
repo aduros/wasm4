@@ -310,10 +310,10 @@ If you use `trace` in each if-statement, you should see the corresponding output
 
 Now, instead of using `trace` to confirm everything works as intended, you should replace it with something like this:
 
-```go
-	if justPressed&w4.BUTTON_DOWN != 0 {
-		snake.down()
-	}
+```typescript
+  if (justPressed & w4.BUTTON_DOWN) {
+    snake.down()
+  }
 ```
 
 I'll leave it to you, to finish the other 3 directions.

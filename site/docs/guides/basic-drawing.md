@@ -45,6 +45,13 @@ PALETTE[2] = 0xeb6b6f
 PALETTE[3] = 0x7c3f58
 ```
 
+```odin
+w4.PALETTE[0] = 0xfff6d3
+w4.PALETTE[1] = 0xf9a875
+w4.PALETTE[2] = 0xeb6b6f
+w4.PALETTE[3] = 0x7c3f58
+```
+
 ```rust
 unsafe {
     *PALETTE = [
@@ -54,6 +61,15 @@ unsafe {
         0x7c3f58,
     ];
 }
+```
+
+```zig
+w4.PALETTE.* = .{
+    0xfff6d3,
+    0xf9a875,
+    0xeb6b6f,
+    0x7c3f58,
+};
 ```
 
 </MultiLanguageCode>
@@ -99,14 +115,25 @@ w4.rect(10, 10, 32, 32);
 w4.Rect(10, 10, 32, 32)
 ```
 
+
 ```nim
 DRAW_COLORS[] = 0x42
 rect(10, 10, 32, 32)
 ```
 
+```odin
+w4.DRAW_COLORS^ = 0x42
+w4.rect(10, 10, 32, 32)
+```
+
 ```rust
 unsafe { *DRAW_COLORS = 0x42 }
 rect(10, 10, 32, 32);
+```
+
+```zig
+w4.DRAW_COLORS.* = 0x42;
+w4.rect(10, 10, 32, 32);
 ```
 
 </MultiLanguageCode>
@@ -140,8 +167,16 @@ w4.Text("Hello world!", 10, 10)
 text("Hello world!", 10, 10)
 ```
 
+```odin
+w4.text("Hello world!", 10, 10)
+```
+
 ```rust
 text("Hello world!", 10, 10);
+```
+
+```zig
+w4.text("Hello world!", 10, 10);
 ```
 
 </MultiLanguageCode>
@@ -185,9 +220,16 @@ for i := range w4.FRAMEBUFFER {
 }
 ```
 
+
 ```nim
 for i in 0..<len(FRAMEBUFFER[]):
   FRAMEBUFFER[i] = 3 or (3 shl 2) or (3 shl 4) or (3 shl 6)
+```
+
+```odin
+for _, i in w4.FRAMEBUFFER {
+    w4.FRAMEBUFFER[i] = 3 | (3 << 2) | (3 << 4) | (3 << 6)
+}
 ```
 
 ```rust
@@ -196,6 +238,12 @@ unsafe {
         .as_mut()
         .expect("framebuffer ref")
         .fill(3 | (3 << 2) | (3 << 4) | (3 << 6));
+}
+```
+
+```zig
+for (w4.FRAMEBUFFER) |*x| {
+    x.* = 3 | (3 << 2) | (3 << 4) | (3 << 6);
 }
 ```
 
@@ -261,17 +309,34 @@ void pixel(int x, int y) {
 ```go
 func pixel (x int, y int) {
     // The byte index into the framebuffer that contains (x, y)
-    var idx = (y*160 + x) >> 2;
+    var idx = (y*160 + x) >> 2
 
     // Calculate the bits within the byte that corresponds to our position
-    var shift = uint8((x & 0b11) << 1);
-    var mask = uint8(0b11 << shift);
+    var shift = uint8((x & 0b11) << 1)
+    var mask = uint8(0b11 << shift)
 
     // Use the first DRAW_COLOR as the pixel color
-    var color = uint8(*w4.DRAW_COLORS & 0b11);
+    var color = uint8(*w4.DRAW_COLORS & 0b11)
 
     // Write to the framebuffer
-    w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] & ^mask);
+    w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &^ mask)
+}
+```
+
+```odin
+pixel :: proc "c" (x : int, y : int) {
+    // The byte index into the framebuffer that contains (x, y)
+    idx := (y*160 + x) >> 2
+
+    // Calculate the bits within the byte that corresponds to our position
+    shift := u8((x & 0b11) << 1)
+    mask := u8(0b11 << shift)
+
+    // Use the first DRAW_COLOR as the pixel color
+    color := u8(w4.DRAW_COLORS^ & 0b11)
+
+    // Write to the framebuffer
+    w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &~ mask)
 }
 ```
 
@@ -306,6 +371,23 @@ fn pixel(x: i32, y: i32) {
 
         framebuffer[idx] = (color << shift) | (framebuffer[idx] & !mask);
     }
+}
+```
+
+```zig
+fn pixel(x: i32, y: i32) void {
+    // The byte index into the framebuffer that contains (x, y)
+    const idx = (@intCast(usize, y) * 160 + @intCast(usize, x)) >> 2;
+
+    // Calculate the bits within the byte that corresponds to our position
+    const shift = @intCast(u3, (x & 0b11) * 2);
+    const mask = @as(u8, 0b11) << shift;
+
+    // Use the first DRAW_COLOR as the pixel color
+    const color = @intCast(u8, w4.DRAW_COLORS.* & 0b11);
+
+    // Write to the framebuffer
+    w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] & ~mask);
 }
 ```
 

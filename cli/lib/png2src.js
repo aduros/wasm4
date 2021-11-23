@@ -9,6 +9,7 @@ const LANGS={
     d: "d",
     go: "go",
     nim: "nim",
+    odin: "odin",
     rs: "rust",
     rust: "rust",
     zig: "zig",
@@ -45,11 +46,17 @@ const %name%Height = %height%
 const %name%Flags = %flags% // %flagsHumanReadable%
 var %name% = [%length%]byte { %bytes% }`,
 
-    rust:
-`const %idiomaticName%_WIDTH: u32 = %width%;
-const %idiomaticName%_HEIGHT: u32 = %height%;
-const %idiomaticName%_FLAGS: u32 = %flags%; // %flagsHumanReadable%
-const %idiomaticName%: [u8; %length%] = [ %bytes% ];`,
+    odin: 
+`%odinName%_width : u32 : %width%
+%odinName%_height : u32 : %height%
+%odinName%_flags : w4.Blit_Flags : %odinFlags% // %flagsHumanReadable%
+%odinName% := [%length%]u8{ %bytes% }`,
+
+    rust: 
+`const %rustName%_WIDTH: u32 = %width%;
+const %rustName%_HEIGHT: u32 = %height%;
+const %rustName%_FLAGS: u32 = %flags%; // %flagsHumanReadable%
+const %rustName%: [u8; %length%] = [ %bytes% ];`,  
 
     zig:
 `const %name%Width = %width%;
@@ -78,16 +85,18 @@ function run (sourceFile, template) {
         palette.set(packed, ii);
     }
 
-    let flags, flagsHumanReadable;
+    let flags, flagsHumanReadable, odinFlags;
     let bpp;
     if (palette.size <= 2) {
         bpp = 1;
         flags = 0;
         flagsHumanReadable = "BLIT_1BPP";
+        odinFlags = "nil"
     } else if (palette.size <= 4) {
         bpp = 2;
         flags = 1;
         flagsHumanReadable = "BLIT_2BPP";
+        odinFlags = "{ .USE_2BPP }"
     } else {
         throw new Error("Palette is larger than 4 colors");
     }
@@ -145,17 +154,21 @@ function run (sourceFile, template) {
         .replace(/[^0-9A-Za-z]+/g, "_")
         .replace(/^([0-9])/, "_$1");
 
-    const idiomaticVarName = (varName.substr(0,1) + varName.substr(1)
+    const rustVarName = (varName.substr(0,1) + varName.substr(1)
         .replace(/[A-Z]/g, l => '_' + l))
         .toLocaleUpperCase()
 
     const dataBytes = [...bytes]
             .map((b) => "0x" + b.toString(16).padStart(2, "0"))
+    
     const data = dataBytes.join(',')
+
+    const odinVarName = (varName.substr(0,1) + varName.substr(1)
+        .replace(/[A-Z]/g, l => '_' + l))
+        .toLocaleLowerCase()
 
     const output = template
         .replace(/%name%/gi, varName)
-        .replace(/%idiomaticName%/gi, idiomaticVarName)
         .replace(/%height%/gi, png.height)
         .replace(/%width%/gi, png.width)
         .replace(/%length%/gi, bytes.length)
@@ -163,7 +176,10 @@ function run (sourceFile, template) {
         .replace(/%flagsHumanReadable%/gi, flagsHumanReadable)
         .replace(/%bytes%/gi,data)
         .replace(/%firstByte%/gi, dataBytes[0])
-        .replace(/%restBytes%/gi, dataBytes.slice(1).join(','));
+        .replace(/%restBytes%/gi, dataBytes.slice(1).join(','))
+        .replace(/%rustName%/gi, rustVarName) // Rust specific
+        .replace(/%odinName%/gi, odinVarName) // Odin specific
+        .replace(/%odinFlags%/gi, odinFlags);
 
     console.log(output);
 }

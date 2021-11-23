@@ -37,9 +37,15 @@ var gameData int32 = 1337
 w4.DiskW(unsafe.Pointer(&gameData), unsafe.Sizeof(gameData))
 ```
 
+
 ```nim
 var gameData = 1337'i32
 discard diskw(addr gameData, uint32 sizeof(gameData))
+```
+
+```odin
+game_data : i32 = 1337
+w4.diskw(&game_data, size_of(game_data))
 ```
 
 ```rust
@@ -49,6 +55,11 @@ unsafe {
     let game_data_bytes = game_data.to_le_bytes();
     diskw(game_data_bytes.as_ptr(), core::mem::size_of::<i32>() as u32);
 }
+```
+
+```zig
+var game_data: i32 = 1337;
+_ = w4.diskw(@ptrCast([*]u8, &game_data), @sizeOf(@TypeOf(game_data)));
 ```
 
 </MultiLanguageCode>
@@ -92,6 +103,11 @@ var gameData: int32
 discard diskr(addr gameData, uint32 sizeof(gameData))
 ```
 
+```odin
+game_data : i32
+w4.diskr(&game_data, size_of(game_data))
+```
+
 ```rust
 let game_data = unsafe {
     let mut buffer = [0u8; core::mem::size_of::<i32>()];
@@ -100,6 +116,11 @@ let game_data = unsafe {
 
     i32::from_le_bytes(buffer)
 };
+```
+
+```zig
+var game_data: i32 = undefined;
+_ = w4.diskr(@ptrCast([*]u8, &game_data), @sizeOf(@TypeOf(game_data)));
 ```
 
 </MultiLanguageCode>

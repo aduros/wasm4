@@ -44,5 +44,5 @@ fn panic_handler(_panic_info: &core::panic::PanicInfo<'_>) -> ! {
         trace(cause);
     }
 
-    unsafe { wasm32::unreachable() }
+    wasm32::unreachable()
 }

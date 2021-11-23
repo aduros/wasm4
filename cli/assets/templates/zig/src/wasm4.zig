@@ -48,10 +48,10 @@ pub const SYSTEM_HIDE_GAMEPAD_OVERLAY: u8 = 2;
 // └───────────────────────────────────────────────────────────────────────────┘
 
 /// Copies pixels to the framebuffer.
-pub extern fn blit(sprite: *const u8, x: i32, y: i32, width: i32, height: i32, flags: u32) void;
+pub extern fn blit(sprite: [*]const u8, x: i32, y: i32, width: i32, height: i32, flags: u32) void;
 
 /// Copies a subregion within a larger sprite atlas to the framebuffer.
-pub extern fn blitSub(sprite: *const u8, x: i32, y: i32, width: i32, height: i32, src_x: u32, src_y: u32, strie: i32, flags: u32) void;
+pub extern fn blitSub(sprite: [*]const u8, x: i32, y: i32, width: i32, height: i32, src_x: u32, src_y: u32, strie: i32, flags: u32) void;
 
 pub const BLIT_2BPP: u32 = 1;
 pub const BLIT_1BPP: u32 = 0;
@@ -102,10 +102,10 @@ pub const TONE_MODE4: u32 = 12;
 // └───────────────────────────────────────────────────────────────────────────┘
 
 /// Reads up to `size` bytes from persistent storage into the pointer `dest`.
-pub extern fn diskr(dest: *u8, size: u32) u32;
+pub extern fn diskr(dest: [*]u8, size: u32) u32;
 
 /// Writes up to `size` bytes from the pointer `src` into persistent storage.
-pub extern fn diskw(src: *const u8, size: u32) u32;
+pub extern fn diskw(src: [*]const u8, size: u32) u32;
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │

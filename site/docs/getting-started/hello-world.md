@@ -48,6 +48,17 @@ proc update {.exportWasm.} =
   rect(10, 10, 32, 32)
 ```
 
+```odin
+package main
+
+import "w4"
+
+@export
+update :: proc "c" () {
+    w4.rect(10, 10, 32, 32)
+}
+```
+
 ```rust
 mod wasm4;
 use wasm4::*;
@@ -55,6 +66,14 @@ use wasm4::*;
 #[no_mangle]
 fn update () {
     rect(10, 10, 32, 32);
+}
+```
+
+```zig
+const w4 = @import("wasm4.zig");
+
+export fn update() void {
+    w4.rect(10, 10, 32, 32);
 }
 ```
 
@@ -110,10 +129,22 @@ DRAW_COLORS[] = 2
 rect(10, 10, 32, 32)
 ```
 
+```odin
+w4.DRAW_COLORS^ = 2
+
+w4.rect(10, 10, 32, 32)
+```
+
 ```rust
 unsafe { *DRAW_COLORS = 2 }
 
 rect(10, 10, 32, 32);
+```
+
+```zig
+w4.DRAW_COLORS.* = 2;
+
+w4.rect(10, 10, 32, 32);
 ```
 
 </MultiLanguageCode>
@@ -144,8 +175,16 @@ w4.Trace("Hello world!")
 trace("Hello world!")
 ```
 
+```odin
+w4.trace("Hello world!")
+```
+
 ```rust
 trace("Hello world!");
+```
+
+```zig
+w4.trace("Hello world!");
 ```
 
 </MultiLanguageCode>

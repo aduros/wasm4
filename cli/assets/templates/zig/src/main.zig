@@ -20,6 +20,6 @@ export fn update() void {
         w4.DRAW_COLORS.* = 4;
     }
 
-    w4.blit(&smiley[0], 76, 76, 8, 8, w4.BLIT_1BPP);
+    w4.blit(&smiley, 76, 76, 8, 8, w4.BLIT_1BPP);
     w4.text("Press X to blink", 16, 90);
 }

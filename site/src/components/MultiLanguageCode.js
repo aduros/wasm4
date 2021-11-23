@@ -10,6 +10,8 @@ const LABELS = {
     "language-nim": "Nim",
     "language-rust": "Rust",
     "language-go": "Go",
+    "language-odin": "Odin",
+    "language-zig": "Zig",
 };
 
 function getLanguage (component) {

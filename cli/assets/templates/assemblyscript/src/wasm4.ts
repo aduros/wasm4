@@ -153,7 +153,7 @@ export function trace (str: string): void {
 declare function traceUtf16 (str: usize, byteLength: u32): void;
 
 // Pass abort messages to trace()
-export function abortHandler (message: string | null, fileName: string | null, lineNumber: u32, columnNumber: u32) :void {
+function abortHandler (message: string | null, fileName: string | null, lineNumber: u32, columnNumber: u32) :void {
     const ptr = changetype<usize>(message);
     if (ptr != 0) {
         const byteLength = load<u32>(ptr - 4);

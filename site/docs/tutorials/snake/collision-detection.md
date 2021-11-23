@@ -46,16 +46,16 @@ fruit.Y = rnd(20)
 In it's final form, it could look like this:
 
 ```typescript {4-9}
-  if (frameCount % 15 == 0) {
-      snake.update()
+    if (frameCount % 15 == 0) {
+        snake.update()
 
-      if (snake.body[0].equals(fruit)) {
-          let tail = snake.body[snake.body.length - 1]
-          snake.body.push(new Point(tail.x, tail.y))
-          fruit.x = rnd(20)
-          fruit.y = rnd(20)
-      }
-  }
+        if (snake.body[0].equals(fruit)) {
+            let tail = snake.body[snake.body.length - 1]
+            snake.body.push(new Point(tail.x, tail.y))
+            fruit.x = rnd(20)
+            fruit.y = rnd(20)
+        }
+    }
 ```
 
 Now you're almost done. Only "Game Over" is left to finish this game.

@@ -29,7 +29,7 @@ With that out the way, let's see what a first draft could look like.
 
 ```typescript
 draw(): void {
-  this.body.forEach(part => w4.rect(part.x * 8, part.y * 8, 8, 8))
+    this.body.forEach(part => w4.rect(part.x * 8, part.y * 8, 8, 8))
 }
 ```
 
@@ -48,14 +48,14 @@ import * as w4 from "./wasm4"
 const snake = new Snake()
 
 export function start(): void {
-  store<u32>(w4.PALETTE, 0xfbf7f3, 0 * sizeof<u32>())
-  store<u32>(w4.PALETTE, 0xe5b083, 1 * sizeof<u32>())
-  store<u32>(w4.PALETTE, 0x426e5d, 2 * sizeof<u32>())
-  store<u32>(w4.PALETTE, 0x20283d, 3 * sizeof<u32>())
+    store<u32>(w4.PALETTE, 0xfbf7f3, 0 * sizeof<u32>())
+    store<u32>(w4.PALETTE, 0xe5b083, 1 * sizeof<u32>())
+    store<u32>(w4.PALETTE, 0x426e5d, 2 * sizeof<u32>())
+    store<u32>(w4.PALETTE, 0x20283d, 3 * sizeof<u32>())
 }
 
 export function update(): void {
-  snake.draw()
+    snake.draw()
 }
 ```
 
@@ -176,15 +176,15 @@ I think it's easier to pick `[0]`.
 Since the body is drawn, head is not much of a problem. Simply use the `rect` function again. But use a specific part instead:
 
 ```typescript
-  w4.rect(this.body[0].x * 8, this.body[0].y * 8, 8, 8)
+    w4.rect(this.body[0].x * 8, this.body[0].y * 8, 8, 8)
 ```
 
 The draw function should now look like this:
 
 ```typescript {3}
 draw(): void {
-  this.body.forEach(part => w4.rect(part.x * 8, part.y * 8, 8, 8))
-  w4.rect(this.body[0].x * 8, this.body[0].y * 8, 8, 8)
+    this.body.forEach(part => w4.rect(part.x * 8, part.y * 8, 8, 8))
+    w4.rect(this.body[0].x * 8, this.body[0].y * 8, 8, 8)
 }
 ```
 
@@ -192,7 +192,7 @@ Notice the difference? Me neither.
 
 The head should stand out a little. For this, you can use a different color:
 
-```go
+```typescript
 store<u16>(w4.DRAW_COLORS, 0x0004)
 ```
 

@@ -25,7 +25,7 @@ A simple
 
 ```typescript
 if (snake.body[0].equals(fruit)) {
-  // Snake's head hits the fruit
+    // Snake's head hits the fruit
 }
 ```
 
@@ -134,16 +134,16 @@ For the player to have any sense of "danger", the game needs a possibility for t
 <TabItem value="language-typescript">
 
 ```typescript
-  isDead(): bool {
-    const head = this.body[0]
-    for (let i = 1, len = this.body.length; i < len; i++) {
-      if (this.body[i].equals(head)) {
-        return true
-      }
-    }
+    isDead(): bool {
+        const head = this.body[0]
+        for (let i = 1, len = this.body.length; i < len; i++) {
+            if (this.body[i].equals(head)) {
+                return true
+            }
+        }
 
-    return false
-  }
+        return false
+    }
 ```
 
 Now you can call this function to check if the snake died in this frame:
@@ -153,7 +153,7 @@ Now you can call this function to check if the snake died in this frame:
         snake.update()
 
         if (snake.isDead()) {
-          // Do something
+            // Do something
         }
 
         if (snake.body[0].equals(fruit)) {

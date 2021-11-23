@@ -312,7 +312,7 @@ Now, instead of using `trace` to confirm everything works as intended, you shoul
 
 ```typescript
     if (justPressed & w4.BUTTON_DOWN) {
-       snake.down()
+        snake.down()
     }
 ```
 

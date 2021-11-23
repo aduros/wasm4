@@ -9,15 +9,24 @@
     "initialMemory": 1,
     "maximumMemory": 1,
     "noExportMemory": true,
-    "memoryBase": 6560
+    "zeroFilledMemory": true,
+    "memoryBase": 6560,
+    "use": [
+      "seed=src/wasm4/seedHandler",
+      "trace="
+    ]
   },
   "targets": {
     "release": {
-      "optimize": 3,
-      "noAssert": true
+      "optimizeLevel": 3,
+      "shrinkLevel": 0,
+      "noAssert": true,
+      "use": "abort="
     },
     "debug": {
-      "debug": true
+      "debug": true,
+      "sourceMap": "http://localhost:4444/cart.wasm.map",
+      "use": "abort=src/wasm4/abortHandler"
     }
   }
 }

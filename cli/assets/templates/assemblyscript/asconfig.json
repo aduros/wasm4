@@ -10,7 +10,8 @@
     "maximumMemory": 1,
     "noExportMemory": true,
     "zeroFilledMemory": true,
-    "memoryBase": 6560
+    "memoryBase": 6560,
+    "use": "seed=src/wasm4/seedHandler"
   },
   "targets": {
     "release": {

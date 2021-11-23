@@ -160,3 +160,8 @@ function abortHandler (message: string | null, fileName: string | null, lineNumb
         traceUtf16(ptr, byteLength);
     }
 }
+
+// Avoid requiring an external seed. Call `Math.seedRandom()` to manually seed `Math.random()`.
+function seedHandler (): f64 {
+    return 0;
+}

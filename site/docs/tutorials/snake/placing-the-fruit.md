@@ -71,7 +71,7 @@ AssemblyScript provides us with the `Math.random` function. It returns a floatin
 
 ```typescript
 function rnd(n: i32 = 20): u16 {
-  return u16(Math.floor(Math.random() * n))
+    return u16(Math.floor(Math.random() * n))
 }
 ```
 
@@ -269,7 +269,7 @@ With that out of the way, it's time to actually render the newly imported sprite
 Rendering the sprite is rather simple. Just call the `blit` function of w4:
 
 ```typescript
-// Blit draws a sprite at position X, Y and uses DRAW_COLORS accordingly
+// Blit draws a sprite at position `x`, `y` and uses DRAW_COLORS accordingly
 function blit(spritePtr: usize, x: i32, y: i32, width: u32, height: u32, flags: u32): void;
 ```
 
@@ -277,26 +277,26 @@ In practice it looks like this:
 
 ```typescript
 export function update(): void {
-  frameCount++
+    frameCount++
 
-  input()
+    input()
 
-  if (frameCount % 15 == 0) {
-    snake.update()
-  }
-  snake.draw()
+    if (frameCount % 15 == 0) {
+        snake.update()
+    }
+    snake.draw()
 
-  w4.blit(fruitSprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP)
+    w4.blit(fruitSprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP)
 }
 ```
 
 But since you set the drawing colors, you need to change the drawing colors too:
 
 ```typescript {3}
-  snaked.draw()
+    snaked.draw()
 
-  store<u16>(w4.DRAW_COLORS, 0x4320)
-  w4.blit(fruitSprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP)
+    store<u16>(w4.DRAW_COLORS, 0x4320)
+    w4.blit(fruitSprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP)
 ```
 
 This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.

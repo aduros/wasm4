@@ -212,10 +212,10 @@ If you change the source to
 
 ```typescript {4}
 draw(): void {
-  this.body.forEach(part => w4.rect(part.x * 8, part.y * 8, 8, 8))
+    this.body.forEach(part => w4.rect(part.x * 8, part.y * 8, 8, 8))
 
-  store<u16>(w4.DRAW_COLORS, 0x0004)
-  w4.rect(this.body[0].x * 8, this.body[0].y * 8, 8, 8)
+    store<u16>(w4.DRAW_COLORS, 0x0004)
+    w4.rect(this.body[0].x * 8, this.body[0].y * 8, 8, 8)
 }
 ```
 
@@ -227,11 +227,11 @@ You'll see a change. The snake changed color. Not only the head, but the complet
 
 ```typescript {2}
 draw(): void {
-  store<u16>(w4.DRAW_COLORS, 0x0043)
-  this.body.forEach(part => w4.rect(part.x * 8, part.y * 8, 8, 8))
+    store<u16>(w4.DRAW_COLORS, 0x0043)
+    this.body.forEach(part => w4.rect(part.x * 8, part.y * 8, 8, 8))
 
-  store<u16>(w4.DRAW_COLORS, 0x0004)
-  w4.rect(this.body[0].x * 8, this.body[0].y * 8, 8, 8)
+    store<u16>(w4.DRAW_COLORS, 0x0004)
+    w4.rect(this.body[0].x * 8, this.body[0].y * 8, 8, 8)
 }
 ```
 

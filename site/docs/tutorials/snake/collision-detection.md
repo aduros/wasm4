@@ -47,14 +47,14 @@ In it's final form, it could look like this:
 
 ```typescript {4-9}
   if (frameCount % 15 == 0) {
-    snake.update()
+      snake.update()
 
-    if (snake.body[0].equals(fruit)) {
-      let tail = snake.body[snake.body.length - 1]
-      snake.body.push(new Point(tail.x, tail.y))
-      fruit.x = rnd(20)
-      fruit.y = rnd(20)
-    }
+      if (snake.body[0].equals(fruit)) {
+          let tail = snake.body[snake.body.length - 1]
+          snake.body.push(new Point(tail.x, tail.y))
+          fruit.x = rnd(20)
+          fruit.y = rnd(20)
+      }
   }
 ```
 
@@ -149,20 +149,20 @@ For the player to have any sense of "danger", the game needs a possibility for t
 Now you can call this function to check if the snake died in this frame:
 
 ```typescript {4-6}
-  if (frameCount % 15 == 0) {
-    snake.update()
+    if (frameCount % 15 == 0) {
+        snake.update()
 
-    if (snake.isDead()) {
-      // Do something
-    }
+        if (snake.isDead()) {
+          // Do something
+        }
 
-    if (snake.body[0].equals(fruit)) {
-      let tail = snake.body[snake.body.length - 1]
-      snake.body.push(new Point(tail.x, tail.y))
-      fruit.x = rnd(20)
-      fruit.y = rnd(20)
+        if (snake.body[0].equals(fruit)) {
+            let tail = snake.body[snake.body.length - 1]
+            snake.body.push(new Point(tail.x, tail.y))
+            fruit.x = rnd(20)
+            fruit.y = rnd(20)
+        }
     }
-  }
 ```
 
 What you do, is up to you. You could stop the game and show the score. Or you could simply reset the game. Up to you.

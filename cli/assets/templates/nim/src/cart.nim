@@ -1,5 +1,12 @@
 import cart/wasm4
 
+# Call NimMain so that global Nim code in modules will be called, 
+# preventing unexpected errors
+proc NimMain {.importc.}
+
+proc start {.exportWasm.} = 
+  NimMain()
+
 var smiley = [
   0b11000011'u8,
   0b10000001,

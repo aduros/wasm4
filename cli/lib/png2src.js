@@ -8,6 +8,7 @@ const LANGS={
     c: "c",
     d: "d",
     go: "go",
+    nim: "nim",
     odin: "odin",
     rs: "rust",
     rust: "rust",
@@ -32,6 +33,12 @@ const uint8_t %name%[%length%] = { %bytes% };`,
 enum %name%Height = %height%;
 enum %name%Flags = %flags%; // %flagsHumanReadable%
 immutable ubyte[] %name% = [ %bytes% ];`,
+
+    nim:
+`const %name%Width = %width%
+const %name%Height = %height%
+const %name%Flags = %flagsHumanReadable%
+var %name%: array[uint8, %length%] = [%firstByte%'u8,%restBytes%]`,
 
     go:
 `const %name%Width = %width%
@@ -151,13 +158,14 @@ function run (sourceFile, template) {
         .replace(/[A-Z]/g, l => '_' + l))
         .toLocaleUpperCase()
 
+    const dataBytes = [...bytes]
+            .map((b) => "0x" + b.toString(16).padStart(2, "0"))
+    
+    const data = dataBytes.join(',')
+
     const odinVarName = (varName.substr(0,1) + varName.substr(1)
         .replace(/[A-Z]/g, l => '_' + l))
         .toLocaleLowerCase()
-
-    const data = [...bytes]
-            .map((b) => "0x" + b.toString(16).padStart(2, "0"))
-            .join(',')
 
     const output = template
         .replace(/%name%/gi, varName)
@@ -167,6 +175,8 @@ function run (sourceFile, template) {
         .replace(/%flags%/gi, flags)
         .replace(/%flagsHumanReadable%/gi, flagsHumanReadable)
         .replace(/%bytes%/gi,data)
+        .replace(/%firstByte%/gi, dataBytes[0])
+        .replace(/%restBytes%/gi, dataBytes.slice(1).join(','))
         .replace(/%rustName%/gi, rustVarName) // Rust specific
         .replace(/%odinName%/gi, odinVarName) // Odin specific
         .replace(/%odinFlags%/gi, odinFlags);

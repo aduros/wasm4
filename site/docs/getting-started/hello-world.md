@@ -41,6 +41,13 @@ func update () {
 }
 ```
 
+```nim
+import cart/wasm4
+
+proc update {.exportWasm.} = 
+  rect(10, 10, 32, 32)
+```
+
 ```odin
 package main
 
@@ -116,6 +123,12 @@ w4.rect(10, 10, 32, 32)
 w4.Rect(10, 10, 32, 32)
 ```
 
+```nim
+DRAW_COLORS[] = 2
+
+rect(10, 10, 32, 32)
+```
+
 ```odin
 w4.DRAW_COLORS^ = 2
 
@@ -156,6 +169,10 @@ w4.trace("Hello world!");
 
 ```go
 w4.Trace("Hello world!")
+```
+
+```nim
+trace("Hello world!")
 ```
 
 ```odin

@@ -72,6 +72,19 @@ var smiley = [8]byte {
 }
 ```
 
+```nim
+var smiley: array[uint8, 8] = [
+  0b11000011'u8,
+  0b10000001,
+  0b00100100,
+  0b00100100,
+  0b00000000,
+  0b00100100,
+  0b10011001,
+  0b11000011,
+]
+```
+
 ```odin
 smiley := [8]u8 {
     0b11000011,
@@ -133,6 +146,11 @@ w4.blit(smiley.ptr, 10, 10, 8, 8, w4.blit1Bpp);
 w4.Blit(&smiley[0], 10, 10, 8, 8, w4.BLIT_1BPP)
 ```
 
+
+```nim
+blit(addr smiley[0], 10, 10, 8, 8, BLIT_1BPP)
+```
+
 ```odin
 // BLIT_1BPP is the default.
 // To use BLIT_2BPP:
@@ -174,11 +192,16 @@ w4.blit(smiley.ptr, 10, 10, 8, 8, w4.blit1Bpp | w4.blitFlipY);
 w4.Blit(&smiley[0], 10, 10, 8, 8, w4.BLIT_1BPP | w4.BLIT_FLIP_Y)
 ```
 
+```nim
+blit(addr smiley[0], 10, 10, 8, 8, BLIT_1BPP or BLIT_FLIP_Y);
+```
+
 ```odin
 // Again: BLIT_1BPP is the default.
 // To use BLIT_2BPP:
 // w4.blit(&smiley[0], 10, 10, 8, 8, {.USE_2BPP, .FLIPY})
 w4.blit(&smiley[0], 10, 10, 8, 8, {.FLIPY})
+
 ```
 
 ```rust
@@ -253,3 +276,5 @@ Where:
 - `%flags%`, `%flagsHumanReadable%` - type flag as integer and enum name (BLIT_2BPP or BLIT_1BPP)
 - `%length%` - count of bytes (integer)
 - `%bytes%` - comma separated series of bytes (string)
+- `%firstByte%` - first byte of the sprite (string)
+- `%restBytes%` - comma-separated series of bytes excluding the first one (string)

@@ -31,6 +31,7 @@ Let's go over creating a new project called `hello-world` for your chosen langua
         {label: 'C / C++', value: 'language-cpp'},
         {label: 'D', value: 'language-d'},
         {label: 'Go', value: 'language-go'},
+        {label: 'Nim', value: 'language-nim'},
         {label: 'Odin', value: 'language-odin'},
         {label: 'Rust', value: 'language-rust'},
         {label: 'Zig', value: 'language-zig'},
@@ -124,6 +125,29 @@ Compile the .wasm cartridge:
 
 ```shell
 make
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 run build/cart.wasm
+```
+
+</TabItem>
+
+<TabItem value="language-nim">
+
+To compile Nim projects you will need `nimble` installed. You will also need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
+
+```shell
+w4 new --nim hello-world
+cd hello-world
+```
+
+Compile the .wasm cartridge:
+
+```shell
+nimble rel
 ```
 
 Run it in WASM-4 with:

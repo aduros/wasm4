@@ -47,6 +47,13 @@ if gamepad&w4.BUTTON_RIGHT != 0 {
 }
 ```
 
+```nim
+var gamepad = GAMEPAD1[]
+
+if bool(gamepad and BUTTON_RIGHT):
+  trace("Right button is down!")
+```
+
 ```odin
 if .RIGHT in w4.GAMEPAD1^ {
     w4.trace("Right button is down!")
@@ -158,6 +165,21 @@ func update () {
         w4.Trace("Right button was just pressed!")
     }
 }
+```
+
+
+```nim
+var previousGamepad: uint8
+
+proc update {.exportWasm.} = 
+  var gamepad = GAMEPAD1[]
+  
+  # Only the buttons that were pressed down this frame
+  var pressedThisFrame = gamepad and (gamepad xor previousGamepad);
+  previousGamepad = gamepad
+
+  if bool(pressedThisFrame and BUTTON_RIGHT):
+    trace("Right button was just pressed!")
 ```
 
 ```odin

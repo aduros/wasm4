@@ -37,6 +37,12 @@ var gameData int32 = 1337
 w4.DiskW(unsafe.Pointer(&gameData), unsafe.Sizeof(gameData))
 ```
 
+
+```nim
+var gameData = 1337'i32
+discard diskw(addr gameData, uint32 sizeof(gameData))
+```
+
 ```odin
 game_data : i32 = 1337
 w4.diskw(&game_data, size_of(game_data))
@@ -90,6 +96,11 @@ import "unsafe"
 
 var gameData int32
 w4.DiskR(unsafe.Pointer(&gameData), unsafe.Sizeof(gameData))
+```
+
+```nim
+var gameData: int32
+discard diskr(addr gameData, uint32 sizeof(gameData))
 ```
 
 ```odin

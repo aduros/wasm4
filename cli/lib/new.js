@@ -8,6 +8,7 @@ const LANGS = {
     c: "c",
     d: "d",
     go: "go",
+    nim: "nim",
     odin: "odin",
     rs: "rust",
     rust: "rust",
@@ -34,6 +35,11 @@ const HELP = {
     go: {
         name: "Go",
         build: "make",
+        cart: "build/cart.wasm",
+    },
+    nim: {
+        name: "Nim",
+        build: "nimble rel",
         cart: "build/cart.wasm",
     },
     odin: {
@@ -63,6 +69,8 @@ async function run (destDir, opts) {
         lang = LANGS.d;
     } else if (opts.go) {
         lang = LANGS.go;
+    } else if (opts.nim) {
+        lang = LANGS.nim;
     } else if (opts.odin) {
         lang = LANGS.odin;
     } else if (opts.rust) {

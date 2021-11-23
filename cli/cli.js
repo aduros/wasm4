@@ -84,7 +84,7 @@ program.command("png2src <images...>")
     .addOption(
         new Option("--lang <lang>", "Use the given language")
             .env("W4_LANG")
-            .choices(["as", "assemblyscript", "c", "d", "go", "rs", "rust"])
+            .choices(["as", "assemblyscript", "c", "d", "go", "nim", "rs", "rust"])
             .default("as")
     )
     .action((images, opts) => {

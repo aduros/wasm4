@@ -11,7 +11,10 @@
     "noExportMemory": true,
     "zeroFilledMemory": true,
     "memoryBase": 6560,
-    "use": "seed=src/wasm4/seedHandler"
+    "use": [
+      "seed=src/wasm4/seedHandler",
+      "trace="
+    ]
   },
   "targets": {
     "release": {

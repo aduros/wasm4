@@ -97,7 +97,7 @@ async function run (destDir, opts) {
 async function init (destDir, lang) {
     switch (lang) {
         case LANGS.assemblyscript:
-            const projectName = path.basename(destDir);
+            const projectName = path.basename(path.resolve(destDir));
             const file = destDir + "/package.json";
             const json = JSON.parse(fs.readFileSync(file));
             json.name = projectName;

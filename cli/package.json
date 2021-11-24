@@ -16,6 +16,7 @@
   "keywords": [
     "2d game engine",
     "assemblyscript",
+    "d",
     "dlang",
     "fantasy computer",
     "fantasy console",
@@ -23,11 +24,14 @@
     "gamedev",
     "go",
     "golang",
+    "nim",
+    "odin",
     "retrogaming",
     "rust",
     "typescript",
     "wasm",
-    "webassembly"
+    "webassembly",
+    "zig"
   ],
   "dependencies": {
     "commander": "^8.2.0",

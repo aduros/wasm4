@@ -3,8 +3,6 @@ target = "wasm32-unknown-unknown"
 
 [target.wasm32-unknown-unknown]
 rustflags = [
-    "-A", "dead_code",
-
     # Import memory from WASM-4
     "-C", "link-arg=--import-memory",
     "-C", "link-arg=--initial-memory=65536",

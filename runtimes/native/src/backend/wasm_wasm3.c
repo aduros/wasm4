@@ -155,17 +155,6 @@ static m3ApiRawFunction (tracef) {
     m3ApiSuccess();
 }
 
-static m3ApiRawFunction (abort_) {
-    printf("Called abort!\n");
-    m3ApiSuccess();
-}
-
-static m3ApiRawFunction (seed) {
-    printf("Called seed!\n");
-    m3ApiReturnType(double);
-    m3ApiReturn(0.0);
-}
-
 static void check (M3Result result) {
     if (result != m3Err_none) {
         M3ErrorInfo info;
@@ -214,9 +203,6 @@ void w4_wasmLoadModule (const uint8_t* wasmBuffer, int byteLength) {
     m3_LinkRawFunction(module, "env", "traceUtf8", "v(ii)", traceUtf8);
     m3_LinkRawFunction(module, "env", "traceUtf16", "v(ii)", traceUtf16);
     m3_LinkRawFunction(module, "env", "tracef", "v(ii)", tracef);
-
-    m3_LinkRawFunction(module, "env", "abort", "v(iiii)", abort_);
-    m3_LinkRawFunction(module, "env", "seed", "F()", seed);
 
 #ifndef NDEBUG
     M3ErrorInfo error;

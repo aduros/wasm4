@@ -120,12 +120,6 @@ export class Runtime {
             traceUtf8: this.traceUtf8.bind(this),
             traceUtf16: this.traceUtf16.bind(this),
             tracef: this.tracef.bind(this),
-
-            // seed for AssemblyScript random generator
-            seed: Date.now,
-
-            // Temporary(?) for assemblyscript
-            abort: function () {},
         };
 
         const module = await WebAssembly.instantiate(wasmBuffer, { env });

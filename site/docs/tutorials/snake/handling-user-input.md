@@ -184,13 +184,13 @@ For this, you need to change the update function of in the main file. Remember, 
 
 ```typescript
 export function update(): void {
-	frameCount++
+    frameCount++
 
-	if (frameCount % 15 == 0) {
-		snake.update()
-	}
+    if (frameCount % 15 == 0) {
+        snake.update()
+    }
 
-	snake.draw()
+    snake.draw()
 }
 ```
 
@@ -244,76 +244,76 @@ The classic processing loop goes like this: Input, Process the input, output the
 It's a good idea to handle the input in it's own function. Something like this could be on your mind:
 
 ```typescript {1-8,13}
-function input() :void {
-	const gamepad = load<u8>(w4.GAMEPAD1);
-	const justPressed = gamepad & (gamepad ^ prevState)
+function input(): void {
+    const gamepad = load<u8>(w4.GAMEPAD1);
+    const justPressed = gamepad & (gamepad ^ prevState)
 
-	if (justPressed & w4.BUTTON_UP) {
-		// Do something
-	}
+    if (justPressed & w4.BUTTON_UP) {
+        // Do something
+    }
 }
 
 export function update(): void {
-	frameCount++
+    frameCount++
 
-	input()
+    input()
 
-	if frameCount%15 == 0 {
-		snake.Update()
-	}
+    if (frameCount % 15 == 0) {
+        snake.update()
+    }
 
-	snake.Draw()
+    snake.draw()
 }
 ```
 
 If you try to compile this, you should get an error: `ERROR TS2304: Cannot find name 'prevState'.`. This is easily fixed. Just place the prevState into the var-section:
 
-```typescript {3}
-var snake = new Snake()
-var frameCount = 0
-var prevState : u8
+```typescript {2}
+const snake = new Snake()
+let prevState: u8
+let frameCount = 0
 ```
 
 To notice any change in the gamepad, you have to store the *current state* at the end of the input. This will make it the *previous state*. And while you're at it, why not add the other 3 directions along the way:
 
 ```typescript {8-18}
-function input() : void {
-	const gamepad = load<u8>(w4.GAMEPAD1);
-	const justPressed = gamepad & (gamepad ^ prevState)
+function input(): void {
+    const gamepad = load<u8>(w4.GAMEPAD1);
+    const justPressed = gamepad & (gamepad ^ prevState)
 
-	if (justPressed & w4.BUTTON_LEFT) {
-		// Do something
-	}
-	if (justPressed & w4.BUTTON_RIGHT) {
-		// Do something
-	}
-	if (justPressed & w4.BUTTON_UP) {
-		// Do something
-	}
-	if (justPressed & w4.BUTTON_DOWN) {
-		// Do something
-	}
+    if (justPressed & w4.BUTTON_LEFT) {
+        // Do something
+    }
+    if (justPressed & w4.BUTTON_RIGHT) {
+        // Do something
+    }
+    if (justPressed & w4.BUTTON_UP) {
+        // Do something
+    }
+    if (justPressed & w4.BUTTON_DOWN) {
+        // Do something
+    }
 
-	prevState = gamepad
+    prevState = gamepad
 }
 ```
 
 If you want to check if it works: Use the `trace` function provided by WASM-4. Here's an example:
 
 ```typescript
-	if (justPressed & w4.BUTTON_DOWN) {
-		w4.trace("Down")
-	}
+    if (justPressed & w4.BUTTON_DOWN) {
+        w4.trace("down")
+    }
 ```
 
 If you use `trace` in each if-statement, you should see the corresponding output in the console.
 
 Now, instead of using `trace` to confirm everything works as intended, you should replace it with something like this:
 
-```go
-	if justPressed&w4.BUTTON_DOWN != 0 {
-		snake.down()
-	}
+```typescript
+    if (justPressed & w4.BUTTON_DOWN) {
+        snake.down()
+    }
 ```
 
 I'll leave it to you, to finish the other 3 directions.
@@ -330,11 +330,12 @@ ERROR TS2339: Property 'right' does not exist on type 'src/snake/Snake'.
 To fix this, add those functions to your snake. Here's an example for `down`:
 
 ```typescript
-	public down() : void {
-		if (this.direction.Y == 0) {
-			this.direction = new Point(0, 1)
-		}
-	}
+    down(): void {
+        if (this.direction.y == 0) {
+            this.direction.x = 0
+            this.direction.y = 1
+        }
+    }
 ```
 
 </TabItem>

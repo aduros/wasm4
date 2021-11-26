@@ -39,7 +39,7 @@ Unlike most other fantasy consoles, pretty much everything is done in code. Sett
 ```typescript
 import * as w4 from "./wasm4";
 
-export function update (): void {
+export function update(): void {
 }
 ```
 
@@ -62,11 +62,11 @@ So in most cases, you'd add a "start" function and export it too. WASM-4 will ex
 <MultiLanguageCode>
 
 ```typescript
-export function start (): void {
-	store<u32>(w4.PALETTE, 0xfbf7f3, 0 * sizeof<u32>());
-	store<u32>(w4.PALETTE, 0xe5b083, 1 * sizeof<u32>());
-	store<u32>(w4.PALETTE, 0x426e5d, 2 * sizeof<u32>());
-	store<u32>(w4.PALETTE, 0x20283d, 3 * sizeof<u32>());
+export function start(): void {
+    store<u32>(w4.PALETTE, 0xfbf7f3, 0 * sizeof<u32>())
+    store<u32>(w4.PALETTE, 0xe5b083, 1 * sizeof<u32>())
+    store<u32>(w4.PALETTE, 0x426e5d, 2 * sizeof<u32>())
+    store<u32>(w4.PALETTE, 0x20283d, 3 * sizeof<u32>())
 }
 ```
 

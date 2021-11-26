@@ -27,23 +27,23 @@ The content is rather simple:
 
 ```typescript
 export class Point {
-    public X : i16
-    public Y : i16
+    constructor(
+        public x: i32,
+        public y: i32
+    ) {}
 
-    constructor(X : i16, Y : i16) {
-        this.X = X
-        this.Y = Y
+    equals(other: Point): bool {
+        return this.x == other.x && this.y == other.y
     }
 }
 
 export class Snake {
-    public body : Array<Point>
-    public direction : Point
-
-    constructor () {
-        this.parts = new Array<Point>()
-        this.direction = new Point(1, 0)
-    }
+    body: Array<Point> = [
+        new Point(2, 0),
+        new Point(1, 0),
+        new Point(0, 0)
+    ]
+    direction: Point = new Point(1, 0)
 }
 ```
 

@@ -24,16 +24,16 @@ Collision detection can be one of the harder to understand concepts of game deve
 A simple
 
 ```typescript
-if (snake.body[0].X == fruit.X && snake.body[0].Y == fruit.Y) {
-	// Snake's head hits the fruit
+if (snake.body[0].equals(fruit)) {
+    // Snake's head hits the fruit
 }
 ```
 
 is enough already to check if the snake eats the fruit. And to make the snake "grow", simply increase the length of the snake using the `push` function of the array. Now it remains the question what values should this new piece have. The easiest would be to add the current last piece:
 
 ```typescript
-let p = snake.body[snake.body.length-1]
-snake.body.push(new Point(p.X, p.Y))
+let tail = snake.body[snake.body.length - 1]
+snake.body.push(new Point(tail.x, tail.y))
 ```
 
 Once this done, simply relocate the fruit:
@@ -46,16 +46,16 @@ fruit.Y = rnd(20)
 In it's final form, it could look like this:
 
 ```typescript {4-9}
-	if (frameCount%15 == 0) {
-		snake.update()
+    if (frameCount % 15 == 0) {
+        snake.update()
 
-		if (snake.body[0].X == fruit.X && snake.body[0].Y == fruit.Y) {
-			let p = snake.body[snake.body.length-1]
-			snake.body.push(new Point(p.X, p.Y))
-			fruit.X = rnd(20)
-			fruit.Y = rnd(20)
-		}
-	}
+        if (snake.body[0].equals(fruit)) {
+            let tail = snake.body[snake.body.length - 1]
+            snake.body.push(new Point(tail.x, tail.y))
+            fruit.x = rnd(20)
+            fruit.y = rnd(20)
+        }
+    }
 ```
 
 Now you're almost done. Only "Game Over" is left to finish this game.
@@ -134,9 +134,10 @@ For the player to have any sense of "danger", the game needs a possibility for t
 <TabItem value="language-typescript">
 
 ```typescript
-    public isDead() : bool {
-        for (let i = 1; i < this.body.length; i++) {
-            if (this.body[i].X == this.body[0].X && this.body[i].Y == this.body[0].Y) {
+    isDead(): bool {
+        const head = this.body[0]
+        for (let i = 1, len = this.body.length; i < len; i++) {
+            if (this.body[i].equals(head)) {
                 return true
             }
         }
@@ -148,20 +149,20 @@ For the player to have any sense of "danger", the game needs a possibility for t
 Now you can call this function to check if the snake died in this frame:
 
 ```typescript {4-6}
-	if (frameCount%15 == 0) {
-		snake.update()
+    if (frameCount % 15 == 0) {
+        snake.update()
 
-		if (snake.isDead()) {
-			// Do something
-		}
- 
-		if (snake.body[0].X == fruit.X && snake.body[0].Y == fruit.Y) {
-			let p = snake.body[snake.body.length-1]
-			snake.body.push(new Point(p.X, p.Y))
-			fruit.X = rnd(20)
-			fruit.Y = rnd(20)
-		}
-	}
+        if (snake.isDead()) {
+            // Do something
+        }
+
+        if (snake.body[0].equals(fruit)) {
+            let tail = snake.body[snake.body.length - 1]
+            snake.body.push(new Point(tail.x, tail.y))
+            fruit.x = rnd(20)
+            fruit.y = rnd(20)
+        }
+    }
 ```
 
 What you do, is up to you. You could stop the game and show the score. Or you could simply reset the game. Up to you.

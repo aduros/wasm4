@@ -18,11 +18,11 @@ A freely moving snake is nice. But it get's a bit dull if that's all there is. T
 <TabItem value="language-typescript">
 To place (and eat) a fruit, you first need to make a variable for this. Since it's simply a point on the grid, `Point` will do:
 
-```typescript {4}
-var snake = new Snake()
-var frameCount = 0
-var prevState : u8
-var fruit : Point
+```typescript {2}
+const snake = new Snake()
+let fruit: Point
+let prevState: u8
+let frameCount = 0
 ```
 
 </TabItem>
@@ -70,26 +70,19 @@ To place (and eat) a fruit, you first need to make a variable for this. Since it
 AssemblyScript provides us with the `Math.random` function. It returns a floating point value between `0` and `0.999999999`. But since we only deal with integer values, it's a good idea to create a helper function:
 
 ```typescript
-function rnd(n : u16) : u16 {
-	return u16(Math.floor(Math.random()*n));
+function rnd(n: i32 = 20): u16 {
+    return u16(Math.floor(Math.random() * n))
 }
 ```
 
 This allows you to call `rnd(20)` to get a number between `0` and `19`. Now you can change the fruit declaration:
 
-```typescript {4}
-var snake = new Snake()
-var frameCount = 0
-var prevState : u8
-var fruit = new Point(rnd(20), rnd(20))
+```typescript {2}
+const snake = new Snake()
+const fruit = new Point(rnd(20), rnd(20))
+let prevState: u8
+let frameCount = 0
 ```
-
-:::tip Use deterministic random numbers
-One of the available runtimes is `libretro`. Libretro allows for multiplayer games using `netplay`.
-But the condition is that the state of the game has to be deterministic.
-Other languages such as Go have no choice but to use a deterministic approach.
-If you want to learn more about that, check out the examples of the other languages.
-:::
 
 </TabItem>
 
@@ -163,10 +156,10 @@ Indexed PNG files can be created by several image apps like [Aseprite](https://w
 
 The image we import is a 8x8 PNG file with exactly 4 colors. And it's this image here:
 
-![Zoomed Fruit](images/fruit-zoomed.webp)  
+![Zoomed Fruit](images/fruit-zoomed.webp)
 This image is zoomed by 800%.
 
-![Zoomed Fruit](images/fruit.png)  
+![Zoomed Fruit](images/fruit.png)
 This is the original image. You can download it to proceed.
 
 <Tabs
@@ -200,12 +193,12 @@ To get it into a an existing file, use the `>>` operator. Like this:
 
 This will add the previous lines to your `main.ts` and causes an error because "fruit" already exists. Just rename the new fruit to `fruitSprite` and move it somewhere else. Also: You can remove the other stuff added, you won't need it for this project:
 
-```typescript {5}
-var snake = new Snake()
-var frameCount = 0
-var prevState : u8
-var fruit = new Point(rnd(20), rnd(20))
-const fruitSprite = memory.data<u8>([ 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0 ]);
+```typescript {2}
+const snake = new Snake()
+const fruit = new Point(rnd(20), rnd(20))
+let frameCount = 0
+let prevState: u8
+const fruitSprite = memory.data<u8>([ 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0 ])
 ```
 
 With that out of the way, it's time to actually render the newly imported sprite.
@@ -276,34 +269,34 @@ With that out of the way, it's time to actually render the newly imported sprite
 Rendering the sprite is rather simple. Just call the `blit` function of w4:
 
 ```typescript
-// Blit draws a sprite at position X, Y and uses DRAW_COLORS accordingly
-function blit (spritePtr: usize, x: i32, y: i32, width: u32, height: u32, flags: u32): void;
+// Blit draws a sprite at position `x`, `y` and uses DRAW_COLORS accordingly
+function blit(spritePtr: usize, x: i32, y: i32, width: u32, height: u32, flags: u32): void;
 ```
 
 In practice it looks like this:
 
 ```typescript
 export function update(): void {
-	frameCount++
+    frameCount++
 
-	input()
+    input()
 
-	if (frameCount % 15 == 0) {
-		snake.update()
-	}
-	snake.draw()
+    if (frameCount % 15 == 0) {
+        snake.update()
+    }
+    snake.draw()
 
-	w4.blit(fruitSprite, fruit.X*8, fruit.Y*8, 8, 8, w4.BLIT_2BPP)
+    w4.blit(fruitSprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP)
 }
 ```
 
 But since you set the drawing colors, you need to change the drawing colors too:
 
 ```typescript {3}
-	snaked.draw()
+    snaked.draw()
 
-	store<u16>(w4.DRAW_COLORS, 0x4320)
-	w4.blit(fruitSprite, fruit.X*8, fruit.Y*8, 8, 8, w4.BLIT_2BPP)
+    store<u16>(w4.DRAW_COLORS, 0x4320)
+    w4.blit(fruitSprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP)
 ```
 
 This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.

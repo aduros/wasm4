@@ -37,20 +37,20 @@ Keep in mind: This is not what the player sees. This is:
 To achieve the first step (moving the body, excluding the head), a simple loop is all you need:
 
 ```typescript
-	public update() : void {
-		for (let i = this.body.length-1; i > 0; i--) {
-			this.body[i] = new Point(this.body[i-1].X, this.body[i-1].Y)
-		}
-	}
+    update(): void {
+        for (let i = this.body.length - 1; i > 0; i--) {
+            unchecked(body[i].x = body[i - 1].x)
+            unchecked(body[i].y = body[i - 1].y)
+        }
+    }
 ```
 
 Don't forget to call the new function in the main-loop:
 
 ```typescript {2}
 export function update(): void {
-	snake.update()
-
-	snake.draw()
+    snake.update()
+    snake.draw()
 }
 ```
 
@@ -119,21 +119,23 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 
 This isn't hard either. Simple add the add the direction to the current head. And then make sure the head stays within the boundaries:
 
-```typescript {6-13}
-	public update() : void {
-		for (let i = this.body.length-1; i > 0; i--) {
-			this.body[i] = new Point(this.body[i-1].X, this.body[i-1].Y)
-		}
+```typescript {7-15}
+    update(): void {
+        for (let i = this.body.length - 1; i > 0; i--) {
+            unchecked(body[i].x = body[i - 1].x)
+            unchecked(body[i].y = body[i - 1].y)
+        }
 
-		this.body[0].X = (this.body[0].X + this.direction.X) % 20
-		this.body[0].Y = (this.body[0].Y + this.direction.Y) % 20
-		if (this.body[0].X < 0) {
-			this.body[0].X = 19
-		}
-		if (this.body[0].Y < 0) {
-			this.body[0].Y = 19
-		}
-	}
+        this.body[0].x = (this.body[0].x + this.direction.x) % 20
+        this.body[0].y = (this.body[0].y + this.direction.y) % 20
+
+        if (this.body[0].x < 0) {
+            this.body[0].x = 19
+        }
+        if (this.body[0].y < 0) {
+            this.body[0].y = 19
+        }
+    }
 ```
 
 </TabItem>
@@ -202,19 +204,19 @@ The easiest way is probably to count the frames and update the snake only every 
 For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
 
 ```typescript {2}
-var snake = new Snake()
-var frameCount = 0
+const snake = new Snake()
+let frameCount = 0
 ```
 
 This variable in main.ts keeps track of all frames so far. Just increase it's value in the main-update function:
 
 ```typescript {2}
 export function update(): void {
-	frameCount++
+    frameCount++
 
-	snake.update()
+    snake.update()
 
-	snake.draw()
+    snake.draw()
 }
 ```
 
@@ -222,13 +224,13 @@ Now all you need is to check if the passed frames are dividable by X:
 
 ```typescript {4-6}
 export function update(): void {
-	frameCount++
+    frameCount++
 
-	if (frameCount % 15 == 0) {
-		snake.update()
-	}
+    if (frameCount % 15 == 0) {
+        snake.update()
+    }
 
-	snake.draw()
+    snake.draw()
 }
 ```
 

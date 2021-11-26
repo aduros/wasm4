@@ -1,5 +1,4 @@
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import MultiLanguage, {Page} from '@site/src/components/MultiLanguage';
 
 # Setup
 
@@ -21,23 +20,12 @@ You can also install `w4` with NPM by running `npm install -g wasm4`
 
 ## Quickstart
 
-Let's go over creating a new project called `hello-world` for your chosen language.
+Let's go over creating a new project called `hello-world` for your chosen language. Use the dropdown
+menu to select a different language.
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'D', value: 'language-d'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Nim', value: 'language-nim'},
-        {label: 'Odin', value: 'language-odin'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 
 To compile AssemblyScript projects you will need `npm` installed.
 
@@ -64,9 +52,9 @@ Run it in WASM-4 with:
 w4 run build/cart.wasm
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
+<Page value="c">
 
 To compile C/C++ projects you will need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
 
@@ -87,9 +75,9 @@ Run it in WASM-4 with:
 w4 run build/cart.wasm
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-d">
+<Page value="d">
 
 To compile D projects you will need `ldc` installed. To use libc, you also need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
 
@@ -110,9 +98,9 @@ Run it in WASM-4 with:
 w4 run cart.wasm
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="go">
 
 To compile Go projects you will need `go` and `tinygo` installed.
 
@@ -133,9 +121,9 @@ Run it in WASM-4 with:
 w4 run build/cart.wasm
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-nim">
+<Page value="nim">
 
 To compile Nim projects you will need `nimble` installed. You will also need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
 
@@ -156,9 +144,9 @@ Run it in WASM-4 with:
 w4 run build/cart.wasm
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-odin">
+<Page value="odin">
 
 To compile Odin projects you will need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable. You'll also need the latest version of [Odin](https://https://github.com/odin-lang/Odin).
 
@@ -179,9 +167,9 @@ Run it in WASM-4 with:
 w4 run build/cart.wasm
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-rust">
+<Page value="rust">
 
 To compile Rust projects you will need `cargo` installed. You will also need the wasm32 target,
 which can be installed with `rustup target add wasm32-unknown-unknown`.
@@ -203,9 +191,9 @@ Run it in WASM-4 with:
 w4 run target/wasm32-unknown-unknown/release/cart.wasm
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-zig">
+<Page value="zig">
 
 To compile Zig projects you will need a recent build of `zig` installed.
 
@@ -226,9 +214,9 @@ Run it in WASM-4 with:
 w4 run zig-out/lib/cart.wasm
 ```
 
-</TabItem>
+</Page>
 
-</Tabs>
+</MultiLanguage>
 
 :::tip
 You can also use `w4 watch` to automatically watch for changes in source files and rebuild in real-time.

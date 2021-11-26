@@ -1,0 +1,11 @@
+.multilang {
+  text-align: right;
+}
+
+.multilang .navbar__link {
+  font-weight: bold;
+}
+
+.multilang .dropdown__link, .multilang .navbar__link {
+  cursor: pointer;
+}

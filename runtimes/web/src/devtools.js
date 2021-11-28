@@ -49,5 +49,5 @@ export class DevtoolsManager {
   */
   _notifyUpdateCompleted = throttle((dataView, fps) => {
     window.dispatchEvent(createUpdateCompletedEvent(dataView, fps));
-  }, 300);
+  }, 250);
 }

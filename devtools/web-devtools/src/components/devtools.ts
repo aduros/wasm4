@@ -27,7 +27,7 @@ export class Wasm4Devtools extends LitElement {
   };
 
   renderMouse({ pointerPos, mouseButtons }: Wasm4MemoryView) {
-    return html` <section class="mouse-section">
+    return html`<section class="mouse-section">
         <h4 class="heading">mouse position</h4>
         <ul class="mouse-pos-list">
           <li class="info-box mouse-pos">
@@ -79,6 +79,10 @@ export class Wasm4Devtools extends LitElement {
       <section>
         <h4>fps</h4>
         <span>${fps}</span>
+      </section>
+      <section>
+        <h4>gamepad</h4>
+        <wasm4-gamepad raw-value=${memoryView.gamepads[0] ?? 0}></wasm4-gamepad>
       </section>
     </article>`;
   }

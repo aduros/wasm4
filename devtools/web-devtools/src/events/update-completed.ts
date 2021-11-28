@@ -17,6 +17,7 @@ export interface Wasm4MemoryView {
   pointerPos: Point;
   mouseButtons: MouseButtons;
   systemFlags: number;
+  gamepads: number[];
   palette: [number, number, number, number];
   drawColors: number;
 }
@@ -37,6 +38,15 @@ function extractPalette(data: DataView): Wasm4MemoryView['palette'] {
   }
 
   return palette;
+}
+
+function extractGamepads(data: DataView): Wasm4MemoryView['gamepads'] {
+  return [
+    data.getUint8(constants.ADDR_GAMEPAD1),
+    data.getUint8(constants.ADDR_GAMEPAD2),
+    data.getUint8(constants.ADDR_GAMEPAD3),
+    data.getUint8(constants.ADDR_GAMEPAD4),
+  ];
 }
 
 function getStoredValue(): string | null {
@@ -70,10 +80,13 @@ export function createUpdateCompletedEvent(
   const palette = extractPalette(data);
   const drawColors = data.getUint16(constants.ADDR_DRAW_COLORS, true);
 
+  const gamepads = extractGamepads(data);
+
   const memory: Wasm4MemoryView = {
     mouseButtons,
     palette,
     pointerPos,
+    gamepads,
     systemFlags,
     drawColors,
   };

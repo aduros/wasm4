@@ -3,6 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { formatColor } from '../utils/format';
 import paletteCss from '../styles/palette.scss';
 import { withTheme } from '../styles/commons';
+
 export const wasm4PaletteTagName = 'wasm4-palette' as const;
 
 @customElement(wasm4PaletteTagName)
@@ -19,7 +20,7 @@ export class Wasm4Palette extends LitElement {
     return html`<section class="palette-article">
       <h4>${this.heading}</h4>
       <div class="palette-grid">
-        ${this.palette.map((color) => {
+        ${this.palette.slice(0, 4).map((color) => {
           const colorHex = formatColor(color);
 
           const shouldInvertColor =

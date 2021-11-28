@@ -1,3 +1,5 @@
 /dist/wasm4.js
 /dist/wasm4.css
 /dist/cart.wasm
+/dist/wasm4.js.*
+

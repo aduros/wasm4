@@ -3,7 +3,12 @@
   "private": true,
   "scripts": {
     "build": "webpack --mode production",
-    "start": "webpack serve --mode development --content-base dist --devtool inline-source-map --host 0.0.0.0"
+    "start": "webpack serve --mode development --content-base dist --devtool inline-source-map --host 0.0.0.0",
+    "prepare": "npm --prefix '../../devtools/web-devtools' i"
+  },
+  "dependencies": {
+    "@wasm4/web-devtools": "file:../../devtools/web-devtools",
+    "lodash-es": "^4.17.21"
   },
   "devDependencies": {
     "css-loader": "^6.2.0",

@@ -1,0 +1,35 @@
+/* Theme */
+:host {
+  --wasm4-devtools-bg-primary: #202020;
+  --wasm4-devtools-bg-secondary: #444;
+  --wasm4-devtools-text-primary: #fff;
+  --wasm4-devtools-text-secondary: rgba(255, 255, 255, 0.7);
+  --wasm4-devtools-text-size: 16px;
+
+  color: var(--wasm4-devtools-text-primary);
+  background-color: var(--wasm4-devtools-bg-primary);
+}
+
+.text-primary {
+  color: var(--wasm4-devtools-text-primary) !important;
+}
+
+.text-secondary {
+  color: var(--wasm4-devtools-text-secondary) !important;
+}
+
+.bg-primary {
+  background-color: var(--wasm4-devtools-bg-primary) !important;
+}
+
+.bg-secondary {
+  background-color: var(--wasm4-devtools-bg-secondary) !important;
+}
+
+/* Typography */
+:host {
+  font-size: var(--wasm4-devtools-text-size);
+  font-family: monospace;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}

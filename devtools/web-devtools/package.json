@@ -1,0 +1,38 @@
+{
+  "name": "@wasm4/web-devtools",
+  "version": "1.0.0",
+  "main": "dist/web-devtools.cjs.js",
+  "module": "dist/web-devtools.es.js",
+  "private": true,
+  "exports": {
+    ".": {
+      "import": "./dist/web-devtools.es.js",
+      "require": "./dist/web-devtools.cjs.js"
+    }
+  },
+  "types": "types/index.d.ts",
+  "files": [
+    "dist",
+    "types"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "clean": "rimraf dist types",
+    "build": "tsc && vite build",
+    "prepare": "npm run clean && npm run build",
+    "prettify": "prettier . --write"
+  },
+  "dependencies": {
+    "lit": "^2.0.0",
+    "fast-equals": "^2.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.10",
+    "prettier": "2.5.0",
+    "rimraf": "3.0.2",
+    "rollup-plugin-postcss-lit": "^2.0.0",
+    "sass": "^1.43.5",
+    "typescript": "^4.3.2",
+    "vite": "^2.6.4"
+  }
+}

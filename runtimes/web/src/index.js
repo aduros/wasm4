@@ -2,7 +2,7 @@ import * as constants from "./constants";
 import { Runtime } from "./runtime";
 import { websocket } from "./devkit";
 import * as z85 from "./z85";
-
+import { DevtoolsManager } from './devtools';
 import "./styles.css";
 
 const qs = new URL(document.location).searchParams;
@@ -54,6 +54,7 @@ async function loadCartWasm () {
 
 (async function () {
     const runtime = new Runtime();
+    const devtoolsManager = new DevtoolsManager();
     const canvas = runtime.canvas;
     document.getElementById("content").appendChild(canvas);
     let wasmBuffer = await loadCartWasm();
@@ -190,6 +191,7 @@ async function loadCartWasm () {
         "2": saveState,
         "4": loadState,
         "r": reboot,
+        "F8": devtoolsManager.toggleDevtools,
         "F9": takeScreenshot,
         "F10": recordVideo,
         "F11": requestFullscreen,
@@ -477,6 +479,8 @@ async function loadCartWasm () {
 
             gamepadOverlay.style.display = runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY)
                 ? "none" : "";
+
+            devtoolsManager.updateCompleted(runtime.data, deltaFrame);     
         }
 
         requestAnimationFrame(loop);

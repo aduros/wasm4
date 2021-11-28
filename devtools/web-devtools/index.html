@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + Lit App</title>
+    <script type="module" src="/src/index.ts"></script>
+    <script type="module">
+      import { updateCompletedEventType } from '/src/events/update-completed.ts';
+
+      window.addEventListener('load', () => {
+        window.dispatchEvent(
+          new CustomEvent(updateCompletedEventType, {
+            detail: {
+              memory: {
+                pointerPos: { x: 24, y: -30 },
+                mouseButtons: {
+                  left: true,
+                  right: false,
+                  middle: false,
+                },
+                systemFlags: 0,
+                palette: [0xfff6d3, 0xf9a875, 0xeb6b6f, 0x7c3f58],
+                drawColors: 4,
+              },
+              fps: 60,
+              storedValue: null,
+            },
+          })
+        );
+      });
+    </script>
+  </head>
+  <body>
+    <wasm4-devtools />
+    <wasm4-palette />
+  </body>
+</html>

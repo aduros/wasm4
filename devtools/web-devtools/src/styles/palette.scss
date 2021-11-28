@@ -1,0 +1,19 @@
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  height: 50px;
+  border-radius: 4px;
+  overflow: hidden;
+  font-weight: 800;
+  font-size: 0.875em;
+
+  .color-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.palette-article h3 {
+  margin-bottom: 0.2em;
+}

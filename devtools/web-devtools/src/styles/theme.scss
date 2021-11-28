@@ -1,34 +1,44 @@
+$theme: (
+  bg-primary: #202020,
+  bg-secondary: #444,
+  text-primary: #fff,
+  text-secondary: rgba(255, 255, 255, 0.7),
+  text-size: 16px,
+);
+
+@function theme-get($theme-key) {
+  @if map-get($theme, $theme-key) == null {
+    @error "#{$theme-key} is not a valid property key.";
+  }
+
+  @return var(--wasm4-devtools-#{$theme-key}, map-get($theme, $theme-key));
+}
+
 /* Theme */
 :host {
-  --wasm4-devtools-bg-primary: #202020;
-  --wasm4-devtools-bg-secondary: #444;
-  --wasm4-devtools-text-primary: #fff;
-  --wasm4-devtools-text-secondary: rgba(255, 255, 255, 0.7);
-  --wasm4-devtools-text-size: 16px;
-
-  color: var(--wasm4-devtools-text-primary);
-  background-color: var(--wasm4-devtools-bg-primary);
+  color: theme-get(text-primary);
+  background-color: theme-get(bg-primary);
 }
 
 .text-primary {
-  color: var(--wasm4-devtools-text-primary) !important;
+  color: theme-get(text-primary) !important;
 }
 
 .text-secondary {
-  color: var(--wasm4-devtools-text-secondary) !important;
+  color: theme-get(text-secondary) !important;
 }
 
 .bg-primary {
-  background-color: var(--wasm4-devtools-bg-primary) !important;
+  background-color: theme-get(bg-primary) !important;
 }
 
 .bg-secondary {
-  background-color: var(--wasm4-devtools-bg-secondary) !important;
+  background-color: theme-get(bg-secondary) !important;
 }
 
 /* Typography */
 :host {
-  font-size: var(--wasm4-devtools-text-size);
+  font-size: theme-get(text-size);
   font-family: monospace;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

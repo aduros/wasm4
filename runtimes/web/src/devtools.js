@@ -4,9 +4,20 @@ import {
   wasm4DevtoolsTagName,
   closeDevtoolsEventType,
 } from '@wasm4/web-devtools';
+import { showDevToolsQueryKey } from './constants';
 
 export class DevtoolsManager {
+  /**
+   * @private
+   */
   _enabled = false;
+
+  static enabledByQueryParams() {
+    return (
+      new URLSearchParams(window.location.search).get(showDevToolsQueryKey) ||
+      ''
+    ).startsWith('1');
+  }
 
   constructor() {
     window.addEventListener(closeDevtoolsEventType, this.removeDevTools);

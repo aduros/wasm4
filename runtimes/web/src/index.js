@@ -458,8 +458,7 @@ async function loadCartWasm () {
     window.addEventListener("pointermove", onPointerEvent);
     window.addEventListener("pointerup", onPointerEvent);
 
-    const gamepadOverlay = document.getElementById("gamepad");
-
+    const gamepadOverlay = document.getElementById("gamepad"); 
     // https://gist.github.com/addyosmani/5434533#file-limitloop-js-L60
 
     const INTERVAL = 1000 / 60;
@@ -486,4 +485,8 @@ async function loadCartWasm () {
         requestAnimationFrame(loop);
     }
     loop();
+
+    if(DevtoolsManager.enabledByQueryParams()) {
+        requestAnimationFrame(devtoolsManager.toggleDevtools);
+    }
 })();

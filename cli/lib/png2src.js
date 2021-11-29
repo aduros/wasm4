@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const pngjs = require("pngjs");
+const mustache = require("mustache");
 
 const LANGS={
     as: "assemblyscript",
@@ -17,57 +18,88 @@ const LANGS={
 const DEFAULT_LANG = 'assemblyscript';
 const TEMPLATES = {
     assemblyscript:
-`const %name%Width = %width%;
-const %name%Height = %height%;
-const %name%Flags = %flags%; // %flagsHumanReadable%
-const %name% = memory.data<u8>([ %bytes% ]);`,
+`{{#sprites}}
+// {{name}}
+const {{name}}Width = {{width}};
+const {{name}}Height = {{height}};
+const {{name}}Flags = {{flags}}; // {{flagsHumanReadable}}
+const {{name}} = memory.data<u8>([ {{bytes}} ]);
+
+{{/sprites}}`,
 
     c:
-`#define %name%Width %width%
-#define %name%Height %height%
-#define %name%Flags %flagsHumanReadable%
-const uint8_t %name%[%length%] = { %bytes% };`,
+`{{#sprites}}
+// {{name}}
+#define {{name}}Width {{width}}
+#define {{name}}Height {{height}}
+#define {{name}}Flags {{flagsHumanReadable}}
+const uint8_t {{name}}[{{length}}] = { {{bytes}} };
+
+{{/sprites}}`,
 
     d:
-`enum %name%Width = %width%;
-enum %name%Height = %height%;
-enum %name%Flags = %flags%; // %flagsHumanReadable%
-immutable ubyte[] %name% = [ %bytes% ];`,
+`
+{{#sprites}}
+// {{name}}
+enum {{name}}Width = {{width}};
+enum {{name}}Height = {{height}};
+enum {{name}}Flags = {{flag}}; // {{flagsHumanReadable}}
+immutable ubyte[] {{name}} = [ {{bytes}} ];
 
-    nim:
-`const %name%Width = %width%
-const %name%Height = %height%
-const %name%Flags = %flagsHumanReadable%
-var %name%: array[uint8, %length%] = [%firstByte%'u8,%restBytes%]`,
+{{/sprites}}`,
 
     go:
-`const %name%Width = %width%
-const %name%Height = %height%
-const %name%Flags = %flags% // %flagsHumanReadable%
-var %name% = [%length%]byte { %bytes% }`,
+`{{#sprites}}
+// {{name}}
+const {{name}}Width = {{width}}
+const {{name}}Height = {{height}}
+const {{name}}Flags = {{flags}} // {{flagsHumanReadable}}
+var {{name}} = [{{length}}]byte { {{bytes}} }
+
+{{/sprites}}`,
+
+    nim:
+`{{#sprites}}
+# {{name}}
+const {{name}}Width = {{width}}
+const {{name}}Height = {{height}}
+const {{name}}Flags = {{flagsHumanReadable}}
+var {{name}}: array[uint8, {{length}}] = [{{firstByte}}'u8,{{restBytes}}]
+
+{{/sprites}}`,
 
     odin: 
-`%odinName%_width : u32 : %width%
-%odinName%_height : u32 : %height%
-%odinName%_flags : w4.Blit_Flags : %odinFlags% // %flagsHumanReadable%
-%odinName% := [%length%]u8{ %bytes% }`,
+`{{#sprites}}
+// {{name}}
+{{odinName}}_width : u32 : {{width}}
+{{odinName}}_height : u32 : {{height}}
+{{odinName}}_flags : w4.Blit_Flags : {{odinFlags}} // {{flagsHumanReadable}}
+{{odinName}} := [{{length}}]u8{ {{bytes}} }
+
+{{/sprites}}`,
 
     rust: 
-`const %rustName%_WIDTH: u32 = %width%;
-const %rustName%_HEIGHT: u32 = %height%;
-const %rustName%_FLAGS: u32 = %flags%; // %flagsHumanReadable%
-const %rustName%: [u8; %length%] = [ %bytes% ];`,  
+`{{#sprites}}
+// {{name}}
+const {{rustName}}_WIDTH: u32 = {{width}};
+const {{rustName}}_HEIGHT: u32 = {{height}};
+const {{rustName}}_FLAGS: u32 = {{flags}}; // {{flagsHumanReadable}}
+const {{rustName}}: [u8; {{length}}] = [ {{bytes}} ];
+
+{{/sprites}}`,
 
     zig:
-`const %name%Width = %width%;
-const %name%Height = %height%;
-const %name%Flags = %flags%; // %flagsHumanReadable%
-const %name% = [%length%]u8{ %bytes% };`,
+`{{#sprites}}
+// {{name}}
+const {{name}}Width = {{width}};
+const {{name}}Height = {{height}};
+const {{name}}Flags = {{flags}}; // {{flagsHumanReadable}}
+const {{name}} = [{{length}}]u8{ {{bytes}} };
+
+{{/sprites}}`,
 }
 
-function run (sourceFile, template) {
-    template = template || TEMPLATES[DEFAULT_LANG];
-
+function run (sourceFile) {
     const png = pngjs.PNG.sync.read(fs.readFileSync(sourceFile), {
         colorType: 1,
         inputColorType: 1,
@@ -167,21 +199,20 @@ function run (sourceFile, template) {
         .replace(/[A-Z]/g, l => '_' + l))
         .toLocaleLowerCase()
 
-    const output = template
-        .replace(/%name%/gi, varName)
-        .replace(/%height%/gi, png.height)
-        .replace(/%width%/gi, png.width)
-        .replace(/%length%/gi, bytes.length)
-        .replace(/%flags%/gi, flags)
-        .replace(/%flagsHumanReadable%/gi, flagsHumanReadable)
-        .replace(/%bytes%/gi,data)
-        .replace(/%firstByte%/gi, dataBytes[0])
-        .replace(/%restBytes%/gi, dataBytes.slice(1).join(','))
-        .replace(/%rustName%/gi, rustVarName) // Rust specific
-        .replace(/%odinName%/gi, odinVarName) // Odin specific
-        .replace(/%odinFlags%/gi, odinFlags);
-
-    console.log(output);
+    return {
+        "name": varName,
+        "height": png.height,
+        "width": png.width,
+        "length": bytes.length,
+        "flags": flags,
+        "flagsHumanReadable": flagsHumanReadable,
+        "bytes": data,
+        "firstByte": dataBytes[0],
+        "restBytes": dataBytes.slice(1).join(','),
+        "rustName": rustVarName,
+        "odinName": odinVarName,
+        "odinFlags": odinFlags,
+    };
 }
 
 exports.run = run;
@@ -201,7 +232,8 @@ function runAll (files, opts) {
     } else {
         template = fs.readFileSync(opts.template, {encoding: 'utf8'});
     }
-
+    
+    let output = { "sprites": [] };
     for (let ii = 0; ii < files.length; ++ii) {
         const file = files[ii];
 
@@ -210,11 +242,18 @@ function runAll (files, opts) {
                 console.log();
             }
 
-            run(file, template);
+            output.sprites.push(run(file));
         } catch (error) {
             console.error("Error processing "+file+": "+error.message);
             break;
         }
+    }
+
+    const parsed = mustache.render(template, output);
+    if (opts.output == "-") {
+        console.log(parsed);
+    } else {
+        fs.writeFileSync(opts.output, parsed);
     }
 }
 

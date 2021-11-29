@@ -1,11 +1,14 @@
 import { html, LitElement } from 'lit';
-import { classMap } from 'lit/directives/class-map.js';
 import { customElement } from 'lit/decorators.js';
-import { UpdateController } from '../controllers/UpdateController';
-import { Wasm4MemoryView } from '../events/update-completed';
-import { createCloseDevtoolsEvent } from '../events/close-devtools';
-import devtoolsCss from '../styles/devtools.scss';
-import { withTheme } from '../styles/commons';
+import { UpdateController } from '../../controllers/UpdateController';
+import { Wasm4MemoryView } from '../../events/update-completed';
+import { createCloseDevtoolsEvent } from '../../events/close-devtools';
+import devtoolsCss from './devtools.scss';
+import { withTheme } from '../../styles/commons';
+import {
+  SYSTEM_HIDE_GAMEPAD_OVERLAY,
+  SYSTEM_PRESERVE_FRAMEBUFFER,
+} from '../../constants';
 
 export const wasm4DevtoolsTagName = 'wasm4-devtools' as const;
 
@@ -26,7 +29,7 @@ export class Wasm4Devtools extends LitElement {
     this.dispatchEvent(createCloseDevtoolsEvent());
   };
 
-  renderMouse({ pointerPos, mouseButtons }: Wasm4MemoryView) {
+  renderMouse({ pointerPos, mouseBtnByte }: Wasm4MemoryView) {
     return html`<section class="mouse-section">
         <h4 class="heading">mouse position</h4>
         <ul class="mouse-pos-list">
@@ -38,23 +41,10 @@ export class Wasm4Devtools extends LitElement {
           </li>
         </ul>
       </section>
-      <section>
-        <h4 class="heading">mouse buttons</h4>
-        <ul class="mouse-buttons">
-          ${Object.entries(mouseButtons).map(
-            ([btnKey, active]) =>
-              html`<li
-                class=${classMap({
-                  ['info-box']: 1,
-                  dim: !active,
-                  ['text-primary']: active,
-                })}
-              >
-                ${btnKey}
-              </li>`
-          )}
-        </ul>
-      </section>`;
+      <wasm4-mouse-buttons
+        heading="mouse buttons"
+        raw-value=${mouseBtnByte}
+      ></wasm4-mouse-buttons>`;
   }
 
   render() {
@@ -63,6 +53,7 @@ export class Wasm4Devtools extends LitElement {
     }
 
     const { memoryView, fps } = this.updateController.state;
+    const { systemFlags } = memoryView;
 
     return html`<article class="devtools-wrapper">
       <button
@@ -74,11 +65,29 @@ export class Wasm4Devtools extends LitElement {
         &times;
       </button>
       ${this.renderMouse(memoryView)}<wasm4-palette
+        palette-heading="palette"
         .palette=${memoryView.palette}
       ></wasm4-palette>
-      <section>
+      <section class="fps-section">
         <h4>fps</h4>
-        <span>${fps}</span>
+        <span class="info-box text-primary">${fps}</span>
+      </section>
+      <section class="flags-section">
+        <h4>system flags</h4>
+        <div class="flags-wrapper">
+          <div>
+            <span class="flag-label">preserve framebuffer</span>
+            <span class="info-box text-primary"
+              >${systemFlags & SYSTEM_PRESERVE_FRAMEBUFFER}</span
+            >
+          </div>
+          <div>
+            <span class="flag-label">hide gamepad overlay</span>
+            <span class="info-box text-primary"
+              >${systemFlags & SYSTEM_HIDE_GAMEPAD_OVERLAY}</span
+            >
+          </div>
+        </div>
       </section>
       <section>
         <h4>gamepad</h4>

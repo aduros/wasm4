@@ -1,4 +1,4 @@
-@use 'theme.scss';
+@use '../../styles/theme.scss';
 
 :host {
   display: block;
@@ -38,31 +38,27 @@
   grid-gap: 16px;
 }
 
-.info-box {
-  text-align: center;
-  padding: 0.2em 0.4em;
-  color: theme.theme-get(text-secondary);
-  background: theme.theme-get(bg-secondary);
-  border-radius: 4px;
-  min-width: 60px;
-  display: inline-block;
-  font-size: 0.875em;
-}
-
 .mouse-pos {
   white-space: nowrap;
 }
 
-.active {
-  color: theme.theme-get(text-primary);
+.fps-section {
+  display: flex;
+  flex-flow: row nowrap;
+  grid-gap: 16px;
+  align-items: center;
+
+  & > * {
+    margin: 0;
+  }
 }
 
-.dim {
-  opacity: 0.4;
-}
-
-.mouse-buttons {
+.flags-wrapper {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-gap: 8px;
+  grid-template-rows: 1fr 1fr;
+  grid-gap: 16px;
+
+  & .flag-label {
+    font-size: 0.875em;
+  }
 }

@@ -1,8 +1,8 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { formatColor } from '../utils/format';
-import paletteCss from '../styles/palette.scss';
-import { withTheme } from '../styles/commons';
+import { formatColor } from '../../utils/format';
+import paletteCss from './palette.scss';
+import { withTheme } from '../../styles/commons';
 
 export const wasm4PaletteTagName = 'wasm4-palette' as const;
 
@@ -12,13 +12,13 @@ export class Wasm4Palette extends LitElement {
   palette = [0, 0, 0, 0];
 
   @property({ type: String, attribute: 'palette-heading' })
-  heading = 'palette';
+  heading = '';
 
   static styles = withTheme(paletteCss);
 
   render() {
     return html`<section class="palette-article">
-      <h4>${this.heading}</h4>
+      ${this.heading && html`<h4>${this.heading}</h4>`}
       <div class="palette-grid">
         ${this.palette.slice(0, 4).map((color) => {
           const colorHex = formatColor(color);

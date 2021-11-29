@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { withTheme } from '../styles/commons';
-import gamepadCss from '../styles/gamepad.scss';
+import { withTheme } from '../../styles/commons';
+import gamepadCss from './gamepad.scss';
 import { classMap } from 'lit/directives/class-map.js';
 import {
   BUTTON_X,
@@ -10,7 +10,8 @@ import {
   BUTTON_DOWN,
   BUTTON_LEFT,
   BUTTON_RIGHT,
-} from '../constants';
+} from '../../constants';
+
 export const wasm4GamepadTagName = 'wasm4-gamepad';
 
 @customElement(wasm4GamepadTagName)

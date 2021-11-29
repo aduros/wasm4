@@ -43,3 +43,22 @@ $theme: (
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
+
+.active {
+  color: theme-get(text-primary);
+}
+
+.dim {
+  opacity: 0.4;
+}
+
+.info-box {
+  text-align: center;
+  padding: 0.2em 0.4em;
+  color: theme-get(text-secondary);
+  background: theme-get(bg-secondary);
+  border-radius: 4px;
+  min-width: 60px;
+  display: inline-block;
+  font-size: 0.875em;
+}

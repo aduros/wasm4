@@ -6,16 +6,9 @@ export interface Point {
   x: number;
   y: number;
 }
-
-export interface MouseButtons {
-  left: boolean;
-  right: boolean;
-  middle: boolean;
-}
-
 export interface Wasm4MemoryView {
   pointerPos: Point;
-  mouseButtons: MouseButtons;
+  mouseBtnByte: number;
   systemFlags: number;
   gamepads: number[];
   palette: [number, number, number, number];
@@ -65,13 +58,8 @@ export function createUpdateCompletedEvent(
 ): Wasm4UpdateCompletedEvent {
   const x = data.getInt16(constants.ADDR_MOUSE_X, true);
   const y = data.getInt16(constants.ADDR_MOUSE_Y, true);
-  const mouseBtnValue = data.getUint8(constants.ADDR_MOUSE_BUTTONS);
+  const mouseBtnByte = data.getUint8(constants.ADDR_MOUSE_BUTTONS);
 
-  const mouseButtons = {
-    left: !!(mouseBtnValue & constants.MOUSE_LEFT),
-    middle: !!(mouseBtnValue & constants.MOUSE_MIDDLE),
-    right: !!(mouseBtnValue & constants.MOUSE_RIGHT),
-  };
   const pointerPos = {
     x,
     y,
@@ -83,7 +71,7 @@ export function createUpdateCompletedEvent(
   const gamepads = extractGamepads(data);
 
   const memory: Wasm4MemoryView = {
-    mouseButtons,
+    mouseBtnByte,
     palette,
     pointerPos,
     gamepads,

@@ -48,6 +48,11 @@ program.command("watch")
             .env("W4_NO_OPEN")
             .default(false)
     )
+    .addOption(
+        new Option("-q, --no-qr", "Prevents the generation of the QR code")
+            .env("W4_NO_QR")
+            .default(false)
+    )
     .action(opts => {
         const watch = require("./lib/watch");
         watch.start(opts);
@@ -58,6 +63,11 @@ program.command("run <cart>")
     .addOption(
         new Option("-n, --no-open", "Doesn't open the browser")
             .env("W4_NO_OPEN")
+            .default(false)
+    )
+    .addOption(
+        new Option("-q, --no-qr", "Prevents the generation of the QR code")
+            .env("W4_NO_QR")
             .default(false)
     )
     .action((cart, opts) => {

@@ -261,20 +261,29 @@ from right to left: color 1 becomes 3, color 2 becomes 1, color 3 becomes 0 (tra
 You can use a custom template for generating a image source.
 Use a `--template filename` for this.
 
+Templates use the `Mustache` syntax. An array called `sprites` is provided.
+
 Basic template (C):
 ```
-#define %name%Width %width%
-#define %name%Height %height%
-#define %name%Flags %flagsHumanReadable%
-const uint8_t %name%[%length%] = { %bytes% };
+{{#sprites}}
+// {{name}}
+#define {{name}}Width {{width}}
+#define {{name}}Height {{height}}
+#define {{name}}Flags {{flagsHumanReadable}}
+const uint8_t {{name}}[{{length}}] = { {{bytes}} };
+
+{{/sprites}}
 ```
 
 Where:
-- `%name%` - filename (string),
-- `%idiomaticName%` - Rust specific variable name (string)
-- `%width%`, `%height%` - image dimensions (integer)
-- `%flags%`, `%flagsHumanReadable%` - type flag as integer and enum name (BLIT_2BPP or BLIT_1BPP)
-- `%length%` - count of bytes (integer)
-- `%bytes%` - comma separated series of bytes (string)
-- `%firstByte%` - first byte of the sprite (string)
-- `%restBytes%` - comma-separated series of bytes excluding the first one (string)
+- `{{#sprites}}`, `{{/sprites}}` - Start and end of the list of sprites
+- `{{name}}` - filename (i.e. `wallTop`; string),
+- `{{rustName}}` - Rust specific variable name (i.e. `WALL_TOP`; string)
+- `{{odinName}}` - Odin specific variable name (i.e. `wall_top`; string)
+- `{{odinFlags}}` - Odin specific flags (`nil` or `.USE_2BPP`)
+- `{{width}}`, `{{height}}` - image dimensions (integer)
+- `{{flags}}`, `{{flagsHumanReadable}}` - type flag as integer and enum name (BLIT_2BPP or BLIT_1BPP)
+- `{{length}}` - count of bytes (integer)
+- `{{bytes}}` - comma separated series of bytes (string)
+- `{{firstByte}}` - first byte of the sprite (string)
+- `{{restBytes}}` - comma-separated series of bytes excluding the first one (string)

@@ -4,7 +4,40 @@ import {
   wasm4DevtoolsTagName,
   closeDevtoolsEventType,
 } from '@wasm4/web-devtools';
-import { showDevToolsQueryKey } from './constants';
+import * as constants from './constants';
+
+class BufferedData {
+  mouseButtons = 0;
+  gamepads = [0, 0, 0, 0];
+
+  /**
+   * @type {(dataView: DataView) => void}
+   */
+  update = (dataView) => {
+    this.mouseButtons =
+      this.mouseButtons | dataView.getUint8(constants.ADDR_MOUSE_BUTTONS);
+
+    for (let i = 0, len = this.gamepads; i < len; i++) {
+      this.gamepads[i] =
+        dataView.getUint8(constants[`ADDR_GAMEPAD${i + 1}`]) | this.gamepads[i];
+    }
+  };
+
+  /**
+   * @type {() => BufferedMemoryData}
+   */
+  flush = () => {
+    const output = {
+      mouseButtons: this.mouseButtons,
+      gamepads: this.gamepads,
+    };
+
+    this.mouseButtons = 0;
+    this.gamepads.fill(0);
+
+    return output;
+  };
+}
 
 export class DevtoolsManager {
   /**
@@ -12,9 +45,14 @@ export class DevtoolsManager {
    */
   _enabled = false;
 
+  /**
+   * @private
+   */
+  _bufferedData = new BufferedData();
+
   static enabledByQueryParams() {
     return (
-      new URLSearchParams(window.location.search).get(showDevToolsQueryKey) ||
+      new URLSearchParams(window.location.search).get(constants.showDevToolsQueryKey) ||
       ''
     ).startsWith('1');
   }
@@ -29,7 +67,7 @@ export class DevtoolsManager {
   updateCompleted = (dataView, deltaFrame) => {
     if (this._enabled) {
       const fps = Math.floor(1_000 / deltaFrame);
-
+      this._bufferedData.update(dataView);
       this._notifyUpdateCompleted(dataView, fps);
     }
   };
@@ -61,6 +99,8 @@ export class DevtoolsManager {
    * @type {(dataView: DataView) => void}
    */
   _notifyUpdateCompleted = throttle((dataView, fps) => {
-    window.dispatchEvent(createUpdateCompletedEvent(dataView, fps));
+    window.dispatchEvent(
+      createUpdateCompletedEvent(dataView, fps, this._bufferedData.flush())
+    );
   }, 200);
 }

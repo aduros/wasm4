@@ -21,6 +21,11 @@ export interface UpdateCompletedDetails {
   storedValue: string | null;
 }
 
+export interface BufferedMemoryData {
+  mouseButtons: number;
+  gamepads: number[];
+}
+
 export type Wasm4UpdateCompletedEvent = CustomEvent<UpdateCompletedDetails>;
 
 function extractPalette(data: DataView): Wasm4MemoryView['palette'] {
@@ -33,12 +38,12 @@ function extractPalette(data: DataView): Wasm4MemoryView['palette'] {
   return palette;
 }
 
-function extractGamepads(data: DataView): Wasm4MemoryView['gamepads'] {
+function extractGamepads(data: DataView,   bufferedData: BufferedMemoryData,): Wasm4MemoryView['gamepads'] {
   return [
-    data.getUint8(constants.ADDR_GAMEPAD1),
-    data.getUint8(constants.ADDR_GAMEPAD2),
-    data.getUint8(constants.ADDR_GAMEPAD3),
-    data.getUint8(constants.ADDR_GAMEPAD4),
+    data.getUint8(constants.ADDR_GAMEPAD1) | bufferedData.gamepads[0],
+    data.getUint8(constants.ADDR_GAMEPAD2) | bufferedData.gamepads[1],
+    data.getUint8(constants.ADDR_GAMEPAD3) | bufferedData.gamepads[2],
+    data.getUint8(constants.ADDR_GAMEPAD4) | bufferedData.gamepads[3],
   ];
 }
 
@@ -54,11 +59,12 @@ function getStoredValue(): string | null {
 export function createUpdateCompletedEvent(
   data: DataView,
   fps: number,
+  bufferedData: BufferedMemoryData,
   eventInit: EventInit = { bubbles: true }
 ): Wasm4UpdateCompletedEvent {
   const x = data.getInt16(constants.ADDR_MOUSE_X, true);
   const y = data.getInt16(constants.ADDR_MOUSE_Y, true);
-  const mouseBtnByte = data.getUint8(constants.ADDR_MOUSE_BUTTONS);
+  const mouseBtnByte = data.getUint8(constants.ADDR_MOUSE_BUTTONS) | bufferedData.mouseButtons;
 
   const pointerPos = {
     x,
@@ -68,7 +74,7 @@ export function createUpdateCompletedEvent(
   const palette = extractPalette(data);
   const drawColors = data.getUint16(constants.ADDR_DRAW_COLORS, true);
 
-  const gamepads = extractGamepads(data);
+  const gamepads = extractGamepads(data, bufferedData);
 
   const memory: Wasm4MemoryView = {
     mouseBtnByte,

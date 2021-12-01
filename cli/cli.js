@@ -118,7 +118,7 @@ program
     .parse();
 
 // Manages unhandled rejections:
-// conforms behaviour between node versions:
+// conforms behavior between node versions:
 // node 15+ throw on `unhandledRejection`.
 // @see https://nodejs.org/api/process.html#process_event_unhandledrejection
 process.on('unhandledRejection', unhandledRejectionError => {

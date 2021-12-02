@@ -13,6 +13,7 @@ Get inspired with some resources from around the web.
 
 ## Game Jams
 
+- [WASM-4 Game Jam](https://itch.io/jam/wasm4)
 - [GBJam](https://twitter.com/gbjamofficial)
 - [Retro Jam](https://itch.io/jam/retro-jam-2021)
 

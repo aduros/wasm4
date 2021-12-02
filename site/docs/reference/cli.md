@@ -1,6 +1,6 @@
-# The "w4" tool (CLI)
+# CLI
 
-After installing WASM-4, you can use it's Command Line Interface (CLI) to perform various tasks.
+After installing WASM-4, you can use its Command Line Interface (CLI) to perform various tasks.
 
 ## The `w4` command
 
@@ -308,7 +308,7 @@ At least one of the targets (`--html`, `--windows`, `--linux`, `--mac`) must be 
 
 **Summary:**
 
-The `help` commands provides more details about the `w4` CLI and it's tools.
+The `help` commands provides more details about the `w4` CLI and its tools.
 
 **Usage:**
 
@@ -334,7 +334,7 @@ w4 help run-native
 
 **Description:**
 
-This command shows all options, the usage and more about the `w4` CLI or it's subcommands. 
+This command shows all options, the usage and more about the `w4` CLI or its subcommands. 
 Providing the `-V` or `--version` option however has precedence over a subcommand.
 
 Therefore a `w4 help --version png2src` will not lead to show the help for the `png2src` command, but will only output the current version.

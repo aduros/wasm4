@@ -42,7 +42,7 @@
   white-space: nowrap;
 }
 
-.fps-section {
+.inline-section {
   display: flex;
   flex-flow: row nowrap;
   grid-gap: 16px;
@@ -60,5 +60,22 @@
 
   & .flag-label {
     font-size: 0.875em;
+  }
+}
+
+.tabs {
+  display: flex;
+  flex-flow: row nowrap;
+  grid-gap: 4px;
+  cursor: pointer;
+  font-weight: 900;
+
+  .tab-item {
+    pointer-events: auto;
+    padding: 4px;
+  }
+
+  .tab-item[data-active='1'] {
+    border-bottom: 1px solid currentColor;
   }
 }

@@ -62,3 +62,52 @@ $theme: (
   display: inline-block;
   font-size: 0.875em;
 }
+
+.table {
+  text-align: left;
+  overflow: hidden;
+  border-collapse: collapse;
+  margin-bottom: 0;
+  border-style: solid;
+  border-color: currentColor;
+  border-width: 1px;
+  max-width: 100%;
+  font-size: theme-get(text-size);
+
+  tbody,
+  thead,
+  tfoot,
+  tr {
+    font-size: inherit;
+  }
+
+  td,
+  th {
+    border-width: 0;
+    border-style: none;
+    border-color: inherit;
+    font-size: 0.875em;
+    padding: 0.3em 0.4em;
+    min-width: 50px;
+    border-bottom: 1px solid currentColor;
+  }
+}
+
+a,
+a:visited {
+  color: theme-get(text-primary);
+  outline: none;
+  font-size: 0.875em;
+}
+
+a:focus {
+  color: theme-get(text-secondary);
+}
+
+.list {
+  padding-left: 1.2em;
+
+  li {
+    list-style: disc;
+  }
+}

@@ -5,3 +5,7 @@ export function formatColor(col: number): string {
 export function formatToggle(val: boolean): string {
   return val ? 'on' : 'off';
 }
+
+export function formatHex(val: number): string {
+  return `0x${val.toString(16)}`;
+}

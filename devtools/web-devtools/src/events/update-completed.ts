@@ -38,7 +38,10 @@ function extractPalette(data: DataView): Wasm4MemoryView['palette'] {
   return palette;
 }
 
-function extractGamepads(data: DataView,   bufferedData: BufferedMemoryData,): Wasm4MemoryView['gamepads'] {
+function extractGamepads(
+  data: DataView,
+  bufferedData: BufferedMemoryData
+): Wasm4MemoryView['gamepads'] {
   return [
     data.getUint8(constants.ADDR_GAMEPAD1) | bufferedData.gamepads[0],
     data.getUint8(constants.ADDR_GAMEPAD2) | bufferedData.gamepads[1],
@@ -64,7 +67,8 @@ export function createUpdateCompletedEvent(
 ): Wasm4UpdateCompletedEvent {
   const x = data.getInt16(constants.ADDR_MOUSE_X, true);
   const y = data.getInt16(constants.ADDR_MOUSE_Y, true);
-  const mouseBtnByte = data.getUint8(constants.ADDR_MOUSE_BUTTONS) | bufferedData.mouseButtons;
+  const mouseBtnByte =
+    data.getUint8(constants.ADDR_MOUSE_BUTTONS) | bufferedData.mouseButtons;
 
   const pointerPos = {
     x,

@@ -11,7 +11,6 @@ import {
 } from '../../constants';
 import { repeat } from 'lit/directives/repeat.js';
 import { identity } from '../../utils/functions';
-import { formatHex } from '../../utils/format';
 
 export const wasm4DevtoolsTagName = 'wasm4-devtools' as const;
 

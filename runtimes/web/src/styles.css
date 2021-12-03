@@ -160,6 +160,9 @@ body {
 
 #devtools {
   position: fixed;
-  top: 4px;
-  right: 4px;
+  background: transparent;
+  top: 0;
+  right: 0;
+  padding: 4px;
+  height: 100vh;
 }

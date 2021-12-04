@@ -44,6 +44,18 @@ $theme: (
   -webkit-font-smoothing: antialiased;
 }
 
+.text-align-left {
+  text-align: left !important;
+}
+
+.text-align-right {
+  text-align: right !important;
+}
+
+.text-align-center {
+  text-align: center !important;
+}
+
 .active {
   color: theme-get(text-primary);
 }
@@ -77,7 +89,10 @@ $theme: (
   tbody,
   thead,
   tfoot,
-  tr {
+  tr,
+  td,
+  th {
+    text-align: inherit;
     font-size: inherit;
   }
 

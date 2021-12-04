@@ -10,7 +10,7 @@ import {
   SYSTEM_PRESERVE_FRAMEBUFFER,
 } from '../../constants';
 import { repeat } from 'lit/directives/repeat.js';
-import { identity } from '../../utils/functions';
+import { bitmask, identity } from '../../utils/functions';
 
 export const wasm4DevtoolsTagName = 'wasm4-devtools' as const;
 
@@ -41,12 +41,12 @@ export class Wasm4Devtools extends LitElement {
 
   private _renderGeneralView = (memoryView: Wasm4MemoryView, fps: number) => {
     const drawColors = memoryView.drawColors ?? 0;
-
-    const mask = (to: number, from = 0) => ((1 << to) - 1) ^ ((1 << from) - 1);
-    const color1Mask = mask(3);
-    const color2Mask = mask(7, 3);
-    const color3Mask = mask(11, 7);
-    const color4Mask = mask(15, 11);
+    const colorMasks = [
+      bitmask(3),
+      bitmask(7, 3),
+      bitmask(11, 7),
+      bitmask(15, 11),
+    ];
 
     return html`<article>
       <wasm4-palette
@@ -55,7 +55,7 @@ export class Wasm4Devtools extends LitElement {
       ></wasm4-palette>
       <section>
         <h4>draw colors</h4>
-        <table class="table">
+        <table class="table text-align-right">
           <thead>
             <tr>
               <th>color</th>
@@ -63,26 +63,18 @@ export class Wasm4Devtools extends LitElement {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              <td>${drawColors & color1Mask}</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>${drawColors & color2Mask}</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>${drawColors & color3Mask}</td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td>${drawColors & color4Mask}</td>
-            </tr>
+            ${repeat(
+              colorMasks,
+              identity,
+              (colorMask, idx) => html`<tr>
+                <td class="text-align-center">${idx + 1}</td>
+                <td>${drawColors & colorMask}</td>
+              </tr>`
+            )}
           </tbody>
           <tfoot>
             <tr>
-              <td>sum</td>
+              <td class="text-align-center">sum</td>
               <td>${drawColors}</td>
             </tr>
           </tfoot>

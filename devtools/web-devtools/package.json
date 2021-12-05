@@ -23,8 +23,6 @@
     "prettify": "prettier . --write"
   },
   "dependencies": {
-    "chart.js": "^3.6.1",
-    "fast-equals": "^2.0.3",
     "lit": "^2.0.0"
   },
   "devDependencies": {

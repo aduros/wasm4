@@ -6,6 +6,6 @@ export function formatToggle(val: boolean): string {
   return val ? 'on' : 'off';
 }
 
-export function formatHex(val: number): string {
-  return `0x${val.toString(16)}`;
+export function formatHex(val: number, padding = 2): string {
+  return val.toString(16).padStart(padding, '0').toUpperCase();
 }

@@ -1,7 +1,6 @@
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { UpdateController } from '../../controllers/UpdateController';
-import { Wasm4MemoryView } from '../../events/update-completed';
 import { createCloseDevtoolsEvent } from '../../events/close-devtools';
 import devtoolsCss from './devtools.scss';
 import { withTheme } from '../../styles/commons';
@@ -11,10 +10,11 @@ import {
 } from '../../constants';
 import { repeat } from 'lit/directives/repeat.js';
 import { bitmask, identity } from '../../utils/functions';
+import { MemoryView } from '../../models/MemoryView';
 
 export const wasm4DevtoolsTagName = 'wasm4-devtools' as const;
 
-const tabs = ['general', 'controls', 'info'] as const;
+const tabs = ['general', 'controls', 'mem', 'info'] as const;
 
 /**
  * `<wasm4-devtools></wasm4-devtools>`
@@ -26,7 +26,10 @@ export class Wasm4Devtools extends LitElement {
   static styles = withTheme(devtoolsCss);
 
   @state()
-  _activeTab: string = tabs[0];
+  private _expanded = true;
+
+  @state()
+  private _activeTab: typeof tabs[number] = tabs[0];
 
   _handleCloseButtonClick = () => {
     this.dispatchEvent(createCloseDevtoolsEvent());
@@ -34,12 +37,16 @@ export class Wasm4Devtools extends LitElement {
 
   _handleTabClick = (evt: MouseEvent) => {
     const tabValue = (evt.composedPath()[0] as HTMLElement)?.dataset.tabValue;
-    if (tabValue) {
-      this._activeTab = tabValue;
+    if (tabs.includes(tabValue as any)) {
+      this._activeTab = tabValue as typeof tabs[number];
     }
   };
 
-  private _renderGeneralView = (memoryView: Wasm4MemoryView, fps: number) => {
+  private _toggleExapanded = () => {
+    this._expanded = !this._expanded;
+  };
+
+  private _renderGeneralView = (memoryView: MemoryView, fps: number) => {
     const drawColors = memoryView.drawColors ?? 0;
     const colorMasks = [
       bitmask(3),
@@ -108,7 +115,7 @@ export class Wasm4Devtools extends LitElement {
     return html` <wasm4-info-view></wasm4-info-view> `;
   };
 
-  private _renderControls = (memoryView: Wasm4MemoryView, _: number) => {
+  private _renderControls = (memoryView: MemoryView, _: number) => {
     return html`<wasm4-controls-view
       .mouseButtons=${memoryView.mouseBtnByte}
       .mouseX=${memoryView.pointerPos.x}
@@ -117,7 +124,13 @@ export class Wasm4Devtools extends LitElement {
     ></wasm4-controls-view>`;
   };
 
-  private _renderTab = (memoryView: Wasm4MemoryView, fps: number) => {
+  private _renderMemory = (memoryView: MemoryView, _: number) => {
+    return html`<wasm4-memory-view
+      .memoryView=${memoryView}
+    ></wasm4-memory-view>`;
+  };
+
+  private _renderTab = (memoryView: MemoryView, fps: number) => {
     let renderTab;
     switch (this._activeTab) {
       case 'controls':
@@ -125,6 +138,9 @@ export class Wasm4Devtools extends LitElement {
         break;
       case 'info':
         renderTab = this._renderInfo;
+        break;
+      case 'mem':
+        renderTab = this._renderMemory;
         break;
       default:
         renderTab = this._renderGeneralView;
@@ -140,31 +156,65 @@ export class Wasm4Devtools extends LitElement {
 
     const { memoryView, fps } = this.updateController.state;
 
-    return html`<div class="devtools-wrapper">
-      <button
-        type="button"
-        aria-label="close"
-        class="close-btn"
-        @click=${this._handleCloseButtonClick}
-      >
-        &times;
-      </button>
-      <ul class="tabs" @click=${this._handleTabClick}>
-        ${repeat(
-          tabs,
-          identity,
-          (label) =>
-            html`<li
-              data-tab-value=${label}
-              data-active=${Number(label === this._activeTab)}
-              class="tab-item"
+    return html`<div class="fixed-wrapper">
+      <div class="devtools-wrapper bg-primary">
+        <div class="devtools-top">
+          <div class="devtools-top-btn">
+            <button
+              type="button"
+              aria-label="collapse"
+              class="top-btn"
+              title="collapse"
+              @click=${this._toggleExapanded}
             >
-              ${label}
-            </li>`
-        )}
-      </ul>
-      ${this._renderTab(memoryView, fps)}
-    </div> `;
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M0 0h24v24H0V0z" fill="none" />
+                <path d="M6 19h12v2H6v-2z" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              aria-label="close"
+              class="top-btn"
+              title="close"
+              @click=${this._handleCloseButtonClick}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M0 0h24v24H0V0z" fill="none" />
+                <path
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div ?hidden=${!this._expanded}>
+          <ul class="tabs" @click=${this._handleTabClick}>
+            ${repeat(
+              tabs,
+              identity,
+              (label) =>
+                html`<li
+                  data-tab-value=${label}
+                  data-active=${Number(label === this._activeTab)}
+                  class="tab-item"
+                >
+                  ${label}
+                </li>`
+            )}
+          </ul>
+          ${this._renderTab(memoryView, fps)}
+        </div>
+      </div>
+    </div>`;
   }
 }
 

@@ -1,35 +1,57 @@
 @use '../../styles/theme.scss';
 
-:host {
+.fixed-wrapper {
+  position: fixed;
+  background: transparent;
+  top: 0;
+  right: 0;
+  padding: 4px;
+  height: 100vh;
+  z-index: 11;
+  pointer-events: none;
+}
+
+.devtools-wrapper {
   display: block;
   border: solid 1px gray;
   padding: 8px;
   border-radius: 4px;
   overflow-x: hidden;
   overflow-y: auto;
-  min-width: 280px;
+  min-width: 295px;
   position: relative;
   max-height: 100%;
-}
+  pointer-events: auto;
 
-.devtools-wrapper {
-  .close-btn {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 0;
+  .devtools-top {
+    display: grid;
+    grid-template-columns: 1r auto;
+    justify-content: space-between;
+    grid-template-areas: '. win-btn';
+    overflow: hidden;
+  }
+
+  .devtools-top-btn {
+    grid-area: win-btn;
+    height: inherit;
+    user-select: none;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    grid-gap: 4px;
+  }
+
+  .top-btn {
     border-radius: 4px;
     background: transparent;
     border: none;
     box-shadow: none;
     color: inherit;
-    font-size: 1.6em;
     display: flex;
     justify-content: center;
     align-items: center;
-    line-height: 1;
-    width: 2em;
-    height: 2em;
+    width: 2.2em;
+    height: 2.2em;
     cursor: pointer;
   }
 }
@@ -71,7 +93,7 @@
   grid-gap: 4px;
   cursor: pointer;
   font-weight: 900;
-
+  user-select: none;
   .tab-item {
     pointer-events: auto;
     padding: 4px;

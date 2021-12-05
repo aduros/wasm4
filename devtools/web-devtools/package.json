@@ -23,8 +23,9 @@
     "prettify": "prettier . --write"
   },
   "dependencies": {
-    "lit": "^2.0.0",
-    "fast-equals": "^2.0.3"
+    "chart.js": "^3.6.1",
+    "fast-equals": "^2.0.3",
+    "lit": "^2.0.0"
   },
   "devDependencies": {
     "@types/node": "^16.11.10",

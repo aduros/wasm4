@@ -157,12 +157,3 @@ body:not(.focus) #gamepad {
 body {
   overflow: hidden;
 }
-
-#devtools {
-  position: fixed;
-  background: transparent;
-  top: 0;
-  right: 0;
-  padding: 4px;
-  height: 100vh;
-}

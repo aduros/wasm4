@@ -11,6 +11,10 @@
       window.addEventListener('load', () => {
         const detail = {
           memory: {
+            getUint8() {
+              return 128;
+            },
+            byteLen: 65536,
             pointerPos: { x: 24, y: -30 },
             mouseButtons: {
               left: true,
@@ -51,7 +55,11 @@
     <br />
     <h2>&lt;wasm4-controls-view&gt;&lt;/wasm4-controls-view&gt;</h2>
     <wasm4-controls-view></wasm4-controls-view>
+    <br />
     <h2>&lt;wasm4-info-view&gt;&lt;/wasm4-info-view&gt;</h2>
     <wasm4-info-view></wasm4-info-view>
+    <br />
+    <h2>&lt;wasm4-memory-view&gt;&lt;/wasm4-memory-view&gt;</h2>
+    <wasm4-memory-view></wasm4-memory-view>
   </body>
 </html>

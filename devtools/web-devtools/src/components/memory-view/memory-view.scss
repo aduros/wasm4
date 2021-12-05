@@ -1,0 +1,43 @@
+@use '../../styles/theme.scss';
+
+.memory-map {
+  image-rendering: pixelated;
+  border: 2px solid gray;
+  border-radius: 4px;
+  flex: 0 0 auto;
+  align-self: center;
+}
+
+.memory-map-wrapper {
+  display: block;
+  margin: 0 auto;
+}
+
+.hex-view {
+  padding: 0.2em 0;
+  min-height: 80px;
+  font-size: 0.61em;
+
+  .hex-header {
+    border-bottom: 1px solid theme.theme-get(text-primary);
+    margin-bottom: 0.5em;
+    padding: 0.5em 0;
+  }
+
+  text-transform: uppercase;
+}
+
+.hex-form {
+  font-size: 0.875em;
+  [type='number'] {
+    width: 75px;
+    border-radius: 4px;
+  }
+
+  .form-group {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    grid-gap: 4px;
+  }
+}

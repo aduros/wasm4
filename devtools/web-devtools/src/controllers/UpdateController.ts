@@ -1,20 +1,18 @@
 import { ReactiveController, ReactiveControllerHost } from 'lit';
-import { deepEqual } from 'fast-equals';
 import {
   updateCompletedEventType,
   Wasm4UpdateCompletedEvent,
-  Wasm4MemoryView,
 } from '../events/update-completed';
+import { MemoryView } from '../models/MemoryView';
 
 interface UpdateControllerState {
-  memoryView: Wasm4MemoryView;
+  memoryView: MemoryView;
   storedValue: string | null;
   fps: number;
 }
 
 export class UpdateController implements ReactiveController {
   host: ReactiveControllerHost;
-
   state: Readonly<UpdateControllerState> | null = null;
 
   constructor(host: ReactiveControllerHost) {
@@ -29,10 +27,8 @@ export class UpdateController implements ReactiveController {
         fps: detail.fps,
       };
 
-      if (!deepEqual(nextState, this.state)) {
-        this.state = nextState;
-        this.host.requestUpdate();
-      }
+      this.state = nextState;
+      this.host.requestUpdate();
     }
   };
 

@@ -7,7 +7,13 @@ import {
 import * as constants from './constants';
 
 class BufferedData {
+  /**
+   * @type {number}
+   */
   mouseButtons = 0;
+  /**
+   * @type {number[]}
+   */
   gamepads = [0, 0, 0, 0];
 
   /**
@@ -42,18 +48,21 @@ class BufferedData {
 export class DevtoolsManager {
   /**
    * @private
+   * @type {boolean}
    */
   _enabled = false;
 
   /**
    * @private
+   * @type {BufferedData}
    */
   _bufferedData = new BufferedData();
 
   static enabledByQueryParams() {
     return (
-      new URLSearchParams(window.location.search).get(constants.showDevToolsQueryKey) ||
-      ''
+      new URLSearchParams(window.location.search).get(
+        constants.showDevToolsQueryKey
+      ) || ''
     ).startsWith('1');
   }
 
@@ -72,6 +81,9 @@ export class DevtoolsManager {
     }
   };
 
+  /**
+   * @type {() => void}
+   */
   removeDevTools = () => {
     if (this._enabled) {
       this.toggleDevtools();
@@ -84,16 +96,17 @@ export class DevtoolsManager {
   toggleDevtools = () => {
     this._enabled = !this._enabled;
 
-    const devtoolsRoot = document.getElementById('devtools');
-
     if (this._enabled) {
-      devtoolsRoot.appendChild(document.createElement(wasm4DevtoolsTagName));
+      document.body.appendChild(document.createElement(wasm4DevtoolsTagName));
     } else {
-      while (devtoolsRoot.firstChild) {
-        devtoolsRoot.removeChild(devtoolsRoot.firstChild);
-      }
+      Array.from(document.body.querySelectorAll(wasm4DevtoolsTagName)).forEach(
+        (elem) => {
+          elem.parentElement.removeChild(elem);
+        }
+      );
     }
   };
+
   /**
    * @private
    * @type {(dataView: DataView) => void}

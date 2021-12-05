@@ -69,7 +69,10 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-
+            - name: Build web-devtools
+              working-directory: devtools/web-devtools
+              run: |
+                  npm ci
             - name: Build web runtime
               working-directory: runtimes/web
               run: |

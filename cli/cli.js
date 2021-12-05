@@ -43,13 +43,15 @@ blankProject(
 
 program.command("watch")
     .description("Rebuild and refresh when source code changes")
+    .option("--open", "Opens the browser", true)
     .addOption(
-        new Option("-n, --no-open", "Doesn't open the browser")
+        new Option("-no, --no-open", "Doesn't open the browser")
             .env("W4_NO_OPEN")
             .default(false)
     )
+    .option("--qr", "Generates a QR code", true)
     .addOption(
-        new Option("--qr", "Generates a QR code")
+        new Option("-nq, --no-qr", "Prevents the generation of a QR code")
             .env("W4_NO_QR")
             .default(false)
     )
@@ -60,13 +62,15 @@ program.command("watch")
 
 program.command("run <cart>")
     .description("Open a cartridge in the web runtime")
+    .option("--open", "Opens the browser", true)
     .addOption(
-        new Option("-n, --no-open", "Doesn't open the browser")
+        new Option("-no, --no-open", "Doesn't open the browser")
             .env("W4_NO_OPEN")
             .default(false)
     )
+    .option("--qr", "Generates a QR code", true)
     .addOption(
-        new Option("--qr", "Generates a QR code")
+        new Option("-nq, --no-qr", "Prevents the generation of a QR code")
             .env("W4_NO_QR")
             .default(false)
     )

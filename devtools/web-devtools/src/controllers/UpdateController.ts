@@ -11,6 +11,11 @@ interface UpdateControllerState {
   fps: number;
 }
 
+/**
+ * Subscribes to `updateCompletedEventType` events and stores
+ * the latest `event.detail` inside `this.state`.
+ * @see https://lit.dev/docs/composition/controllers/
+ */
 export class UpdateController implements ReactiveController {
   host: ReactiveControllerHost;
   state: Readonly<UpdateControllerState> | null = null;

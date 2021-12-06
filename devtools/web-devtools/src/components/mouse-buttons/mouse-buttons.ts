@@ -7,6 +7,18 @@ import mouseButtonsCss from './mouse-buttons.scss';
 
 export const wasm4MouseTagName = 'wasm4-mouse-buttons';
 
+/**
+ * ### Programmatic usage
+ * @example
+ * 
+ * ```ts
+ * import { wasm4MouseTagName } from '@wasm4/web-devtools';
+ * 
+ * const elem = document.createElement(wasm4MouseTagName);
+ *
+ * document.body.appendChild(elem);
+ * ```
+ */
 @customElement(wasm4MouseTagName)
 export class Wasm4MouseButtons extends LitElement {
   static styles = withTheme(mouseButtonsCss);

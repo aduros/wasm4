@@ -17,7 +17,15 @@ export const wasm4DevtoolsTagName = 'wasm4-devtools' as const;
 const tabs = ['general', 'controls', 'mem', 'info'] as const;
 
 /**
- * `<wasm4-devtools></wasm4-devtools>`
+ * ### Programmatic usage
+ * @example
+ * 
+ * ```ts
+ * import { wasm4DevtoolsTagName } from '@wasm4/web-devtools';
+ * 
+ * const elem = document.createElement(wasm4DevtoolsTagName);
+ * document.body.appendChild(elem);
+ * ```
  */
 @customElement(wasm4DevtoolsTagName)
 export class Wasm4Devtools extends LitElement {

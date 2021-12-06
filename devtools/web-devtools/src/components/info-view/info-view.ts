@@ -31,6 +31,17 @@ const links: Link[] = [
   { label: 'github', href: 'https://github.com/aduros/wasm4' },
 ];
 
+/**
+ * ### Programmatic usage
+ * @example
+ * 
+ * ```ts
+ * import { wasm4InfoTagName } from '@wasm4/web-devtools';
+ * 
+ * const elem = document.createElement(wasm4InfoTagName));
+ * document.body.appendChild(elem);
+ * ```
+ */
 @customElement(wasm4InfoTagName)
 export class Wasm4InfoView extends LitElement {
   static styles = withTheme();

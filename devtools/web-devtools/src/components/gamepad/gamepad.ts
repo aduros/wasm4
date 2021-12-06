@@ -14,6 +14,18 @@ import {
 
 export const wasm4GamepadTagName = 'wasm4-gamepad';
 
+/**
+ * ### Programmatic usage
+ * @example
+ * 
+ * ```ts
+ * import { wasm4GamepadTagName } from '@wasm4/web-devtools';
+ * 
+ * const elem = document.createElement(wasm4GamepadTagName);
+ *
+ * document.body.appendChild(elem);
+ * ```
+ */
 @customElement(wasm4GamepadTagName)
 export class Wasm4Gamepad extends LitElement {
   static styles = withTheme(gamepadCss);

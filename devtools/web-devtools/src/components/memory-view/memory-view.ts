@@ -20,6 +20,19 @@ interface HexEditorFormState {
 
 const colorFormula = 'b = (byte & 0xf) << 4; g = (byte & 0xf0)';
 
+/**
+ * A custom element that renders a memory map and a simple hex editor view.
+ * 
+ * @example
+ * 
+ * ```ts
+ * import { wasm4MemoryViewTagName } from '@wasm4/web-devtools';
+ * const elem = document.createElement(wasm4MemoryViewTagName);
+ * 
+ * elem.memoryView = { ... };
+ * document.body.appendChild(elem);
+ * ```
+ */
 @customElement(wasm4MemoryViewTagName)
 export class Wasm4MemoryView extends LitElement {
   static styles = withTheme(memoryViewCss);

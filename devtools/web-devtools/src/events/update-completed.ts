@@ -24,6 +24,15 @@ function getStoredValue(): string | null {
   }
 }
 
+/**
+ * An event that is meant to be triggered after a `runtime.update` that provides
+ * infos regarding the console runtime.
+ * @param dataView `runtime.data`
+ * @param fps 
+ * @param bufferedData 
+ * @param eventInit optional, defaults to `{ bubbles: true }`.
+ * @returns 
+ */
 export function createUpdateCompletedEvent(
   dataView: DataView,
   fps: number,

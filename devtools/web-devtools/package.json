@@ -10,6 +10,11 @@
       "require": "./dist/web-devtools.cjs.js"
     }
   },
+  "author": {
+    "name": "FaberVitale",
+    "url": "https://github.com/FaberVitale"
+  },
+  "license": "MIT",
   "types": "types/index.d.ts",
   "files": [
     "dist",

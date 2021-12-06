@@ -35,7 +35,7 @@ class BufferedData {
   flush = () => {
     const output = {
       mouseButtons: this.mouseButtons,
-      gamepads: this.gamepads,
+      gamepads: this.gamepads.slice(),
     };
 
     this.mouseButtons = 0;

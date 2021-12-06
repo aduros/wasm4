@@ -8,6 +8,12 @@
   align-self: center;
 }
 
+.color-formula {
+  font-size: 0.65em;
+  padding: 0.1em 0.1em;
+  max-width: 280px;
+}
+
 .memory-map-wrapper {
   display: block;
   margin: 0 auto;
@@ -29,8 +35,12 @@
 
 .hex-form {
   font-size: 0.875em;
-  [type='number'] {
+  input[type='number'] {
     width: 75px;
+    border: none;
+    margin: 0;
+    padding: 0.2em;
+    line-height: 1.15;
     border-radius: 4px;
   }
 

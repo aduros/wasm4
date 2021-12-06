@@ -18,6 +18,8 @@ interface HexEditorFormState {
   };
 }
 
+const colorFormula = 'b = (byte & 0xf) << 4; g = (byte & 0xf0)';
+
 @customElement(wasm4MemoryViewTagName)
 export class Wasm4MemoryView extends LitElement {
   static styles = withTheme(memoryViewCss);
@@ -57,7 +59,7 @@ export class Wasm4MemoryView extends LitElement {
     for (let i = 0, len = this.imageData.data.byteLength; i < len; i += 4) {
       const greyColor = memoryView.getUint8(i / 4);
       const green = greyColor & 0xf0;
-      const blue = greyColor & 0xf;
+      const blue = (greyColor & 0xf) << 4;
 
       this.imageData.data[i] = 0;
       this.imageData.data[i + 1] = green;
@@ -100,9 +102,7 @@ export class Wasm4MemoryView extends LitElement {
 
     const { firstRow } = this.hexEditor.values;
 
-    const rowOffsets = [0, 1, 2, 3, 4, 5, 6, 7, 8].map(
-      (rowId) => firstRow + rowId * 16
-    );
+    const rowOffsets = range(0, 8).map((rowId) => firstRow + rowId * 16);
 
     const rows = rowOffsets
       .filter((rowId) => rowId <= maxFirstRowValue)
@@ -168,6 +168,7 @@ export class Wasm4MemoryView extends LitElement {
           class="memory-map"
           ${ref(this.memoryCanvasRef)}
         ></canvas>
+        <div class="color-formula">${colorFormula}</div>
       </section>
       ${this._renderHexView(this.memoryView)}
     </article>`;

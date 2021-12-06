@@ -159,6 +159,7 @@ export class Wasm4Devtools extends LitElement {
     return html`<div class="fixed-wrapper">
       <div class="devtools-wrapper bg-primary">
         <div class="devtools-top">
+          <h2>devtools</h2>
           <div class="devtools-top-btn">
             <button
               type="button"

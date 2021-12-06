@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + Lit App</title>
+    <title>@wasm4/web-devtools components demo</title>
     <script type="module" src="/src/index.ts"></script>
     <script type="module">
       import { updateCompletedEventType } from '/src/events/update-completed.ts';
@@ -36,6 +36,7 @@
         );
 
         document.querySelector('wasm4-palette').palette = detail.memory.palette;
+        document.querySelector('wasm4-memory-view').memoryView = detail.memory;
       });
     </script>
   </head>

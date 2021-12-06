@@ -9,6 +9,16 @@ export function bitmask(to: number, from = 0) {
   return ((1 << to) - 1) ^ ((1 << from) - 1);
 }
 
+export function clamp(value: number, min: number, max: number): number {
+  if (!Number.isFinite(min) || !Number.isFinite(max) || min > max) {
+    throw new TypeError(
+      `clamp: invalid min and max provided: min ${min}, max ${max}`
+    );
+  }
+
+  return Math.max(min, Math.min(max, value));
+}
+
 export function renderHexRow(memoryView: MemoryView, offset: number): string {
   const clampedOffset = Math.max(0, Math.min(offset, memoryView.byteLen - 1));
   let row: string[] = [];

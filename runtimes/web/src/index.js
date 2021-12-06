@@ -429,6 +429,9 @@ async function loadCartWasm () {
     window.addEventListener("pointermove", onPointerEvent);
     window.addEventListener("pointerup", onPointerEvent);
 
+    // @see https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilitychange_event
+    window.addEventListener('visibilitychange', runtime.updatePausedFlag)
+
     const gamepadOverlay = document.getElementById("gamepad");
 
     // https://gist.github.com/addyosmani/5434533#file-limitloop-js-L60

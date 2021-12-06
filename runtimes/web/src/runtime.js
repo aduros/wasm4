@@ -293,4 +293,8 @@ export class Runtime {
 
         this.compositor.composite(palette, this.framebuffer);
     }
+
+    updatePausedFlag = () => {
+        this.paused = document.visibilityState !== 'visible';
+    }
 }

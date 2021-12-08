@@ -19,9 +19,11 @@ function start (cartFile, opts) {
     app.use(express.static(__dirname+"/../assets/runtime"));
 
     const server = app.listen(PORT, async () => {
-        const qr = await qrcode.toString(`http://${getIP()}:${PORT}`, {type: "terminal", small: true});
-        console.log("\n  " + qr.replace(/\n/g, "\n  "));
-        console.log(`Open http://localhost:${PORT}, or scan this QR code on your mobile device. Press ctrl-C to exit.`);
+        if (opts.qr) {
+            const qr = await qrcode.toString(`http://${getIP()}:${PORT}`, {type: "terminal", small: true});
+            console.log("\n  " + qr.replace(/\n/g, "\n  "));
+        }
+        console.log(`Open http://localhost:${PORT}${opts.qr ? ", or scan this QR code on your mobile device." : "."} Press ctrl-C to exit.`);
 
         if (opts.open) {
             open(`http://localhost:${PORT}`);

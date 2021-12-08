@@ -1,34 +1,58 @@
 @use '../../styles/theme.scss';
 
+$devtools-top-height: 2.923em;
+$fixed-wrapper-padding: 4px;
+$devtools-body-max-height: calc(100vh - $devtools-top-height - 2 * $fixed-wrapper-padding);
+
 .fixed-wrapper {
   position: fixed;
   background: transparent;
   top: 0;
   right: 0;
-  padding: 4px;
+  padding: $fixed-wrapper-padding;
   height: 100vh;
-  z-index: 11;
+  z-index: theme.theme-get(window-z-index);
   pointer-events: none;
 }
 
 .devtools-wrapper {
+  position: relative;
   display: block;
   border: solid 1px gray;
-  padding: 8px;
   border-radius: 4px;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
   min-width: 295px;
   position: relative;
   max-height: 100%;
   pointer-events: auto;
+
+  &::before {
+    content: "";
+    height: $devtools-top-height;
+    width: 100%;
+  }
+
+  .devtools-top-static-placeholder {
+    height: $devtools-top-height;
+    width: 100%;
+    padding: 0;
+  }
 
   .devtools-top {
     display: grid;
     grid-template-columns: 1r auto;
     justify-content: space-between;
     grid-template-areas: '. win-btn';
+    align-items: center;
     overflow: hidden;
+    padding: 0 8px;
+    position: absolute;
+    background: theme;
+    z-index: 5;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: $devtools-top-height;
   }
 
   .devtools-top-btn {
@@ -53,6 +77,24 @@
     width: 2.2em;
     height: 2.2em;
     cursor: pointer;
+  }
+
+  .devtools-body {
+    max-height: $devtools-body-max-height;
+    padding: 0 8px 8px;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      -webkit-appearance: none;
+      width: 7px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      border-radius: 4px;
+      background-color: theme.theme-get(text-secondary);
+      box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+    }
   }
 }
 

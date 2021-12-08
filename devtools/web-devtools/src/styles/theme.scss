@@ -4,6 +4,7 @@ $theme: (
   text-primary: #fff,
   text-secondary: rgba(255, 255, 255, 0.7),
   text-size: 16px,
+  window-z-index: 11,
 );
 
 @function theme-get($theme-key) {

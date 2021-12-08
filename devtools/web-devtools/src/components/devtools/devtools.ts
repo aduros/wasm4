@@ -166,7 +166,8 @@ export class Wasm4Devtools extends LitElement {
 
     return html`<div class="fixed-wrapper">
       <div class="devtools-wrapper bg-primary">
-        <div class="devtools-top">
+        <div class="devtools-top-static-placeholder"></div>
+        <div class="devtools-top bg-primary">
           <h2>devtools</h2>
           <div class="devtools-top-btn">
             <button
@@ -205,7 +206,7 @@ export class Wasm4Devtools extends LitElement {
             </button>
           </div>
         </div>
-        <div ?hidden=${!this._expanded}>
+        <div class="devtools-body" ?hidden=${!this._expanded}>
           <ul class="tabs" @click=${this._handleTabClick}>
             ${repeat(
               tabs,

@@ -12,6 +12,9 @@ A collection of custom elements that provides information regarding wasm4 web ru
 npm --prefix devtools/web-devtools i
 ```
 
+This relies on [lit](https://lit.dev) library to manage custom elements:
+docs are available [here](https://lit.dev/docs/).
+
 ### Test locally
 
 Starts local server

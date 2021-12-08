@@ -180,6 +180,8 @@ export class Wasm4Devtools extends LitElement {
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
+                height="24px"
+                width="24px"
                 fill="currentColor"
               >
                 <path d="M0 0h24v24H0V0z" fill="none" />
@@ -196,6 +198,8 @@ export class Wasm4Devtools extends LitElement {
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
+                height="24px"
+                width="24px"
                 fill="currentColor"
               >
                 <path d="M0 0h24v24H0V0z" fill="none" />

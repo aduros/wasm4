@@ -23,6 +23,8 @@
   padding: 0.2em 0;
   min-height: 80px;
   font-size: 0.61em;
+  white-space: nowrap;
+  overflow-x: hidden;
 
   .hex-header {
     border-bottom: 1px solid theme.theme-get(text-primary);

@@ -2,47 +2,7 @@
 
 ## Description
 
-A collection of custom elements that provides information regarding wasm4 web runtime.
-
-## Developing
-
-### Install dependencies
-
-```bash
-npm --prefix devtools/web-devtools i
-```
-
-This relies on [lit](https://lit.dev) library to manage custom elements:
-docs are available [here](https://lit.dev/docs/).
-
-### Test locally
-
-Starts local server
-
-```bash
-npm --prefix devtools/web-devtools run dev
-```
-
-### Build package & web runtime
-
-Starts local server
-
-```bash
-npm --prefix devtools/web-devtools/ run build && npm --prefix runtimes/web/ run build
-```
-
-### Build package
-
-```bash
-npm --prefix devtools/web-devtools run build
-```
-
-### Run formatter
-
-```bash
-npm --prefix devtools/web-devtools run prettify
-```
-
+A collection of custom elements that provides information about [wasm4](https://wasm4.org/) web runtime.
 
 ## Usage
 
@@ -67,3 +27,44 @@ All exported components can be customized using the following css variables:
 --wasm4-devtools-window-z-index: 15; /* unitless number */
 }
 ```
+
+## Developing
+
+### Install dependencies
+
+```bash
+npm --prefix devtools/web-devtools i
+```
+
+This package relies on [lit](https://lit.dev) library to manage custom elements:
+docs are available [here](https://lit.dev/docs/).
+
+### Test locally
+
+Starts local server
+
+```bash
+npm --prefix devtools/web-devtools run dev
+```
+
+### Build package & web runtime
+
+```bash
+npm --prefix devtools/web-devtools/ run build && npm --prefix runtimes/web/ run build
+```
+
+### Build package
+
+```bash
+npm --prefix devtools/web-devtools run build
+```
+
+### Run formatter
+
+```bash
+npm --prefix devtools/web-devtools run prettify
+```
+
+## License
+
+[MIT](./License)

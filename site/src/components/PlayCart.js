@@ -28,45 +28,14 @@ import { Giscus } from "@giscus/react";
 // }
 
 function Embed ({ slug, title, author }) {
-    const queryParams = new URLSearchParams({
-        url: `/carts/${slug}.wasm`,
-        screenshot: `/carts/${slug}.png`,
-    });
-
+    let params = "?url="+encodeURIComponent(`/carts/${slug}.wasm`);
+    params += "&screenshot="+encodeURIComponent(`/carts/${slug}.png`);
     if (title) {
-        queryParams.append('title', title + '');
+        params += "&title="+encodeURIComponent(title);
     }
-
     if (author) {
-        queryParams.append('author', author + '')
+        params += "&author="+encodeURIComponent(author);
     }
-    const params = queryParams.toString();
-    const search = params && `?${params}`;
-
-    const iframeRef = React.useRef();
-
-
-    React.useEffect(() => {
-        const handleFocusChange = (evt) => {
-            window.requestAnimationFrame(() => {
-                if(!iframeRef.current) {
-                    console.warn('Embed: invalid ref or unsubscribed evt listener!');
-                    return;
-                } 
-    
-                if(document.activeElement !== iframeRef.current) {
-                    iframeRef.current.contentWindow.postMessage('wasm4-iframe-blur', '*');
-                    console.log('postmessage', evt.type);
-                }
-            })
-        }
-        window.addEventListener('blur',  handleFocusChange);
-
-        return () => {
-            window.removeEventListener('blur', handleFocusChange);
-        }
-    }, []);
-
     return (
         <iframe
             src={`/embed/${params}`}

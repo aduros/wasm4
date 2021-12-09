@@ -114,10 +114,10 @@ Add some comment if you want. And then press "Make pull request" at the bottom. 
 
 ## Wait a Bit
 
-Since this procedure is currently involving the interaction of humans, your PR (short for Pull Request) needs to be verified by an authorized person such as `aduros`. Your PR will also cause a notification in our discord channel to let him know sooner rather than later.
+Since this procedure is currently involving the interaction of humans, your PR (short for Pull Request) needs to be verified by a maintainer. Your PR will also cause a notification in our Discord channel to let us know sooner rather than later.
 
-And once he approved your PR, another notification will be send to our discord channel.
+And once a maintainer approves your PR, another notification will be sent to our Discord channel.
 
 ## Discord!
 
-If you have questions or if you don't want to miss when your game is added (or simply want to talk to a bunch of nice people), [join us on our discord channel](https://discord.gg/E8wqqMFW).
+If you have questions or if you don't want to miss when your game is added (or simply want to talk to a bunch of nice people), [join us on our Discord channel](https://discord.gg/7teRdHdbYk).

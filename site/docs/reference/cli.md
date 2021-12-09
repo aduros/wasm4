@@ -117,25 +117,32 @@ w4 watch --no-open
 
 **Options:**
 
-| Option    | Default value | Description                       |
-| --------- | ------------- | --------------------------------- |
-| -n        |               | Prevents the browser from opening |
-| --no-open |               | Same as `-n`                      |
+| Option    | Default value | Description                                   |
+| --------- | ------------- | --------------------------------------------- |
+| -n        |               | Prevents the browser from opening             |
+| --no-open |               | Same as `-n`                                  |
+| --open    |               | Forces a new browser tab or window (Default)  |
+| --qr      |               | Generates a QR code in the terminal (Default) |
+| -nq       |               | Prevents the generation of a QR code          |
+| --no-qr   |               | Same as `-nq`                                 |
 
 **Description:**
 
 By default, the command starts the build process (`npm run build`, `make` etc.), starts a server and opens the browser.
 The option `-n`/`--no-open` prevents the browser from opening.
 
-Also note, that the server will listen on `localhost:4444`.
+Another default behavior is the generation of a QR code in the terminal. This can be useful to test game on other devices such as mobile phones. The option `-nq`/`--no-qr` prevents this from happening. This can be useful in case the terminal is can't display QR codes.
 
-It's also possible to set this option by default by setting an environment variable for the current user or the whole system.
+It's also possible to set those options by setting an environment variable for the current user or the whole system. The corresponding variables are `W4_NO_OPEN` and `W4_NO_QR`. Setting it to any value activates them.
+
+Also note, that the server will listen on `localhost:4444`.
 
 Example (Linux):
 
 ```bash
 # ~/.profile
-export W4_NO_OPEN
+export W4_NO_OPEN=1 # Disable the browser from opening
+export W4_NO_QR=1   # Disable the generation of QR codes
 ```
 
 ## `run`
@@ -160,26 +167,11 @@ w4 run --no-open carts/watris.wasm
 
 **Options:**
 
-| Option    | Default value | Description                       |
-| --------- | ------------- | --------------------------------- |
-| -n        |               | Prevents the browser from opening |
-| --no-open |               | Same as `-n`                      |
+`w4 run` has the same options as [`w4 watch`](#watch)
 
 **Description:**
 
-The command starts the web runtime in a local server and opens the browser.
-But the option `-n`/`--no-open` can be used to prevent the browser from opening.
-
-Also note, that the server will listen on `localhost:4444`.
-
-It's also possible to set this option by default by setting an environment variable for the current user or the whole system.
-
-Example (Linux):
-
-```bash
-# ~/.profile
-export W4_NO_OPEN
-```
+The command starts the web runtime in a local server. Aside from starting the build process, the same is identical to [`w4 watch`](#watch).
 
 ## `run-native`
 
@@ -246,6 +238,8 @@ w4 png2src --lang rust top.png down.png left.png right.png
 | --lang LANGUAGE  | as / W4_LANG  | Uses the provided language              |
 | -t FILE          |               | Uses a custom template file             |
 | --template FILE  |               | Same as `-t`                            |
+| -o FILE          |               | Use given file instead of stdout        |
+| --output FILE    |               | Same as `-o`                            |
 
 **Description:**
 
@@ -258,6 +252,10 @@ The command takes one or more PNG image(s) and converts them to source code. The
 Using an image that is not index or has more than 4 colors will cause an error. Images with the size of 4x4 or less might lead to bugs.
 
 By default it uses AssemblyScript. But this can be changed by setting the environment variable `W4_LANG`. Check the description of [`new`, `create` and `init`](#new-create-and-init) for more details.
+
+It also writes the output to the standard output (stdout). Usually this is the terminal executing `w4 png2src`. This can be changed by providing the `-o`/`--output` option.
+
+The template file has to use Mustache. More about this can be found in [Docs/Guides/Sprites/Custom template](/docs/guides/sprites#custom-template).
 
 ## `bundle`
 

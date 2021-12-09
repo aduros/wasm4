@@ -79,6 +79,13 @@ export class Runtime {
         }
     }
 
+    pauseAudio() {
+        const ctx = this.apu.ctx;
+        if (ctx.state == "running") {
+            ctx.suspend();
+        } 
+    }
+
     reset (zeroMemory) {
         // Initialize default color table and palette
         const mem32 = new Uint32Array(this.memory.buffer);
@@ -294,7 +301,13 @@ export class Runtime {
         this.compositor.composite(palette, this.framebuffer);
     }
 
-    updatePausedFlag = () => {
-        this.paused = document.visibilityState !== 'visible';
+    updateIdleState = () => {
+        this.paused = !document.body.classList.contains('focus');
+
+        if(this.paused) {
+           this.pauseAudio();
+        } else {
+            this.unlockAudio();
+        }
     }
 }

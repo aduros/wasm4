@@ -71,9 +71,11 @@ async function loadCartWasm () {
 
         window.onblur = function () {
             document.body.classList.remove("focus");
+            runtime.updateIdleState();
         }
         window.onfocus = function () {
             document.body.classList.add("focus");
+            runtime.updateIdleState();
         }
     }
     document.body.classList.add("focus");
@@ -428,9 +430,6 @@ async function loadCartWasm () {
     window.addEventListener("pointerdown", onPointerEvent);
     window.addEventListener("pointermove", onPointerEvent);
     window.addEventListener("pointerup", onPointerEvent);
-
-    // @see https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilitychange_event
-    window.addEventListener('visibilitychange', runtime.updatePausedFlag)
 
     const gamepadOverlay = document.getElementById("gamepad");
 

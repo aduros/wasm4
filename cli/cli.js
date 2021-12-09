@@ -51,7 +51,7 @@ program.command("watch")
     )
     .option("--qr", "Displays a QR code", true)
     .addOption(
-        new Option("-nq, --no-qr", "Don't display a QR code")
+        new Option("--no-qr", "Don't display a QR code")
             .env("W4_NO_QR")
             .default(false)
     )

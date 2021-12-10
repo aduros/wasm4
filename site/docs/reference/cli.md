@@ -123,15 +123,14 @@ w4 watch --no-open
 | --no-open |               | Same as `-n`                                  |
 | --open    |               | Forces a new browser tab or window (Default)  |
 | --qr      |               | Generates a QR code in the terminal (Default) |
-| -nq       |               | Prevents the generation of a QR code          |
-| --no-qr   |               | Same as `-nq`                                 |
+| --no-qr   |               | Prevents the generation of a QR code                                 |
 
 **Description:**
 
 By default, the command starts the build process (`npm run build`, `make` etc.), starts a server and opens the browser.
 The option `-n`/`--no-open` prevents the browser from opening.
 
-Another default behavior is the generation of a QR code in the terminal. This can be useful to test game on other devices such as mobile phones. The option `-nq`/`--no-qr` prevents this from happening. This can be useful in case the terminal is can't display QR codes.
+Another default behavior is the generation of a QR code in the terminal. This can be useful to test games on other devices such as mobile phones. The option `--no-qr` prevents this from happening. This can be useful in case the terminal can't display QR codes.
 
 It's also possible to set those options by setting an environment variable for the current user or the whole system. The corresponding variables are `W4_NO_OPEN` and `W4_NO_QR`. Setting it to any value activates them.
 
@@ -171,7 +170,11 @@ w4 run --no-open carts/watris.wasm
 
 **Description:**
 
-The command starts the web runtime in a local server. Aside from starting the build process, the same is identical to [`w4 watch`](#watch).
+The command starts the web runtime in a local server.
+
+Unlike the `w4 watch` command, the `w4 run` command doesn't start the build process. It also won't update the running game should it get updated during runtime.
+
+Aside from those differences, it behaves the same as [`w4 watch`](#watch).
 
 ## `run-native`
 

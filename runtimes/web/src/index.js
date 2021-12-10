@@ -71,9 +71,11 @@ async function loadCartWasm () {
 
         window.onblur = function () {
             document.body.classList.remove("focus");
+            runtime.updateIdleState();
         }
         window.onfocus = function () {
             document.body.classList.add("focus");
+            runtime.updateIdleState();
         }
     }
     document.body.classList.add("focus");

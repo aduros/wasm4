@@ -24,6 +24,7 @@ Below you'll find instructions for your language.
         {label: 'C / C++', value: 'language-cpp'},
         {label: 'Rust', value: 'language-rust'},
         {label: 'Go', value: 'language-go'},
+        {label: 'Zig', value: 'language-zig'},
     ]}>
 
 <TabItem value="language-typescript">
@@ -122,6 +123,29 @@ Compile the .wasm cartridge:
 
 ```shell
 make
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 watch
+```
+
+</TabItem>
+
+<TabItem value="language-zig">
+
+To compile zig projects you will need `zig` installed.
+
+```shell
+w4 new --zig snake
+cd snake
+```
+
+Compile the .wasm cartridge:
+
+```shell
+zig build
 ```
 
 Run it in WASM-4 with:

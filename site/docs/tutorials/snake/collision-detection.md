@@ -17,6 +17,7 @@ Collision detection can be one of the harder to understand concepts of game deve
         {label: 'C / C++', value: 'language-cpp'},
         {label: 'Rust', value: 'language-rust'},
         {label: 'Go', value: 'language-go'},
+        {label: 'Zig', value: 'language-zig'},
     ]}>
 
 <TabItem value="language-typescript">
@@ -115,6 +116,49 @@ Now you're almost done. Only "Game Over" is left to finish this game.
 
 </TabItem>
 
+<TabItem value="language-typescript">
+
+A simple
+
+```zig
+if (snake.body.get(0).equals(fruit)) {
+    // Snake's head hits the fruit
+}
+```
+
+is enough already to check if the snake eats the fruit. And to make the snake "grow", simply increase the length of the snake using the `push` function of the array. Now it remains the question what values should this new piece have. The easiest would be to add the current last piece:
+
+```zig
+var tail = snake.body.get(snake.body.len-1);
+snake.body.append(Point.init(tail.x, tail.y)) catch @panic("couldn't grow snake");
+```
+
+Once this done, simply relocate the fruit:
+
+```zig
+fruit.x = rnd(20);
+fruit.y = rnd(20);
+```
+
+In it's final form, it could look like this:
+
+```zig {4-9}
+    if (frameCount % 15 == 0) {
+        snake.update()
+
+        if (snake.body[0].equals(fruit)) {
+            let tail = snake.body[snake.body.length - 1]
+            snake.body.push(new Point(tail.x, tail.y))
+            fruit.x = rnd(20)
+            fruit.y = rnd(20)
+        }
+    }
+```
+
+Now you're almost done. Only "Game Over" is left to finish this game.
+
+</TabItem>
+
 </Tabs>
 
 ## Collision Detection with Itself
@@ -129,6 +173,7 @@ For the player to have any sense of "danger", the game needs a possibility for t
         {label: 'C / C++', value: 'language-cpp'},
         {label: 'Rust', value: 'language-rust'},
         {label: 'Go', value: 'language-go'},
+        {label: 'Zig', value: 'language-zig'},
     ]}>
 
 <TabItem value="language-typescript">
@@ -211,6 +256,43 @@ Now you can call this function to check if the snake died in this frame:
 			fruit.Y = rnd(20)
 		}
 	}
+```
+
+What you do, is up to you. You could stop the game and show the score. Or you could simply reset the game. Up to you.
+
+</TabItem>
+
+<TabItem value="language-zig">
+
+```zig
+    pub fn isDead(this: @This()) bool {
+        const head = this.body.get(0);
+        for (this.body.constSlice()) |part, i| {
+            if (i == 0) continue;
+            if (part.equals(head)) return true;
+        }
+
+        return false;
+    }
+```
+
+Now you can call this function to check if the snake died in this frame:
+
+```zig {4-6}
+    if (frameCount % 15 == 0) {
+        snake.update()
+
+        if (snake.isDead()) {
+            // Do something
+        }
+
+        if (snake.body[0].equals(fruit)) {
+            let tail = snake.body[snake.body.length - 1]
+            snake.body.push(new Point(tail.x, tail.y))
+            fruit.x = rnd(20)
+            fruit.y = rnd(20)
+        }
+    }
 ```
 
 What you do, is up to you. You could stop the game and show the score. Or you could simply reset the game. Up to you.

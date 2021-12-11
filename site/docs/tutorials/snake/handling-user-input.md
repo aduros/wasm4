@@ -53,6 +53,7 @@ You can achieve this by using the bitwise XOR operator. To make it short, here i
         {label: 'C / C++', value: 'language-cpp'},
         {label: 'Rust', value: 'language-rust'},
         {label: 'Go', value: 'language-go'},
+        {label: 'Zig', value: 'language-zig'},
     ]}>
 
 <TabItem value="language-typescript">
@@ -95,6 +96,23 @@ The variable `justPressed` now holds all buttons that were pressed this frame. Y
 ```go
 if justPressed&w4.BUTTON_UP != 0 {
 	// Do something
+}
+```
+
+</TabItem>
+
+<TabItem value="language-zig">
+
+```zig
+const gamepad = w4.GAMEPAD1.*;
+const justPressed = gamepad & (gamepad ^ prevState);
+```
+
+The constant `justPressed` now holds all buttons that were pressed this frame. You can check the state of a single button like this:
+
+```zig
+if (justPressed & w4.BUTTON_UP != 0) {
+    // Do something
 }
 ```
 
@@ -178,6 +196,7 @@ For this, you need to change the update function of in the main file. Remember, 
         {label: 'C / C++', value: 'language-cpp'},
         {label: 'Rust', value: 'language-rust'},
         {label: 'Go', value: 'language-go'},
+        {label: 'Zig', value: 'language-zig'},
     ]}>
 
 <TabItem value="language-typescript">
@@ -225,6 +244,22 @@ func update() {
 
 </TabItem>
 
+<TabItem value="language-zig">
+
+```zig
+export function update(): void {
+    frameCount++
+
+    if (frameCount % 15 == 0) {
+        snake.update()
+    }
+
+    snake.draw()
+}
+```
+
+</TabItem>
+
 </Tabs>
 
 The classic processing loop goes like this: Input, Process the input, output the result. Or in case of most games: User-Input, Update, Render. The last two steps are already in place. Now it's time to add the first part.
@@ -237,6 +272,7 @@ The classic processing loop goes like this: Input, Process the input, output the
         {label: 'C / C++', value: 'language-cpp'},
         {label: 'Rust', value: 'language-rust'},
         {label: 'Go', value: 'language-go'},
+        {label: 'Zig', value: 'language-zig'},
     ]}>
 
 <TabItem value="language-typescript">
@@ -456,6 +492,108 @@ func (s *Snake) Down() {
 		s.Direction = Point{X: 0, Y: 1}
 	}
 }
+```
+
+</TabItem>
+
+<TabItem value="language-zig">
+
+It's a good idea to handle the input in it's own function. Something like this could be on your mind:
+
+```zig {1-8,13}
+fn input() void {
+    const gamepad = w4.GAMEPAD1.*;
+    const justPressed = gamepad & (gamepad ^ prevState);
+
+    if (justPressed & w4.BUTTON_UP != 0) {
+        // Do something
+    }
+}
+
+export fn update() void {
+    frameCount += 1;
+    
+    input();
+
+    if (frameCount % 15 == 0) {
+        snake.update();
+    }
+
+    snake.draw();
+}
+```
+
+If you try to compile this, you should get an error: `error: use of undeclared identifier 'prevState'`. This is easily fixed. Just place the prevState into the var-section:
+
+```zig {3}
+var snake = Snake.init();
+var frameCount: u32 = 0;
+var prevState: u8 = 0;
+```
+
+To notice any change in the gamepad, you have to store the *current state* at the end of the input. This will make it the *previous state*. And while you're at it, why not add the other 3 directions along the way:
+
+```zig {8-18}
+function input(): void {
+    const gamepad = load<u8>(w4.GAMEPAD1)};
+    const justPressed = gamepad & (gamepad ^ prevState)
+
+    if (justPressed & w4.BUTTON_LEFT != 0) {
+        // Do something
+    }
+    if (justPressed & w4.BUTTON_RIGHT != 0) {
+        // Do something
+    }
+    if (justPressed & w4.BUTTON_UP != 0) {
+        // Do something
+    }
+    if (justPressed & w4.BUTTON_DOWN != 0) {
+        w4.trace("down");
+    }
+
+    prevState = gamepad
+}
+```
+
+If you want to check if it works: Use the `trace` function provided by WASM-4. Here's an example:
+
+```zig
+    if (justPressed & w4.BUTTON_DOWN != 0) {
+        w4.trace("down");
+    }
+```
+
+If you use `trace` in each if-statement, you should see the corresponding output in the console.
+
+Now, instead of using `trace` to confirm everything works as intended, you should replace it with something like this:
+
+```zig
+    if (justPressed & w4.BUTTON_DOWN != 0) {
+        snake.down();
+    }
+```
+
+I'll leave it to you, to finish the other 3 directions.
+
+You'll be - once again - rewarded with an error message:
+
+```
+./src/main.zig:22:14: error: no member named 'left' in struct 'snake.Snake'
+        snake.left();
+             ^
+cart...The step exited with error code 1
+error: the build command failed with exit code 1
+```
+
+Zig will only list this first unknown it finds, but you'll get an error for each function as you add them. To fix the errors, add those functions to your snake. Here's an example for `down`:
+
+```zig
+    pub fn down(this: *@This()) void {
+        if (this.direction.y == 0) {
+            this.direction.x = 0;
+            this.direction.y = 1;
+        }
+    }
 ```
 
 </TabItem>

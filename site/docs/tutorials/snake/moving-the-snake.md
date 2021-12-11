@@ -30,6 +30,7 @@ Keep in mind: This is not what the player sees. This is:
         {label: 'C / C++', value: 'language-cpp'},
         {label: 'Rust', value: 'language-rust'},
         {label: 'Go', value: 'language-go'},
+        {label: 'Zig', value: 'language-zig'},
     ]}>
 
 <TabItem value="language-typescript">
@@ -113,6 +114,7 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
         {label: 'C / C++', value: 'language-cpp'},
         {label: 'Rust', value: 'language-rust'},
         {label: 'Go', value: 'language-go'},
+        {label: 'Zig', value: 'language-zig'},
     ]}>
 
 <TabItem value="language-typescript">
@@ -175,6 +177,43 @@ func (s *Snake) Update() {
 
 </TabItem>
 
+<TabItem value="language-zig">
+
+To achieve the first step (moving the body, excluding the head), a simple loop is all you need:
+
+```zig
+    pub fn update(this: *@This()) void {
+        const part = this.body.slice();
+        var i: usize = part.len - 1;
+        while (i > 0) : (i -= 1) {
+            part[i].x = part[i - 1].x;
+            part[i].y = part[i - 1].y;
+        }
+
+        part[0].x = @mod((part[0].x + this.direction.x), 20);
+        part[0].y = @mod((part[0].y + this.direction.y), 20);
+
+        if (part[0].x < 0) part[0].x = 19;
+        if (part[0].y < 0) part[0].y = 19;
+    }
+```
+
+Don't forget to call the new function in the main-loop:
+
+```zig {2}
+export fn update() void {
+    snake.update();
+    snake.draw();
+}
+
+```
+
+Now if you execute this, you'd notice that you can't see much. In fact, you might see the snake for a short moment before the head is all that's left.
+
+![](images/snake_move_head_only.webp)
+
+</TabItem>
+
 </Tabs>
 
 That's it. Now you should see the snake running from left to right. Maybe a little too fast, though.
@@ -197,6 +236,7 @@ The easiest way is probably to count the frames and update the snake only every 
         {label: 'C / C++', value: 'language-cpp'},
         {label: 'Rust', value: 'language-rust'},
         {label: 'Go', value: 'language-go'},
+        {label: 'Zig', value: 'language-zig'},
     ]}>
 
 <TabItem value="language-typescript">
@@ -295,6 +335,48 @@ func update() {
 	}
 
 	snake.Draw()
+}
+```
+
+That's it. Your snake should be quite a bit slower now. This reduces the snake from 60 units per second to 4 units per second (60/15 = 4).
+
+![Moving Snake (slow)](images/snake-motion-slow.webp)
+
+</TabItem>
+
+<TabItem value="language-zig">
+
+For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
+
+```zig {2}
+var snake: Snake = Snake.init();
+var frameCount: u32 = 0;
+```
+
+This variable in main.ts keeps track of all frames so far. Just increase it's value in the main-update function:
+
+```zig {2}
+export fn update() void {
+    frameCount += 1;
+
+    snake.update();
+
+    snake.draw();
+}
+
+```
+
+Now all you need is to check if the passed frames are dividable by X:
+
+```zig {4-6}
+export function update(): void {
+    frameCount++
+
+    if (frameCount % 15 == 0) {
+        snake.update()
+    }
+
+    snake.draw()
 }
 ```
 

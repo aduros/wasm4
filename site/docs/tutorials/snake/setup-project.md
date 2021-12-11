@@ -159,15 +159,15 @@ w4 watch
 </Tabs>
 
 :::note Prevent Browser from opening
-If you don't want the browser to open a new tab for you, you can prevent this by using the `-n` or `--no-browser` option. You can also set an environment variable called `W4_NO_BROWSER`.
+If you don't want the browser to open a new tab for you, you can prevent this by using the `-n` or `--no-open` option. You can also set an environment variable called `W4_NO_OPEN`.
 
 Examples:
 ```shell
-w4 watch --no-browser
+w4 watch --no-open
 ```
 or
 ```shell
-W4_NO_BROWSER=1 w4 watch
+W4_NO_OPEN=1 w4 watch
 ```
 :::
 

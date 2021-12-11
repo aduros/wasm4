@@ -116,7 +116,7 @@ Now you're almost done. Only "Game Over" is left to finish this game.
 
 </TabItem>
 
-<TabItem value="language-typescript">
+<TabItem value="language-zig">
 
 A simple
 

@@ -4,10 +4,10 @@
   "scripts": {
     "build": "webpack --mode production",
     "start": "webpack serve --mode development --content-base dist --devtool inline-source-map --host 0.0.0.0",
-    "prepare": "npm --prefix '../../devtools/web-devtools' i"
+    "prepare": "npm --prefix '../../devtools/web' i"
   },
   "dependencies": {
-    "@wasm4/web-devtools": "file:../../devtools/web-devtools",
+    "@wasm4/web-devtools": "file:../../devtools/web",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {

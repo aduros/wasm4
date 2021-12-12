@@ -17,10 +17,10 @@ export const wasm4GamepadTagName = 'wasm4-gamepad';
 /**
  * ### Programmatic usage
  * @example
- * 
+ *
  * ```ts
  * import { wasm4GamepadTagName } from '@wasm4/web-devtools';
- * 
+ *
  * const elem = document.createElement(wasm4GamepadTagName);
  *
  * document.body.appendChild(elem);

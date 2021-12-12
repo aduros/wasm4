@@ -19,12 +19,12 @@ All exported components can be customized using the following css variables:
 
 ```css
 :root {
---wasm4-devtools-bg-primary: pink;  /* color */
---wasm4-devtools-bg-secondary: cornflowerblue; /* color */
---wasm4-devtools-text-primary: black; /* color */
---wasm4-devtools-text-secondary: gray; /* color */
---wasm4-devtools-text-text-size: 18px; /* dimension */
---wasm4-devtools-window-z-index: 15; /* unitless number */
+  --wasm4-devtools-bg-primary: pink; /* color */
+  --wasm4-devtools-bg-secondary: cornflowerblue; /* color */
+  --wasm4-devtools-text-primary: black; /* color */
+  --wasm4-devtools-text-secondary: gray; /* color */
+  --wasm4-devtools-text-text-size: 18px; /* dimension */
+  --wasm4-devtools-window-z-index: 15; /* unitless number */
 }
 ```
 

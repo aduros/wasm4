@@ -35,7 +35,7 @@ export function range(from: number, to: number, step = 1): number[] {
     !Number.isFinite(from) ||
     !Number.isFinite(to) ||
     !Number.isFinite(step) ||
-    from > to || 
+    from > to ||
     step === 0
   ) {
     throw new TypeError(

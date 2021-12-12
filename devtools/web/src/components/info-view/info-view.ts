@@ -2,6 +2,8 @@ import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { withTheme } from '../../styles/commons';
 import { repeat } from 'lit/directives/repeat.js';
+import { memoryMap } from '../../constants';
+import { formatHex } from '../../utils/format';
 
 export const wasm4InfoTagName = 'wasm4-info-view';
 
@@ -34,10 +36,10 @@ const links: Link[] = [
 /**
  * ### Programmatic usage
  * @example
- * 
+ *
  * ```ts
  * import { wasm4InfoTagName } from '@wasm4/web-devtools';
- * 
+ *
  * const elem = document.createElement(wasm4InfoTagName));
  * document.body.appendChild(elem);
  * ```
@@ -54,7 +56,7 @@ export class Wasm4InfoView extends LitElement {
       <article class="bg-primary" part="root-view">
         ${this.heading && html`<h3 class="heading">${this.heading}</h3>`}
         <section>
-          <h4>Links</h4>
+          <h4>links</h4>
           <ul class="list">
             ${repeat(
               links,
@@ -67,12 +69,12 @@ export class Wasm4InfoView extends LitElement {
           </ul>
         </section>
         <section>
-          <h4>Keybindings</h4>
+          <h4>keybindings</h4>
           <table class="table">
             <thead>
               <tr>
-                <th>Key</th>
-                <th>Description</th>
+                <th>key</th>
+                <th>description</th>
               </tr>
             </thead>
             <tbody>
@@ -83,6 +85,30 @@ export class Wasm4InfoView extends LitElement {
                   html`<tr>
                     <td>${key}</td>
                     <td>${description}</td>
+                  </tr>`
+              )}
+            </tbody>
+          </table>
+        </section>
+        <section>
+          <h4>memory map</h4>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>address</th>
+                <th>size (bytes)</th>
+                <th>description</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${repeat(
+                Object.entries(memoryMap),
+                ([_, { offset }]) => offset,
+                ([desc, { offset, len }]) =>
+                  html`<tr>
+                    <td>0x${formatHex(offset)}</td>
+                    <td>${len}</td>
+                    <td>${desc}</td>
                   </tr>`
               )}
             </tbody>

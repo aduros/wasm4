@@ -2,7 +2,9 @@
 
 $devtools-top-height: 2.923em;
 $fixed-wrapper-padding: 4px;
-$devtools-body-max-height: calc(100vh - $devtools-top-height - 2 * $fixed-wrapper-padding);
+$devtools-body-max-height: calc(
+  100vh - $devtools-top-height - 2 * $fixed-wrapper-padding
+);
 
 .fixed-wrapper {
   position: fixed;
@@ -36,13 +38,13 @@ $devtools-body-max-height: calc(100vh - $devtools-top-height - 2 * $fixed-wrappe
   border: solid 1px gray;
   border-radius: 4px;
   overflow: hidden;
-  min-width: 295px;
+  width: 300px;
   position: relative;
   max-height: 100%;
   pointer-events: auto;
 
   &::before {
-    content: "";
+    content: '';
     height: $devtools-top-height;
     width: 100%;
   }
@@ -104,11 +106,11 @@ $devtools-body-max-height: calc(100vh - $devtools-top-height - 2 * $fixed-wrappe
       -webkit-appearance: none;
       width: 7px;
     }
-    
+
     &::-webkit-scrollbar-thumb {
       border-radius: 4px;
       background-color: theme.theme-get(text-secondary);
-      box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+      box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
     }
   }
 }

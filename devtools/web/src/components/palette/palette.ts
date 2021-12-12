@@ -9,13 +9,13 @@ export const wasm4PaletteTagName = 'wasm4-palette' as const;
 /**
  * ### Programmatic usage
  * @example
- * 
+ *
  * ```ts
  * import { wasm4PaletteTagName } from '@wasm4/web-devtools';
- * 
+ *
  * const elem = document.createElement(wasm4PaletteTagName);
  * elem.palette = [0xfff6d3, 0xf9a875, 0xeb6b6f, 0x7c3f58];
- * 
+ *
  * document.body.appendChild(elem);
  * ```
  */

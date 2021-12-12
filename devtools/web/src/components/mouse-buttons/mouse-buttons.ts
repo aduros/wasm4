@@ -10,10 +10,10 @@ export const wasm4MouseTagName = 'wasm4-mouse-buttons';
 /**
  * ### Programmatic usage
  * @example
- * 
+ *
  * ```ts
  * import { wasm4MouseTagName } from '@wasm4/web-devtools';
- * 
+ *
  * const elem = document.createElement(wasm4MouseTagName);
  *
  * document.body.appendChild(elem);

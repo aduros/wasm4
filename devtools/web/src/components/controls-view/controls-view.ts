@@ -7,10 +7,10 @@ export const wasm4ControlsViewTagName = 'wasm4-controls-view';
 /**
  * ### Programmatic usage
  * @example
- * 
+ *
  * ```ts
  * import { wasm4ControlsViewTagName } from '@wasm4/web-devtools';
- * 
+ *
  * const elem = document.createElement(wasm4ControlsViewTagName);
  *
  * document.body.appendChild(elem);

@@ -93,6 +93,7 @@ $theme: (
   tr,
   td,
   th {
+    overflow-wrap: break-word;
     text-align: inherit;
     font-size: inherit;
   }

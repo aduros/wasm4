@@ -20,10 +20,10 @@ const tabs = ['general', 'controls', 'mem', 'info'] as const;
 /**
  * ### Programmatic usage
  * @example
- * 
+ *
  * ```ts
  * import { wasm4DevtoolsTagName } from '@wasm4/web-devtools';
- * 
+ *
  * const elem = document.createElement(wasm4DevtoolsTagName);
  * document.body.appendChild(elem);
  * ```
@@ -60,7 +60,7 @@ export class Wasm4Devtools extends LitElement {
 
   private _changeFixedPosition = () => {
     this._fixedPosition = this._fixedPosition === 'left' ? 'right' : 'left';
-  }
+  };
 
   private _renderGeneralView = (memoryView: MemoryView, fps: number) => {
     const drawColors = memoryView.drawColors ?? 0;
@@ -172,15 +172,22 @@ export class Wasm4Devtools extends LitElement {
 
     const { memoryView, fps } = this.updateController.state;
 
-    const fixedPosBtnLabel = `move ${this._fixedPosition === 'left' ? 'right' : 'left'}`;
+    const fixedPosBtnLabel = `move ${
+      this._fixedPosition === 'left' ? 'right' : 'left'
+    }`;
 
-    return html`<div class=${classMap({"fixed-wrapper": 1, [`pos-${this._fixedPosition}`]: 1 })}>
+    return html`<div
+      class=${classMap({
+        'fixed-wrapper': 1,
+        [`pos-${this._fixedPosition}`]: 1,
+      })}
+    >
       <div class="devtools-wrapper bg-primary">
         <div class="devtools-top-static-placeholder"></div>
         <div class="devtools-top bg-primary">
           <h2>devtools</h2>
           <div class="devtools-top-btn">
-          <button
+            <button
               type="button"
               aria-label="collapse"
               class="top-btn"

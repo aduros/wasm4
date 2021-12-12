@@ -34,3 +34,63 @@ export const MOUSE_MIDDLE = 4;
 
 export const SYSTEM_PRESERVE_FRAMEBUFFER = 1;
 export const SYSTEM_HIDE_GAMEPAD_OVERLAY = 2;
+
+interface Range {
+  offset: number;
+  len: number;
+}
+
+export const memoryMap: Readonly<Record<string, Range>> = {
+  PALETTE: {
+    offset: ADDR_PALETTE,
+    len: 16,
+  },
+  DRAW_COLORS: {
+    offset: ADDR_DRAW_COLORS,
+    len: 2,
+  },
+  GAMEPAD1: {
+    offset: ADDR_GAMEPAD1,
+    len: 1,
+  },
+  GAMEPAD2: {
+    offset: ADDR_GAMEPAD2,
+    len: 1,
+  },
+  GAMEPAD3: {
+    offset: ADDR_GAMEPAD3,
+    len: 1,
+  },
+  GAMEPAD4: {
+    offset: ADDR_GAMEPAD4,
+    len: 1,
+  },
+  MOUSE_X: {
+    offset: ADDR_MOUSE_X,
+    len: 2,
+  },
+  MOUSE_Y: {
+    offset: ADDR_MOUSE_Y,
+    len: 2,
+  },
+  MOUSE_BUTTONS: {
+    offset: ADDR_MOUSE_BUTTONS,
+    len: 1,
+  },
+  SYSTEM_FLAGS: {
+    offset: ADDR_SYSTEM_FLAGS,
+    len: 1,
+  },
+  RESERVED: {
+    offset: 0x0020,
+    len: 128,
+  },
+  FRAMEBUFFER: {
+    offset: ADDR_FRAMEBUFFER,
+    len: 6400,
+  },
+  PROGRAM_MEMORY: {
+    offset: 0x19a0,
+    len: 58975,
+  },
+};

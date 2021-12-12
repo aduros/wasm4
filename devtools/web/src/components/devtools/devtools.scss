@@ -13,6 +13,21 @@ $devtools-body-max-height: calc(100vh - $devtools-top-height - 2 * $fixed-wrappe
   height: 100vh;
   z-index: theme.theme-get(window-z-index);
   pointer-events: none;
+
+  &.pos-right {
+    .toggle-pos-btn {
+      transform: rotateY(-180deg);
+    }
+  }
+
+  &.pos-left {
+    right: auto;
+    left: 0;
+
+    .toggle-pos-btn {
+      transform: rotateY(0);
+    }
+  }
 }
 
 .devtools-wrapper {

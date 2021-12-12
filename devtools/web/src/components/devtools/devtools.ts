@@ -8,6 +8,7 @@ import {
   SYSTEM_HIDE_GAMEPAD_OVERLAY,
   SYSTEM_PRESERVE_FRAMEBUFFER,
 } from '../../constants';
+import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { bitmask, identity } from '../../utils/functions';
 import { MemoryView } from '../../models/MemoryView';
@@ -39,6 +40,9 @@ export class Wasm4Devtools extends LitElement {
   @state()
   private _activeTab: typeof tabs[number] = tabs[0];
 
+  @state()
+  private _fixedPosition: 'left' | 'right' = 'right';
+
   _handleCloseButtonClick = () => {
     this.dispatchEvent(createCloseDevtoolsEvent());
   };
@@ -53,6 +57,10 @@ export class Wasm4Devtools extends LitElement {
   private _toggleExapanded = () => {
     this._expanded = !this._expanded;
   };
+
+  private _changeFixedPosition = () => {
+    this._fixedPosition = this._fixedPosition === 'left' ? 'right' : 'left';
+  }
 
   private _renderGeneralView = (memoryView: MemoryView, fps: number) => {
     const drawColors = memoryView.drawColors ?? 0;
@@ -164,13 +172,15 @@ export class Wasm4Devtools extends LitElement {
 
     const { memoryView, fps } = this.updateController.state;
 
-    return html`<div class="fixed-wrapper">
+    const fixedPosBtnLabel = `move ${this._fixedPosition === 'left' ? 'right' : 'left'}`;
+
+    return html`<div class=${classMap({"fixed-wrapper": 1, [`pos-${this._fixedPosition}`]: 1 })}>
       <div class="devtools-wrapper bg-primary">
         <div class="devtools-top-static-placeholder"></div>
         <div class="devtools-top bg-primary">
           <h2>devtools</h2>
           <div class="devtools-top-btn">
-            <button
+          <button
               type="button"
               aria-label="collapse"
               class="top-btn"
@@ -186,6 +196,24 @@ export class Wasm4Devtools extends LitElement {
               >
                 <path d="M0 0h24v24H0V0z" fill="none" />
                 <path d="M6 19h12v2H6v-2z" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              aria-label=${fixedPosBtnLabel}
+              class="top-btn toggle-pos-btn"
+              title=${fixedPosBtnLabel}
+              @click=${this._changeFixedPosition}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                height="24px"
+                width="24px"
+                fill="currentColor"
+              >
+                <path d="M0 0h24v24H0V0z" fill="none" />
+                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
               </svg>
             </button>
             <button

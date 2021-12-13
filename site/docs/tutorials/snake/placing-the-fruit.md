@@ -13,6 +13,7 @@ A freely moving snake is nice. But it get's a bit dull if that's all there is. T
         {label: 'C / C++', value: 'language-cpp'},
         {label: 'Rust', value: 'language-rust'},
         {label: 'Go', value: 'language-go'},
+        {label: 'Zig', value: 'language-zig'},
     ]}>
 
 <TabItem value="language-typescript">
@@ -51,6 +52,22 @@ To place (and eat) a fruit, you first need to make a variable for this. Since it
 
 </TabItem>
 
+<TabItem value="language-zig">
+To place (and eat) a fruit, you first need to make a variable for this. Since it's simply a point on the grid, `Point` will do. Set it to undefined for now:
+
+```zig {3,6}
+const w4 = @import("wasm4.zig");
+const Snake = @import("snake.zig").Snake;
+const Point = @import("snake.zig").Point;
+
+var snake = Snake.init();
+var fruit: Point = undefined;
+var frameCount: u32 = 0;
+var prevState: u8 = 0;
+```
+
+</TabItem>
+
 </Tabs>
 
 ## Random Numbers
@@ -63,6 +80,7 @@ To place (and eat) a fruit, you first need to make a variable for this. Since it
         {label: 'C / C++', value: 'language-cpp'},
         {label: 'Rust', value: 'language-rust'},
         {label: 'Go', value: 'language-go'},
+        {label: 'Zig', value: 'language-zig'},
     ]}>
 
 <TabItem value="language-typescript">
@@ -141,6 +159,62 @@ Keep in mind, that the value of `rnd` is `nil` if it wasn't initialized yet.
 
 </TabItem>
 
+<TabItem value="language-zig">
+
+Zig's standard library has a couple of different random number generators, including some that are meant to be cryptographically secure. We don't need anything our snake game to be cryptographically secure, so we'll just use `std.rand.DefaultPrng`, where Prng means pseudo-random number generator. To start, we'll need to import `std` and initialize the prng:
+
+```zig {2,8-9,20-21}
+const w4 = @import("wasm4.zig");
+const std = @import("std");
+const Snake = @import("snake.zig").Snake;
+const Point = @import("snake.zig").Point;
+
+var snake = Snake.init();
+var fruit: Point = undefined;
+var frameCount: u32 = 0;
+var prevState: u8 = 0;
+var prng = std.rand.DefaultPrng.init(0);
+var random: std.rand.Random = undefined;
+
+export fn start() void {
+    w4.PALETTE.* = .{
+        0xfbf7f3,
+        0xe5b083,
+        0x426e5d,
+        0x20283d,
+    };
+    prng = std.rand.DefaultPrng.init(0);
+    random = prng.random();
+}
+
+```
+
+We can call `random.intRangeLessThan(T, at_least, less_than)` to get a number between `at_least` and `less_than`, with the type of `T`. You can wrap that in a helper function if you'd like:
+
+```zig 
+fn rnd(max: i32) i32 {
+    random.intRangeLessThan(i32, 0, max);
+}
+```
+
+Now use it for the location of the fruit: 
+
+```zig {10}
+export fn start() void {
+    w4.PALETTE.* = .{
+        0xfbf7f3,
+        0xe5b083,
+        0x426e5d,
+        0x20283d,
+    };
+    prng = std.rand.DefaultPrng.init(0);
+    random = prng.random();
+    fruit = Point.init(rnd(20), rnd(20));
+}
+```
+
+</TabItem>
+
 </Tabs>
 
 ## Importing PNG Files
@@ -170,6 +244,7 @@ This is the original image. You can download it to proceed.
         {label: 'C / C++', value: 'language-cpp'},
         {label: 'Rust', value: 'language-rust'},
         {label: 'Go', value: 'language-go'},
+        {label: 'Zig', value: 'language-zig'},
     ]}>
 
 <TabItem value="language-typescript">
@@ -250,6 +325,40 @@ With that out of the way, it's time to actually render the newly imported sprite
 
 </TabItem>
 
+<TabItem value="language-zig">
+
+Now you need to import the image. For this, the WASM-4 CLI tool `w4` comes with another tool: `png2src`. You can use it like this:
+
+`w4 png2src --zig fruit.png`
+
+This will output the following content in the terminal:
+
+```zig
+const fruitWidth = 8;
+const fruitHeight = 8;
+const fruitFlags = 1; // BLIT_2BPP
+const fruit = [16]u8{ 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0 };
+```
+
+To get it into a an existing file, use the `>>` operator (or copy and paste). Like this:
+
+`w4 png2src --zig fruit.png >> main.zig`
+
+This will add the previous lines to your `main.zig` and causes an error because "fruit" already exists. Just rename the new fruit to `fruitSprite` and move it somewhere else. Also: You can remove the other stuff added, you won't need it for this project:
+
+```zig {6}
+var snake = Snake.init();
+var fruit: Point = undefined;
+var frameCount: u32 = 0;
+var prevState: u8 = 0;
+var random: std.rand.Random = undefined;
+const fruitSprite = [16]u8{ 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0 };
+```
+
+With that out of the way, it's time to actually render the newly imported sprite.
+
+</TabItem>
+
 </Tabs>
 
 ## Rendering a PNG File
@@ -262,6 +371,7 @@ With that out of the way, it's time to actually render the newly imported sprite
         {label: 'C / C++', value: 'language-cpp'},
         {label: 'Rust', value: 'language-rust'},
         {label: 'Go', value: 'language-go'},
+        {label: 'Zig', value: 'language-zig'},
     ]}>
 
 <TabItem value="language-typescript">
@@ -350,6 +460,45 @@ But since you set the drawing colors, you need to change the drawing colors too:
 
 	*w4.DRAW_COLORS = 0x4320
 	w4.Blit(&fruitSprite[0], fruit.X*8, fruit.Y*8, 8, 8, w4.BLIT_2BPP)
+```
+
+This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.
+
+</TabItem>
+
+<TabItem value="language-zig">
+
+Rendering the sprite is rather simple. Just call the `blit` function of w4:
+
+```zig
+/// Copies pixels to the framebuffer.
+pub extern fn blit(sprite: [*]const u8, x: i32, y: i32, width: i32, height: i32, flags: u32) void;
+```
+
+In practice it looks like this:
+
+```zig {11}
+export fn update() void {
+    frameCount += 1;
+
+    input();
+
+    if (frameCount % 15 == 0) {
+        snake.update();
+    }
+    snake.draw();
+
+    w4.blit(fruitSprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP)
+}
+```
+
+But since you set the drawing colors, you need to change the drawing colors too:
+
+```zig {3}
+    snake.draw();
+
+    w4.DRAW_COLORS.* = 0x4320;
+    w4.blit(&fruitSprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP);
 ```
 
 This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.

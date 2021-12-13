@@ -53,6 +53,12 @@ func update() {
 }
 ```
 
+```zig
+const w4 = @import("wasm4.zig");
+
+export fn update() void {}
+```
+
 </MultiLanguageCode>
 
 The update function is required. Or WASM-4 won't be able to show anything. To set up the color palette, it's usually enough to do this once at the start of the game.
@@ -77,6 +83,17 @@ func start() {
 	w4.PALETTE[1] = 0xe5b083
 	w4.PALETTE[2] = 0x426e5d
 	w4.PALETTE[3] = 0x20283d
+}
+```
+
+```zig
+export fn start() void {
+    w4.PALETTE.* = .{
+        0xfbf7f3,
+        0xe5b083,
+        0x426e5d,
+        0x20283d,
+    };
 }
 ```
 

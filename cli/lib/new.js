@@ -54,7 +54,7 @@ const HELP = {
     },
     zig: {
       name: 'Zig',
-      build: 'zig build',
+      build: 'zig build -Drelease-small=true',
       cart: 'zig-out/lib/cart.wasm',
     },
 }

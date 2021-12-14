@@ -69,7 +69,10 @@ pub extern fn oval(x: i32, y: i32, width: i32, height: i32) void;
 pub extern fn rect(x: i32, y: i32, width: u32, height: u32) void;
 
 /// Draws text using the built-in system font.
-pub extern fn text(str: [*:0]const u8, x: i32, y: i32) void;
+pub fn text(str: []const u8, x: i32, y: i32) void {
+    textUtf8(str.ptr, str.len, x, y);
+}
+extern fn textUtf8(strPtr: [*]const u8, strLen: usize, x: i32, y: i32) void;
 
 /// Draws a vertical line
 pub extern fn vline(x: i32, y: i32, len: u32) void;
@@ -114,4 +117,7 @@ pub extern fn diskw(src: [*]const u8, size: u32) u32;
 // └───────────────────────────────────────────────────────────────────────────┘
 
 /// Prints a message to the debug console.
-pub extern fn trace(x: [*:0]const u8) void;
+pub fn trace(x: []const u8) void {
+    traceUtf8(x.ptr, x.len);
+}
+extern fn traceUtf8(strPtr: [*]const u8, strLen: usize) void;

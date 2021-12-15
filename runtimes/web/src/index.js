@@ -442,7 +442,6 @@ async function loadCartWasm () {
 
     function loop () {
         processGamepad();
-        requestAnimationFrame(loop);
 
         const now = performance.now();
         const deltaFrame = now - lastFrame;
@@ -455,6 +454,7 @@ async function loadCartWasm () {
                 ? "none" : "";
         }
 
+        requestAnimationFrame(loop);
     }
     loop();
 })();

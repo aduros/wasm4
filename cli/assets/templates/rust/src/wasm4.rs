@@ -59,6 +59,7 @@ extern "C" {
 }
 
 /// Copies a subregion within a larger sprite atlas to the framebuffer.
+#[allow(clippy::too_many_arguments)]
 pub fn blit_sub(
     sprite: &[u8],
     x: i32,

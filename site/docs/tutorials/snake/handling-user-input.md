@@ -1,7 +1,6 @@
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import MultiLanguage, {Page} from '@site/src/components/MultiLanguage';
 
-# Handling User Input
+# User Input
 
 With a moving snake, you've done a good part of the game. This part lets you give the control into the players hands. If the player presses a certain button, you just have to change the values of the "Direction"-Property of your snake.
 
@@ -45,18 +44,9 @@ Since the current state of the gamepad is stored in a single variable, you need 
 
 You can achieve this by using the bitwise XOR operator. To make it short, here is the code snippet you can use:
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 
 ```typescript
 const gamepad = load<u8>(w4.GAMEPAD1);
@@ -71,21 +61,21 @@ if (justPressed & w4.BUTTON_UP) {
 }
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
-
-// TODO
-
-</TabItem>
-
-<TabItem value="language-rust">
+<Page value="c">
 
 // TODO
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="d">
+
+// TODO
+
+</Page>
+
+<Page value="go">
 
 ```go
 justPressed := *w4.GAMEPAD1 & (*w4.GAMEPAD1 ^ prevState)
@@ -99,9 +89,27 @@ if justPressed&w4.BUTTON_UP != 0 {
 }
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-zig">
+<Page value="nim">
+
+// TODO
+
+</Page>
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+// TODO
+
+</Page>
+
+<Page value="zig">
 
 ```zig
 const gamepad = w4.GAMEPAD1.*;
@@ -116,9 +124,9 @@ if (justPressed & w4.BUTTON_UP != 0) {
 }
 ```
 
-</TabItem>
+</Page>
 
-</Tabs>
+</MultiLanguage>
 
 If you don't care *why* that is, [skip to the next part](#changing-directions).
 
@@ -188,18 +196,9 @@ Like most of this tutorial, this is step is rather easy once you've grasped how 
 
 For this, you need to change the update function of in the main file. Remember, this is how it currently looks like:
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 
 ```typescript
 export function update(): void {
@@ -213,21 +212,21 @@ export function update(): void {
 }
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
-
-// TODO
-
-</TabItem>
-
-<TabItem value="language-rust">
+<Page value="d">
 
 // TODO
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="d">
+
+// TODO
+
+</Page>
+
+<Page value="go">
 
 ```go
 //go:export update
@@ -242,9 +241,27 @@ func update() {
 }
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-zig">
+<Page value="nim">
+
+// TODO
+
+</Page>
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+// TODO
+
+</Page>
+
+<Page value="zig">
 
 ```zig
 export function update(): void {
@@ -258,24 +275,15 @@ export function update(): void {
 }
 ```
 
-</TabItem>
+</Page>
 
-</Tabs>
+</MultiLanguage>
 
 The classic processing loop goes like this: Input, Process the input, output the result. Or in case of most games: User-Input, Update, Render. The last two steps are already in place. Now it's time to add the first part.
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 
 It's a good idea to handle the input in it's own function. Something like this could be on your mind:
 
@@ -374,21 +382,21 @@ To fix this, add those functions to your snake. Here's an example for `down`:
     }
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
-
-// TODO
-
-</TabItem>
-
-<TabItem value="language-rust">
+<Page value="c">
 
 // TODO
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="d">
+
+// TODO
+
+</Page>
+
+<Page value="go">
 
 It's a good idea to handle the input in it's own function. Something like this could be on your mind:
 
@@ -494,9 +502,27 @@ func (s *Snake) Down() {
 }
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-zig">
+<Page value="nim">
+
+// TODO
+
+</Page>
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+// TODO
+
+</Page>
+
+<Page value="zig">
 
 It's a good idea to handle the input in it's own function. Something like this could be on your mind:
 
@@ -596,9 +622,9 @@ Zig will only list this first unknown it finds, but you'll get an error for each
     }
 ```
 
-</TabItem>
+</Page>
 
-</Tabs>
+</MultiLanguage>
 
 First, it checks if the direction is already changing the Y-Direction. Only if it isn't allow the change. And then change the Y-Direction to 1. The `Up` direction requires a Y-Direction of `-1`. `Left` and `Right` don't check the Y, but the X and change it accordingly (Left: -1, Right: 1).
 

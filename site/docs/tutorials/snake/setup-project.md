@@ -1,5 +1,4 @@
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import MultiLanguage, {Page} from '@site/src/components/MultiLanguage';
 
 
 # Setup Your Project
@@ -16,18 +15,9 @@ On Windows this is usually `C:\Users\[YOUR USERNAME]\Projects\`.
 
 Below you'll find instructions for your language.
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 
 To compile AssemblyScript projects you will need `npm` installed.
 
@@ -53,9 +43,9 @@ Run it in WASM-4 with:
 ```shell
 w4 watch
 ```
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
+<Page value="c">
 
 :::note Work in Progress
 The tutorial for C/C++ is currently a Work-in-Progress. Most of the language specific instructions are currently missing.
@@ -80,9 +70,113 @@ Run it in WASM-4 with:
 w4 watch
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-rust">
+<Page value="d">
+
+:::note Work in Progress
+The tutorial for D is currently a Work-in-Progress. Most of the language specific instructions are currently missing.
+:::
+
+To compile D projects you will need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
+
+```shell
+w4 new --d snake
+cd snake
+```
+
+Compile the .wasm cartridge:
+
+```shell
+make
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 watch
+```
+
+</Page>
+
+<Page value="go">
+
+To compile Go projects you will need `go` and `tinygo` installed.
+
+```shell
+w4 new --go snake
+cd snake
+```
+
+Compile the .wasm cartridge:
+
+```shell
+make
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 watch
+```
+
+</Page>
+
+<Page value="nim">
+
+:::note Work in Progress
+The tutorial for Nim is currently a Work-in-Progress. Most of the language specific instructions are currently missing.
+:::
+
+To compile Nim projects you will need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
+
+```shell
+w4 new --nim snake
+cd snake
+```
+
+Compile the .wasm cartridge:
+
+```shell
+nimble rel
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 watch
+```
+
+</Page>
+
+<Page value="odin">
+
+:::note Work in Progress
+The tutorial for Odin is currently a Work-in-Progress. Most of the language specific instructions are currently missing.
+:::
+
+To compile Odin projects you will need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable. You'll also need the latest version of [Odin](https://https://github.com/odin-lang/Odin).
+
+```shell
+w4 new --nim snake
+cd snake
+```
+
+Compile the .wasm cartridge:
+
+```shell
+nimble rel
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 watch
+```
+
+</Page>
+
+<Page value="rust">
 
 :::note Work in Progress
 The tutorial for Rust is currently a Work-in-Progress. Most of the language specific instructions are currently missing.
@@ -108,32 +202,9 @@ Run it in WASM-4 with:
 w4 watch
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
-
-To compile Go projects you will need `go` and `tinygo` installed.
-
-```shell
-w4 new --go snake
-cd snake
-```
-
-Compile the .wasm cartridge:
-
-```shell
-make
-```
-
-Run it in WASM-4 with:
-
-```shell
-w4 watch
-```
-
-</TabItem>
-
-<TabItem value="language-zig">
+<Page value="zig">
 
 To compile zig projects you will need `zig` installed.
 
@@ -145,7 +216,7 @@ cd snake
 Compile the .wasm cartridge:
 
 ```shell
-zig build
+zig build -Drelease-small=true
 ```
 
 Run it in WASM-4 with:
@@ -154,9 +225,9 @@ Run it in WASM-4 with:
 w4 watch
 ```
 
-</TabItem>
+</Page>
 
-</Tabs>
+</MultiLanguage>
 
 :::note Prevent Browser from opening
 If you don't want the browser to open a new tab for you, you can prevent this by using the `-n` or `--no-open` option. You can also set an environment variable called `W4_NO_OPEN`.

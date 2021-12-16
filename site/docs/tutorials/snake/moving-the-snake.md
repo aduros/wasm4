@@ -1,5 +1,4 @@
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import MultiLanguage, {Page} from '@site/src/components/MultiLanguage';
 
 # Moving the Snake
 
@@ -22,18 +21,9 @@ Keep in mind: This is not what the player sees. This is:
 
 ## Moving the Body
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 
 To achieve the first step (moving the body, excluding the head), a simple loop is all you need:
 
@@ -59,21 +49,21 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 
 ![](images/snake_move_head_only.webp)
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
-
-// TODO
-
-</TabItem>
-
-<TabItem value="language-rust">
+<Page value="c">
 
 // TODO
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="d">
+
+// TODO
+
+</Page>
+
+<Page value="go">
 
 To achieve the first step (moving the body, excluding the head), a simple loop is all you need:
 
@@ -100,24 +90,63 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 
 ![](images/snake_move_head_only.webp)
 
-</TabItem>
+</Page>
 
-</Tabs>
+<Page value="nim">
+
+// TODO
+
+</Page>
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+// TODO
+
+</Page>
+
+<Page value="zig">
+To achieve the first step (moving the body, excluding the head), a simple loop is all you need:
+
+```zig
+    pub fn update(this: *@This()) void {
+        const part = this.body.slice();
+        var i: usize = part.len - 1;
+        while (i > 0) : (i -= 1) {
+            part[i].x = part[i - 1].x;
+            part[i].y = part[i - 1].y;
+        }
+    }
+```
+
+Don't forget to call the new function in the main-loop:
+
+```zig {2}
+export fn update() void {
+    snake.update();
+    snake.draw();
+}
+
+```
+
+Now if you execute this, you'd notice that you can't see much. In fact, you might see the snake for a short moment before the head is all that's left.
+
+![](images/snake_move_head_only.webp)
+
+</Page>
+
+</MultiLanguage>
 
 ## Moving the Head
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 
 This isn't hard either. Simple add the add the direction to the current head. And then make sure the head stays within the boundaries:
 
@@ -140,21 +169,21 @@ This isn't hard either. Simple add the add the direction to the current head. An
     }
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
-
-// TODO
-
-</TabItem>
-
-<TabItem value="language-rust">
+<Page value="c">
 
 // TODO
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="d">
+
+// TODO
+
+</Page>
+
+<Page value="go">
 
 This isn't hard either. Simple add the add the direction to the current head. And then make sure the head stays within the boundaries:
 
@@ -175,13 +204,31 @@ func (s *Snake) Update() {
 }
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-zig">
+<Page value="nim">
 
-To achieve the first step (moving the body, excluding the head), a simple loop is all you need:
+// TODO
 
-```zig
+</Page>
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+// TODO
+
+</Page>
+
+<Page value="zig">
+
+This isn't hard either. Simple add the add the direction to the current head. And then make sure the head stays within the boundaries:
+
+```zig {9-13}
     pub fn update(this: *@This()) void {
         const part = this.body.slice();
         var i: usize = part.len - 1;
@@ -198,23 +245,9 @@ To achieve the first step (moving the body, excluding the head), a simple loop i
     }
 ```
 
-Don't forget to call the new function in the main-loop:
+</Page>
 
-```zig {2}
-export fn update() void {
-    snake.update();
-    snake.draw();
-}
-
-```
-
-Now if you execute this, you'd notice that you can't see much. In fact, you might see the snake for a short moment before the head is all that's left.
-
-![](images/snake_move_head_only.webp)
-
-</TabItem>
-
-</Tabs>
+</MultiLanguage>
 
 That's it. Now you should see the snake running from left to right. Maybe a little too fast, though.
 
@@ -228,18 +261,9 @@ There are several ways to slow the snake down.
 
 The easiest way is probably to count the frames and update the snake only every X frames.
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 
 For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
 
@@ -278,21 +302,21 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 
 ![Moving Snake (slow)](images/snake-motion-slow.webp)
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
-
-// TODO
-
-</TabItem>
-
-<TabItem value="language-rust">
+<Page value="c">
 
 // TODO
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="d">
+
+// TODO
+
+</Page>
+
+<Page value="go">
 
 For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
 
@@ -342,9 +366,28 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 
 ![Moving Snake (slow)](images/snake-motion-slow.webp)
 
-</TabItem>
+</Page>
 
-<TabItem value="language-zig">
+<Page value="nim">
+
+// TODO
+
+</Page>
+
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+// TODO
+
+</Page>
+
+<Page value="zig">
 
 For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
 
@@ -384,6 +427,6 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 
 ![Moving Snake (slow)](images/snake-motion-slow.webp)
 
-</TabItem>
+</Page>
 
-</Tabs>
+</MultiLanguage>

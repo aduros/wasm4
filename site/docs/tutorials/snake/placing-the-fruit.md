@@ -1,22 +1,12 @@
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import MultiLanguage, {Page} from '@site/src/components/MultiLanguage';
 
 # Placing the Fruit
 
 A freely moving snake is nice. But it get's a bit dull if that's all there is. To make it a bit more of a challenge, you'd need to add something to change the snake. The classic approach is to let the snake "eat" fruits. That's a good place to start.
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 To place (and eat) a fruit, you first need to make a variable for this. Since it's simply a point on the grid, `Point` will do:
 
 ```typescript {2}
@@ -26,21 +16,21 @@ let prevState: u8
 let frameCount = 0
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
-
-// TODO
-
-</TabItem>
-
-<TabItem value="language-rust">
+<Page value="c">
 
 // TODO
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="d">
+
+// TODO
+
+</Page>
+
+<Page value="go">
 
 To place (and eat) a fruit, you first need to make a variable for this. Since it's simply a point on the grid, `Point` will do:
 
@@ -50,9 +40,27 @@ To place (and eat) a fruit, you first need to make a variable for this. Since it
 	fruit      Point
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-zig">
+<Page value="nim">
+
+// TODO
+
+</Page>
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+// TODO
+
+</Page>
+
+<Page value="zig">
 To place (and eat) a fruit, you first need to make a variable for this. Since it's simply a point on the grid, `Point` will do. Set it to undefined for now:
 
 ```zig {3,6}
@@ -66,24 +74,15 @@ var frameCount: u32 = 0;
 var prevState: u8 = 0;
 ```
 
-</TabItem>
+</Page>
 
-</Tabs>
+</MultiLanguage>
 
 ## Random Numbers
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 
 AssemblyScript provides us with the `Math.random` function. It returns a floating point value between `0` and `0.999999999`. But since we only deal with integer values, it's a good idea to create a helper function:
 
@@ -102,21 +101,21 @@ let prevState: u8
 let frameCount = 0
 ```
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
-
-// TODO
-
-</TabItem>
-
-<TabItem value="language-rust">
+<Page value="c">
 
 // TODO
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="d">
+
+// TODO
+
+</Page>
+
+<Page value="go">
 
 Go provides us with pretty much everything we could need to create random numbers. The package `math/rand` contains a handy function: `Intn(n int) int`. It takes an integer and returns a random value between 0 and n-1. If you think, placing something like this in `start` would be a good idea:
 
@@ -157,9 +156,27 @@ Works. But since this is the `start`-function, `frameCount` is pretty much alway
 Keep in mind, that the value of `rnd` is `nil` if it wasn't initialized yet.
 :::
 
-</TabItem>
+</Page>
 
-<TabItem value="language-zig">
+<Page value="nim">
+
+// TODO
+
+</Page>
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+// TODO
+
+</Page>
+
+<Page value="zig">
 
 Zig's standard library has a couple of different random number generators, including some that are meant to be cryptographically secure. We don't need anything our snake game to be cryptographically secure, so we'll just use `std.rand.DefaultPrng`, where Prng means pseudo-random number generator. To start, we'll need to import `std` and initialize the prng:
 
@@ -213,9 +230,9 @@ export fn start() void {
 }
 ```
 
-</TabItem>
+</Page>
 
-</Tabs>
+</MultiLanguage>
 
 ## Importing PNG Files
 
@@ -236,18 +253,9 @@ This image is zoomed by 800%.
 ![Zoomed Fruit](images/fruit.png)
 This is the original image. You can download it to proceed.
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 
 Now you need to import the image. For this, the WASM-4 CLI tool `w4` comes with another tool: `png2src`. You can use it like this:
 
@@ -278,21 +286,21 @@ const fruitSprite = memory.data<u8>([ 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0x
 
 With that out of the way, it's time to actually render the newly imported sprite.
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
-
-// TODO
-
-</TabItem>
-
-<TabItem value="language-rust">
+<Page value="c">
 
 // TODO
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="d">
+
+// TODO
+
+</Page>
+
+<Page value="go">
 
 Now you need to import the image. For this, the WASM-4 CLI tool `w4` comes with another tool: `png2src`. You can use it like this:
 
@@ -323,9 +331,27 @@ This will add the previous lines to your `main.go` and causes an error because "
 
 With that out of the way, it's time to actually render the newly imported sprite.
 
-</TabItem>
+</Page>
 
-<TabItem value="language-zig">
+<Page value="nim">
+
+// TODO
+
+</Page>
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+// TODO
+
+</Page>
+
+<Page value="zig">
 
 Now you need to import the image. For this, the WASM-4 CLI tool `w4` comes with another tool: `png2src`. You can use it like this:
 
@@ -357,24 +383,15 @@ const fruitSprite = [16]u8{ 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0x
 
 With that out of the way, it's time to actually render the newly imported sprite.
 
-</TabItem>
+</Page>
 
-</Tabs>
+</MultiLanguage>
 
 ## Rendering a PNG File
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 
 Rendering the sprite is rather simple. Just call the `blit` function of w4:
 
@@ -411,21 +428,21 @@ But since you set the drawing colors, you need to change the drawing colors too:
 
 This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
-
-// TODO
-
-</TabItem>
-
-<TabItem value="language-rust">
+<Page value="c">
 
 // TODO
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="d">
+
+// TODO
+
+</Page>
+
+<Page value="go">
 
 Rendering the sprite is rather simple. Just call the `Blit` function of w4:
 
@@ -464,9 +481,27 @@ But since you set the drawing colors, you need to change the drawing colors too:
 
 This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.
 
-</TabItem>
+</Page>
 
-<TabItem value="language-zig">
+<Page value="nim">
+
+// TODO
+
+</Page>
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+// TODO
+
+</Page>
+
+<Page value="zig">
 
 Rendering the sprite is rather simple. Just call the `blit` function of w4:
 
@@ -503,6 +538,6 @@ But since you set the drawing colors, you need to change the drawing colors too:
 
 This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.
 
-</TabItem>
+</Page>
 
-</Tabs>
+</MultiLanguage>

@@ -1,5 +1,4 @@
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import MultiLanguage, {Page} from '@site/src/components/MultiLanguage';
 
 # Collision Detection
 
@@ -9,18 +8,9 @@ Your game is progressing nicely. Only two more things and you're done: Growing t
 
 Collision detection can be one of the harder to understand concepts of game development. Lucky for you, this is not the case this time. This game is using a 20x20 grid. Each cell can either be occupied or free. To check this, you can compare the X and Y values of the 2 entities that are checked.
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 
 A simple
 
@@ -61,21 +51,21 @@ In it's final form, it could look like this:
 
 Now you're almost done. Only "Game Over" is left to finish this game.
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
-
-// TODO
-
-</TabItem>
-
-<TabItem value="language-rust">
+<Page value="c">
 
 // TODO
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="d">
+
+// TODO
+
+</Page>
+
+<Page value="go">
 
  A simple
 
@@ -114,9 +104,27 @@ In it's final form, it could look like this:
 
 Now you're almost done. Only "Game Over" is left to finish this game.
 
-</TabItem>
+</Page>
 
-<TabItem value="language-zig">
+<Page value="nim">
+
+// TODO
+
+</Page>
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+// TODO
+
+</Page>
+
+<Page value="zig">
 
 A simple
 
@@ -157,26 +165,17 @@ In it's final form, it could look like this:
 
 Now you're almost done. Only "Game Over" is left to finish this game.
 
-</TabItem>
+</Page>
 
-</Tabs>
+</MultiLanguage>
 
 ## Collision Detection with Itself
 
 For the player to have any sense of "danger", the game needs a possibility for the player to lose. Usually the snake can't touch itself or it dies. For this, just loop through the body and check if the piece and the head have the same coordinates. Just like with the fruit. But it might be a good idea to move this to it's own function:
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 
 ```typescript
     isDead(): bool {
@@ -212,21 +211,21 @@ Now you can call this function to check if the snake died in this frame:
 
 What you do, is up to you. You could stop the game and show the score. Or you could simply reset the game. Up to you.
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
-
-// TODO
-
-</TabItem>
-
-<TabItem value="language-rust">
+<Page value="c">
 
 // TODO
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="d">
+
+// TODO
+
+</Page>
+
+<Page value="go">
 
 ```go
 func (s *Snake) IsDead() bool {
@@ -260,9 +259,27 @@ Now you can call this function to check if the snake died in this frame:
 
 What you do, is up to you. You could stop the game and show the score. Or you could simply reset the game. Up to you.
 
-</TabItem>
+</Page>
 
-<TabItem value="language-zig">
+<Page value="nim">
+
+// TODO
+
+</Page>
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+// TODO
+
+</Page>
+
+<Page value="zig">
 
 ```zig
     pub fn isDead(this: @This()) bool {
@@ -297,6 +314,6 @@ Now you can call this function to check if the snake died in this frame:
 
 What you do, is up to you. You could stop the game and show the score. Or you could simply reset the game. Up to you.
 
-</TabItem>
+</Page>
 
-</Tabs>
+</MultiLanguage>

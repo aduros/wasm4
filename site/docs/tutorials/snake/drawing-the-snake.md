@@ -1,22 +1,12 @@
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import MultiLanguage, {Page} from '@site/src/components/MultiLanguage';
 
 # Drawing the Snake
 
 ## Drawing the Body
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 
 To draw the snake, you can take advantage of AssemblyScripts `forEach` function.
 To make it a little easier, it's a good idea to use the `rect` function of WASM-4:
@@ -68,21 +58,21 @@ You should see some green blocks at the top.
 
 ![Snake Body](images/draw-body.webp)
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
-
-// TODO
-
-</TabItem>
-
-<TabItem value="language-rust">
+<Page value="c">
 
 // TODO
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="d">
+
+// TODO
+
+</Page>
+
+<Page value="go">
 
 To draw the snake, you can take advantage of Go's `range` keyword to loop through the body.
 To make it a little easier, it's a good idea to use the `Rect` function of WASM-4:
@@ -152,9 +142,27 @@ You should see some green blocks at the top.
 
 ![Snake Body](images/draw-body.webp)
 
-</TabItem>
+</Page>
 
-<TabItem value="language-zig">
+<Page value="nim">
+
+// TODO
+
+</Page>
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+// TODO
+
+</Page>
+
+<Page value="zig">
 
 To draw the snake, you can take advantage of zig's `for` syntax.
 To make it a little easier, it's a good idea to use the `rect` function of WASM-4:
@@ -215,24 +223,15 @@ You should see some green blocks at the top.
 
 ![Snake Body](images/draw-body.webp)
 
-</TabItem>
+</Page>
 
-</Tabs>
+</MultiLanguage>
 
 ## Drawing the Head
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 
 But where is the head? You can pick a side. Either position `[0]` or position `[this.body.length - 1]`.
 
@@ -304,21 +303,21 @@ This changes the color back and adds the darker green as it's outline.
 
 ![Snake with outline](images/draw-body-3.webp)
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
-
-// TODO
-
-</TabItem>
-
-<TabItem value="language-rust">
+<Page value="c">
 
 // TODO
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="d">
+
+// TODO
+
+</Page>
+
+<Page value="go">
 
 But where is the head? You can pick a side. Either position `[0]` or position `[len(snake)-1]`.
 
@@ -397,9 +396,27 @@ This changes the color back and adds the darker green as it's outline.
 
 ![Snake with outline](images/draw-body-3.webp)
 
-</TabItem>
+</Page>
 
-<TabItem value="language-zig">
+<Page value="nim">
+
+// TODO
+
+</Page>
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+// TODO
+
+</Page>
+
+<Page value="zig">
 
 But where is the head? You can pick a side. Either position `[0]` or position `[this.body.length - 1]`.
 
@@ -478,6 +495,6 @@ This changes the color back and adds the darker green as it's outline.
 
 ![Snake with outline](images/draw-body-3.webp)
 
-</TabItem>
+</Page>
 
-</Tabs>
+</MultiLanguage>

@@ -1,23 +1,12 @@
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import MultiLanguage, {Page} from '@site/src/components/MultiLanguage';
 
 # Creating the Snake
 
 Let's take a look at the main component of the game: The snake. There are several ways to implement one.
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-        {label: 'Zig', value: 'language-zig'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
-
+<Page value="assemblyscript">
 
 To keep things tidy, I recommend you'd create a new file called `snake.ts`. This file contains two classes:
 
@@ -51,21 +40,21 @@ export class Snake {
 The snake class contains the body and the current direction of the snake instance.
 But it lacks any functionality for now.
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
-
-// TODO
-
-</TabItem>
-
-<TabItem value="language-rust">
+<Page value="c">
 
 // TODO
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="d">
+
+// TODO
+
+</Page>
+
+<Page value="go">
 
 If you've used Go in the past, this next section won't be too surprising for you. You'll create a new type for the snake with the required properties.
 
@@ -93,10 +82,27 @@ Go offers a buildIn type for points. It's in `image`.
 Creating our own type reduces the size of the cart.
 :::
 
-</TabItem>
+</Page>
 
-<TabItem value="language-zig">
+<Page value="nim">
 
+// TODO
+
+</Page>
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+// TODO
+
+</Page>
+
+<Page value="zig">
 
 To keep things tidy, I recommend you'd create a new file called `snake.zig`. This file contains two structs:
 
@@ -142,6 +148,6 @@ pub const Snake = struct {
 The snake class contains the body and the current direction of the snake instance.
 But it lacks any functionality for now.
 
-</TabItem>
+</Page>
 
-</Tabs>
+</MultiLanguage>

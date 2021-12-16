@@ -1,5 +1,4 @@
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import MultiLanguage, {Page} from '@site/src/components/MultiLanguage';
 
 # Publish Your Game
 
@@ -11,17 +10,9 @@ While your game runs in the browser, press `F9` on your keyboard. This will gene
 
 Now let's compile your game.
 
-<Tabs
-    groupId="code-language"
-    defaultValue="language-typescript"
-    values={[
-        {label: 'AssemblyScript', value: 'language-typescript'},
-        {label: 'C / C++', value: 'language-cpp'},
-        {label: 'Rust', value: 'language-rust'},
-        {label: 'Go', value: 'language-go'},
-    ]}>
+<MultiLanguage>
 
-<TabItem value="language-typescript">
+<Page value="assemblyscript">
 
 ```shell
 npm run build
@@ -29,9 +20,9 @@ npm run build
 
 Your game will be here: `build/cart.wasm`
 
-</TabItem>
+</Page>
 
-<TabItem value="language-cpp">
+<Page value="c">
 
 ```shell
 make
@@ -39,9 +30,37 @@ make
 
 Your game will be here: `build/cart.wasm`
 
-</TabItem>
+</Page>
 
-<TabItem value="language-rust">
+<Page value="d">
+
+// TODO
+
+</Page>
+
+<Page value="go">
+
+```shell
+make
+```
+
+Your game will be here: `build/cart.wasm`
+
+</Page>
+
+<Page value="nim">
+
+// TODO
+
+</Page>
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
 
 ```shell
 cargo build --release
@@ -49,19 +68,19 @@ cargo build --release
 
 Your game will be here: `target/wasm32-unknown-unknown/release/cart.wasm`
 
-</TabItem>
+</Page>
 
-<TabItem value="language-go">
+<Page value="zig">
 
 ```shell
-make
+zig build -Drelease-small=true
 ```
 
-Your game will be here: `build/cart.wasm`
+Your game will be here: `zig-out/lib/cart.wasm`
 
-</TabItem>
+</Page>
 
-</Tabs>
+</MultiLanguage>
 
 ## Your Account
 

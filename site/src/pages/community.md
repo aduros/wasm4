@@ -28,13 +28,13 @@ There are many ways to contribute, here are just a few ideas:
 Here are WASM-4's goals for the future:
 
 - Grow and support a friendly open source community.
-- Build a lightweight native runtime in C + SDL.
-- Support bundling of native Windows/Mac/Linux/Android/iOS applications.
 - Add a pause button and options menu to the emulator.
 - First-class support for new languages: [Swift](https://swiftwasm.org/),
-  [Zig](https://ziglang.org/).
-- Support importing and playing music from [Beepbox](https://www.beepbox.co).
+  [Ruby](https://crystal-lang.org), [Lua](https://nelua.io/).
+- Port the C runtime to low end handheld devices.
+- Support importing and playing music from [Beepbox](https://www.beepbox.co) and other tools.
 - Improve responsiveness of the virtual gamepad on mobile.
+- Netplay support.
 
 ## Credits
 

@@ -2,7 +2,11 @@ import std/os
 
 let wasi = getEnv("WASI_SDK_PATH")
 if wasi == "" and not defined(nimsuggest):
-  quit("Download the WASI SDK (https://github.com/WebAssembly/wasi-sdk) and set the $WASI_SDK_PATH environment variable!")
+  echo ""
+  echo "Error:"
+  echo "Download the WASI SDK (https://github.com/WebAssembly/wasi-sdk) and set the $WASI_SDK_PATH environment variable!"
+  echo ""
+  quit(-1)
 
 switch("cpu", "wasm32")
 switch("cc", "clang")

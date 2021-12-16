@@ -6,7 +6,7 @@ const qrcode = require("qrcode");
 const { Server: WebSocketServer } = require("ws");
 const open = require("open");
 
-const PORT = 4444;
+var attempts = 0;
 
 function start (cartFile, opts) {
     const app = express();
@@ -18,6 +18,8 @@ function start (cartFile, opts) {
     });
     app.use(express.static(__dirname+"/../assets/runtime"));
 
+    let PORT = getPort(opts.port);
+
     const server = app.listen(PORT, async () => {
         if (opts.qr) {
             const qr = await qrcode.toString(`http://${getIP()}:${PORT}`, {type: "terminal", small: true});
@@ -27,6 +29,16 @@ function start (cartFile, opts) {
 
         if (opts.open) {
             open(`http://localhost:${PORT}`);
+        }
+    })
+    .on("error", () => {
+        console.log(`Failed to listen on http://localhost:${PORT}`)
+        if (++attempts > 10) {
+            let msg = `Too many attempts. Make sure you selected a valid range. Currently selected: ${opts.port}`
+            throw msg;
+        } else {
+            console.log(`Attempt #${attempts} to pick a different port ...`)
+            start(cartFile, opts)
         }
     });
 
@@ -72,4 +84,18 @@ function getIP () {
         });
     }
     return ip;
+}
+
+function getPort (range) {
+    let ranges = range.split(",").map(r => {
+        let parts = r.split("-").sort()
+        return {
+            l: parseInt(parts[0]),
+            h: parseInt(parts[parts.length-1])
+        }
+    })
+    let index = Math.floor(Math.random() * ranges.length)
+    let port = Math.floor(Math.random() * (ranges[index].h-ranges[index].l+1)) + ranges[index].l
+
+    return port;
 }

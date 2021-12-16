@@ -304,13 +304,13 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 
 </Page>
 
-<Page value="cpp">
+<Page value="c">
 
 // TODO
 
 </Page>
 
-<Page value="rust">
+<Page value="d">
 
 // TODO
 
@@ -365,6 +365,25 @@ func update() {
 That's it. Your snake should be quite a bit slower now. This reduces the snake from 60 units per second to 4 units per second (60/15 = 4).
 
 ![Moving Snake (slow)](images/snake-motion-slow.webp)
+
+</Page>
+
+<Page value="nim">
+
+// TODO
+
+</Page>
+
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+// TODO
 
 </Page>
 

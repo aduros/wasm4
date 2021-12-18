@@ -31,10 +31,12 @@ function start (opts) {
         buildCommand = "zig";
         buildParams = ["build", "--prominent-compile-errors"];
         buildOutput = "zig-out/lib/cart.wasm";
+
     } else if (fs.existsSync("cart.nimble")) {
         buildCommand = "nimble";
         buildParams = ["dbg"];
         buildOutput = "build/cart.wasm";
+
     } else {
         console.error("This directory doesn't look like a WASM-4 project.");
         process.exit(1);
@@ -70,7 +72,7 @@ function start (opts) {
             return skip;
         default:
             // Only trigger on source file changes
-            return /\.(c|cpp|d|go|h|nim|odin|rs|ts|wat|zig)$/.test(file);
+            return /\.(c|cpp|d|go|h|nelua|nim|odin|rs|ts|wat|zig)$/.test(file);
         }
     }
     watch("./", {recursive: true, filter: watchFilter}, (event, file) => {

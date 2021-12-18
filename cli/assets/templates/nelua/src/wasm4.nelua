@@ -1,0 +1,12 @@
+-- Pointer to WASM-4 memory register
+global DRAW_COLORS = (@*uint16)(0x14);
+
+-- Import some WASM-4 functions
+global function text (str: cstring <const>, x: int32, y: int32): void <cimport> end
+global function trace (str: cstring <const>): void <cimport> end
+
+-- Hack to call Nelua initialization
+local function nelua_main (argc: integer, argv: integer): void <cimport, nodecl> end
+local function _start (): void <cexport, codename "_start">
+    nelua_main(0, 0)
+end

@@ -1,0 +1,14 @@
+require "wasm4"
+
+local x = 69
+
+local function update (): void <cexport, codename "update">
+    -- $ is used to deref a pointer
+    $DRAW_COLORS = 0x23
+
+    -- Call an imported function
+    text("Hello from Nelua!", x, 20)
+    x = (x + 1) % 160
+end
+
+trace("Static init works")

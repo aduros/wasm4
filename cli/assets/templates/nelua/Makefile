@@ -12,19 +12,11 @@ WASM_OPT_FLAGS = -Oz --zero-filled-memory --strip-producers
 # Whether to build for debugging instead of release
 DEBUG = 0
 
-# Compilation flags
-CFLAGS = -Wl,-zstack-size=1024,--no-entry,--import-memory -mexec-model=reactor \
-	-Wl,--initial-memory=65536,--max-memory=65536,--global-base=6560,--allow-undefined,--export-dynamic
-ifeq ($(DEBUG), 1)
-else
-	CFLAGS += -Oz
-endif
-
 # Nelua flags
 NELUA_FLAGS = --cc='$(CC)' --cflags='$(CFLAGS)' -Pabort="'trap'" --add-path src --no-cache
 ifeq ($(DEBUG), 1)
 	# FIXME(2021-12-18): Debug builds aren't working
-	NELUA_FLAGS += --release
+	NELUA_FLAGS += -DDEBUG --verbose --release
 else
 	NELUA_FLAGS += --release
 endif

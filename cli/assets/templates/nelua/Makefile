@@ -13,7 +13,7 @@ WASM_OPT_FLAGS = -Oz --zero-filled-memory --strip-producers
 DEBUG = 0
 
 # Nelua flags
-NELUA_FLAGS = --cc='$(CC)' --cflags='$(CFLAGS)' -Pabort="'trap'" --add-path src --no-cache
+NELUA_FLAGS = --cc='$(CC)' -Pabort="'trap'" --add-path src --no-cache
 ifeq ($(DEBUG), 1)
 	# FIXME(2021-12-18): Debug builds aren't working
 	NELUA_FLAGS += -DDEBUG --verbose --release

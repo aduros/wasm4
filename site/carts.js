@@ -36,6 +36,12 @@ const CARTS = [
         github: "claudiomattera",
     },
     {
+        slug: "game-of-life",
+        title: "Game of Life",
+        author: "Claudio Mattera",
+        github: "claudiomattera",
+    },
+    {
         slug: "wormhole",
         title: "Wormhole",
         author: "David Sims",

@@ -1,8 +1,41 @@
+##[[
+    cflags "-Wl,-zstack-size=1024,--no-entry,--import-memory -mexec-model=reactor"
+    cflags "-Wl,--initial-memory=65536,--max-memory=65536,--global-base=6560,--allow-undefined,--export-dynamic"
+
+    if DEBUG then
+
+    else
+        cflags "-Oz"
+    end
+]]
 -- Pointer to WASM-4 memory register
 global DRAW_COLORS = (@*uint16)(0x14);
 
 -- Import some WASM-4 functions
+
+-- Copies pixels to the framebuffer.
+global function blit(data: *uint8 <const> , x: int32, y: int32, width: uint32, height: uint32, flags: uint32): void <cimport> end
+-- Copies a subregion within a larger sprite atlas to the framebuffer.
+global function blitSub(data: *uint8 <const>, x: int32, y: int32, width: uint32, height: uint32, srcX: uint32, srcY: uint32, stride: uint32, flags: uint32): void <cimport> end
+-- Draws a line between two points.
+global function line(x: int32, y: int32, width: uint32, height: uint32): void <cimport> end
+-- Draws a horizontal line.
+global function hline(x: int32, y: int32, len: uint32): void <cimport> end
+-- Draws a vertical line.
+global function vline(x: int32, y: int32, len: uint32): void <cimport> end
+-- Draws an oval (or circle).
+global function oval(x: int32, y: int32, width: uint32, height: uint32): void <cimport> end
+-- Draws a rectangle.
+global function rect(x: int32, y: int32, width: uint32, height: uint32): void <cimport> end
+-- Draws text using the built-in system font.
 global function text (str: cstring <const>, x: int32, y: int32): void <cimport> end
+-- Plays a sound tone.
+global function tone(frequency: uint32, duration: uint32, volume: uint32, flags: uint32): void <cimport> end
+-- Reads up to `size` bytes from persistent storage into the pointer `destPtr`.
+global function diskr(dest: *void, size: uint32): uint32 <cimport> end
+-- Writes up to `size` bytes from the pointer `srcPtr` into persistent storage.
+global function diskw(src: *void <const>, size: uint32): uint32 <cimport> end
+-- Prints a message to the debug console.
 global function trace (str: cstring <const>): void <cimport> end
 
 -- Hack to call Nelua initialization

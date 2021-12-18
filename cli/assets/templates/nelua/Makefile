@@ -2,7 +2,7 @@ ifndef WASI_SDK_PATH
 $(error Download the WASI SDK (https://github.com/WebAssembly/wasi-sdk) and set $$WASI_SDK_PATH)
 endif
 
-CC = $(WASI_SDK_PATH)/bin/clang --sysroot="$(WASI_SDK_PATH)/share/wasi-sysroot"
+CC = "$(WASI_SDK_PATH)/bin/clang" --sysroot="$(WASI_SDK_PATH)/share/wasi-sysroot"
 NELUA = nelua
 
 # Optional dependency from binaryen for smaller builds

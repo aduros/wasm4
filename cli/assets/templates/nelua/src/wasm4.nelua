@@ -1,45 +1,127 @@
-##[[
-    cflags "-Wl,-zstack-size=1024,--no-entry,--import-memory -mexec-model=reactor"
-    cflags "-Wl,--initial-memory=65536,--max-memory=65536,--global-base=6560,--allow-undefined,--export-dynamic"
+--
+-- WASM-4: https://wasm4.org/docs
 
-    if DEBUG then
+-- ┌───────────────────────────────────────────────────────────────────────────┐
+-- │                                                                           │
+-- │ Platform Constants                                                        │
+-- │                                                                           │
+-- └───────────────────────────────────────────────────────────────────────────┘
 
-    else
-        cflags "-Oz"
-    end
-]]
--- Pointer to WASM-4 memory register
-global DRAW_COLORS = (@*uint16)(0x14);
+global SCREEN_SIZE <const> = 160
 
--- Import some WASM-4 functions
+-- ┌───────────────────────────────────────────────────────────────────────────┐
+-- │                                                                           │
+-- │ Memory Addresses                                                          │
+-- │                                                                           │
+-- └───────────────────────────────────────────────────────────────────────────┘
+
+global PALETTE = (@*[4]uint32)(0x04)
+global DRAW_COLORS <const> = (@*uint16)(0x14)
+global GAMEPAD1 <const> = (@*uint8)(0x16)
+global GAMEPAD2 <const> = (@*uint8)(0x17)
+global GAMEPAD3 <const> = (@*uint8)(0x18)
+global GAMEPAD4 <const> = (@*uint8)(0x19)
+global MOUSE_X <const> = (@*int16)(0x1a)
+global MOUSE_Y <const> = (@*int16)(0x1c)
+global MOUSE_BUTTONS <const> = (@*uint8)(0x1e)
+global SYSTEM_FLAGS <const> = (@*uint8)(0x1f)
+global FRAMEBUFFER = (@*[6400]uint8)(0xa0)
+
+global BUTTON_1 <const> = 1
+global BUTTON_2 <const> = 2
+global BUTTON_LEFT <const> = 16
+global BUTTON_RIGHT <const> = 32
+global BUTTON_UP <const> = 64
+global BUTTON_DOWN <const> = 128
+
+global MOUSE_LEFT <const> = 1
+global MOUSE_RIGHT <const> = 2
+global MOUSE_MIDDLE <const> = 4
+
+global SYSTEM_PRESERVE_FRAMEBUFFER <const> = 1
+global SYSTEM_HIDE_GAMEPAD_OVERLAY <const> = 2
+
+-- ┌───────────────────────────────────────────────────────────────────────────┐
+-- │                                                                           │
+-- │ Drawing Functions                                                         │
+-- │                                                                           │
+-- └───────────────────────────────────────────────────────────────────────────┘
 
 -- Copies pixels to the framebuffer.
 global function blit(data: *uint8 <const> , x: int32, y: int32, width: uint32, height: uint32, flags: uint32): void <cimport> end
+
 -- Copies a subregion within a larger sprite atlas to the framebuffer.
 global function blitSub(data: *uint8 <const>, x: int32, y: int32, width: uint32, height: uint32, srcX: uint32, srcY: uint32, stride: uint32, flags: uint32): void <cimport> end
+
+global BLIT_2BPP <const> = 1
+global BLIT_1BPP <const> = 0
+global BLIT_FLIP_X <const> = 2
+global BLIT_FLIP_Y <const> = 4
+global BLIT_ROTATE <const> = 8
+
 -- Draws a line between two points.
 global function line(x: int32, y: int32, width: uint32, height: uint32): void <cimport> end
+
 -- Draws a horizontal line.
 global function hline(x: int32, y: int32, len: uint32): void <cimport> end
+
 -- Draws a vertical line.
 global function vline(x: int32, y: int32, len: uint32): void <cimport> end
+
 -- Draws an oval (or circle).
 global function oval(x: int32, y: int32, width: uint32, height: uint32): void <cimport> end
+
 -- Draws a rectangle.
 global function rect(x: int32, y: int32, width: uint32, height: uint32): void <cimport> end
+
 -- Draws text using the built-in system font.
-global function text (str: cstring <const>, x: int32, y: int32): void <cimport> end
+global function text(str: cstring <const>, x: int32, y: int32): void <cimport> end
+
+-- ┌───────────────────────────────────────────────────────────────────────────┐
+-- │                                                                           │
+-- │ Sound Functions                                                           │
+-- │                                                                           │
+-- └───────────────────────────────────────────────────────────────────────────┘
+
 -- Plays a sound tone.
 global function tone(frequency: uint32, duration: uint32, volume: uint32, flags: uint32): void <cimport> end
--- Reads up to `size` bytes from persistent storage into the pointer `destPtr`.
+
+global TONE_PULSE1 <const> = 0
+global TONE_PULSE2 <const> = 1
+global TONE_TRIANGLE <const> = 2
+global TONE_NOISE <const> = 3
+global TONE_MODE1 <const> = 0
+global TONE_MODE2 <const> = 4
+global TONE_MODE3 <const> = 8
+global TONE_MODE4 <const> = 12
+
+-- ┌───────────────────────────────────────────────────────────────────────────┐
+-- │                                                                           │
+-- │ Storage Functions                                                         │
+-- │                                                                           │
+-- └───────────────────────────────────────────────────────────────────────────┘
+
+-- Reads up to `size` bytes from persistent storage into the pointer `dest`.
 global function diskr(dest: *void, size: uint32): uint32 <cimport> end
--- Writes up to `size` bytes from the pointer `srcPtr` into persistent storage.
+
+-- Writes up to `size` bytes from the pointer `src` into persistent storage.
 global function diskw(src: *void <const>, size: uint32): uint32 <cimport> end
+
 -- Prints a message to the debug console.
-global function trace (str: cstring <const>): void <cimport> end
+global function trace(str: cstring <const>): void <cimport> end
 
 -- Hack to call Nelua initialization
 local function nelua_main (argc: integer, argv: integer): void <cimport, nodecl> end
 local function _start (): void <cexport, codename "_start">
     nelua_main(0, 0)
 end
+
+-- Setup C compiler settings
+##[[
+cflags "-Wl,-zstack-size=1024,--no-entry,--import-memory -mexec-model=reactor"
+cflags "-Wl,--initial-memory=65536,--max-memory=65536,--global-base=6560,--allow-undefined,--export-dynamic"
+
+if not DEBUG then
+    cflags "-Oz"
+end
+]]

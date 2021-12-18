@@ -47,6 +47,15 @@ const goTypes = {
     FRAMEBUFFER: "[6400]uint8",
 };
 
+const neluaTypes = {
+    PALETTE: "uint32",
+    DRAW_COLORS: "uint16",
+    MOUSE_X: "int16",
+    MOUSE_Y: "int16",
+    SYSTEM_FLAGS: "uint8",
+    FRAMEBUFFER: "uint8",
+};
+
 function generate (fn) {
     let p = 0;
     for (let name in memory) {
@@ -75,6 +84,9 @@ generate((name, addr) => `pub const ${name}: *const u8 = ${addr} as *const u8;`)
 
 console.log("// Go");
 generate((name, addr) => `var ${name} = (*${goTypes[name] || "uint8"})(unsafe.Pointer(uintptr(${addr})));`);
+
+console.log("// Nelua");
+generate((name, addr) => `global ${name} <const> = (@*${neluaTypes[name] || "uint8"})(${addr})`);
 
 var sum = 0;
 for (let name in memory) {

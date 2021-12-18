@@ -121,11 +121,11 @@ void tone (uint32_t frequency, uint32_t duration, uint32_t volume, uint32_t flag
 // │                                                                           │
 // └───────────────────────────────────────────────────────────────────────────┘
 
-/** Reads up to `size` bytes from persistent storage into the pointer `destPtr`. */
+/** Reads up to `size` bytes from persistent storage into the pointer `dest`. */
 WASM_IMPORT("diskr")
 uint32_t diskr (void* dest, uint32_t size);
 
-/** Writes up to `size` bytes from the pointer `srcPtr` into persistent storage. */
+/** Writes up to `size` bytes from the pointer `src` into persistent storage. */
 WASM_IMPORT("diskw")
 uint32_t diskw (const void* src, uint32_t size);
 

@@ -15,8 +15,9 @@ DEBUG = 0
 # Nelua flags
 NELUA_FLAGS = --cc='$(CC)' -Pabort="'trap'" --add-path src --no-cache
 ifeq ($(DEBUG), 1)
+	NELUA_FLAGS += -DDEBUG
 	# FIXME(2021-12-18): Debug builds aren't working
-	NELUA_FLAGS += -DDEBUG --verbose --release
+	NELUA_FLAGS += --verbose --release
 else
 	NELUA_FLAGS += --release
 endif

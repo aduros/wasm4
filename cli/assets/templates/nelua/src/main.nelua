@@ -1,14 +1,25 @@
 require "wasm4"
 
-local x = 69
+local smiley: [8]uint8 = {
+    0b11000011,
+    0b10000001,
+    0b00100100,
+    0b00100100,
+    0b00000000,
+    0b00100100,
+    0b10011001,
+    0b11000011,
+};
 
 local function update (): void <cexport, codename "update">
-    -- $ is used to deref a pointer
-    $DRAW_COLORS = 0x23
+    $DRAW_COLORS = 2
+    text("Hello from Nelua!", 10, 10)
 
-    -- Call an imported function
-    text("Hello from Nelua!", x, 20)
-    x = (x + 1) % 160
+    local gamepad = $GAMEPAD1
+    if gamepad & BUTTON_1 ~= 0 then
+        $DRAW_COLORS = 4
+    end
+
+    blit(&smiley, 76, 76, 8, 8, BLIT_1BPP)
+    text("Press X to blink", 16, 90)
 end
-
-trace("Static init works")

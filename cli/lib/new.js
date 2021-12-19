@@ -2,19 +2,6 @@ const copy = require("recursive-copy");
 const path = require("path");
 const fs = require("fs");
 
-const LANGS = {
-    as: "assemblyscript",
-    assemblyscript: "assemblyscript",
-    c: "c",
-    d: "d",
-    go: "go",
-    nim: "nim",
-    odin: "odin",
-    rs: "rust",
-    rust: "rust",
-    zig: 'zig',
-}
-
 const HELP = {
     assemblyscript: {
         name: "AssemblyScript",
@@ -34,6 +21,11 @@ const HELP = {
     },
     go: {
         name: "Go",
+        build: "make",
+        cart: "build/cart.wasm",
+    },
+    nelua: {
+        name: "Nelua",
         build: "make",
         cart: "build/cart.wasm",
     },
@@ -59,24 +51,34 @@ const HELP = {
     },
 }
 
+const ALIASES = {
+    rs: "rust",
+    as: "assemblyscript",
+};
+
 async function run (destDir, opts) {
-    let lang = LANGS[opts.lang];
+    let lang = opts.lang;
+    if (ALIASES[lang]) {
+        lang = ALIASES[lang];
+    }
     if (opts.assemblyscript) {
-        lang = LANGS.assemblyscript;
+        lang = "assemblyscript";
     } else if (opts.c) {
-        lang = LANGS.c;
+        lang = "c";
     } else if (opts.d) {
-        lang = LANGS.d;
+        lang = "d";
     } else if (opts.go) {
-        lang = LANGS.go;
+        lang = "go";
+    } else if (opts.nelua) {
+        lang = "nelua";
     } else if (opts.nim) {
-        lang = LANGS.nim;
+        lang = "nim";
     } else if (opts.odin) {
-        lang = LANGS.odin;
+        lang = "odin";
     } else if (opts.rust) {
-        lang = LANGS.rust;
+        lang = "rust";
     } else if (opts.zig) {
-        lang = LANGS.zig;
+        lang = "zig";
     }
 
     const srcDir = path.resolve(__dirname+"/../assets/templates/"+lang);
@@ -104,7 +106,7 @@ async function run (destDir, opts) {
 
 async function init (destDir, lang) {
     switch (lang) {
-        case LANGS.assemblyscript:
+        case "assemblyscript":
             const projectName = path.basename(path.resolve(destDir));
             const file = destDir + "/package.json";
             const json = JSON.parse(fs.readFileSync(file));

@@ -10,6 +10,7 @@ let blankProject = (cmd) =>
         .option("--c", "Create C/C++ project (Shorthand for --lang c)")
         .option("--d", "Create D project (Shorthand for --lang d)")
         .option("--go", "Create Go project (Shorthand for --lang go)")
+        .option("--nelua", "Create a Nelua project (Shorthand for --lang nelua)")
         .option("--nim", "Create a Nim project (Shorthand for --lang nim)")
         .option("--odin", "Create Odin project (Shorthand for --lang odin)")
         .option("--rs, --rust", "Create Rust project (Shorthand for --lang rs/--lang rust)")
@@ -17,7 +18,7 @@ let blankProject = (cmd) =>
         .addOption(
             new Option("--lang <lang>", "Use the given language")
                 .env("W4_LANG")
-                .choices(["as", "assemblyscript", "c", "d", "go", "nim", "odin", "rs", "rust", "zig"])
+                .choices(["as", "assemblyscript", "c", "d", "go", "nelua", "nim", "odin", "rs", "rust", "zig"])
                 .default("as")
         )
 

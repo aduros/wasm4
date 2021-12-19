@@ -1,6 +1,6 @@
 require "wasm4"
 
-local smiley: [8]uint8 = {
+local smiley: []uint8 = {
     0b11000011,
     0b10000001,
     0b00100100,
@@ -11,7 +11,7 @@ local smiley: [8]uint8 = {
     0b11000011,
 };
 
-local function update (): void <cexport, codename "update">
+local function update(): void <cexport, codename "update">
     $DRAW_COLORS = 2
     text("Hello from Nelua!", 10, 10)
 

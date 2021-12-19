@@ -1,13 +1,15 @@
 --
 -- WASM-4: https://wasm4.org/docs
 
+require "stringbuilder"
+
 -- ┌───────────────────────────────────────────────────────────────────────────┐
 -- │                                                                           │
 -- │ Platform Constants                                                        │
 -- │                                                                           │
 -- └───────────────────────────────────────────────────────────────────────────┘
 
-global SCREEN_SIZE <const> = 160
+global SCREEN_SIZE <comptime> = 160
 
 -- ┌───────────────────────────────────────────────────────────────────────────┐
 -- │                                                                           │
@@ -16,30 +18,30 @@ global SCREEN_SIZE <const> = 160
 -- └───────────────────────────────────────────────────────────────────────────┘
 
 global PALETTE = (@*[4]uint32)(0x04)
-global DRAW_COLORS <const> = (@*uint16)(0x14)
-global GAMEPAD1 <const> = (@*uint8)(0x16)
-global GAMEPAD2 <const> = (@*uint8)(0x17)
-global GAMEPAD3 <const> = (@*uint8)(0x18)
-global GAMEPAD4 <const> = (@*uint8)(0x19)
-global MOUSE_X <const> = (@*int16)(0x1a)
-global MOUSE_Y <const> = (@*int16)(0x1c)
-global MOUSE_BUTTONS <const> = (@*uint8)(0x1e)
-global SYSTEM_FLAGS <const> = (@*uint8)(0x1f)
+global DRAW_COLORS <comptime> = (@*uint16)(0x14)
+global GAMEPAD1 <comptime> = (@*uint8)(0x16)
+global GAMEPAD2 <comptime> = (@*uint8)(0x17)
+global GAMEPAD3 <comptime> = (@*uint8)(0x18)
+global GAMEPAD4 <comptime> = (@*uint8)(0x19)
+global MOUSE_X <comptime> = (@*int16)(0x1a)
+global MOUSE_Y <comptime> = (@*int16)(0x1c)
+global MOUSE_BUTTONS <comptime> = (@*uint8)(0x1e)
+global SYSTEM_FLAGS <comptime> = (@*uint8)(0x1f)
 global FRAMEBUFFER = (@*[6400]uint8)(0xa0)
 
-global BUTTON_1 <const> = 1
-global BUTTON_2 <const> = 2
-global BUTTON_LEFT <const> = 16
-global BUTTON_RIGHT <const> = 32
-global BUTTON_UP <const> = 64
-global BUTTON_DOWN <const> = 128
+global BUTTON_1 <comptime> = 1
+global BUTTON_2 <comptime> = 2
+global BUTTON_LEFT <comptime> = 16
+global BUTTON_RIGHT <comptime> = 32
+global BUTTON_UP <comptime> = 64
+global BUTTON_DOWN <comptime> = 128
 
-global MOUSE_LEFT <const> = 1
-global MOUSE_RIGHT <const> = 2
-global MOUSE_MIDDLE <const> = 4
+global MOUSE_LEFT <comptime> = 1
+global MOUSE_RIGHT <comptime> = 2
+global MOUSE_MIDDLE <comptime> = 4
 
-global SYSTEM_PRESERVE_FRAMEBUFFER <const> = 1
-global SYSTEM_HIDE_GAMEPAD_OVERLAY <const> = 2
+global SYSTEM_PRESERVE_FRAMEBUFFER <comptime> = 1
+global SYSTEM_HIDE_GAMEPAD_OVERLAY <comptime> = 2
 
 -- ┌───────────────────────────────────────────────────────────────────────────┐
 -- │                                                                           │
@@ -53,11 +55,11 @@ global function blit(data: *uint8 <const> , x: int32, y: int32, width: uint32, h
 -- Copies a subregion within a larger sprite atlas to the framebuffer.
 global function blitSub(data: *uint8 <const>, x: int32, y: int32, width: uint32, height: uint32, srcX: uint32, srcY: uint32, stride: uint32, flags: uint32): void <cimport> end
 
-global BLIT_2BPP <const> = 1
-global BLIT_1BPP <const> = 0
-global BLIT_FLIP_X <const> = 2
-global BLIT_FLIP_Y <const> = 4
-global BLIT_ROTATE <const> = 8
+global BLIT_2BPP <comptime> = 1
+global BLIT_1BPP <comptime> = 0
+global BLIT_FLIP_X <comptime> = 2
+global BLIT_FLIP_Y <comptime> = 4
+global BLIT_ROTATE <comptime> = 8
 
 -- Draws a line between two points.
 global function line(x: int32, y: int32, width: uint32, height: uint32): void <cimport> end
@@ -86,14 +88,14 @@ global function text(str: cstring <const>, x: int32, y: int32): void <cimport> e
 -- Plays a sound tone.
 global function tone(frequency: uint32, duration: uint32, volume: uint32, flags: uint32): void <cimport> end
 
-global TONE_PULSE1 <const> = 0
-global TONE_PULSE2 <const> = 1
-global TONE_TRIANGLE <const> = 2
-global TONE_NOISE <const> = 3
-global TONE_MODE1 <const> = 0
-global TONE_MODE2 <const> = 4
-global TONE_MODE3 <const> = 8
-global TONE_MODE4 <const> = 12
+global TONE_PULSE1 <comptime> = 0
+global TONE_PULSE2 <comptime> = 1
+global TONE_TRIANGLE <comptime> = 2
+global TONE_NOISE <comptime> = 3
+global TONE_MODE1 <comptime> = 0
+global TONE_MODE2 <comptime> = 4
+global TONE_MODE3 <comptime> = 8
+global TONE_MODE4 <comptime> = 12
 
 -- ┌───────────────────────────────────────────────────────────────────────────┐
 -- │                                                                           │
@@ -111,12 +113,29 @@ global function diskw(src: *void <const>, size: uint32): uint32 <cimport> end
 global function trace(str: cstring <const>): void <cimport> end
 
 -- Hack to call Nelua initialization
-local function nelua_main (argc: integer, argv: integer): void <cimport, nodecl> end
-local function _start (): void <cexport, codename "_start">
+local function nelua_main(argc: integer, argv: integer): void <cimport, nodecl> end
+local function _start(): void <cexport, codename "_start">
     nelua_main(0, 0)
 end
 
--- Setup C compiler settings
+-- Hook runtime errors to write using `trace()` instead of writing to C `stderr`.
+local function write_stderr(msg: cstring, len: usize, flush: boolean): void <codename "nelua_write_stderr">
+    trace(msg)
+end
+
+-- Replace global print function to write using `trace()` instead of writing to C `stdout`.
+global function print(...: varargs)
+    local sb: stringbuilder <close>
+    ## for i=1,select('#', ...) do
+        ## if i > 1 then
+            sb:write('\t')
+        ## end
+        sb:write(#[select(i, ...)]#)
+    ## end
+    trace(sb:view())
+end
+
+-- Setup compiler settings
 ##[[
 cflags "-Wl,-zstack-size=1024,--no-entry,--import-memory -mexec-model=reactor"
 cflags "-Wl,--initial-memory=65536,--max-memory=65536,--global-base=6560,--allow-undefined,--export-dynamic"
@@ -124,4 +143,7 @@ cflags "-Wl,--initial-memory=65536,--max-memory=65536,--global-base=6560,--allow
 if not DEBUG then
     cflags "-Oz"
 end
+
+context.rootpragmas.abort = "trap"
+context.rootpragmas.writestderr = "hooked"
 ]]

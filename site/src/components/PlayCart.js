@@ -1,31 +1,8 @@
 import React from 'react';
-import clsx from 'clsx';
 import Layout from '@theme/Layout';
-import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-
+import { AspectRatio } from './AspectRatio';
 import { Giscus } from "@giscus/react";
-// import styles from './index.module.css';
-// import HomepageFeatures from '../components/HomepageFeatures';
-
-// function HomepageHeader() {
-//   const {siteConfig} = useDocusaurusContext();
-//   return (
-//     <header className={clsx('hero hero--primary', styles.heroBanner)}>
-//       <div className="container">
-//         <h1 className="hero__title">{siteConfig.title}</h1>
-//         <p className="hero__subtitle">{siteConfig.tagline}</p>
-//         <div className={styles.buttons}>
-//           <Link
-//             className="button button--secondary button--lg"
-//             to="/docs/intro">
-//             Docusaurus Tutorial - 5min ⏱️
-//           </Link>
-//         </div>
-//       </div>
-//     </header>
-//   );
-// }
 
 function Embed ({ slug, title, author }) {
     let params = "?url="+encodeURIComponent(`/carts/${slug}.wasm`);
@@ -37,12 +14,14 @@ function Embed ({ slug, title, author }) {
         params += "&author="+encodeURIComponent(author);
     }
     return (
+        <AspectRatio width={1} height={1} className="game-embed-wrapper">
         <iframe
             src={`/embed/${params}`}
             allow="fullscreen"
             frameBorder="0"
             className="game-embed">
         </iframe>
+        </AspectRatio>
     );
 }
 

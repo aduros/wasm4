@@ -1,0 +1,12 @@
+.ratio {
+  display: grid;
+  padding: 0;
+}
+
+.ratio > * {
+  grid-area: 1/1;
+}
+
+.innerSvg {
+  visibility: hidden;
+}

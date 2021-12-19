@@ -73,9 +73,12 @@ html[data-theme='dark'] .header-github-link:before {
   text-align: center;
 }
 
-.game-embed {
-  aspect-ratio: 1 / 1;
+.game-embed-wrapper {
   width: calc(min(480px, 100%, 100vh - 200px));
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin: 2rem auto;
+}
+
+.game-embed {
+  width: 100%;
+  height: 100%;
 }

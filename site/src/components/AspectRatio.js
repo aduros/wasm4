@@ -22,7 +22,7 @@ export function AspectRatio({
   return (
     <div {...otherProps} className={clsx(className, styles.ratio)}>
       <svg className={styles.innerSvg} viewBox={`0 0 ${width} ${height}`}></svg>
-      {children}
+      <div className={styles.content}>{children}</div>
     </div>
   );
 }

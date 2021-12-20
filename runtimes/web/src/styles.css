@@ -31,6 +31,9 @@ body {
   height: 100%;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @media (pointer: fine) {

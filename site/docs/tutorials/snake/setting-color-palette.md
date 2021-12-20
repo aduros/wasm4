@@ -70,7 +70,13 @@ func update() {
 ```
 
 ```rust
-# TODO
+#[cfg(feature = "buddy-alloc")]
+mod alloc;
+mod wasm4;
+use wasm4::*;
+
+#[no_mangle]
+fn update() {}
 ```
 
 ```zig
@@ -123,7 +129,12 @@ func start() {
 ```
 
 ```rust
-# TODO
+#[no_mangle]
+fn start() {
+    unsafe {
+        *PALETTE = [0xfbf7f3, 0xe5b083, 0x416e5d, 0x20283d];
+    }
+}
 ```
 
 ```zig

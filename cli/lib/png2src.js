@@ -3,19 +3,6 @@ const path = require("path");
 const pngjs = require("pngjs");
 const mustache = require("mustache");
 
-const LANGS={
-    as: "assemblyscript",
-    assemblyscript: "assemblyscript",
-    c: "c",
-    d: "d",
-    go: "go",
-    nim: "nim",
-    odin: "odin",
-    rs: "rust",
-    rust: "rust",
-    zig: "zig",
-}
-const DEFAULT_LANG = 'assemblyscript';
 const TEMPLATES = {
     assemblyscript:
 `{{#sprites}}
@@ -38,8 +25,7 @@ const uint8_t {{name}}[{{length}}] = { {{bytes}} };
 {{/sprites}}`,
 
     d:
-`
-{{#sprites}}
+`{{#sprites}}
 // {{name}}
 enum {{name}}Width = {{width}};
 enum {{name}}Height = {{height}};
@@ -55,6 +41,16 @@ const {{name}}Width = {{width}}
 const {{name}}Height = {{height}}
 const {{name}}Flags = {{flags}} // {{flagsHumanReadable}}
 var {{name}} = [{{length}}]byte { {{bytes}} }
+
+{{/sprites}}`,
+
+    nelua:
+`{{#sprites}}
+-- {{name}}
+local {{name}}_width <const> = {{width}}
+local {{name}}_height <const> = {{height}}
+local {{name}}_flags <const> = {{flags}} -- {{flagsHumanReadable}}
+local {{name}}: [{{length}}]uint8 <const> = { {{bytes}} }
 
 {{/sprites}}`,
 
@@ -97,7 +93,12 @@ const {{name}}Flags = {{flags}}; // {{flagsHumanReadable}}
 const {{name}} = [{{length}}]u8{ {{bytes}} };
 
 {{/sprites}}`,
-}
+};
+
+const ALIASES = {
+    rs: "rust",
+    as: "assemblyscript",
+};
 
 function run (sourceFile) {
     const png = pngjs.PNG.sync.read(fs.readFileSync(sourceFile), {
@@ -218,19 +219,35 @@ function run (sourceFile) {
 exports.run = run;
 
 function runAll (files, opts) {
-    let template = TEMPLATES[LANGS[opts.lang]];
-
-    if (!opts.template) {
-        // iterate over all options and search a key that presented in templates
-        for(let key in opts) {
-            if (key in TEMPLATES) {
-                template = TEMPLATES[key]
-                break;
-            }
-        }
+    if (opts.template) {
+        template = fs.readFileSync(opts.template, {encoding: 'utf8'});
 
     } else {
-        template = fs.readFileSync(opts.template, {encoding: 'utf8'});
+        // TODO(2021-12-20): Refactor into a common file and remove duplication with new.js
+        let lang = opts.lang;
+        if (ALIASES[lang]) {
+            lang = ALIASES[lang];
+        }
+        if (opts.assemblyscript) {
+            lang = "assemblyscript";
+        } else if (opts.c) {
+            lang = "c";
+        } else if (opts.d) {
+            lang = "d";
+        } else if (opts.go) {
+            lang = "go";
+        } else if (opts.nelua) {
+            lang = "nelua";
+        } else if (opts.nim) {
+            lang = "nim";
+        } else if (opts.odin) {
+            lang = "odin";
+        } else if (opts.rust) {
+            lang = "rust";
+        } else if (opts.zig) {
+            lang = "zig";
+        }
+        template = TEMPLATES[lang];
     }
     
     let output = { "sprites": [] };

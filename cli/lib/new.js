@@ -49,7 +49,7 @@ const HELP = {
       build: 'zig build -Drelease-small=true',
       cart: 'zig-out/lib/cart.wasm',
     },
-}
+};
 
 const ALIASES = {
     rs: "rust",

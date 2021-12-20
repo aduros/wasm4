@@ -202,7 +202,7 @@ async function loadCartWasm () {
 
         if (!isKeyboard) {
             // reset joy pad state
-            runtime.setGamepad(0,0);
+            runtime.setGamepad(0, 0);
         }
 
         isKeyboard = true;
@@ -222,31 +222,66 @@ async function loadCartWasm () {
             }
         }
 
+        let playerIdx = 0;
         let mask = 0;
         switch (event.keyCode) {
-        case 88: case 32: case 81:
+        case 88: // X
+        case 86: // V
+        case 75: // K (for Dvorak keyboards)
+        case 32: // Spacebar
             mask = constants.BUTTON_X;
             break;
-        case 90: case 18: case 186:
-        case 67: case 74: case 89:
+        case 90: // Z
+        case 67: // C
+        case 89: // Y (for German keyboards)
+        case 87: // W (for AZERTY keyboards)
+        case 74: // J (for Dvorak keyboards)
+        case 18: // Alt
             mask = constants.BUTTON_Z;
             break;
-        case 38:
+        case 38: // Up arrow
             mask = constants.BUTTON_UP;
             break;
-        case 40:
+        case 40: // Down arrow
             mask = constants.BUTTON_DOWN;
             break;
-        case 37:
+        case 37: // Left arrow
             mask = constants.BUTTON_LEFT;
             break;
-        case 39:
+        case 39: // Right arrow
+            mask = constants.BUTTON_RIGHT;
+            break;
+
+        case 16: // Shift
+        case 9: // Tab
+            playerIdx = 1;
+            mask = constants.BUTTON_X;
+            break;
+        case 65: // A
+        case 81: // Q
+            playerIdx = 1;
+            mask = constants.BUTTON_Z;
+            break;
+        case 69: // E
+            playerIdx = 1;
+            mask = constants.BUTTON_UP;
+            break;
+        case 68: // D
+            playerIdx = 1;
+            mask = constants.BUTTON_DOWN;
+            break;
+        case 83: // S
+            playerIdx = 1;
+            mask = constants.BUTTON_LEFT;
+            break;
+        case 70: // F
+            playerIdx = 1;
             mask = constants.BUTTON_RIGHT;
             break;
         }
         if (mask != 0) {
             event.preventDefault();
-            runtime.maskGamepad(0, mask, down);
+            runtime.maskGamepad(playerIdx, mask, down);
         }
     };
     window.addEventListener("keydown", onKeyboardEvent);

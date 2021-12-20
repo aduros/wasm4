@@ -26,11 +26,13 @@ void w4_windowBoot (const char* title) {
     do {
         // Keyboard handling
         const uint8_t* keyBuffer = mfb_get_key_buffer(window);
+
+        // Player 1
         uint8_t gamepad = 0;
-        if (keyBuffer[KB_KEY_X]) {
+        if (keyBuffer[KB_KEY_X] || keyBuffer[KB_KEY_V] || keyBuffer[KB_KEY_K] || keyBuffer[KB_KEY_SPACE]) {
             gamepad |= W4_BUTTON_X;
         }
-        if (keyBuffer[KB_KEY_Z]) {
+        if (keyBuffer[KB_KEY_Z] || keyBuffer[KB_KEY_C] || keyBuffer[KB_KEY_Y] || keyBuffer[KB_KEY_W] || keyBuffer[KB_KEY_J]) {
             gamepad |= W4_BUTTON_Z;
         }
         if (keyBuffer[KB_KEY_LEFT]) {
@@ -46,6 +48,28 @@ void w4_windowBoot (const char* title) {
             gamepad |= W4_BUTTON_DOWN;
         }
         w4_runtimeSetGamepad(0, gamepad);
+
+        // Player 2
+        gamepad = 0;
+        if (keyBuffer[KB_KEY_LEFT_SHIFT] || keyBuffer[KB_KEY_TAB]) {
+            gamepad |= W4_BUTTON_X;
+        }
+        if (keyBuffer[KB_KEY_A] || keyBuffer[KB_KEY_Q]) {
+            gamepad |= W4_BUTTON_Z;
+        }
+        if (keyBuffer[KB_KEY_S]) {
+            gamepad |= W4_BUTTON_LEFT;
+        }
+        if (keyBuffer[KB_KEY_F]) {
+            gamepad |= W4_BUTTON_RIGHT;
+        }
+        if (keyBuffer[KB_KEY_E]) {
+            gamepad |= W4_BUTTON_UP;
+        }
+        if (keyBuffer[KB_KEY_D]) {
+            gamepad |= W4_BUTTON_DOWN;
+        }
+        w4_runtimeSetGamepad(1, gamepad);
 
         // Mouse handling
         uint8_t mouseButtons = 0;

@@ -8,6 +8,7 @@ const names = {
     "c": "C / C++",
     "d": "D",
     "go": "Go",
+    "nelua": "Nelua",
     "nim": "Nim",
     "odin": "Odin",
     "rust": "Rust",

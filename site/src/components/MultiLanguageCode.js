@@ -1,12 +1,14 @@
 import React from 'react';
 import MultiLanguage, {Page} from "./MultiLanguage";
 
-const values = {
+const classNameToLanguage = {
     "language-typescript": "assemblyscript",
     "language-javascript": "assemblyscript",
     "language-c": "c",
     "language-cpp": "c",
     "language-d": "d",
+    "language-lua": "nelua",
+    "language-nelua": "nelua",
     "language-nim": "nim",
     "language-rust": "rust",
     "language-go": "go",
@@ -16,7 +18,7 @@ const values = {
 
 export default function MultiLanguageCode (props) {
     const pages = props.children.map(child => (
-        <Page value={values[child.props.children.props.className]}>
+        <Page value={classNameToLanguage[child.props.children.props.className]}>
             {child}
         </Page>
     ));

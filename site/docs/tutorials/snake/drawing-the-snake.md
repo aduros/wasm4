@@ -185,7 +185,7 @@ pub const Snake = struct {
 
     pub fn draw(this: @This()) void {
         for(this.body.constSlice()) |part| {
-            w4.rect(part.x * 8, part.y * 8, 8, 8));
+            w4.rect(part.x * 8, part.y * 8, 8, 8);
         }
     }
 }

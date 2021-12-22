@@ -87,9 +87,9 @@ const {{rustName}}: [u8; {{length}}] = [ {{bytes}} ];
     zig:
 `{{#sprites}}
 // {{name}}
-const {{name}}Width = {{width}};
-const {{name}}Height = {{height}};
-const {{name}}Flags = {{flags}}; // {{flagsHumanReadable}}
+const {{name}}_width = {{width}};
+const {{name}}_height = {{height}};
+const {{name}}_flags = {{flags}}; // {{flagsHumanReadable}}
 const {{name}} = [{{length}}]u8{ {{bytes}} };
 
 {{/sprites}}`,

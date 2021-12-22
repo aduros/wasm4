@@ -72,6 +72,13 @@ w4.PALETTE.* = .{
 };
 ```
 
+```nelua
+PALETTE[0] = 0xfff6d3
+PALETTE[1] = 0xf9a875
+PALETTE[2] = 0xeb6b6f
+PALETTE[3] = 0x7c3f58
+```
+
 </MultiLanguageCode>
 
 The default Gameboy-ish palette looks like this:
@@ -136,6 +143,11 @@ w4.DRAW_COLORS.* = 0x42;
 w4.rect(10, 10, 32, 32);
 ```
 
+```nelua
+$DRAW_COLORS = 0x42
+rect(10, 10, 32, 32)
+```
+
 </MultiLanguageCode>
 
 A value of `0` in a draw color means it will be transparent. For example, to
@@ -177,6 +189,10 @@ text("Hello world!", 10, 10);
 
 ```zig
 w4.text("Hello world!", 10, 10);
+```
+
+```nelua
+text("Hello world!", 10, 10)
 ```
 
 </MultiLanguageCode>

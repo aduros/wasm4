@@ -77,6 +77,15 @@ export fn update() void {
 }
 ```
 
+```nelua
+require "wasm4"
+
+local function update (): void <cexport, codename "update">
+    rect(10, 10, 32, 32)
+end
+```
+
+
 </MultiLanguageCode>
 
 The first line imports the WASM-4 API definitions. This is a stub source file included with all
@@ -147,6 +156,12 @@ w4.DRAW_COLORS.* = 2;
 w4.rect(10, 10, 32, 32);
 ```
 
+```nelua
+$DRAW_COLORS = 2
+
+rect(10, 10, 32, 32)
+```
+
 </MultiLanguageCode>
 
 ## Debugging
@@ -185,6 +200,10 @@ trace("Hello world!");
 
 ```zig
 w4.trace("Hello world!");
+```
+
+```nelua
+trace("Hello World!")
 ```
 
 </MultiLanguageCode>

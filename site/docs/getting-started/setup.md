@@ -216,6 +216,29 @@ w4 run zig-out/lib/cart.wasm
 
 </Page>
 
+<Page value="nelua">
+
+To compile nelua projects you will need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
+
+```shell
+w4 new --nelua hello-world
+cd hello-world
+```
+
+Compile the .wasm cartridge:
+
+```shell
+make
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 run build/cart.wasm
+```
+
+</Page>
+
 </MultiLanguage>
 
 :::tip

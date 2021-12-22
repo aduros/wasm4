@@ -100,7 +100,7 @@ module.exports = {
     prism: {
       theme: lightCodeTheme,
       darkTheme: darkCodeTheme,
-      additionalLanguages: ['rust', 'd', 'nim', 'zig'],
+      additionalLanguages: ['rust', 'd', 'lua', 'nim', 'zig'],
     },
     colorMode: {
       defaultMode: 'dark',

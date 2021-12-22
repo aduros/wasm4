@@ -235,6 +235,9 @@ for i := range w4.FRAMEBUFFER {
 }
 ```
 
+```lua
+-- TODO
+```
 
 ```nim
 for i in 0..<len(FRAMEBUFFER[]):
@@ -338,21 +341,8 @@ func pixel (x int, y int) {
 }
 ```
 
-```odin
-pixel :: proc "c" (x : int, y : int) {
-    // The byte index into the framebuffer that contains (x, y)
-    idx := (y*160 + x) >> 2
-
-    // Calculate the bits within the byte that corresponds to our position
-    shift := u8((x & 0b11) << 1)
-    mask := u8(0b11 << shift)
-
-    // Use the first DRAW_COLOR as the pixel color
-    color := u8(w4.DRAW_COLORS^ & 0b11)
-
-    // Write to the framebuffer
-    w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &~ mask)
-}
+```lua
+-- TODO
 ```
 
 ```nim
@@ -369,6 +359,23 @@ proc pixel(x, y: int32) =
 
   # Write to the framebuffer
   FRAMEBUFFER[idx] = uint8((color shl shift) or (FRAMEBUFFER[idx] and not mask))
+```
+
+```odin
+pixel :: proc "c" (x : int, y : int) {
+    // The byte index into the framebuffer that contains (x, y)
+    idx := (y*160 + x) >> 2
+
+    // Calculate the bits within the byte that corresponds to our position
+    shift := u8((x & 0b11) << 1)
+    mask := u8(0b11 << shift)
+
+    // Use the first DRAW_COLOR as the pixel color
+    color := u8(w4.DRAW_COLORS^ & 0b11)
+
+    // Write to the framebuffer
+    w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &~ mask)
+}
 ```
 
 ```rust

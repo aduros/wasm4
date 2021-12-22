@@ -131,6 +131,12 @@ w4.rect(10, 10, 32, 32)
 w4.Rect(10, 10, 32, 32)
 ```
 
+```lua
+$DRAW_COLORS = 2
+
+rect(10, 10, 32, 32)
+```
+
 ```nim
 DRAW_COLORS[] = 2
 
@@ -153,12 +159,6 @@ rect(10, 10, 32, 32);
 w4.DRAW_COLORS.* = 2;
 
 w4.rect(10, 10, 32, 32);
-```
-
-```nelua
-$DRAW_COLORS = 2
-
-rect(10, 10, 32, 32)
 ```
 
 </MultiLanguageCode>
@@ -185,6 +185,10 @@ w4.trace("Hello world!");
 w4.Trace("Hello world!")
 ```
 
+```lua
+trace("Hello World!")
+```
+
 ```nim
 trace("Hello world!")
 ```
@@ -199,10 +203,6 @@ trace("Hello world!");
 
 ```zig
 w4.trace("Hello world!");
-```
-
-```nelua
-trace("Hello World!")
 ```
 
 </MultiLanguageCode>

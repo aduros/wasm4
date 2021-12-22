@@ -7,7 +7,8 @@ const { supportedIconExtensions } = require('./lib/utils/icon');
 let blankProject = (cmd) =>
     cmd
         .option("--as, --assemblyscript", "Create AssemblyScript project (Shorthand for --lang as/--lang assemblyscript)")
-        .option("--c", "Create C/C++ project (Shorthand for --lang c)")
+        .option("--c", "Create C project (Shorthand for --lang c)")
+        .option("--cpp", "Create C++ project (Shorthand for --lang cpp)")
         .option("--d", "Create D project (Shorthand for --lang d)")
         .option("--go", "Create Go project (Shorthand for --lang go)")
         .option("--nelua", "Create Nelua project (Shorthand for --lang nelua)")
@@ -18,7 +19,7 @@ let blankProject = (cmd) =>
         .addOption(
             new Option("--lang <lang>", "Use the given language")
                 .env("W4_LANG")
-                .choices(["as", "assemblyscript", "c", "d", "go", "nelua", "nim", "odin", "rs", "rust", "zig"])
+                .choices(["as", "assemblyscript", "c", "cpp", "d", "go", "nelua", "nim", "odin", "rs", "rust", "zig"])
                 .default("as")
         )
 
@@ -90,7 +91,7 @@ program.command("run-native <cart>")
 program.command("png2src <images...>")
     .description("Convert images to source code")
     .option("--as, --assemblyscript", "Generate AssemblyScript source (Shorthand for --lang as/--lang assemblyscript)")
-    .option("--c", "Generate C/C++ source (Shorthand for --lang c)")
+    .option("--c, --cpp", "Generate C/C++ source (Shorthand for --lang c)")
     .option("--d", "Generate D source (Shorthand for --lang d)")
     .option("--go", "Generate Go source (Shorthand for --lang go)")
     .option("--nelua", "Generate Nelua source (Shorthand for --lang nelua)")
@@ -103,7 +104,7 @@ program.command("png2src <images...>")
     .addOption(
         new Option("--lang <lang>", "Use the given language")
             .env("W4_LANG")
-            .choices(["as", "assemblyscript", "c", "d", "go", "nelua", "nim", "odin", "rs", "rust"])
+            .choices(["as", "assemblyscript", "c", "cpp", "d", "go", "nelua", "nim", "odin", "rs", "rust"])
             .default("as")
     )
     .action((images, opts) => {

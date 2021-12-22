@@ -60,12 +60,18 @@ To compile C/C++ projects you will need to download the [WASI SDK](https://githu
 
 ```shell
 w4 new --c hello-world
-cd hello-world
+```
+
+For a C++ project pass `--cpp` instead of `--c` like this:
+
+```shell
+w4 new --cpp hello-world
 ```
 
 Compile the .wasm cartridge:
 
 ```shell
+cd hello-world
 make
 ```
 

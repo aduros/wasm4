@@ -98,6 +98,7 @@ const {{name}} = [{{length}}]u8{ {{bytes}} };
 const ALIASES = {
     rs: "rust",
     as: "assemblyscript",
+    cpp: "c",
 };
 
 function run (sourceFile) {
@@ -230,7 +231,7 @@ function runAll (files, opts) {
         }
         if (opts.assemblyscript) {
             lang = "assemblyscript";
-        } else if (opts.c) {
+        } else if (opts.c || opts.cpp) {
             lang = "c";
         } else if (opts.d) {
             lang = "d";

@@ -14,6 +14,11 @@ const HELP = {
         build: "make",
         cart: "build/cart.wasm",
     },
+    cpp: {
+        name: "C++",
+        build: "make",
+        cart: "build/cart.wasm",
+    },
     d: {
         name: "D",
         build: "make",
@@ -65,6 +70,8 @@ async function run (destDir, opts) {
         lang = "assemblyscript";
     } else if (opts.c) {
         lang = "c";
+    } else if (opts.cpp) {
+        lang = "cpp";
     } else if (opts.d) {
         lang = "d";
     } else if (opts.go) {
@@ -81,9 +88,14 @@ async function run (destDir, opts) {
         lang = "zig";
     }
 
-    const srcDir = path.resolve(__dirname+"/../assets/templates/"+lang);
+    const srcDir = path.resolve(`${__dirname}/../assets/templates/${lang == "cpp" ? "c" : lang}`);
     await copy(srcDir, destDir, { dot: true });
     await init(destDir, lang);
+
+    // The C++ is exactly the same as the C template, just with .cpp instead of .c
+    if (lang == "cpp") {
+        fs.renameSync(destDir+"/src/main.c", destDir+"/src/main.cpp");
+    }
 
     const help = HELP[lang];
     console.log(`OK! Created ${help.name} project at ${path.resolve(destDir)}`);

@@ -5,7 +5,7 @@ import MultiLanguage, {Page} from '@site/src/components/MultiLanguage';
 To move the snake, you have to change the X and Y position of every body-part of the snake.
 
 For this, you can start at the end of the body and give this part the values of the part ahead.
-Since the final piece to get's it's values "stolen" is the head, the head seems to disappear for very brief moment.
+Since the final piece to get its values "stolen" is the head, the head seems to disappear for very brief moment.
 
 After this is done, you simply move the head in the direction of the snake.
 Since all of this happens, before the snake is rendered, it appears as a fluid motion.
@@ -393,14 +393,14 @@ For this, you'd need a new variable. You can call it whatever you like, just be 
 
 ```zig {2}
 var snake: Snake = Snake.init();
-var frameCount: u32 = 0;
+var frame_count: u32 = 0;
 ```
 
 This variable in main.ts keeps track of all frames so far. Just increase it's value in the main-update function:
 
 ```zig {2}
 export fn update() void {
-    frameCount += 1;
+    frame_count += 1;
 
     snake.update();
 
@@ -413,9 +413,9 @@ Now all you need is to check if the passed frames are dividable by X:
 
 ```zig {4-6}
 export function update(): void {
-    frameCount++
+    frame_count += 1;
 
-    if (frameCount % 15 == 0) {
+    if (frame_count % 15 == 0) {
         snake.update()
     }
 

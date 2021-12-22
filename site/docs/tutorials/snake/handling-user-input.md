@@ -113,13 +113,13 @@ if justPressed&w4.BUTTON_UP != 0 {
 
 ```zig
 const gamepad = w4.GAMEPAD1.*;
-const justPressed = gamepad & (gamepad ^ prevState);
+const just_pressed = gamepad & (gamepad ^ prev_state);
 ```
 
-The constant `justPressed` now holds all buttons that were pressed this frame. You can check the state of a single button like this:
+The constant `just_pressed` now holds all buttons that were pressed this frame. You can check the state of a single button like this:
 
 ```zig
-if (justPressed & w4.BUTTON_UP != 0) {
+if (just_pressed & w4.BUTTON_UP != 0) {
     // Do something
 }
 ```
@@ -529,9 +529,9 @@ It's a good idea to handle the input in it's own function. Something like this c
 ```zig {1-8,13}
 fn input() void {
     const gamepad = w4.GAMEPAD1.*;
-    const justPressed = gamepad & (gamepad ^ prevState);
+    const just_pressed = gamepad & (gamepad ^ prevState);
 
-    if (justPressed & w4.BUTTON_UP != 0) {
+    if (just_pressed & w4.BUTTON_UP != 0) {
         // Do something
     }
 }
@@ -541,7 +541,7 @@ export fn update() void {
     
     input();
 
-    if (frameCount % 15 == 0) {
+    if (frame_count % 15 == 0) {
         snake.update();
     }
 
@@ -553,38 +553,38 @@ If you try to compile this, you should get an error: `error: use of undeclared i
 
 ```zig {3}
 var snake = Snake.init();
-var frameCount: u32 = 0;
-var prevState: u8 = 0;
+var frame_count: u32 = 0;
+var prev_state: u8 = 0;
 ```
 
 To notice any change in the gamepad, you have to store the *current state* at the end of the input. This will make it the *previous state*. And while you're at it, why not add the other 3 directions along the way:
 
 ```zig {8-18}
 function input(): void {
-    const gamepad = load<u8>(w4.GAMEPAD1)};
-    const justPressed = gamepad & (gamepad ^ prevState)
+    const gamepad = w4.GAMEPAD1.*;
+    const just_pressed = gamepad & (gamepad ^ prev_state)
 
-    if (justPressed & w4.BUTTON_LEFT != 0) {
+    if (just_pressed & w4.BUTTON_LEFT != 0) {
         // Do something
     }
-    if (justPressed & w4.BUTTON_RIGHT != 0) {
+    if (just_pressed & w4.BUTTON_RIGHT != 0) {
         // Do something
     }
-    if (justPressed & w4.BUTTON_UP != 0) {
+    if (just_pressed & w4.BUTTON_UP != 0) {
         // Do something
     }
-    if (justPressed & w4.BUTTON_DOWN != 0) {
+    if (just_pressed & w4.BUTTON_DOWN != 0) {
         w4.trace("down");
     }
 
-    prevState = gamepad
+    prev_state = gamepad;
 }
 ```
 
 If you want to check if it works: Use the `trace` function provided by WASM-4. Here's an example:
 
 ```zig
-    if (justPressed & w4.BUTTON_DOWN != 0) {
+    if (just_pressed & w4.BUTTON_DOWN != 0) {
         w4.trace("down");
     }
 ```
@@ -594,7 +594,7 @@ If you use `trace` in each if-statement, you should see the corresponding output
 Now, instead of using `trace` to confirm everything works as intended, you should replace it with something like this:
 
 ```zig
-    if (justPressed & w4.BUTTON_DOWN != 0) {
+    if (just_pressed & w4.BUTTON_DOWN != 0) {
         snake.down();
     }
 ```

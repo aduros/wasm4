@@ -70,8 +70,8 @@ const Point = @import("snake.zig").Point;
 
 var snake = Snake.init();
 var fruit: Point = undefined;
-var frameCount: u32 = 0;
-var prevState: u8 = 0;
+var frame_count: u32 = 0;
+var prev_state: u8 = 0;
 ```
 
 </Page>
@@ -180,7 +180,7 @@ Keep in mind, that the value of `rnd` is `nil` if it wasn't initialized yet.
 
 Zig's standard library has a couple of different random number generators, including some that are meant to be cryptographically secure. We don't need anything our snake game to be cryptographically secure, so we'll just use `std.rand.DefaultPrng`, where Prng means pseudo-random number generator. To start, we'll need to import `std` and initialize the prng:
 
-```zig {2,8-9,20-21}
+```zig {2,10-11,20-21}
 const w4 = @import("wasm4.zig");
 const std = @import("std");
 const Snake = @import("snake.zig").Snake;
@@ -188,9 +188,9 @@ const Point = @import("snake.zig").Point;
 
 var snake = Snake.init();
 var fruit: Point = undefined;
-var frameCount: u32 = 0;
-var prevState: u8 = 0;
-var prng = std.rand.DefaultPrng.init(0);
+var frame_count: u32 = 0;
+var prev_state: u8 = 0;
+var prng: std.rand.DefaultPrng = undefined;
 var random: std.rand.Random = undefined;
 
 export fn start() void {
@@ -208,13 +208,13 @@ export fn start() void {
 
 We can call `random.intRangeLessThan(T, at_least, less_than)` to get a number between `at_least` and `less_than`, with the type of `T`. You can wrap that in a helper function if you'd like:
 
-```zig 
+```zig
 fn rnd(max: i32) i32 {
-    random.intRangeLessThan(i32, 0, max);
+    return random.intRangeLessThan(i32, 0, max);
 }
 ```
 
-Now use it for the location of the fruit: 
+Now use it for the location of the fruit:
 
 ```zig {10}
 export fn start() void {
@@ -360,9 +360,9 @@ Now you need to import the image. For this, the WASM-4 CLI tool `w4` comes with 
 This will output the following content in the terminal:
 
 ```zig
-const fruitWidth = 8;
-const fruitHeight = 8;
-const fruitFlags = 1; // BLIT_2BPP
+const fruit_width = 8;
+const fruit_height = 8;
+const fruit_flags = 1; // BLIT_2BPP
 const fruit = [16]u8{ 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0 };
 ```
 
@@ -375,10 +375,10 @@ This will add the previous lines to your `main.zig` and causes an error because 
 ```zig {6}
 var snake = Snake.init();
 var fruit: Point = undefined;
-var frameCount: u32 = 0;
-var prevState: u8 = 0;
+var frame_count: u32 = 0;
+var prev_state: u8 = 0;
 var random: std.rand.Random = undefined;
-const fruitSprite = [16]u8{ 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0 };
+const fruit_sprite = [16]u8{ 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0 };
 ```
 
 With that out of the way, it's time to actually render the newly imported sprite.
@@ -514,16 +514,16 @@ In practice it looks like this:
 
 ```zig {11}
 export fn update() void {
-    frameCount += 1;
+    frame_count += 1;
 
     input();
 
-    if (frameCount % 15 == 0) {
+    if (frame_count % 15 == 0) {
         snake.update();
     }
     snake.draw();
 
-    w4.blit(fruitSprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP)
+    w4.blit(&fruit_sprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP);
 }
 ```
 
@@ -533,7 +533,7 @@ But since you set the drawing colors, you need to change the drawing colors too:
     snake.draw();
 
     w4.DRAW_COLORS.* = 0x4320;
-    w4.blit(&fruitSprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP);
+    w4.blit(&fruit_sprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP);
 ```
 
 This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.

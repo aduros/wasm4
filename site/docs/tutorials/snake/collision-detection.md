@@ -137,7 +137,7 @@ if (snake.body.get(0).equals(fruit)) {
 is enough already to check if the snake eats the fruit. And to make the snake "grow", simply increase the length of the snake using the `push` function of the array. Now it remains the question what values should this new piece have. The easiest would be to add the current last piece:
 
 ```zig
-var tail = snake.body.get(snake.body.len-1);
+const tail = snake.body.get(snake.body.len-1);
 snake.body.append(Point.init(tail.x, tail.y)) catch @panic("couldn't grow snake");
 ```
 
@@ -151,14 +151,14 @@ fruit.y = rnd(20);
 In it's final form, it could look like this:
 
 ```zig {4-9}
-    if (frameCount % 15 == 0) {
-        snake.update()
+    if (frame_count % 15 == 0) {
+        snake.update();
 
-        if (snake.body[0].equals(fruit)) {
-            let tail = snake.body[snake.body.length - 1]
-            snake.body.push(new Point(tail.x, tail.y))
-            fruit.x = rnd(20)
-            fruit.y = rnd(20)
+        if (snake.body.get(0).equals(fruit)) {
+            const tail = snake.body.get(snake.body.len - 1);
+            snake.body.append(Point.init(tail.x, tail.y)) catch @panic("couldn't grow snake");
+            fruit.x = rnd(20);
+            fruit.y = rnd(20);
         }
     }
 ```
@@ -296,18 +296,18 @@ What you do, is up to you. You could stop the game and show the score. Or you co
 Now you can call this function to check if the snake died in this frame:
 
 ```zig {4-6}
-    if (frameCount % 15 == 0) {
-        snake.update()
+    if (frame_count % 15 == 0) {
+        snake.update();
 
         if (snake.isDead()) {
             // Do something
         }
 
-        if (snake.body[0].equals(fruit)) {
-            let tail = snake.body[snake.body.length - 1]
-            snake.body.push(new Point(tail.x, tail.y))
-            fruit.x = rnd(20)
-            fruit.y = rnd(20)
+        if (snake.body.get(0).equals(fruit)) {
+            const tail = snake.body.get(snake.body.len - 1);
+            snake.body.append(Point.init(tail.x, tail.y)) catch @panic("couldn't grow snake");
+            fruit.x = rnd(20);
+            fruit.y = rnd(20);
         }
     }
 ```

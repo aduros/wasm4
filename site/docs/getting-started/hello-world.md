@@ -41,6 +41,14 @@ func update () {
 }
 ```
 
+```lua
+require "wasm4"
+
+local function update (): void <cexport, codename "update">
+    rect(10, 10, 32, 32)
+end
+```
+
 ```nim
 import cart/wasm4
 
@@ -147,6 +155,12 @@ w4.DRAW_COLORS.* = 2;
 w4.rect(10, 10, 32, 32);
 ```
 
+```nelua
+$DRAW_COLORS = 2
+
+rect(10, 10, 32, 32)
+```
+
 </MultiLanguageCode>
 
 ## Debugging
@@ -185,6 +199,10 @@ trace("Hello world!");
 
 ```zig
 w4.trace("Hello world!");
+```
+
+```nelua
+trace("Hello World!")
 ```
 
 </MultiLanguageCode>

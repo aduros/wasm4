@@ -38,6 +38,13 @@ w4.PALETTE[2] = 0xeb6b6f
 w4.PALETTE[3] = 0x7c3f58
 ```
 
+```lua
+PALETTE[0] = 0xfff6d3
+PALETTE[1] = 0xf9a875
+PALETTE[2] = 0xeb6b6f
+PALETTE[3] = 0x7c3f58
+```
+
 ```nim
 PALETTE[0] = 0xfff6d3
 PALETTE[1] = 0xf9a875
@@ -115,6 +122,10 @@ w4.rect(10, 10, 32, 32);
 w4.Rect(10, 10, 32, 32)
 ```
 
+```lua
+$DRAW_COLORS = 0x42
+rect(10, 10, 32, 32)
+```
 
 ```nim
 DRAW_COLORS[] = 0x42
@@ -161,6 +172,10 @@ w4.text("Hello world!", 10, 10);
 
 ```go
 w4.Text("Hello world!", 10, 10)
+```
+
+```lua
+text("Hello world!", 10, 10)
 ```
 
 ```nim

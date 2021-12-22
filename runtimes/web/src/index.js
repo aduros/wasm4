@@ -187,12 +187,12 @@ async function loadCartWasm () {
     });
 
     const HOTKEYS = {
-        50: saveState, // 2
-        52: loadState, // 4
-        82: reboot, // R
-        120: takeScreenshot, // F9
-        121: recordVideo, // F10
-        122: requestFullscreen, // F11
+        "2": saveState,
+        "4": loadState,
+        "r": reboot,
+        "F9": takeScreenshot,
+        "F10": recordVideo,
+        "F11": requestFullscreen,
     };
 
     let isKeyboard = true;
@@ -214,7 +214,7 @@ async function loadCartWasm () {
         document.body.style.cursor = "none";
 
         if (down) {
-            const hotkeyFn = HOTKEYS[event.keyCode];
+            const hotkeyFn = HOTKEYS[event.key];
             if (hotkeyFn) {
                 hotkeyFn();
                 event.preventDefault();
@@ -224,57 +224,47 @@ async function loadCartWasm () {
 
         let playerIdx = 0;
         let mask = 0;
-        switch (event.keyCode) {
-        case 88: // X
-        case 86: // V
-        case 75: // K (for Dvorak keyboards)
-        case 32: // Spacebar
+        switch (event.code) {
+        case "KeyX": case "KeyV": case "Space": case "ControlLeft": case "ControlRight": case "KeyM":
             mask = constants.BUTTON_X;
             break;
-        case 90: // Z
-        case 67: // C
-        case 89: // Y (for German keyboards)
-        case 87: // W (for AZERTY keyboards)
-        case 74: // J (for Dvorak keyboards)
-        case 18: // Alt
+        case "KeyZ": case "KeyC": case "AltLeft": case "AltRight": case "KeyN":
             mask = constants.BUTTON_Z;
             break;
-        case 38: // Up arrow
+        case "ArrowUp":
             mask = constants.BUTTON_UP;
             break;
-        case 40: // Down arrow
+        case "ArrowDown":
             mask = constants.BUTTON_DOWN;
             break;
-        case 37: // Left arrow
+        case "ArrowLeft":
             mask = constants.BUTTON_LEFT;
             break;
-        case 39: // Right arrow
+        case "ArrowRight":
             mask = constants.BUTTON_RIGHT;
             break;
 
-        case 16: // Shift
-        case 9: // Tab
+        case "ShiftLeft": case "Tab":
             playerIdx = 1;
             mask = constants.BUTTON_X;
             break;
-        case 65: // A
-        case 81: // Q
+        case "KeyA": case "KeyQ":
             playerIdx = 1;
             mask = constants.BUTTON_Z;
             break;
-        case 69: // E
+        case "KeyE":
             playerIdx = 1;
             mask = constants.BUTTON_UP;
             break;
-        case 68: // D
+        case "KeyD":
             playerIdx = 1;
             mask = constants.BUTTON_DOWN;
             break;
-        case 83: // S
+        case "KeyS":
             playerIdx = 1;
             mask = constants.BUTTON_LEFT;
             break;
-        case 70: // F
+        case "KeyF":
             playerIdx = 1;
             mask = constants.BUTTON_RIGHT;
             break;

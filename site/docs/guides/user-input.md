@@ -47,6 +47,10 @@ if gamepad&w4.BUTTON_RIGHT != 0 {
 }
 ```
 
+```lua
+-- TODO
+```
+
 ```nim
 var gamepad = GAMEPAD1[]
 
@@ -167,6 +171,9 @@ func update () {
 }
 ```
 
+```lua
+-- TODO
+```
 
 ```nim
 var previousGamepad: uint8

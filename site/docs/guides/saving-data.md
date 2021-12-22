@@ -37,6 +37,9 @@ var gameData int32 = 1337
 w4.DiskW(unsafe.Pointer(&gameData), unsafe.Sizeof(gameData))
 ```
 
+```lua
+-- TODO
+```
 
 ```nim
 var gameData = 1337'i32
@@ -96,6 +99,10 @@ import "unsafe"
 
 var gameData int32
 w4.DiskR(unsafe.Pointer(&gameData), unsafe.Sizeof(gameData))
+```
+
+```lua
+-- TODO
 ```
 
 ```nim

@@ -72,6 +72,10 @@ var smiley = [8]byte {
 }
 ```
 
+```lua
+-- TODO
+```
+
 ```nim
 var smiley: array[uint8, 8] = [
   0b11000011'u8,
@@ -146,6 +150,9 @@ w4.blit(smiley.ptr, 10, 10, 8, 8, w4.blit1Bpp);
 w4.Blit(&smiley[0], 10, 10, 8, 8, w4.BLIT_1BPP)
 ```
 
+```lua
+-- TODO
+```
 
 ```nim
 blit(addr smiley[0], 10, 10, 8, 8, BLIT_1BPP)
@@ -190,6 +197,10 @@ w4.blit(smiley.ptr, 10, 10, 8, 8, w4.blit1Bpp | w4.blitFlipY);
 
 ```go
 w4.Blit(&smiley[0], 10, 10, 8, 8, w4.BLIT_1BPP | w4.BLIT_FLIP_Y)
+```
+
+```lua
+-- TODO
 ```
 
 ```nim

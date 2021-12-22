@@ -41,6 +41,14 @@ func update () {
 }
 ```
 
+```lua
+require "wasm4"
+
+local function update (): void <cexport, codename "update">
+    rect(10, 10, 32, 32)
+end
+```
+
 ```nim
 import cart/wasm4
 
@@ -76,15 +84,6 @@ export fn update() void {
     w4.rect(10, 10, 32, 32);
 }
 ```
-
-```nelua
-require "wasm4"
-
-local function update (): void <cexport, codename "update">
-    rect(10, 10, 32, 32)
-end
-```
-
 
 </MultiLanguageCode>
 

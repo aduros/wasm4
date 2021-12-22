@@ -30,12 +30,35 @@ function HomepageHeader() {
   );
 }
 
+function GameJamBanner() {
+  return (
+    <section style={{background: "#1c1e21"}}>
+      <div className="container">
+        <div className="row">
+          <div className="col col--12 text--center padding-vert--md">
+            <div>
+              <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/hWGu4SqlRy0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div>
+              <p>A quick video introduction to WASM-4. Our first game jam will take place between January 14 - 23, 2022 and is open to everyone!</p>
+            </div>
+            <div>
+              <a className="button button--secondary button--outline button--lg" href="https://itch.io/jam/wasm4" target="_blank">Join Game Jam</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const {siteConfig} = useDocusaurusContext();
   return (
     <Layout>
       <HomepageHeader />
       <main>
+        <GameJamBanner />
         <HomepageFeatures />
       </main>
     </Layout>

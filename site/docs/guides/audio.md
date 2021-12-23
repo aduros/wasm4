@@ -46,7 +46,7 @@ w4.Tone(262, 60, 100, w4.TONE_PULSE1)
 ```
 
 ```lua
--- TODO
+tone(262, 60, 100, TONE_PULSE1)
 ```
 
 ```nim
@@ -100,7 +100,7 @@ w4.Tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_MODE3)
 ```
 
 ```lua
--- TODO
+tone(262, 60, 100, TONE_PULSE1 | TONE_MODE3)
 ```
 
 ```nim
@@ -148,7 +148,7 @@ w4.Tone(262 | (523 << 16), 60, 100, w4.TONE_PULSE1)
 ```
 
 ```lua
--- TODO
+tone(262 | (523 << 16), 60, 100, TONE_PULSE1)
 ```
 
 ```nim
@@ -205,7 +205,7 @@ w4.Tone(262, 60 | (30 << 8), 100, w4.TONE_PULSE1)
 ```
 
 ```lua
--- TODO
+tone(262, 60 | (30 << 8), 100, TONE_PULSE1)
 ```
 
 ```odin

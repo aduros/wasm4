@@ -44,7 +44,7 @@ func update () {
 ```lua
 require "wasm4"
 
-local function update (): void <cexport, codename "update">
+local function update () <cexport, codename "update">
     rect(10, 10, 32, 32)
 end
 ```

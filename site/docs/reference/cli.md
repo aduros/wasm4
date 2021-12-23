@@ -71,6 +71,7 @@ w4 init --lang nim
 | --c              |               | Uses C/C++  for the new project         |
 | --d              |               | Uses D for the new project              |
 | --go             |               | Uses Go for the new project             |
+| --nelua          |               | Uses Nelua for the new project          |
 | --nim            |               | Uses Nim for the new project            |
 | --odin           |               | Uses Odin for the new project           |
 | --rs             |               | Uses Rust for the new project           |
@@ -233,6 +234,7 @@ w4 png2src --lang rust top.png down.png left.png right.png
 | --c              |               | Uses C/C++  for the new project         |
 | --d              |               | Uses D for the new project              |
 | --go             |               | Uses Go for the new project             |
+| --nelua          |               | Uses Nelua for the new project          |
 | --nim            |               | Uses Nim for the new project            |
 | --odin           |               | Uses Odin for the new project           |
 | --rs             |               | Uses Rust for the new project           |

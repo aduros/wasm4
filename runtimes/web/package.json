@@ -7,8 +7,7 @@
     "prepare": "npm --prefix '../../devtools/web' i"
   },
   "dependencies": {
-    "@wasm4/web-devtools": "file:../../devtools/web",
-    "lodash-es": "^4.17.21"
+    "@wasm4/web-devtools": "file:../../devtools/web"
   },
   "devDependencies": {
     "css-loader": "^6.2.0",

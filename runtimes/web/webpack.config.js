@@ -1,5 +1,6 @@
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const webpack = require('webpack');
 
 /**
  * @type {import('webpack').Configuration}
@@ -21,6 +22,9 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: "wasm4.css",
         }),
+        new webpack.optimize.LimitChunkCountPlugin({
+            maxChunks: 1,
+          })
     ],
     optimization: {
         minimizer: [

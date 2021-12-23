@@ -7,3 +7,4 @@ export * from './components/memory-view/memory-view';
 export * from './components/info-view/info-view';
 export * from './events/update-completed';
 export * from './events/close-devtools';
+export * from './devtools-manager';

@@ -2,7 +2,6 @@ import * as constants from "./constants";
 import { Runtime } from "./runtime";
 import { websocket } from "./devkit";
 import * as z85 from "./z85";
-import { DevtoolsManager } from './devtools';
 import "./styles.css";
 
 const qs = new URL(document.location).searchParams;
@@ -54,11 +53,11 @@ async function loadCartWasm () {
 
 (async function () {
     const runtime = new Runtime();
-    const devtoolsManager = new DevtoolsManager();
     const canvas = runtime.canvas;
     document.getElementById("content").appendChild(canvas);
     let wasmBuffer = await loadCartWasm();
     await runtime.load(wasmBuffer);
+    const devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager())
 
     if (screenshot != null) {
         // Wait until the initial focus before starting the runtime
@@ -485,8 +484,4 @@ async function loadCartWasm () {
         requestAnimationFrame(loop);
     }
     loop();
-
-    if(DevtoolsManager.enabledByQueryParams()) {
-        requestAnimationFrame(devtoolsManager.toggleDevtools);
-    }
 })();

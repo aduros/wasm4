@@ -28,7 +28,9 @@
     "prettify": "prettier . --write"
   },
   "dependencies": {
-    "lit": "^2.0.0"
+    "lit": "^2.0.0",
+    "lodash-es": "^4.17.21",
+    "@types/lodash-es": "^4.17.5"
   },
   "devDependencies": {
     "@types/node": "^16.11.10",

@@ -57,7 +57,12 @@ async function loadCartWasm () {
     document.getElementById("content").appendChild(canvas);
     let wasmBuffer = await loadCartWasm();
     await runtime.load(wasmBuffer);
-    const devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager())
+
+    let devtoolsManager = { toggleDevtools(){} };
+    /* `ENABLE_DEVTOOLS` is a compile-time flag, see `webpack.config.js` */
+    if(ENABLE_DEVTOOLS) {
+        devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager())
+    }
 
     if (screenshot != null) {
         // Wait until the initial focus before starting the runtime
@@ -478,7 +483,9 @@ async function loadCartWasm () {
             gamepadOverlay.style.display = runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY)
                 ? "none" : "";
 
-            devtoolsManager.updateCompleted(runtime.data, deltaFrame);     
+            if(ENABLE_DEVTOOLS) {
+                devtoolsManager.updateCompleted(runtime.data, deltaFrame);  
+            }
         }
 
         requestAnimationFrame(loop);

@@ -50,10 +50,10 @@ global SYSTEM_HIDE_GAMEPAD_OVERLAY <comptime> = 2
 -- └───────────────────────────────────────────────────────────────────────────┘
 
 -- Copies pixels to the framebuffer.
-global function blit(data: *uint8 <const> , x: int32, y: int32, width: uint32, height: uint32, flags: uint32): void <cimport> end
+global function blit(data: *[0]uint8 , x: int32, y: int32, width: uint32, height: uint32, flags: uint32): void <cimport> end
 
 -- Copies a subregion within a larger sprite atlas to the framebuffer.
-global function blitSub(data: *uint8 <const>, x: int32, y: int32, width: uint32, height: uint32, srcX: uint32, srcY: uint32, stride: uint32, flags: uint32): void <cimport> end
+global function blitSub(data: *[0]uint8, x: int32, y: int32, width: uint32, height: uint32, srcX: uint32, srcY: uint32, stride: uint32, flags: uint32): void <cimport> end
 
 global BLIT_2BPP <comptime> = 1
 global BLIT_1BPP <comptime> = 0
@@ -77,7 +77,7 @@ global function oval(x: int32, y: int32, width: uint32, height: uint32): void <c
 global function rect(x: int32, y: int32, width: uint32, height: uint32): void <cimport> end
 
 -- Draws text using the built-in system font.
-global function text(str: cstring <const>, x: int32, y: int32): void <cimport> end
+global function text(str: cstring, x: int32, y: int32): void <cimport> end
 
 -- ┌───────────────────────────────────────────────────────────────────────────┐
 -- │                                                                           │
@@ -104,13 +104,13 @@ global TONE_MODE4 <comptime> = 12
 -- └───────────────────────────────────────────────────────────────────────────┘
 
 -- Reads up to `size` bytes from persistent storage into the pointer `dest`.
-global function diskr(dest: *void, size: uint32): uint32 <cimport> end
+global function diskr(dest: pointer, size: uint32): uint32 <cimport> end
 
 -- Writes up to `size` bytes from the pointer `src` into persistent storage.
-global function diskw(src: *void <const>, size: uint32): uint32 <cimport> end
+global function diskw(src: pointer, size: uint32): uint32 <cimport> end
 
 -- Prints a message to the debug console.
-global function trace(str: cstring <const>): void <cimport> end
+global function trace(str: cstring): void <cimport> end
 
 -- Hack to call Nelua initialization
 local function nelua_main(argc: integer, argv: integer): void <cimport, nodecl> end

@@ -143,7 +143,9 @@ export class APU {
         node.connect(gain);
 
         const gainValue = gain.gain;
-        gainValue.setValueAtTime(0, 0);
+        if(existingNode == null){
+            gainValue.setValueAtTime(0, 0);
+        }
         gainValue.linearRampToValueAtTime(peakLevel, attackTime);
         gainValue.linearRampToValueAtTime(sustainLevel, decayTime);
         gainValue.linearRampToValueAtTime(sustainLevel, sustainTime);

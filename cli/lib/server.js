@@ -5,8 +5,11 @@ const path = require("path");
 const qrcode = require("qrcode");
 const { Server: WebSocketServer } = require("ws");
 const open = require("open");
+const { exit } = require("process");
 
 var attempts = 0;
+var PORT = 0;
+var FIRST_PORT = 0;
 
 function start (cartFile, opts) {
     const app = express();
@@ -18,12 +21,19 @@ function start (cartFile, opts) {
     });
     app.use(express.static(__dirname+"/../assets/runtime"));
 
-    let PORT = getPort(opts.port);
+    if (PORT == 0) {
+        PORT = opts.port;
+        FIRST_PORT = opts.port;
+    }
 
     const server = app.listen(PORT, async () => {
         if (opts.qr) {
             const qr = await qrcode.toString(`http://${getIP()}:${PORT}`, {type: "terminal", small: true});
             console.log("\n  " + qr.replace(/\n/g, "\n  "));
+        }
+        if (FIRST_PORT != PORT) {
+            console.log(`Unable to bind on port ${FIRST_PORT}.`);
+            console.log(`Using ${PORT} instead.`);
         }
         console.log(`Open http://localhost:${PORT}${opts.qr ? ", or scan this QR code on your mobile device." : "."} Press ctrl-C to exit.`);
 
@@ -32,13 +42,19 @@ function start (cartFile, opts) {
         }
     })
     .on("error", () => {
-        console.log(`Failed to listen on http://localhost:${PORT}`)
-        if (++attempts > 10) {
-            let msg = `Too many attempts. Make sure you selected a valid range. Currently selected: ${opts.port}`
-            throw msg;
+        if (++attempts > 1000) {
+            console.log(`Unable to bind on port ${FIRST_PORT}.`);
+            console.log(`Error: Unable to find available port.`);
+            console.log(`Please specify a different port using the --port <port> option.\n`)
+            console.log(`Use\n`)
+            console.log(`\tw4 help watch\n`)
+            console.log('or\n')
+            console.log(`\tw4 help run\n`)
+            console.log('for more informations.')
+            exit(1);
         } else {
-            console.log(`Attempt #${attempts} to pick a different port ...`)
-            start(cartFile, opts)
+            PORT++;
+            start(cartFile, opts);
         }
     });
 
@@ -84,18 +100,4 @@ function getIP () {
         });
     }
     return ip;
-}
-
-function getPort (range) {
-    let ranges = range.split(",").map(r => {
-        let parts = r.split("-").sort()
-        return {
-            l: parseInt(parts[0]),
-            h: parseInt(parts[parts.length-1])
-        }
-    })
-    let index = Math.floor(Math.random() * ranges.length)
-    let port = Math.floor(Math.random() * (ranges[index].h-ranges[index].l+1)) + ranges[index].l
-
-    return port;
 }

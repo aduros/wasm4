@@ -13,5 +13,7 @@ npm run build
 cd "$site"
 rm -rf static/embed
 cp -r "$runtime/dist" static/embed
+rm static/embed/wasm4.js
+mv static/embed/wasm4-release.js static/embed/wasm4.js
 npm ci
 npm run build

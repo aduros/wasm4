@@ -124,7 +124,7 @@ w4 watch --no-open
 | --open    |               | Forces a new browser tab or window (Default)  |
 | --qr      |               | Generates a QR code in the terminal (Default) |
 | --no-qr   |               | Prevents the generation of a QR code          |
-| --port    | 4000-6000     | Selects a random port of the given range(s)   |
+| --port    | 4444          | Binds the command to the given port           |
 
 **Description:**
 
@@ -133,14 +133,9 @@ The option `-n`/`--no-open` prevents the browser from opening.
 
 Another default behavior is the generation of a QR code in the terminal. This can be useful to test games on other devices such as mobile phones. The option `--no-qr` prevents this from happening. This can be useful in case the terminal can't display QR codes.
 
-The `--port` option allows to bind the command on a specific range of ports.
-It's possible to pick a single port like `--port 4444`.
-To pick a range, it's possible to specify it by using `--port 4000-6000`. This will select a random port.
-Multiple ranges can be specified too: `--port 4000-6000,8000-7000,8080`. This selects a random port between 4000 and 600 or between 7000 and 8000 or simply port 8080.
+The `--port` option allows to bind the command on a specific port. The default port is `4444`. In case, `w4` is unable to bind to the given port, it tries to find an available port in the next 1000 higher ports. Should this also fail, the execution will be stopped and an error will be presented to notify the user.
 
 It's also possible to set those options by setting an environment variable for the current user or the whole system. The corresponding variables are `W4_NO_OPEN`, `W4_NO_QR` and `W4_PORT`. Setting it to any value activates them.
-
-Also note: w4 will pick a random port. If it fails, it will try up to 10 times. Afterwards, an exception is thrown.
 
 Example (Linux):
 
@@ -148,7 +143,7 @@ Example (Linux):
 # ~/.profile
 export W4_NO_OPEN=1 # Disable the browser from opening
 export W4_NO_QR=1   # Disable the generation of QR codes
-export W4_PORT=8080 # Use port 8080 instead of a random port between 4000 and 6000
+export W4_PORT=8080 # Use port 8080 instead of port 4444
 ```
 
 ## `run`

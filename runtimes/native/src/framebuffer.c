@@ -348,14 +348,15 @@ void w4_framebufferBlit (const uint8_t* sprite, int dstX, int dstY, int width, i
             // Sample the sprite to get a color index
             int colorIdx;
             int x = srcX + sx, y = srcY + sy;
+            int bitIndex = y * srcStride + x;
             if (bpp2) {
-                uint8_t byte = sprite[(y * srcStride + x) >> 2];
-                int shift = 6 - ((x & 0x03) << 1);
+                uint8_t byte = sprite[bitIndex >> 2];
+                int shift = 6 - ((bitIndex & 0x03) << 1);
                 colorIdx = (byte >> shift) & 0b11;
 
             } else {
-                uint8_t byte = sprite[(y * srcStride + x) >> 3];
-                int shift = 7 - (x & 0x07);
+                uint8_t byte = sprite[bitIndex >> 3];
+                int shift = 7 - (bitIndex & 0x07);
                 colorIdx = (byte >> shift) & 0b1;
             }
 

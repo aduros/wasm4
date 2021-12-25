@@ -1,7 +1,28 @@
---
 -- WASM-4: https://wasm4.org/docs
 
-require "stringbuilder"
+-- Configure compiler.
+-- NOTE: This must come first because it changes some compiler settings!
+##[[
+ldflags "-Wl,-zstack-size=2048,--no-entry,--import-memory -mexec-model=reactor"
+ldflags "-Wl,--initial-memory=65536,--max-memory=65536,--global-base=6560,--export-dynamic"
+
+if DEBUG then
+  -- We should use at least 01 optimization, otherwise the application may use too much stack space.
+  cflags "-Oz -g"
+  ldflags "-Wl,--export-all,--no-gc-sections"
+else
+  -- Optimization for the making the application small as possible.
+  cflags "-Oz -g0 -flto"
+  ldflags "-Wl,--strip-all,--gc-sections,--lto-O3"
+end
+
+-- Generates an illegal instruction on aborts/panics
+context.rootpragmas.abort = "trap"
+-- We will not write to stdout, instead any write to it will be hooked.
+context.rootpragmas.writestderr = "hooked"
+-- We don't need to emit `main()` entry point, we will hook this ourselves.
+context.rootpragmas.nogcentry = true
+]]
 
 -- ┌───────────────────────────────────────────────────────────────────────────┐
 -- │                                                                           │
@@ -50,10 +71,10 @@ global SYSTEM_HIDE_GAMEPAD_OVERLAY <comptime> = 2
 -- └───────────────────────────────────────────────────────────────────────────┘
 
 -- Copies pixels to the framebuffer.
-global function blit(data: *[0]uint8 , x: int32, y: int32, width: uint32, height: uint32, flags: uint32): void <cimport> end
+global function blit(data: *[0]uint8, x: int32, y: int32, width: uint32, height: uint32, flags: uint32): void <cimport,cattribute'import_name("blit")'> end
 
 -- Copies a subregion within a larger sprite atlas to the framebuffer.
-global function blitSub(data: *[0]uint8, x: int32, y: int32, width: uint32, height: uint32, srcX: uint32, srcY: uint32, stride: uint32, flags: uint32): void <cimport> end
+global function blitSub(data: *[0]uint8, x: int32, y: int32, width: uint32, height: uint32, srcX: uint32, srcY: uint32, stride: uint32, flags: uint32): void <cimport,cattribute'import_name("blitSub")'> end
 
 global BLIT_2BPP <comptime> = 1
 global BLIT_1BPP <comptime> = 0
@@ -62,22 +83,22 @@ global BLIT_FLIP_Y <comptime> = 4
 global BLIT_ROTATE <comptime> = 8
 
 -- Draws a line between two points.
-global function line(x: int32, y: int32, width: uint32, height: uint32): void <cimport> end
+global function line(x: int32, y: int32, width: uint32, height: uint32): void <cimport,cattribute'import_name("line")'> end
 
 -- Draws a horizontal line.
-global function hline(x: int32, y: int32, len: uint32): void <cimport> end
+global function hline(x: int32, y: int32, len: uint32): void <cimport,cattribute'import_name("hline")'> end
 
 -- Draws a vertical line.
-global function vline(x: int32, y: int32, len: uint32): void <cimport> end
+global function vline(x: int32, y: int32, len: uint32): void <cimport,cattribute'import_name("vline")'> end
 
 -- Draws an oval (or circle).
-global function oval(x: int32, y: int32, width: uint32, height: uint32): void <cimport> end
+global function oval(x: int32, y: int32, width: uint32, height: uint32): void <cimport,cattribute'import_name("oval")'> end
 
 -- Draws a rectangle.
-global function rect(x: int32, y: int32, width: uint32, height: uint32): void <cimport> end
+global function rect(x: int32, y: int32, width: uint32, height: uint32): void <cimport,cattribute'import_name("rect")'> end
 
 -- Draws text using the built-in system font.
-global function text(str: cstring, x: int32, y: int32): void <cimport> end
+global function text(str: cstring, x: int32, y: int32): void <cimport,cattribute'import_name("text")'> end
 
 -- ┌───────────────────────────────────────────────────────────────────────────┐
 -- │                                                                           │
@@ -86,7 +107,7 @@ global function text(str: cstring, x: int32, y: int32): void <cimport> end
 -- └───────────────────────────────────────────────────────────────────────────┘
 
 -- Plays a sound tone.
-global function tone(frequency: uint32, duration: uint32, volume: uint32, flags: uint32): void <cimport> end
+global function tone(frequency: uint32, duration: uint32, volume: uint32, flags: uint32): void <cimport,cattribute'import_name("tone")'> end
 
 global TONE_PULSE1 <comptime> = 0
 global TONE_PULSE2 <comptime> = 1
@@ -104,46 +125,74 @@ global TONE_MODE4 <comptime> = 12
 -- └───────────────────────────────────────────────────────────────────────────┘
 
 -- Reads up to `size` bytes from persistent storage into the pointer `dest`.
-global function diskr(dest: pointer, size: uint32): uint32 <cimport> end
+global function diskr(dest: pointer, size: uint32): uint32 <cimport,cattribute'import_name("diskr")'> end
 
 -- Writes up to `size` bytes from the pointer `src` into persistent storage.
-global function diskw(src: pointer, size: uint32): uint32 <cimport> end
+global function diskw(src: pointer, size: uint32): uint32 <cimport,cattribute'import_name("diskw")'> end
+
+
+-- ┌───────────────────────────────────────────────────────────────────────────┐
+-- │                                                                           │
+-- │ Trace functions                                                           │
+-- │                                                                           │
+-- └───────────────────────────────────────────────────────────────────────────┘
 
 -- Prints a message to the debug console.
-global function trace(str: cstring): void <cimport> end
+global function trace(str: cstring): void <cimport,cattribute'import_name("trace")'> end
 
--- Hack to call Nelua initialization
-local function nelua_main(argc: integer, argv: integer): void <cimport, nodecl> end
-local function _start(): void <cexport, codename "_start">
-    nelua_main(0, 0)
-end
+-- Prints a message to the debug console (C style printf).
+global function tracef(format: cstring, ...: cvarargs): void <cimport,cattribute'import_name("tracef"),__format__ (__printf__, 1, 2)'> end
+
+-- ┌───────────────────────────────────────────────────────────────────────────┐
+-- │                                                                           │
+-- │ Nelua hooks and compiler configuration                                    │
+-- │                                                                           │
+-- └───────────────────────────────────────────────────────────────────────────┘
+
+## if not pragmas.nogc then
+require 'allocators.gc'
+## end
+
+require "stringbuilder" -- for `print()`
 
 -- Hook runtime errors to write using `trace()` instead of writing to C `stderr`.
 local function write_stderr(msg: cstring, len: usize, flush: boolean): void <codename "nelua_write_stderr">
-    trace(msg)
+  trace(msg)
 end
 
 -- Replace global print function to write using `trace()` instead of writing to C `stdout`.
 global function print(...: varargs)
-    local sb: stringbuilder <close>
-    ## for i=1,select('#', ...) do
-        ## if i > 1 then
-            sb:write('\t')
-        ## end
-        sb:write(#[select(i, ...)]#)
+  local sb: stringbuilder <close>
+  ## for i=1,select('#', ...) do
+    ## if i > 1 then
+      sb:write('\t')
     ## end
-    trace(sb:view())
+    sb:write(#[select(i, ...)]#)
+  ## end
+  trace(sb:view())
 end
 
--- Setup compiler settings
-##[[
-cflags "-Wl,-zstack-size=1024,--no-entry,--import-memory -mexec-model=reactor"
-cflags "-Wl,--initial-memory=65536,--max-memory=65536,--global-base=6560,--allow-undefined,--export-dynamic"
+-- Macro used to install `update` and `_start` WASM4 callbacks.
+## function setup_wasm4_callbacks(update)
+  ## static_assert(symbols.update, 'please declare update function!')
 
-if not DEBUG then
-    cflags "-Oz"
-end
+  local function _update(): void <cexport,codename'update'>
+    #[update]#()
+    ## if not pragmas.nogc then
+    -- We must always manually call garbage collection in the end of every frame.
+    -- This is the only safe point to do so, because in WASM we cannot scan the function stack.
+    gc:step()
+    ## end
+  end
 
-context.rootpragmas.abort = "trap"
-context.rootpragmas.writestderr = "hooked"
-]]
+  -- Hook application entry point.
+  local function _start(): void <entrypoint>
+    ## if not pragmas.nogc then
+    -- The GC should be initialized as the first thing.
+    gc:init(nilptr)
+    ## end
+    local function nelua_main(argc: cint, argv: *cstring): cint <cimport,nodecl> end
+    -- This will all code in top scopes.
+    nelua_main(0,nilptr)
+  end
+## end

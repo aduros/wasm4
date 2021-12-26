@@ -236,7 +236,7 @@ for i := range w4.FRAMEBUFFER {
 ```
 
 ```lua
-require 'memory'
+require "memory"
 memory.set(FRAMEBUFFER, (3 | (3 << 2) | (3 << 4) | (3 << 6)), 160*160/4)
 ```
 

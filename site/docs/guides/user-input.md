@@ -178,7 +178,7 @@ func update () {
 ```lua
 local previous_gamepad: uint8
 
-local function update() <cexport, codename 'update'>
+local function update()
     local gamepad = $GAMEPAD1
 
     -- Only the buttons that were pressed down this frame
@@ -189,6 +189,8 @@ local function update() <cexport, codename 'update'>
         trace("Right button was just pressed!")
     end
 end
+
+## setup_wasm4_callbacks(update)
 ```
 
 ```nim

@@ -91,6 +91,23 @@ if justPressed&w4.BUTTON_UP != 0 {
 
 </Page>
 
+<Page value="nelua">
+
+```lua
+local gamepad <const> = $GAMEPAD1
+local just_pressed <const> = gamepad & (gamepad ~ prev_state)
+```
+
+The constant `just_pressed` now holds all buttons that were pressed this frame. You can check the state of a single button like this:
+
+```lua
+if just_pressed & BUTTON_UP ~= 0 then
+  -- Do something
+end
+```
+
+</Page>
+
 <Page value="nim">
 
 // TODO
@@ -239,6 +256,22 @@ func update() {
 
 	snake.Draw()
 }
+```
+
+</Page>
+
+<Page value="nelua">
+
+```lua
+local function update()
+  frame_count = frame_count + 1
+
+  if frame_count % 15 == 0 then
+    snake:update()
+  end
+
+  snake:draw()
+end
 ```
 
 </Page>
@@ -500,6 +533,114 @@ func (s *Snake) Down() {
 		s.Direction = Point{X: 0, Y: 1}
 	}
 }
+```
+
+</Page>
+
+<Page value="nelua">
+
+It's a good idea to handle the input in it's own function. Something like this could be on your mind:
+
+```lua {1-8,13}
+local function input()
+  local gamepad = $GAMEPAD1
+  local just_pressed = gamepad & (gamepad ~ prev_state)
+
+  if just_pressed & BUTTON_UP ~= 0 then
+    -- Do something
+  end
+end
+
+local function update()
+  frame_count = frame_count + 1
+
+  input()
+
+  if frame_count % 15 == 0 then
+    snake:update()
+  end
+
+  snake:draw()
+end
+```
+
+If you try to compile this, you should get an error: `error: undeclared symbol 'prev_state'`. This is easily fixed. Just place the prev_state into the var-section:
+
+```lua {3}
+local snake <const> = Snake.init()
+local frame_count = 0
+local prev_state = 0
+```
+
+To notice any change in the gamepad, you have to store the *current state* at the end of the input. This will make it the *previous state*. And while you're at it, why not add the other 3 directions along the way:
+
+```lua {5-18}
+local function input()
+  local gamepad = $GAMEPAD1
+  local just_pressed = gamepad & (gamepad ~ prev_state)
+
+  if just_pressed & BUTTON_LEFT ~= 0 then
+    -- Do something
+  end
+  if just_pressed & BUTTON_RIGHT ~= 0 then
+    -- Do something
+  end
+  if just_pressed & BUTTON_UP ~= 0 then
+    -- Do something
+  end
+  if just_pressed & BUTTON_DOWN ~= 0 then
+    -- Do something
+  end
+
+  prev_state = gamepad
+end
+```
+
+If you want to check if it works: Use the `trace` function provided by WASM-4. Here's an example:
+
+```lua
+if just_pressed & BUTTON_DOWN ~= 0 then
+  trace("down")
+end
+```
+
+If you use `trace` in each if-statement, you should see the corresponding output in the console.
+
+Now, instead of using `trace` to confirm everything works as intended, you should replace it with something like this:
+
+```lua
+if just_pressed & BUTTON_DOWN ~= 0 then
+  snake:down()
+end
+```
+
+I'll leave it to you, to finish the other 3 directions.
+
+You'll be - once again - rewarded with an error message:
+
+```
+src/main.nelua:1:1: from: AST node Block
+require "wasm4"
+^~~~~~~~~~~~~~~
+src/main.nelua:19:3: from: AST node Block
+  local gamepad = $GAMEPAD1
+  ^~~~~~~~~~~~~~~~~~~~~~~~~
+src/main.nelua:23:5: from: AST node Block
+    snake:left()
+    ^~~~~~~~~~~~
+src/main.nelua:23:10: error: cannot index meta field 'left' for type 'snake.Snake'
+    snake:left()
+         ^~~~~~~
+```
+
+Nelua will only list this first unknown it finds, but you'll get an error for each function as you add them. To fix the errors, add those functions to your snake. Here's an example for `down`:
+
+```lua
+function Snake:down()
+  if self.direction.y == 0 then
+    self.direction = {x = 0, y = 1}
+  end
+end
 ```
 
 </Page>

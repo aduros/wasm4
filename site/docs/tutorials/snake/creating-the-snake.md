@@ -84,6 +84,58 @@ Creating our own type reduces the size of the cart.
 
 </Page>
 
+<Page value="nelua">
+
+To keep things tidy, I recommend you'd create a new file called `snake.nelua`. This file contains two records:
+
+- The `Point` - Holding X and Y coordinates
+- The `Snake` - The actual snake implementation
+
+The content is rather simple:
+
+```lua
+require "wasm4"
+local sequence = require "sequence"
+
+local snake = @record{}
+
+local snake.Point = @record{
+  x: int32,
+  y: int32,
+}
+
+local Point = snake.Point
+
+function Point.__eq(self: Point, other: Point): boolean
+  return self.x == other.x and self.y == other.y
+end
+
+local snake.Snake = @record{
+  body: sequence(Point),
+  direction: Point,
+}
+
+local Snake = snake.Snake
+
+function Snake.init(): Snake
+  return Snake{
+    body = {
+      { x = 2, y = 0 },
+      { x = 1, y = 0 },
+      { x = 0, y = 0 },
+    },
+    direction = { x = 1, y = 0 },
+  }
+end
+
+return snake
+```
+
+The snake record contains the body and the current direction of the snake instance.
+But it lacks any functionality for now.
+
+</Page>
+
 <Page value="nim">
 
 // TODO

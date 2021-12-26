@@ -48,6 +48,16 @@ Your game will be here: `build/cart.wasm`
 
 </Page>
 
+<Page value="nelua">
+
+```shell
+make
+```
+
+Your game will be here: `build/cart.wasm`
+
+</Page>
+
 <Page value="nim">
 
 // TODO

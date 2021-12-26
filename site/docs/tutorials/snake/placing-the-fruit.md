@@ -42,6 +42,22 @@ To place (and eat) a fruit, you first need to make a variable for this. Since it
 
 </Page>
 
+<Page value="nelua">
+To place (and eat) a fruit, you first need to make a variable for this. Since it's simply a point on the grid, `Point` will do.
+
+```lua {6}
+require "wasm4"
+local Snake = require "snake"
+local Point, Snake = Snake.Point, Snake.Snake
+
+local snake <const> = Snake.init()
+local fruit: Point
+local frame_count = 0
+local prev_state = 0
+```
+
+</Page>
+
 <Page value="nim">
 
 // TODO
@@ -155,6 +171,22 @@ Works. But since this is the `start`-function, `frameCount` is pretty much alway
 :::tip Check the for nil
 Keep in mind, that the value of `rnd` is `nil` if it wasn't initialized yet.
 :::
+
+</Page>
+
+<Page value="nelua">
+
+Nelua provides us a `math` library with a `random` function, which when called with two integers `m` and `n` it returns a pseudo-random integer with uniform distribution in the range [`m`, `n`].
+This allows you to call `math.random(0, 19)` to get a number between `0` and `19`. Now you can change the fruit declaration:
+
+```lua {1, 4}
+local math = require 'math'
+
+local snake <const> = Snake.init()
+local fruit: Point = { x = math.random(0, 19), y = math.random(0,19) }
+local frame_count = 0
+local prev_state = 0
+```
 
 </Page>
 
@@ -333,6 +365,40 @@ With that out of the way, it's time to actually render the newly imported sprite
 
 </Page>
 
+<Page value="nelua">
+
+Now you need to import the image. For this, the WASM-4 CLI tool `w4` comes with another tool: `png2src`. You can use it like this:
+
+`w4 png2src --nelua fruit.png`
+
+This will output the following content in the terminal:
+
+```lua
+-- fruit
+local fruit_width <comptime> = 8
+local fruit_height <comptime> = 8
+local fruit_flags <comptime> = 1 -- BLIT_2BPP
+local fruit: [16]uint8 <const> = { 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0 }
+```
+
+To get it into a an existing file, use the `>>` operator. Like this:
+
+`w4 png2src --assemblyscript fruit.png >> main.nelua`
+
+This will add the previous lines to your `main.nelua` and it will shadow the previous `fruit` variable. Just rename the new fruit to `fruit_sprite` and move it somewhere else. Also: You can remove the other stuff added, you won't need it for this project:
+
+```lua {5}
+local snake <const> = Snake.init()
+local fruit: Point = { x = math.random(0, 19), y = math.random(0,19) }
+local frame_count = 0
+local prev_state = 0
+local fruit_sprite: [16]uint8 <const> = { 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0 }
+```
+
+With that out of the way, it's time to actually render the newly imported sprite.
+
+</Page>
+
 <Page value="nim">
 
 // TODO
@@ -477,6 +543,46 @@ But since you set the drawing colors, you need to change the drawing colors too:
 
 	*w4.DRAW_COLORS = 0x4320
 	w4.Blit(&fruitSprite[0], fruit.X*8, fruit.Y*8, 8, 8, w4.BLIT_2BPP)
+```
+
+This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.
+
+</Page>
+
+<Page value="nelua">
+
+Rendering the sprite is rather simple. Just call the `blit` function of w4:
+
+```lua
+// Blit draws a sprite at position `x`, `y` and uses DRAW_COLORS accordingly
+global function blit(data: *[0]uint8, x: int32, y: int32, width: uint32, height: uint32, flags: uint32)
+```
+
+In practice it looks like this:
+
+```lua {12}
+local function update()
+  frame_count = frame_count + 1
+
+  input()
+
+  if frame_count % 15 == 0 then
+    snake:update()
+  end
+
+  snake:draw()
+
+  blit(fruit_sprite, fruit.x * 8, fruit.y * 8, 8, 8, BLIT_2BPP)
+end
+```
+
+But since you set the drawing colors, you need to change the drawing colors too:
+
+```lua {3}
+  snake:draw()
+
+  $DRAW_COLORS = 0x4320
+  blit(fruit_sprite, fruit.x * 8, fruit.y * 8, 8, 8, BLIT_2BPP)
 ```
 
 This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.

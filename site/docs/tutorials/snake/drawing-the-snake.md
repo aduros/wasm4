@@ -173,16 +173,14 @@ require "wasm4"
 local Snake = require "snake"
 local Point, Snake = Snake.Point, Snake.Snake
 
-local snake <const> = Snake.init()
+local snake = Snake.init()
 
-local function start() <cexport, codename "start">
-  $PALETTE = {
-    0xfbf7f3,
-    0xe5b083,
-    0x426e5d,
-    0x20283d
-  }
-end
+$PALETTE = {
+  0xfbf7f3,
+  0xe5b083,
+  0x426e5d,
+  0x20283d
+}
 
 local function update()
   snake:draw()

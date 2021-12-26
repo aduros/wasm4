@@ -94,8 +94,8 @@ if justPressed&w4.BUTTON_UP != 0 {
 <Page value="nelua">
 
 ```lua
-local gamepad <const> = $GAMEPAD1
-local just_pressed <const> = gamepad & (gamepad ~ prev_state)
+local gamepad = $GAMEPAD1
+local just_pressed = gamepad & (gamepad ~ prev_state)
 ```
 
 The constant `just_pressed` now holds all buttons that were pressed this frame. You can check the state of a single button like this:
@@ -567,7 +567,7 @@ end
 If you try to compile this, you should get an error: `error: undeclared symbol 'prev_state'`. This is easily fixed. Just place the prev_state into the var-section:
 
 ```lua {3}
-local snake <const> = Snake.init()
+local snake = Snake.init()
 local frame_count = 0
 local prev_state = 0
 ```

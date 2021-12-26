@@ -106,10 +106,6 @@ local snake.Point = @record{
 
 local Point = snake.Point
 
-function Point.__eq(self: Point, other: Point): boolean
-  return self.x == other.x and self.y == other.y
-end
-
 local snake.Snake = @record{
   body: sequence(Point),
   direction: Point,

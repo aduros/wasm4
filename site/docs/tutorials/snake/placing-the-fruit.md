@@ -50,7 +50,7 @@ require "wasm4"
 local Snake = require "snake"
 local Point, Snake = Snake.Point, Snake.Snake
 
-local snake <const> = Snake.init()
+local snake = Snake.init()
 local fruit: Point
 local frame_count = 0
 local prev_state = 0
@@ -182,7 +182,7 @@ This allows you to call `math.random(0, 19)` to get a number between `0` and `19
 ```lua {1, 4}
 local math = require 'math'
 
-local snake <const> = Snake.init()
+local snake = Snake.init()
 local fruit: Point = { x = math.random(0, 19), y = math.random(0,19) }
 local frame_count = 0
 local prev_state = 0
@@ -378,21 +378,21 @@ This will output the following content in the terminal:
 local fruit_width <comptime> = 8
 local fruit_height <comptime> = 8
 local fruit_flags <comptime> = 1 -- BLIT_2BPP
-local fruit: [16]uint8 <const> = { 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0 }
+local fruit: [16]uint8 = { 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0 }
 ```
 
 To get it into a an existing file, use the `>>` operator. Like this:
 
-`w4 png2src --assemblyscript fruit.png >> main.nelua`
+`w4 png2src --nelua fruit.png >> main.nelua`
 
 This will add the previous lines to your `main.nelua` and it will shadow the previous `fruit` variable. Just rename the new fruit to `fruit_sprite` and move it somewhere else. Also: You can remove the other stuff added, you won't need it for this project:
 
 ```lua {5}
-local snake <const> = Snake.init()
+local snake = Snake.init()
 local fruit: Point = { x = math.random(0, 19), y = math.random(0,19) }
 local frame_count = 0
 local prev_state = 0
-local fruit_sprite: [16]uint8 <const> = { 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0 }
+local fruit_sprite: [16]uint8 = { 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0 }
 ```
 
 With that out of the way, it's time to actually render the newly imported sprite.

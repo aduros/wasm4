@@ -423,7 +423,7 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
 
 ```lua {2}
-local snake <const> = Snake.init()
+local snake = Snake.init()
 local frame_count = 0
 ```
 

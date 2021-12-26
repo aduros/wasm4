@@ -313,7 +313,7 @@ What you do, is up to you. You could stop the game and show the score. Or you co
 
 ```lua
 function Snake:is_dead(): boolean
-  local head <const> = self.body[1]
+  local head = self.body[1]
 
   for i = 2, #self.body do
     if self.body[i] == head then

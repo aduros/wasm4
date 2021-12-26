@@ -73,7 +73,7 @@ var smiley = [8]byte {
 ```
 
 ```lua
-local smiley: []uint8 <const> = {
+local smiley: []uint8 = {
     0b11000011,
     0b10000001,
     0b00100100,

@@ -23,30 +23,52 @@ export function Page ({children, hidden, className}) {
     );
 }
 
-export default function MultiLanguage (props) {
-    const children = Children.toArray(props.children);
+/**
+ * @type {() => { activeLang: string, updateLang: (nextLang: string) => void}}
+ */
+function useLanguageCode() {
     const {tabGroupChoices, setTabGroupChoices} = useUserPreferencesContext();
-    const [selectedValue, setSelectedValue] = useState("assemblyscript");
+    const [activeLang, setSelectedValue] = useState(() => {
+        const relevantTabGroupChoice = tabGroupChoices.language;
 
-    function handleChange (value) {
-        // TODO(2021-11-26): Hide the dropdown?
+        const currentQueryParams = new URLSearchParams(window.location.search);
+
+        const langByQueryParams = (currentQueryParams.get('code-lang') ?? '').toLowerCase().trim();
+        
+        if(Object.prototype.hasOwnProperty.call(names, langByQueryParams)) {
+            return langByQueryParams;
+        }
+
+        if (relevantTabGroupChoice != null && relevantTabGroupChoice != activeLang) {
+            return relevantTabGroupChoice;
+        }
+
+        return "assemblyscript";
+    });
+
+
+    function updateLang (value) {
         setSelectedValue(value);
         setTabGroupChoices("language", value);
     }
 
-    const relevantTabGroupChoice = tabGroupChoices.language;
-    if (relevantTabGroupChoice != null && relevantTabGroupChoice != selectedValue) {
-        setSelectedValue(relevantTabGroupChoice);
-    }
+
+   return { activeLang, updateLang };
+}
+
+
+export default function MultiLanguage (props) {
+    const children = Children.toArray(props.children);
+    const { activeLang, updateLang } = useLanguageCode();
 
     const dropdown = (
         <div className="dropdown dropdown--hoverable dropdown--right">
-            <a className="navbar__link">{names[selectedValue]} </a>
+            <a className="navbar__link">{names[activeLang]} </a>
             <ul className="dropdown__menu text--left">
                 {Object.entries(names).map(([value, name]) => 
-                    <li>
-                        <a className={`dropdown__link ${value == selectedValue ? "dropdown__link--active" : ""}`}
-                            onClick={() => handleChange(value)}>
+                    <li key={value}>
+                        <a className={`dropdown__link ${value == activeLang ? "dropdown__link--active" : ""}`}
+                            onClick={() => updateLang(value)}>
                             {name}
                         </a>
                     </li>
@@ -61,10 +83,10 @@ export default function MultiLanguage (props) {
                 {dropdown}
             </div>
             <div>
-                {children.map((item, i) =>
+                {children.map((item) =>
                     cloneElement(item, {
-                        key: i,
-                        hidden: item.props.value !== selectedValue,
+                        key: item.props.value,
+                        hidden: item.props.value !== activeLang,
                     })
                 )}
             </div>

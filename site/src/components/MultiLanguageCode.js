@@ -17,8 +17,8 @@ const classNameToLanguage = {
 };
 
 export default function MultiLanguageCode (props) {
-    const pages = props.children.map(child => (
-        <Page value={classNameToLanguage[child.props.children.props.className]}>
+    const pages = props.children.map((child, idx) => (
+        <Page key={idx} value={classNameToLanguage[child.props.children.props.className]}>
             {child}
         </Page>
     ));

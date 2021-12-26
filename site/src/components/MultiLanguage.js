@@ -1,4 +1,4 @@
-import React, {useState, cloneElement, Children} from 'react';
+import React, {useState, cloneElement, Children, useRef, useEffect } from 'react';
 import useUserPreferencesContext from '@theme/hooks/useUserPreferencesContext';
 
 import "./MultiLanguage.css";
@@ -31,15 +31,7 @@ function useLanguageCode() {
     const [activeLang, setSelectedValue] = useState(() => {
         const relevantTabGroupChoice = tabGroupChoices.language;
 
-        const currentQueryParams = new URLSearchParams(window.location.search);
-
-        const langByQueryParams = (currentQueryParams.get('code-lang') ?? '').toLowerCase().trim();
-        
-        if(Object.prototype.hasOwnProperty.call(names, langByQueryParams)) {
-            return langByQueryParams;
-        }
-
-        if (relevantTabGroupChoice != null && relevantTabGroupChoice != activeLang) {
+        if (relevantTabGroupChoice != null) {
             return relevantTabGroupChoice;
         }
 
@@ -47,11 +39,31 @@ function useLanguageCode() {
     });
 
 
-    function updateLang (value) {
+    /**
+     * @type {(val: string) => void}
+     */
+    const updateLang = (value)=> {
         setSelectedValue(value);
         setTabGroupChoices("language", value);
-    }
+    };
 
+    // @see https://overreacted.io/making-setinterval-declarative-with-react-hooks/
+    const updateLangRef = useRef(updateLang);
+
+    useEffect(()=> {
+        updateLangRef.current = updateLang;
+    });
+
+    const search = (typeof window !== 'undefined' ? window.location.search : '');
+
+    useEffect(() => {
+        const currentQueryParams = new URLSearchParams(search);
+        const langByQueryParams = (currentQueryParams.get('code-lang') ?? '').toLowerCase().trim();
+
+        if(Object.prototype.hasOwnProperty.call(names, langByQueryParams)) {
+            updateLangRef.current(langByQueryParams);
+        }
+    }, [search])
 
    return { activeLang, updateLang };
 }

@@ -8,7 +8,7 @@ ldflags "-Wl,--initial-memory=65536,--max-memory=65536,--global-base=6560,--expo
 
 if DEBUG then
   -- We should use at least 01 optimization, otherwise the application may use too much stack space.
-  cflags "-Oz -g"
+  cflags "-O1 -g"
   ldflags "-Wl,--export-all,--no-gc-sections"
 else
   -- Optimization for the making the application small as possible.
@@ -22,6 +22,8 @@ context.rootpragmas.abort = "trap"
 context.rootpragmas.writestderr = "hooked"
 -- We don't need to emit `main()` entry point, we will hook this ourselves.
 context.rootpragmas.nogcentry = true
+-- Bundle `snprintf` (used by `string.format`).
+context.rootpragmas.usenanoprintf = true
 ]]
 
 -- ┌───────────────────────────────────────────────────────────────────────────┐
@@ -38,7 +40,7 @@ global SCREEN_SIZE <comptime> = 160
 -- │                                                                           │
 -- └───────────────────────────────────────────────────────────────────────────┘
 
-global PALETTE = (@*[4]uint32)(0x04)
+global PALETTE <comptime> = (@*[4]uint32)(0x04)
 global DRAW_COLORS <comptime> = (@*uint16)(0x14)
 global GAMEPAD1 <comptime> = (@*uint8)(0x16)
 global GAMEPAD2 <comptime> = (@*uint8)(0x17)
@@ -48,7 +50,7 @@ global MOUSE_X <comptime> = (@*int16)(0x1a)
 global MOUSE_Y <comptime> = (@*int16)(0x1c)
 global MOUSE_BUTTONS <comptime> = (@*uint8)(0x1e)
 global SYSTEM_FLAGS <comptime> = (@*uint8)(0x1f)
-global FRAMEBUFFER = (@*[6400]uint8)(0xa0)
+global FRAMEBUFFER <comptime> = (@*[6400]uint8)(0xa0)
 
 global BUTTON_1 <comptime> = 1
 global BUTTON_2 <comptime> = 2
@@ -174,7 +176,7 @@ end
 
 -- Macro used to install `update` and `_start` WASM4 callbacks.
 ## function setup_wasm4_callbacks(update)
-  ## static_assert(symbols.update, 'please declare update function!')
+  ## static_assert(update, 'please declare update function!')
 
   local function _update(): void <cexport,codename'update'>
     #[update]#()
@@ -186,7 +188,7 @@ end
   end
 
   -- Hook application entry point.
-  local function _start(): void <entrypoint>
+  local function _start(): void <cexport,entrypoint>
     ## if not pragmas.nogc then
     -- The GC should be initialized as the first thing.
     gc:init(nilptr)

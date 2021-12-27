@@ -47,6 +47,11 @@ program.command("watch")
     .description("Rebuild and refresh when source code changes")
     .option("--open", "Open the browser", true)
     .addOption(
+        new Option("--port <port>", "Binds the runtime to a specific port")
+            .env("W4_PORT")
+            .default("4444")
+    )
+    .addOption(
         new Option("-n, --no-open", "Don't open the browser")
             .env("W4_NO_OPEN")
             .default(false)
@@ -65,6 +70,11 @@ program.command("watch")
 program.command("run <cart>")
     .description("Open a cartridge in the web runtime")
     .option("--open", "Open the browser", true)
+    .addOption(
+        new Option("--port <port>", "Binds the runtime to a specific port")
+            .env("W4_PORT")
+            .default("4444")
+    )
     .addOption(
         new Option("-n, --no-open", "Don't open the browser")
             .env("W4_NO_OPEN")

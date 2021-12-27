@@ -124,7 +124,8 @@ w4 watch --no-open
 | --no-open |               | Same as `-n`                                  |
 | --open    |               | Forces a new browser tab or window (Default)  |
 | --qr      |               | Generates a QR code in the terminal (Default) |
-| --no-qr   |               | Prevents the generation of a QR code                                 |
+| --no-qr   |               | Prevents the generation of a QR code          |
+| --port    | 4444          | Binds the command to the given port           |
 
 **Description:**
 
@@ -133,9 +134,9 @@ The option `-n`/`--no-open` prevents the browser from opening.
 
 Another default behavior is the generation of a QR code in the terminal. This can be useful to test games on other devices such as mobile phones. The option `--no-qr` prevents this from happening. This can be useful in case the terminal can't display QR codes.
 
-It's also possible to set those options by setting an environment variable for the current user or the whole system. The corresponding variables are `W4_NO_OPEN` and `W4_NO_QR`. Setting it to any value activates them.
+The `--port` option allows to bind the command on a specific port. The default port is `4444`. In case, `w4` is unable to bind to the given port, it tries to find an available port in the next 1000 higher ports. Should this also fail, the execution will be stopped and an error will be presented to notify the user.
 
-Also note, that the server will listen on `localhost:4444`.
+It's also possible to set those options by setting an environment variable for the current user or the whole system. The corresponding variables are `W4_NO_OPEN`, `W4_NO_QR` and `W4_PORT`. Setting it to any value activates them.
 
 Example (Linux):
 
@@ -143,6 +144,7 @@ Example (Linux):
 # ~/.profile
 export W4_NO_OPEN=1 # Disable the browser from opening
 export W4_NO_QR=1   # Disable the generation of QR codes
+export W4_PORT=8080 # Use port 8080 instead of port 4444
 ```
 
 ## `run`

@@ -32,8 +32,7 @@ function start (cartFile, opts) {
             console.log("\n  " + qr.replace(/\n/g, "\n  "));
         }
         if (FIRST_PORT != PORT) {
-            console.log(`Unable to bind on port ${FIRST_PORT}.`);
-            console.log(`Using ${PORT} instead.`);
+            console.log(`Unable to bind on port ${FIRST_PORT}, using ${PORT} instead.`);
         }
         console.log(`Open http://localhost:${PORT}${opts.qr ? ", or scan this QR code on your mobile device." : "."} Press ctrl-C to exit.`);
 
@@ -50,7 +49,7 @@ function start (cartFile, opts) {
             console.log(`\tw4 help watch\n`)
             console.log('or\n')
             console.log(`\tw4 help run\n`)
-            console.log('for more informations.')
+            console.log('for more information.')
             exit(1);
         } else {
             PORT++;

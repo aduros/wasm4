@@ -15,6 +15,20 @@ const names = {
     "zig": "Zig",
 };
 
+/**
+ * @type {(val: unknown) => val is keyof typeof names}
+ */
+function isValidLanguageValue(value) {
+    return typeof value === 'string' && Object.prototype.hasOwnProperty.call(names, value);
+}
+
+/**
+ * @type {(val: string | null | undefined) => string}
+ */
+function normalizeLanguageValue(val) {
+    return (val ?? '').trim().toLowerCase()
+}
+
 export function Page ({children, hidden, className}) {
     return (
         <div {...{hidden, className}}>
@@ -28,22 +42,13 @@ export function Page ({children, hidden, className}) {
  */
 function useLanguageCode() {
     const {tabGroupChoices, setTabGroupChoices} = useUserPreferencesContext();
-    const [activeLang, setSelectedValue] = useState(() => {
-        const relevantTabGroupChoice = tabGroupChoices.language;
-
-        if (relevantTabGroupChoice != null) {
-            return relevantTabGroupChoice;
-        }
-
-        return "assemblyscript";
-    });
-
+    const [activeLang, setActiveLang] = useState("assemblyscript");
 
     /**
      * @type {(val: string) => void}
      */
-    const updateLang = (value)=> {
-        setSelectedValue(value);
+    const updateLang = (value) => {
+        setActiveLang(value);
         setTabGroupChoices("language", value);
     };
 
@@ -55,13 +60,23 @@ function useLanguageCode() {
     });
 
     const search = (typeof window !== 'undefined' ? window.location.search : '');
+    const rawLanguagePreference = tabGroupChoices.language;
+
+    useEffect(() => {
+        const langFromPreferences = normalizeLanguageValue(rawLanguagePreference);
+
+        if(isValidLanguageValue(langFromPreferences)) {
+            setActiveLang(langFromPreferences);
+        }
+
+    }, [rawLanguagePreference]);
 
     useEffect(() => {
         const currentQueryParams = new URLSearchParams(search);
-        const langByQueryParams = (currentQueryParams.get('code-lang') ?? '').toLowerCase().trim();
+        const langFromQueryParams = normalizeLanguageValue(currentQueryParams.get('code-lang'));
 
-        if(Object.prototype.hasOwnProperty.call(names, langByQueryParams)) {
-            updateLangRef.current(langByQueryParams);
+        if(isValidLanguageValue(langFromQueryParams)) {
+            updateLangRef.current(langFromQueryParams);
         }
     }, [search])
 

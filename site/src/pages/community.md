@@ -30,7 +30,7 @@ Here are WASM-4's goals for the future:
 - Grow and support a friendly open source community.
 - Add a pause button and options menu to the emulator.
 - First-class support for new languages: [Swift](https://swiftwasm.org/),
-  [Ruby](https://crystal-lang.org), [Lua](https://nelua.io/).
+  [Ruby](https://crystal-lang.org), [C#](https://github.com/yowl/csharp-wasm4).
 - Port the C runtime to low end handheld devices.
 - Support importing and playing music from [Beepbox](https://www.beepbox.co) and other tools.
 - Improve responsiveness of the virtual gamepad on mobile.

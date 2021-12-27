@@ -1,4 +1,7 @@
 import React, {useState, cloneElement, Children, useRef, useEffect } from 'react';
+import Link from '@docusaurus/Link';
+import { useHistory } from 'react-router-dom';
+import clsx from 'clsx';
 import useUserPreferencesContext from '@theme/hooks/useUserPreferencesContext';
 
 import "./MultiLanguage.css";
@@ -48,8 +51,14 @@ function useLanguageCode() {
      * @type {(val: string) => void}
      */
     const updateLang = (value) => {
-        setActiveLang(value);
-        setTabGroupChoices("language", value);
+        const isValid = isValidLanguageValue(value);
+
+        if(value !== activeLang && isValid) {
+            setActiveLang(value);
+            setTabGroupChoices("language", value);
+        } else if(!isValid) {
+            console.warn(`MultilanguageCode: invalid code-lang received: "${value}"`);
+        }
     };
 
     // @see https://overreacted.io/making-setinterval-declarative-with-react-hooks/
@@ -86,19 +95,29 @@ function useLanguageCode() {
 
 export default function MultiLanguage (props) {
     const children = Children.toArray(props.children);
-    const { activeLang, updateLang } = useLanguageCode();
+    const { activeLang } = useLanguageCode();
+    const history = useHistory();
 
     const dropdown = (
         <div className="dropdown dropdown--hoverable dropdown--right">
             <a className="navbar__link">{names[activeLang]} </a>
             <ul className="dropdown__menu text--left">
-                {Object.entries(names).map(([value, name]) => 
-                    <li key={value}>
-                        <a className={`dropdown__link ${value == activeLang ? "dropdown__link--active" : ""}`}
-                            onClick={() => updateLang(value)}>
-                            {name}
-                        </a>
-                    </li>
+                {Object.entries(names).map(([value, name]) => {
+                    // We use `#no-scroll` to prevent scroll to top on page change.
+                    // @see https://github.com/facebook/docusaurus/blob/73ee356949e6baf70732c69cf6be8d8919f3f75a/packages/docusaurus/src/client/PendingNavigation.tsx#L79
+                    const to = `${history.location.pathname}?code-lang=${value}${history.location.hash || '#no-scroll'}`
+
+                    return (<li key={value}>
+                        <Link 
+                          to={to} 
+                          replace
+                          className={clsx('dropdown__link', value == activeLang && "dropdown__link--active")}
+                        >
+                        {name}
+                        </Link>
+                    </li>);
+                }
+       
                 )}
             </ul>
         </div>

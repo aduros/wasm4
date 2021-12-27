@@ -26,6 +26,7 @@ export class APU {
         this.ctx = ctx;
 
         this.nodes = new Array(4);
+        this.gains = new Array(4);
 
         function createDutyCycle (pulseWidth) {
             const real = new Float32Array(DUTY_CYCLE_LENGTH);
@@ -82,22 +83,31 @@ export class APU {
             sustainLevel *= 0.5;
         }
 
-        // Create gain node with ADSR ramp
-        const gain = ctx.createGain();
-        const gainValue = gain.gain;
-        gainValue.setValueAtTime(0, 0);
-        gainValue.linearRampToValueAtTime(peakLevel, attackTime);
-        gainValue.linearRampToValueAtTime(sustainLevel, decayTime);
-        gainValue.linearRampToValueAtTime(sustainLevel, sustainTime);
-        gainValue.linearRampToValueAtTime(0, releaseTime);
-
         let node;
-        if (channel == 3) {
-            node = ctx.createBufferSource();
-            node.buffer = this.noiseBuffer;
-            node.loop = true;
+        const existingNode = this.nodes[channel];
+        if (existingNode != null) {
+            node = existingNode;
+        } else {
+            // create a new node
+            if (channel == 3) {
+                node = ctx.createBufferSource();
+                node.buffer = this.noiseBuffer;
+                node.loop = true;
+            } else {
+                node = ctx.createOscillator();
+                if (channel == 2) {
+                    node.type = "triangle";
+                }
+            }
+            this.nodes[channel] = node;
+            node.addEventListener('ended', () => {this.nodes[channel] = null;}); //note: might want accesses to be atomic
+            node.start(0);
+        }
 
+        // update a node, whether new or reused
+        if (channel == 3) {
             const pbrValue = node.playbackRate;
+            pbrValue.cancelScheduledValues(0);
             pbrValue.setValueAtTime(freq1*freq1/1000000, 0);
             // pbrValue.value = NOISE_TABLE[16*(freq1/1024) | 0];
             if (freq2) {
@@ -105,30 +115,40 @@ export class APU {
             }
 
         } else {
-            node = ctx.createOscillator();
-            if (channel == 2) {
-                node.type = "triangle";
-            } else {
+            if (channel != 2) {
                 const wave = this.pulseDutyCycles[mode];
                 node.setPeriodicWave(wave);
             }
 
             const freqValue = node.frequency;
+            freqValue.cancelScheduledValues(0);
             freqValue.setValueAtTime(freq1, 0);
             if (freq2) {
                 freqValue.linearRampToValueAtTime(freq2, releaseTime);
             }
         }
+        node.stop(releaseTime); // replaces any previous stop delay
 
-        const existingNode = this.nodes[channel];
-        if (existingNode != null) {
-            existingNode.stop(0);
+        // Create gain node with ADSR ramp
+        let gain;
+        const existingGain = this.gains[channel];
+        if (existingGain != null) {
+            gain = existingGain;
+            existingGain.gain.cancelScheduledValues(0);
+        } else {
+            gain = ctx.createGain();
+            this.gains[channel] = gain;
+            gain.connect(ctx.destination);
         }
-        this.nodes[channel] = node;
-
-        node.start(0);
-        node.stop(releaseTime);
         node.connect(gain);
-        gain.connect(ctx.destination);
+
+        const gainValue = gain.gain;
+        if(existingNode == null){
+            gainValue.setValueAtTime(0, 0);
+        }
+        gainValue.linearRampToValueAtTime(peakLevel, attackTime);
+        gainValue.linearRampToValueAtTime(sustainLevel, decayTime);
+        gainValue.linearRampToValueAtTime(sustainLevel, sustainTime);
+        gainValue.linearRampToValueAtTime(0, releaseTime);
     }
 }

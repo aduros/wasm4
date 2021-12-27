@@ -473,7 +473,9 @@ async function loadCartWasm () {
 
         if (deltaFrame >= INTERVAL) {
             lastFrame = now - (deltaFrame % INTERVAL);
-            runtime.update();
+            if (!runtime.crashed) {
+                runtime.update();
+            }
 
             gamepadOverlay.style.display = runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY)
                 ? "none" : "";

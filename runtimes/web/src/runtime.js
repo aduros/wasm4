@@ -29,6 +29,7 @@ export class Runtime {
         this.reset();
 
         this.paused = false;
+        this.crashed = false;
     }
 
     setMouse (x, y, buttons) {
@@ -83,7 +84,7 @@ export class Runtime {
         const ctx = this.apu.ctx;
         if (ctx.state == "running") {
             ctx.suspend();
-        } 
+        }
     }
 
     reset (zeroMemory) {
@@ -92,6 +93,7 @@ export class Runtime {
         if (zeroMemory) {
             mem32.fill(0);
         }
+        this.crashed = false;
         mem32.set(constants.COLORS, constants.ADDR_PALETTE >> 2);
         this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
 
@@ -289,10 +291,69 @@ export class Runtime {
         }
 
         if (this.wasm.exports.update != null) {
-            this.wasm.exports.update();
+            try {
+                this.wasm.exports.update();
+            } catch (err) {
+                if (err instanceof WebAssembly.RuntimeError) {
+                    this.blueScreen(err);
+                } else {
+                    // if we don't know what it is, throw it again
+                    throw err;
+                }
+            }
+
         }
 
         this.composite();
+    }
+
+    errorToBlueScreenText(err) {
+        let message = `${err.name}:\n${err.message}`;
+
+        // hand written messages for specific errors
+        if (err.message.match(/unreachable/)) {
+            message = "This cartridge has\nreached a code \nsegment marked as\nunreachable.";
+        } else if (err.message.match(/out of bounds/)) {
+            message = "This cartridge has\nattempted a memory\naccess that is\nout of bounds.";
+        }
+        message += "\n\n\n\n\nHit R to reboot.";
+        return message;
+    }
+
+    blueScreen(err) {
+        this.crashed = true;
+
+        const COLORS = [
+            0x1111ee, // blue
+            0x86c06c,
+            0xaaaaaa, // grey
+            0xffffff, // white
+        ];
+
+        const toCharArr = (s) => [...s].map(x => x.charCodeAt(0));
+
+        const title = ` ${constants.CRASH_TITLE} `;
+        const UI = {
+            header_title: title,
+            header_width: (8 * title.length) - 1,
+            header_x: (160 - (8 * title.length)) / 2,
+            header_y: 20,
+            message_y: 60,
+            message_x: 9
+        };
+        const mem32 = new Uint32Array(this.memory.buffer);
+        mem32.set(COLORS, constants.ADDR_PALETTE >> 2);
+        this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
+        this.framebuffer.clear();
+        this.framebuffer.drawHLine(UI.header_x, UI.header_y-1, UI.header_width);
+        this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1131, true);
+        this.framebuffer.drawText(toCharArr(UI.header_title), UI.header_x, UI.header_y);
+        this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
+        const errorExplanation = this.errorToBlueScreenText(err);
+        this.framebuffer.drawText(toCharArr(errorExplanation), UI.message_x, UI.message_y);
+        this.composite();
+        // to help with debugging
+        console.error(err);
     }
 
     composite () {

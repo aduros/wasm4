@@ -7,6 +7,8 @@ export const HEIGHT = 160;
 
 export const STORAGE_SIZE = 1024;
 
+export const CRASH_TITLE = "WASM-4";
+
 // Default palette
 export const COLORS = [
     0xe0f8cf,

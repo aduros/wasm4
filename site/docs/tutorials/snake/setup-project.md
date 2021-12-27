@@ -122,6 +122,29 @@ w4 watch
 
 </Page>
 
+<Page value="nelua">
+
+To compile Nelua projects you will need `nelua` installed.
+
+```shell
+w4 new --nelua snake
+cd snake
+```
+
+Compile the .wasm cartridge:
+
+```shell
+make
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 watch
+```
+
+</Page>
+
 <Page value="nim">
 
 :::note Work in Progress

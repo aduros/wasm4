@@ -61,6 +61,15 @@ func update() {
 }
 ```
 
+```lua
+require "wasm4"
+
+local function update()
+end
+
+## setup_wasm4_callbacks(update)
+```
+
 ```nim
 # TODO
 ```
@@ -111,6 +120,18 @@ func start() {
 	w4.PALETTE[1] = 0xe5b083
 	w4.PALETTE[2] = 0x426e5d
 	w4.PALETTE[3] = 0x20283d
+}
+```
+
+```lua
+require "wasm4"
+
+-- in nelua we can place the "start" code at the top of the file
+$PALETTE = {
+  0xfbf7f3,
+  0xe5b083,
+  0x426e5d,
+  0x20283d
 }
 ```
 

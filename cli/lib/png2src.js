@@ -47,9 +47,9 @@ var {{name}} = [{{length}}]byte { {{bytes}} }
     nelua:
 `{{#sprites}}
 -- {{name}}
-local {{name}}_width <const> = {{width}}
-local {{name}}_height <const> = {{height}}
-local {{name}}_flags <const> = {{flags}} -- {{flagsHumanReadable}}
+local {{name}}_width <comptime> = {{width}}
+local {{name}}_height <comptime> = {{height}}
+local {{name}}_flags <comptime> = {{flags}} -- {{flagsHumanReadable}}
 local {{name}}: [{{length}}]uint8 <const> = { {{bytes}} }
 
 {{/sprites}}`,

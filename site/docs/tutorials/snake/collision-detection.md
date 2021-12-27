@@ -106,6 +106,54 @@ Now you're almost done. Only "Game Over" is left to finish this game.
 
 </Page>
 
+<Page value="nelua">
+
+A simple
+
+```lua
+if snake.body[1] == fruit then
+  -- Snake's head hits the fruit
+end
+```
+
+is enough already to check if the snake eats the fruit. And to make the snake "grow", simply increase the length of the snake using the `push` function of the sequence. Now it remains the question what values should this new piece have. The easiest would be to add the current last piece:
+
+```lua
+local tail = snake.body[#snake.body]
+snake.body:push({ x = tail.x, y = tail.y })
+```
+
+Once this done, simply relocate the fruit:
+
+```lua
+fruit = { x = math.random(0, 19), y = math.random(0,19) }
+```
+
+Just this however will realocate the fruit in the same places for every run because it uses always the same seed, to generate a random seed we need to call `math.randomseed` function with at least one argument, which can be `frame_count`:
+
+```lua
+math.randomseed(frame_count)
+```
+
+In it's final form, it could look like this:
+
+```lua {4-9}
+  if frame_count % 15 == 0 then
+    snake:update()
+
+    if snake.body[1] == fruit then
+      local tail = snake.body[#snake.body]
+      snake.body:push({ x = tail.x, y = tail.y })
+      math.randomseed(frame_count)
+      fruit = { x = math.random(0, 19), y = math.random(0,19) }
+    end
+  end
+```
+
+Now you're almost done. Only "Game Over" is left to finish this game.
+
+</Page>
+
 <Page value="nim">
 
 // TODO
@@ -255,6 +303,45 @@ Now you can call this function to check if the snake died in this frame:
 			fruit.Y = rnd(20)
 		}
 	}
+```
+
+What you do, is up to you. You could stop the game and show the score. Or you could simply reset the game. Up to you.
+
+</Page>
+
+<Page value="nelua">
+
+```lua
+function Snake:is_dead(): boolean
+  local head = self.body[1]
+
+  for i = 2, #self.body do
+    if self.body[i] == head then
+      return true
+    end
+  end
+
+  return false
+end
+```
+
+Now you can call this function to check if the snake died in this frame:
+
+```lua {4-6}
+  if frame_count % 15 == 0 then
+    snake:update()
+
+    if snake:is_dead() then
+      -- Do something
+    end
+
+    if snake.body[1] == fruit then
+      local tail = snake.body[#snake.body]
+      snake.body:push({ x = tail.x, y = tail.y })
+      math.randomseed(frame_count)
+      fruit = { x = math.random(0, 19), y = math.random(0,19) }
+    end
+  end
 ```
 
 What you do, is up to you. You could stop the game and show the score. Or you could simply reset the game. Up to you.

@@ -92,6 +92,32 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 
 </Page>
 
+<Page value="nelua">
+To achieve the first step (moving the body, excluding the head), a simple loop is all you need:
+
+```lua
+function Snake:update()
+  for i = #self.body, 2, -1 do
+    self.body[i] = self.body[i - 1]
+  end
+end
+```
+
+Don't forget to call the new function in the main-loop:
+
+```lua {2}
+local function update()
+  snake:update()
+  snake:draw()
+end
+```
+
+Now if you execute this, you'd notice that you can't see much. In fact, you might see the snake for a short moment before the head is all that's left.
+
+![](images/snake_move_head_only.webp)
+
+</Page>
+
 <Page value="nim">
 
 // TODO
@@ -202,6 +228,30 @@ func (s *Snake) Update() {
 		s.Body[0].Y = 19
 	}
 }
+```
+
+</Page>
+
+<Page value="nelua">
+
+This isn't hard either. Simple add the add the direction to the current head. And then make sure the head stays within the boundaries:
+
+```lua {6-14}
+function Snake:update()
+  for i = #self.body, 2, -1 do
+    self.body[i] = self.body[i - 1]
+  end
+
+  self.body[1].x = (self.body[1].x + self.direction.x) % 20
+  self.body[1].y = (self.body[1].y + self.direction.y) % 20
+
+  if self.body[1].x < 0 then
+    self.body[1].x = 19
+  end
+  if self.body[1].y < 0 then
+    self.body[1].y = 19
+  end
+end
 ```
 
 </Page>
@@ -360,6 +410,45 @@ func update() {
 
 	snake.Draw()
 }
+```
+
+That's it. Your snake should be quite a bit slower now. This reduces the snake from 60 units per second to 4 units per second (60/15 = 4).
+
+![Moving Snake (slow)](images/snake-motion-slow.webp)
+
+</Page>
+
+<Page value="nelua">
+
+For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
+
+```lua {2}
+local snake = Snake.init()
+local frame_count = 0
+```
+
+This variable in main.nelua keeps track of all frames so far. Just increase it's value in the main-update function:
+
+```lua {2}
+local function update()
+  frame_count = frame_count + 1
+  snake:update()
+  snake:draw()
+end
+```
+
+Now all you need is to check if the passed frames are dividable by X:
+
+```lua {4-6}
+local function update()
+  frame_count = frame_count + 1
+
+  if frame_count % 15 == 0 then
+    snake:update()
+  end
+
+  snake:draw()
+end
 ```
 
 That's it. Your snake should be quite a bit slower now. This reduces the snake from 60 units per second to 4 units per second (60/15 = 4).

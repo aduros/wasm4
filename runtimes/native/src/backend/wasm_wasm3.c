@@ -166,7 +166,17 @@ static void check (M3Result result) {
 
 uint8_t* w4_wasmInit () {
     env = m3_NewEnvironment();
-    runtime = m3_NewRuntime(env, 4096, NULL);
+
+    // This is an arbitrary limit corresponding to the implementation details
+    // of the wasm3 interpreter. It's unrelated to the resource constraints of
+    // the wasm4 VM. Making this too small will ultimately result in `[trap]
+    // stack overflow` at the command line.
+    //
+    // Using 64 KB, since this is the default of wasm3 standalone binary on
+    // desktop platforms (from wasm3/platforms/app/main.c).
+    uint32_t wasm3StackSize = 64 * 1024;
+
+    runtime = m3_NewRuntime(env, wasm3StackSize, NULL);
 
     runtime->memory.maxPages = 1;
     ResizeMemory(runtime, 1);

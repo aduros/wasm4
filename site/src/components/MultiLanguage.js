@@ -1,4 +1,4 @@
-import React, {useState, cloneElement, Children, useRef, useEffect } from 'react';
+import React, {useState, cloneElement, Children, useRef, useEffect, useLayoutEffect } from 'react';
 import Link from '@docusaurus/Link';
 import { useHistory } from 'react-router-dom';
 import clsx from 'clsx';
@@ -71,7 +71,7 @@ function useLanguageCode() {
     const search = (typeof window !== 'undefined' ? window.location.search : '');
     const rawLanguagePreference = tabGroupChoices.language;
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const langFromPreferences = normalizeLanguageValue(rawLanguagePreference);
 
         if(isValidLanguageValue(langFromPreferences)) {

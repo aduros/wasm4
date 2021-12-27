@@ -74,13 +74,9 @@ export class APU {
         const sustainTime = decayTime + sustain;
         const releaseTime = sustainTime + release;
 
-        let peakLevel = 1;
-        let sustainLevel = volume/100;
-        if (channel == 0 || channel == 1) {
-            // Pulse waves are naturally LOUD, so half their volume
-            peakLevel *= 0.5;
-            sustainLevel *= 0.5;
-        }
+        // Peak level of any channel should be -12 dB, or a quarter of full volume
+        let peakLevel = 0.25;
+        let sustainLevel = volume/100 * peakLevel;
 
         // Create gain node with ADSR ramp
         const gain = ctx.createGain();

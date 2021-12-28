@@ -213,7 +213,107 @@ You should see some green blocks at the top.
 
 <Page value="rust">
 
-// TODO
+We'll add a new function `draw` inside `Snake` implementation.
+
+To make it a little easier, it's a good idea to use the `rect` function of WASM-4 
+that is already defined in `src/lib/wasm4.rs`:
+
+```rust
+// rect draws a rectangle. It uses color 1 to fill and color 2 for the outline
+pub fn rect(x: i32, y: i32, width: u32, height: u32);
+```
+
+Simply loop through the body and draw it at `x * 8` and `y * 8` because our snake is made of 8x8 squares.
+
+```rust
+// `src/lib/snake.rs` inside `impl Snake {}` block
+pub fn draw(&self) {
+    for &Point { x, y } in self.body.iter() {
+        wasm4::rect(x * 8, y * 8, 8, 8);
+    }
+}
+```
+
+:::note Importing wasm4
+Keep in mind you need to import `wasm4`, in case your editor doesn't do this for you.
+
+```rust
+use crate::wasm4;
+```
+:::
+
+---
+
+That's all fine, but since there is no instance of the snake, nothing can be drawn. To fix this we are going to define a `Game` struct
+inside `src/lib/game.rs`.
+
+```rust
+// src/lib/game.rs
+use crate::snake::{Point, Snake};
+use crate::wasm4;
+
+pub struct Game {
+    snake: Snake,
+}
+
+impl Game {
+    pub fn new() -> Self {
+      Self {
+          snake: Snake::new(),
+      }
+    }
+
+    pub fn update(&self) {
+        self.snake.draw();
+    }
+}
+```
+
+We'll store a global `Game` instance using [`Mutex`](https://doc.rust-lang.org/std/sync/struct.Mutex.html), provided by the standard library, and the macro [`lazy_static`](https://crates.io/crates/lazy_static) from [crates.io](https://crates.io/).
+
+```rust
+// src/lib.rs
+#[cfg(feature = "buddy-alloc")]
+mod alloc;
+mod game;
+mod palette;
+mod snake;
+mod wasm4;
+use game::Game;
+use lazy_static::lazy_static;
+use std::sync::Mutex;
+
+lazy_static! {
+    static ref SNAKE_GAME: Mutex<Game> = Mutex::new(Game::new());
+}
+
+#[no_mangle]
+fn start() {
+    palette::set_palette([0xfff6d3, 0xf9a875, 0xeb6b6f, 0x7c3f58]);
+}
+
+#[no_mangle]
+fn update() {
+    SNAKE_GAME.lock().expect("game_state").update();
+}
+```
+
+:::note Using external libraries
+[`lazy_static`](https://crates.io/crates/lazy_static) is an external library:
+
+we have to declare inside the `dependencies` section of `Cargo.toml`, otherwise `rustc` does not know how to resolve it and will
+not compile our game.
+
+```toml
+[dependencies]
+buddy-alloc = { version = "0.4.1", optional = true }
+lazy_static = "1.4.0"
+```
+
+See also:
+- [using crates(rustbook)](https://doc.rust-lang.org/book/ch02-00-guessing-game-tutorial.html?highlight=dependencies#using-a-crate-to-get-more-functionality)
+- [add a dependency(cargobook)](https://doc.rust-lang.org/cargo/guide/dependencies.html#adding-a-dependency)
+:::
 
 </Page>
 
@@ -548,36 +648,71 @@ This changes the color back and adds the darker green as it's outline.
 
 <Page value="rust">
 
-We'll add a new function `draw` in the `Snake` struct implementation.
+But where is the head? You can pick a side. Either position `0` or position `self.body.len() - 1`.
+I think it's easier to pick `0`.
 
-To make it a little easier, it's a good idea to use the `rect` function of WASM-4 
-that is already defined inside `src/wasm4.rs`:
+Since the body is drawn, head is not much of a problem. Simply use the `rect` function again. But use a specific part instead:
 
-```rust
-// rect draws a rectangle. It uses color 1 to fill and color 2 for the outline
-pub fn rect(x: i32, y: i32, width: u32, height: u32);
-```
-
-Our snake body is made of `8x8` squares and is in a `20x20` grid:
-
-simply loop through the body and draw it at `x * 8` and `y * 8`. 
-
-```rust
-// inside `impl Snake {  }` block
+```rust {8}
+// `src/lib/palette.rs` inside `impl Snake {}` block
 pub fn draw(&self) {
     for &Point { x, y } in self.body.iter() {
         wasm4::rect(x * 8, y * 8, 8, 8);
     }
+
+    wasm4::rect(self.body[0].x * 8, self.body[0].y * 8, 8, 8);
 }
 ```
 
-:::note Importing wasm4
-Keep in mind you need to import `wasm4`, in case your editor doesn't do this for you.
+Notice the difference? Me neither.
+The head should stand out a little. For this, you can use a different color.
+
+We'll create a helper function inside `src/lib/palette.rs` to confine the `unsafe` code.
 
 ```rust
-use crate::wasm4;
+// src/lib/palette.rs
+pub fn set_draw_color<T: Into<u16>>(idx: T) {
+    unsafe { *wasm4::DRAW_COLORS = idx.into() }
+}
 ```
-:::
+
+Then we'll invoke `draw_color` inside `src/lib/snake.rs`:
+
+```rust {7}
+// src/lib/snake.rs
+pub fn draw(&self) {
+    for &Point { x, y } in self.body.iter() {
+        wasm4::rect(x * 8, y * 8, 8, 8);
+    }
+
+    set_draw_color(0x4u16);
+    wasm4::rect(self.body[0].x * 8, self.body[0].y * 8, 8, 8);
+}
+```
+
+Result:
+
+![Changing Color](images/draw-body-2.webp)
+
+You'll see a change. The snake changed color. Not only the head, but the complete snake! Once you've set a color, it stays that way. So if you want to change only the head, you have to change color 1 again. Right before you draw the body.
+
+```rust {3}
+// src/lib/snake.rs
+pub fn draw(&self) {
+    set_draw_color(0x43u16);
+
+    for &Point { x, y } in self.body.iter() {
+        wasm4::rect(x * 8, y * 8, 8, 8);
+    }
+
+    set_draw_color(0x4u16);
+    wasm4::rect(self.body[0].x * 8, self.body[0].y * 8, 8, 8);
+}
+```
+
+This changes the color back and adds the darker green as it's outline.
+
+![Snake with outline](images/draw-body-3.webp)
 
 </Page>
 

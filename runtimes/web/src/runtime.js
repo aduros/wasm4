@@ -311,19 +311,6 @@ export class Runtime {
         this.composite();
     }
 
-    errorToBlueScreenText(err) {
-        let message = `${err.name}:\n${err.message}`;
-
-        // hand written messages for specific errors
-        if (err.message.match(/unreachable/)) {
-            message = "This cartridge has\nreached a code \nsegment marked as\nunreachable.";
-        } else if (err.message.match(/out of bounds/)) {
-            message = "This cartridge has\nattempted a memory\naccess that is\nout of bounds.";
-        }
-        message += "\n\n\n\n\nHit R to reboot.";
-        return message;
-    }
-
     blueScreen(err) {
         this.crashed = true;
 
@@ -337,24 +324,23 @@ export class Runtime {
         const toCharArr = (s) => [...s].map(x => x.charCodeAt(0));
 
         const title = ` ${constants.CRASH_TITLE} `;
-        const UI = {
-            header_title: title,
-            header_width: (8 * title.length) - 1,
-            header_x: (160 - (8 * title.length)) / 2,
-            header_y: 20,
-            message_y: 60,
-            message_x: 9
-        };
+        const headerTitle = title;
+        const headerWidth = (8 * title.length) - 1;
+        const headerX = (160 - (8 * title.length)) / 2;
+        const headerY = 20;
+        const messageX = 9;
+        const messageY = 60;
+
         const mem32 = new Uint32Array(this.memory.buffer);
         mem32.set(COLORS, constants.ADDR_PALETTE >> 2);
         this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
         this.framebuffer.clear();
-        this.framebuffer.drawHLine(UI.header_x, UI.header_y-1, UI.header_width);
+        this.framebuffer.drawHLine(headerX, headerY-1, headerWidth);
         this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1131, true);
-        this.framebuffer.drawText(toCharArr(UI.header_title), UI.header_x, UI.header_y);
+        this.framebuffer.drawText(toCharArr(headerTitle), headerX, headerY);
         this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
-        const errorExplanation = this.errorToBlueScreenText(err);
-        this.framebuffer.drawText(toCharArr(errorExplanation), UI.message_x, UI.message_y);
+        const errorExplanation = errorToBlueScreenText(err);
+        this.framebuffer.drawText(toCharArr(errorExplanation), messageX, messageY);
         this.composite();
 
         // to help with debugging
@@ -376,4 +362,17 @@ export class Runtime {
             this.unlockAudio();
         }
     }
+}
+
+function errorToBlueScreenText(err) {
+    let message = `${err.name}:\n${err.message}`;
+
+    // hand written messages for specific errors
+    if (err.message.match(/unreachable/)) {
+        message = "This cartridge has\nreached a code \nsegment marked as\nunreachable.";
+    } else if (err.message.match(/out of bounds/)) {
+        message = "This cartridge has\nattempted a memory\naccess that is\nout of bounds.";
+    }
+    message += "\n\n\n\n\nHit R to reboot.";
+    return message;
 }

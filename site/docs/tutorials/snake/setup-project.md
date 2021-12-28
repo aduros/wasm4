@@ -203,8 +203,11 @@ w4 watch
 
 ### Requirements
 
-1. rust toolchain: https://www.rust-lang.org/tools/install.
-2. `wasm32-unknown-unknown` target: `rustup target add wasm32-unknown-unknown`
+To compile Rust projects you will need to install the [rust toolchain using rustup](https://www.rust-lang.org/tools/install) then add `wasm32-unknown-unknown` target:
+
+```bash
+rustup target add wasm32-unknown-unknown
+```
 
 Create a new project 
 

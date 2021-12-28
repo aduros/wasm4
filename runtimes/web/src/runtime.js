@@ -217,8 +217,12 @@ export class Runtime {
         return str;
     }
 
-    print (str) {
-        console.log(str);
+    print (str, error = false) {
+        if (error) {
+            console.error(str);
+        } else {
+            console.log(str);
+        }
         if (websocket != null && websocket.readyState == 1) {
             websocket.send(str);
         }
@@ -352,8 +356,9 @@ export class Runtime {
         const errorExplanation = this.errorToBlueScreenText(err);
         this.framebuffer.drawText(toCharArr(errorExplanation), UI.message_x, UI.message_y);
         this.composite();
+
         // to help with debugging
-        console.error(err);
+        this.print(err.stack, true);
     }
 
     composite () {

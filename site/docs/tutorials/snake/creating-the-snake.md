@@ -146,7 +146,57 @@ But it lacks any functionality for now.
 
 <Page value="rust">
 
-// TODO
+To keep things tidy, I recommend to create a new file called `snake.rs`. 
+This file contains two structs:
+
+- The `Point` - Holding `x` and `y` coordinates.
+- The `Snake` - The actual snake implementation.
+
+`Snake` has an [associated function](https://doc.rust-lang.org/reference/items/associated-items.html#associated-functions-and-methods) `new` that returns a brand new snake.
+
+We have also defined few derivable traits to `Point`:
+
+- `PartialEq` and `Eq` add the `==` operator to perform an equality checks between `Point` instances.
+- `Clone` and `Copy` relax the ownership rules when dealing with `Point` instances.
+
+You can learn more about these traits in the [rust-book](https://doc.rust-lang.org/stable/book/):
+
+- [PartialEq, Eq](https://doc.rust-lang.org/book/appendix-03-derivable-traits.html?highlight=partialEq#partialeq-and-eq-for-equality-comparisons)
+- [Clone, Copy](https://doc.rust-lang.org/book/appendix-03-derivable-traits.html?highlight=partialEq#clone-and-copy-for-duplicating-values) 
+
+```rust
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub struct Point {
+    pub x: i32,
+    pub y: i32,
+}
+
+pub struct Snake {
+    pub body: Vec<Point>,
+    pub direction: Point,
+}
+
+impl Snake {
+    pub fn new() -> Self {
+        Self {
+            body: vec![
+                Point { x: 2, y: 0 },
+                Point { x: 1, y: 0 },
+                Point { x: 0, y: 0 },
+            ],
+            direction: Point { x: 1, y: 0 },
+        }
+    }
+}
+```
+
+:::note
+Don't forget to declare this module in `lib.rs`.
+
+```rust
+mod snake;
+```
+:::
 
 </Page>
 

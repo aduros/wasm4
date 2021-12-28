@@ -548,7 +548,36 @@ This changes the color back and adds the darker green as it's outline.
 
 <Page value="rust">
 
-// TODO
+We'll add a new function `draw` in the `Snake` struct implementation.
+
+To make it a little easier, it's a good idea to use the `rect` function of WASM-4 
+that is already defined inside `src/wasm4.rs`:
+
+```rust
+// rect draws a rectangle. It uses color 1 to fill and color 2 for the outline
+pub fn rect(x: i32, y: i32, width: u32, height: u32);
+```
+
+Our snake body is made of `8x8` squares and is in a `20x20` grid:
+
+simply loop through the body and draw it at `x * 8` and `y * 8`. 
+
+```rust
+// inside `impl Snake {  }` block
+pub fn draw(&self) {
+    for &Point { x, y } in self.body.iter() {
+        wasm4::rect(x * 8, y * 8, 8, 8);
+    }
+}
+```
+
+:::note Importing wasm4
+Keep in mind you need to import `wasm4`, in case your editor doesn't do this for you.
+
+```rust
+use crate::wasm4;
+```
+:::
 
 </Page>
 

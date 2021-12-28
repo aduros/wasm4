@@ -201,12 +201,12 @@ w4 watch
 
 <Page value="rust">
 
-:::note Work in Progress
-The tutorial for Rust is currently a Work-in-Progress. Most of the language specific instructions are currently missing.
-:::
+### Requirements
 
-To compile Rust projects you will need `cargo` installed. You will also need the wasm32 target,
-which can be installed with `rustup target add wasm32-unknown-unknown`.
+1. rust toolchain: https://www.rust-lang.org/tools/install.
+2. `wasm32-unknown-unknown` target: `rustup target add wasm32-unknown-unknown`
+
+Create a new project 
 
 ```shell
 w4 new --rust snake

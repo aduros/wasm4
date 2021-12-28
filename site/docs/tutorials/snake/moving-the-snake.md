@@ -132,7 +132,47 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 
 <Page value="rust">
 
-// TODO
+To achieve the first step (moving the body, excluding the head), we just remove the last body segment.
+
+```rust
+// `src/lib/snake.rs`
+    pub fn update(&mut self) -> Option<Point> {
+        if self.body.len() > 1 {
+            self.body.pop()
+        } else {
+            None
+        }
+    }
+```
+
+Don't forget to call the new function inside `Game::update`.
+
+```rust {17}
+// src/lib/game.rs
+use crate::snake::{Point, Snake};
+use crate::wasm4;
+
+pub struct Game {
+    snake: Snake,
+}
+
+impl Game {
+    pub fn new() -> Self {
+      Self {
+          snake: Snake::new(),
+      }
+    }
+
+    pub fn update(&mut self) {
+        self.snake.update();
+        self.snake.draw();
+    }
+}
+```
+
+Now if you execute this, you'd notice that you can't see much. In fact, you might see the snake for a short moment before the head is all that's left.
+
+![](images/snake_move_head_only.webp)
 
 </Page>
 
@@ -270,7 +310,30 @@ end
 
 <Page value="rust">
 
-// TODO
+This isn't hard either. Simple insert at `0` the new head position and then make sure the head stays within the boundaries:
+
+```rust
+// `src/lib/snake.rs`
+    pub fn update(&mut self) -> Option<Point> {
+        self.body.insert(
+            0,
+            Point {
+                x: (self.body[0].x + self.direction.x) % 20,
+                y: (self.body[0].y + self.direction.y) % 20,
+            },
+        );
+
+        if self.body[0].x < 0 {
+            self.body[0].x = 19;
+        }
+
+        if self.body[0].y < 0 {
+            self.body[0].y = 19;
+        }
+
+        self.body.pop()
+    }
+```
 
 </Page>
 
@@ -472,7 +535,55 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 
 <Page value="rust">
 
-// TODO
+For this, you'd need to store a enw property inside `Game`. You can call it whatever you like, just be sure you know what it's purpose is.
+
+```rust {7,14}
+// src/lib/game.rs
+use crate::snake::{Point, Snake};
+use crate::wasm4;
+
+pub struct Game {
+    snake: Snake,
+    frame_count: u32,
+}
+
+impl Game {
+    pub fn new() -> Self {
+      Self {
+          snake: Snake::new(),
+          frame_count: 0,
+      }
+    }
+}
+```
+
+It keeps track of all frames so far. Just increase its value in `Game::update`.
+
+```rust {3}
+// src/lib/game.rs
+pub fn update(&mut self) {
+    self.frame_count = self.frame_count.overflowing_add(1).0;
+
+    self.snake.update();
+    self.snake.draw();
+}
+```
+
+Now all you need is to check if the passed frames are dividable by X:
+
+```rust {3,5-7}
+// src/lib/game.rs
+pub fn update(&mut self) {
+    self.frame_count = self.frame_count.overflowing_add(1).0;
+
+    if self.frame_count % 15 == 0 {
+        self.snake.update();
+    }
+    self.snake.draw();
+}
+```
+
+That's it. Your snake should be quite a bit slower now. This reduces the snake from 60 units per second to 4 units per second (60/15 = 4).
 
 </Page>
 

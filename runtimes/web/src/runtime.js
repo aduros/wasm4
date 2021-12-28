@@ -131,15 +131,32 @@ export class Runtime {
             tracef: this.tracef.bind(this),
         };
 
-        const module = await WebAssembly.instantiate(wasmBuffer, { env });
-        this.wasm = module.instance;
+        await this.safeCall(async () => {
+            const module = await WebAssembly.instantiate(wasmBuffer, { env });
+            this.wasm = module.instance;
 
-        // Call the WASI _start/_initialize function (different from WASM-4's start callback!)
-        if (this.wasm.exports._start != null) {
-            this.wasm.exports._start();
-        }
-        if (this.wasm.exports._initialize != null) {
-            this.wasm.exports._initialize();
+            // Call the WASI _start/_initialize function (different from WASM-4's start callback!)
+            if (this.wasm.exports._start != null) {
+                this.wasm.exports._start();
+            }
+            if (this.wasm.exports._initialize != null) {
+                this.wasm.exports._initialize();
+            }
+        });
+    }
+
+    async safeCall (fn) {
+        if (fn != null) {
+            try {
+                await fn();
+            } catch (err) {
+                if (err instanceof WebAssembly.RuntimeError) {
+                    this.blueScreen(err);
+                } else {
+                    // if we don't know what it is, throw it again
+                    throw err;
+                }
+            }
         }
     }
 
@@ -280,9 +297,7 @@ export class Runtime {
     }
 
     start () {
-        if (this.wasm.exports.start != null) {
-            this.wasm.exports.start();
-        }
+        this.safeCall(this.wasm.exports.start);
     }
 
     update () {
@@ -294,19 +309,7 @@ export class Runtime {
             this.framebuffer.clear();
         }
 
-        if (this.wasm.exports.update != null) {
-            try {
-                this.wasm.exports.update();
-            } catch (err) {
-                if (err instanceof WebAssembly.RuntimeError) {
-                    this.blueScreen(err);
-                } else {
-                    // if we don't know what it is, throw it again
-                    throw err;
-                }
-            }
-
-        }
+        this.safeCall(this.wasm.exports.update);
 
         this.composite();
     }

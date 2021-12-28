@@ -29,7 +29,8 @@ To achieve the first step (moving the body, excluding the head), a simple loop i
 
 ```typescript
     update(): void {
-        for (let i = this.body.length - 1; i > 0; i--) {
+        let body = this.body;
+        for (let i = body.length - 1; i > 0; i--) {
             unchecked(body[i].x = body[i - 1].x)
             unchecked(body[i].y = body[i - 1].y)
         }
@@ -176,21 +177,22 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 
 This isn't hard either. Simple add the add the direction to the current head. And then make sure the head stays within the boundaries:
 
-```typescript {7-15}
+```typescript {8-16}
     update(): void {
-        for (let i = this.body.length - 1; i > 0; i--) {
+        let body = this.body;
+        for (let i = body.length - 1; i > 0; i--) {
             unchecked(body[i].x = body[i - 1].x)
             unchecked(body[i].y = body[i - 1].y)
         }
 
-        this.body[0].x = (this.body[0].x + this.direction.x) % 20
-        this.body[0].y = (this.body[0].y + this.direction.y) % 20
+        body[0].x = (body[0].x + this.direction.x) % 20
+        body[0].y = (body[0].y + this.direction.y) % 20
 
-        if (this.body[0].x < 0) {
-            this.body[0].x = 19
+        if (body[0].x < 0) {
+            body[0].x = 19
         }
-        if (this.body[0].y < 0) {
-            this.body[0].y = 19
+        if (body[0].y < 0) {
+            body[0].y = 19
         }
     }
 ```

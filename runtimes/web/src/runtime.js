@@ -372,9 +372,9 @@ function errorToBlueScreenText(err) {
 
     // hand written messages for specific errors
     if (err.message.match(/unreachable/)) {
-        message = "This cartridge has\nreached a code \nsegment marked as\nunreachable.";
+        message = "The cartridge has\nreached a code \nsegment marked as\nunreachable.";
     } else if (err.message.match(/out of bounds/)) {
-        message = "This cartridge has\nattempted a memory\naccess that is\nout of bounds.";
+        message = "The cartridge has\nattempted a memory\naccess that is\nout of bounds.";
     }
     message += "\n\n\n\n\nHit R to reboot.";
     return message;

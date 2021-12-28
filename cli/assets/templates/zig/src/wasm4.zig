@@ -121,7 +121,13 @@ pub fn trace(x: []const u8) void {
     traceUtf8(x.ptr, x.len);
 }
 extern fn traceUtf8(strPtr: [*]const u8, strLen: usize) void;
+
 /// Use with caution, as there's no compile-time type checking.
-/// %d and %f expects 32-bit integers and floats, respectively.
-/// See https://github.com/aduros/wasm4/issues/244.
+///
+/// * %c, %d, and %x expect 32-bit integers.
+/// * %f expects 64-bit floats.
+/// * %s expects a *zero-terminated* string pointer.
+///
+/// See https://github.com/aduros/wasm4/issues/244 for discussion and type-safe
+/// alternatives.
 pub extern fn tracef(x: [*:0]const u8, ...) void;

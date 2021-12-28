@@ -328,7 +328,7 @@ export class Runtime {
 
         const title = ` ${constants.CRASH_TITLE} `;
         const headerTitle = title;
-        const headerWidth = (8 * title.length) - 1;
+        const headerWidth = (8 * title.length);
         const headerX = (160 - (8 * title.length)) / 2;
         const headerY = 20;
         const messageX = 9;

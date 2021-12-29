@@ -222,6 +222,29 @@ w4 run target/wasm32-unknown-unknown/release/cart.wasm
 
 </Page>
 
+<Page value="wat">
+
+To compile WebAssembly Text projects you will need to download [WABT](https://github.com/WebAssembly/wabt) and set the `$WABT_PATH` environment variable.
+
+```shell
+w4 new --wat hello-world
+cd hello-world
+```
+
+Compile the .wasm cartridge:
+
+```shell
+make
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 run build/cart.wasm
+```
+
+</Page>
+
 <Page value="zig">
 
 To compile Zig projects you will need a recent build of `zig` installed.

@@ -76,6 +76,19 @@ if gamepad & BUTTON_RIGHT != 0 {
 }
 ```
 
+```wasm
+(data (i32.const 0x2000) "Right button is down!\00")
+
+(local $gamepad i32)
+(local.set $gamepad (i32.load8_u offset=0x16))
+
+(if (i32.and (local.get $gamepad) (i32.const 32))
+  (then
+    (call $trace (i32.const 0x2000))
+  )
+)
+```
+
 ```zig
 const gamepad = w4.GAMEPAD1.*;
 
@@ -242,6 +255,37 @@ fn update() {
         trace("Right button was just pressed!");
     }
 }
+```
+
+```wasm
+;; Store the previous gamepad state in a global variable rather than linear
+;; memory. It is defined as a mutable global with the initial value 0.
+(global $previous-gamepad (mut i32) (i32.const 0))
+
+(data (i32.const 0x2000) "Right button was just pressed!\00")
+
+(func (export "update")
+  (local $gamepad i32)
+  (local $pressed-this-frame i32)
+
+  (local.set $gamepad (i32.load8_u (i32.const 0x16)))
+
+  ;; Only the buttons that were pressed down this frame
+  (local.set $pressed-this-frame
+    (i32.and
+      (local.get $gamepad)
+      (i32.xor
+        (local.get $gamepad)
+        (global.get $previous-gamepad))))
+
+  (global.set $previous-gamepad (local.get $gamepad))
+
+  (if (i32.and (local.get $pressed-this-frame) (i32.const 32))
+    (then
+      (call $trace (i32.const 0x2000))
+    )
+  )
+)
 ```
 
 ```zig

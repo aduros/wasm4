@@ -61,6 +61,14 @@ unsafe {
 }
 ```
 
+```wasm
+;; game data (1337 stored in little-endian format)
+(data (i32.const 0x2000) "\39\05\00\00")
+
+;; write 4 bytes from address 0x2000
+(call $diskw (i32.const 0x2000) (i32.const 4))
+```
+
 ```zig
 var game_data: i32 = 1337;
 _ = w4.diskw(@ptrCast([*]u8, &game_data), @sizeOf(@TypeOf(game_data)));
@@ -125,6 +133,11 @@ let game_data = unsafe {
 
     i32::from_le_bytes(buffer)
 };
+```
+
+```wasm
+;; Read 4 bytes into memory at address 0x2000.
+(call $diskr (i32.const 0x2000) (i32.const 4))
 ```
 
 ```zig

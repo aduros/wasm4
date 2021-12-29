@@ -79,6 +79,15 @@ fn update () {
 }
 ```
 
+```wasm
+(import "env" "rect" (func $rect (param i32 i32 i32 i32)))
+
+(func (export "update")
+  ;; Draw a rectangle at (10,10) with size (32, 32).
+  (call $rect (i32.const 10) (i32.const 10) (i32.const 32) (i32.const 32))
+)
+```
+
 ```zig
 const w4 = @import("wasm4.zig");
 
@@ -157,6 +166,14 @@ unsafe { *DRAW_COLORS = 2 }
 rect(10, 10, 32, 32);
 ```
 
+```wasm
+;; Set DRAW_COLORS (at address 0x14) to 2.
+(i32.store16 (i32.const 0x14) (i32.const 2))
+
+;; Draw a rectangle at (10,10) with size (32, 32).
+(call $rect (i32.const 10) (i32.const 10) (i32.const 32) (i32.const 32))
+```
+
 ```zig
 w4.DRAW_COLORS.* = 2;
 
@@ -201,6 +218,15 @@ w4.trace("Hello world!")
 
 ```rust
 trace("Hello world!");
+```
+
+```wasm
+(import "env" "trace" (func $trace (param i32)))
+
+;; Put the string at address 0x2000 in memory.
+(data (i32.const 0x2000) "Hello world!\00")
+
+(call $trace (i32.const 0x2000))
 ```
 
 ```zig

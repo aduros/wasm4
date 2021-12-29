@@ -200,6 +200,54 @@ mod snake;
 
 </Page>
 
+<Page value="wat">
+
+Unfortunately, the WebAssembly text format has no way to create classes or structs. The only way to lay out the stack structure is by manually allocating memory for the snake structure.
+
+We'll pretend as though we have the following types. Note that they are not valid WebAssembly text definitions:
+
+```wasm
+(;
+  = 8 bytes
+  typedef struct {
+    i32 x;
+    i32 y;
+  } Point;
+
+  = 3200 bytes
+  typedef Point Body[400];
+
+  = 3212 bytes
+  typedef {
+    Point direction;
+    i32 body_length;
+    Body body;
+  } Snake;
+;)
+```
+
+We'll place these values in linear memory starting at 0x19a0, which is the start of the region mapped for use by the game:
+
+```wasm
+;; snake.direction   = 0x19a0
+;; snake.body_length = 0x19a8
+;; snake.body        = 0x19ac
+```
+
+Let's start the snake with 3 points: `(2, 0), (1, 0), (0, 0)`. The snake's initial direction will be moving left, `(1, 0)`.
+
+```wasm
+(data (i32.const 0x19a0)
+  "\01\00\00\00" "\00\00\00\00" ;; direction (1, 0)
+  "\03\00\00\00"                ;; body_length 3
+  "\02\00\00\00" "\00\00\00\00" ;; body[0] = (2, 0)
+  "\01\00\00\00" "\00\00\00\00" ;; body[1] = (1, 0)
+  "\00\00\00\00" "\00\00\00\00" ;; body[2] = (0, 0)
+)
+```
+
+</Page>
+
 <Page value="zig">
 
 To keep things tidy, I recommend you'd create a new file called `snake.zig`. This file contains two structs:

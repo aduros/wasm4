@@ -98,6 +98,19 @@ impl Game {
 
 </Page>
 
+<Page value="wat">
+To place (and eat) a fruit, you first need to make a variable for this. Since it's simply a point on the grid, a point will do.
+
+```wasm
+;; snake.direction   = 0x19a0
+;; snake.body_length = 0x19a8
+;; snake.body        = 0x19ac
+;; frame_count       = 0x262c
+;; fruit             = 0x2630
+```
+
+</Page>
+
 <Page value="zig">
 To place (and eat) a fruit, you first need to make a variable for this. Since it's simply a point on the grid, `Point` will do. Set it to undefined for now:
 
@@ -277,6 +290,72 @@ impl Game {
 }
 ```
 
+
+</Page>
+
+<Page value="wat">
+
+The WebAssembly text format doesn't provide any random number generator, so we'll have to write our own. [Xorshift](https://en.wikipedia.org/wiki/Xorshift) is a reasonable choice.
+
+```wasm
+;; Initialize the random state to 1234.
+(global $random-state (mut i32) (i32.const 1234))
+
+(func $rnd (param $n i32) (result i32)
+  (local $x i32)
+
+  ;; x = random-state
+  ;; x ^= x << 13
+  ;; x ^= x >> 17
+  ;; x ^= x << 5
+  ;; random-state = x
+  (global.set $random-state
+    (local.tee $x
+      (i32.xor
+        (local.tee $x
+          (i32.xor
+            (local.tee $x
+              (i32.xor
+                (local.tee $x (global.get $random-state))
+                (i32.shl
+                  (local.get $x)
+                  (i32.const 13))))
+            (i32.shr_u
+              (local.get $x)
+              (i32.const 17))))
+        (i32.shl
+          (local.get $x)
+          (i32.const 5)))))
+
+  ;; convert a random i32 in the range [0, 2**32) to a random f32 in the range
+  ;; [0, 1). Then multiply by `n` to convert it to a f32 in the range [0, n).
+  ;; Finally convert it back to an i32.
+  (i32.trunc_f32_u
+    (f32.mul
+      (f32.mul
+        (f32.convert_i32_u (i32.shr_u (local.get $x) (i32.const 8)))
+        (f32.const 0x1p-24))
+      (f32.convert_i32_u
+        (local.get $n))))
+)
+```
+
+This allows you to call `rnd(20)` to get a number between `0` and `19`. Now you can randomly initialize the fruit position:
+
+```wasm
+(func (export "start")
+  (i32.store (i32.const 0x04) (i32.const 0xfbf7f3))
+  (i32.store (i32.const 0x08) (i32.const 0xe5b083))
+  (i32.store (i32.const 0x0c) (i32.const 0x426e5d))
+  (i32.store (i32.const 0x10) (i32.const 0x20283d))
+
+  ;; fruit.x = rnd(20)
+  (i32.store (i32.const 0x2630) (call $rnd (i32.const 20)))
+
+  ;; fruit.y = rnd(20)
+  (i32.store (i32.const 0x2634) (call $rnd (i32.const 20)))
+)
+```
 
 </Page>
 
@@ -524,6 +603,43 @@ pub struct Game {
 
 </Page>
 
+<Page value="wat">
+
+Now you need to import the image. For this, the WASM-4 CLI tool `w4` comes with another tool: `png2src`. You can use it like this:
+
+`w4 png2src --wat fruit.png`
+
+This will output the following content in the terminal:
+
+```zig
+;; fruit
+;; fruit_width = 8;
+;; fruit_height = 8;
+;; fruit_flags = 1; // BLIT_2BPP
+
+(data
+  (i32.const ???)
+  "\00\a0\02\00\0e\f0\36\5c\d6\57\d5\57\35\5c\0f\f0"
+)
+```
+
+To get it into a an existing file, use the `>>` operator. Like this:
+
+`w4 png2src --wat fruit.png >> main.wat`
+
+This will add the previous lines to your `main.wat` and causes an error because it doesn't know where to put the data. Let's put it at 0x2638, after the fruit position:
+
+```wasm
+(data
+  (i32.const 0x2638)
+  "\00\a0\02\00\0e\f0\36\5c\d6\57\d5\57\35\5c\0f\f0"
+)
+```
+
+With that out of the way, it's time to actually render the newly imported sprite.
+
+</Page>
+
 <Page value="zig">
 
 Now you need to import the image. For this, the WASM-4 CLI tool `w4` comes with another tool: `png2src`. You can use it like this:
@@ -764,6 +880,56 @@ But since you set the drawing colors, you need to change the drawing colors too:
 ```
 
 This way, w4 uses the color palette in its default configuration. Except for one thing: The background will be transparent.
+
+</Page>
+
+<Page value="wat">
+
+Rendering the sprite is rather simple. Just call the `blit` function of w4:
+
+```wasm
+;; Copies pixels to the framebuffer.
+(import "env" "blit" (func $blit (param i32 i32 i32 i32 i32 i32)))
+```
+
+In practice it looks like this:
+
+```wasm
+(func (export "update")
+  ...
+
+  ;; Draw fruit.
+  (call $blit
+    (i32.const 0x2638)
+    (i32.mul (i32.load (i32.const 0x2630)) (i32.const 8))
+    (i32.mul (i32.load (i32.const 0x2634)) (i32.const 8))
+    (i32.const 8)
+    (i32.const 8)
+    (i32.const 1))
+)
+```
+
+But since you set the drawing colors, you need to change the drawing colors too:
+
+```wasm
+(func (export "update")
+  ...
+
+  ;; Set fruit colors.
+  (i32.store16 (i32.const 0x14) (i32.const 0x4320))
+
+  ;; Draw fruit.
+  (call $blit
+    (i32.const 0x2638)
+    (i32.mul (i32.load (i32.const 0x2630)) (i32.const 8))
+    (i32.mul (i32.load (i32.const 0x2634)) (i32.const 8))
+    (i32.const 8)
+    (i32.const 8)
+    (i32.const 1))
+)
+```
+
+This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.
 
 </Page>
 

@@ -70,6 +70,17 @@ unsafe {
 }
 ```
 
+```wasm
+;; PALETTE[0]
+(i32.store (i32.const 0x04) (i32.const 0xfff6d3))
+;; PALETTE[1]
+(i32.store (i32.const 0x08) (i32.const 0xf9a875))
+;; PALETTE[2]
+(i32.store (i32.const 0x0c) (i32.const 0xeb6b6f))
+;; PALETTE[3]
+(i32.store (i32.const 0x10) (i32.const 0x7c3f58))
+```
+
 ```zig
 w4.PALETTE.* = .{
     0xfff6d3,
@@ -142,6 +153,14 @@ unsafe { *DRAW_COLORS = 0x42 }
 rect(10, 10, 32, 32);
 ```
 
+```wasm
+;; Set DRAW_COLORS (at address 0x14) to 0x42.
+(i32.store16 (i32.const 0x14) (i32.const 0x42))
+
+;; Draw a rectangle at (10,10) with size (32, 32).
+(call $rect (i32.const 10) (i32.const 10) (i32.const 32) (i32.const 32))
+```
+
 ```zig
 w4.DRAW_COLORS.* = 0x42;
 w4.rect(10, 10, 32, 32);
@@ -188,6 +207,15 @@ w4.text("Hello world!", 10, 10)
 
 ```rust
 text("Hello world!", 10, 10);
+```
+
+```wasm
+(import "env" "text" (func $text (param i32 i32 i32)))
+
+;; Put the string at address 0x2000 in memory.
+(data (i32.const 0x2000) "Hello world!\00")
+
+(call $text (i32.const 0x2000) (i32.const 10) (i32.const 10))
 ```
 
 ```zig
@@ -258,6 +286,22 @@ unsafe {
         .expect("framebuffer ref")
         .fill(3 | (3 << 2) | (3 << 4) | (3 << 6));
 }
+```
+
+```wasm
+;; i = 0;
+(local $i i32)
+
+(loop $loop
+  ;; FRAMEBUFFER[i] = 0xff;
+  (i32.store8 offset=0xa0 (local.get $i) (i32.const 0xff))
+
+  ;; i = i + 1;
+  (local.set $i (i32.add (local.get $i) (i32.const 1)))
+
+  ;; loop while i < 160*160/4
+  (br_if (i32.lt_u (local.get $i) (i32.const 6400)))
+)
 ```
 
 ```zig
@@ -408,6 +452,65 @@ fn pixel(x: i32, y: i32) {
         framebuffer[idx] = (color << shift) | (framebuffer[idx] & !mask);
     }
 }
+```
+
+```wasm
+(func $pixel (param $x i32) (param $y i32)
+  (local $idx i32)
+  (local $shift i32)
+  (local $mask i32)
+  (local $color i32)
+
+  ;; The byte index into the framebuffer that contains (x, y)
+  ;;  idx = (y*160 + x) >> 2;
+  (local.set $idx
+    (i32.shr_u
+      (i32.add
+        (i32.mul
+          (local.get $y)
+          (i32.const 160))
+        (local.get $x))
+      (i32.const 2)))
+
+  ;; Calculate the bits within the byte that corresponds to our position
+  ;; shift = (x & 0b11) << 1;
+  (local.set $shift
+    (i32.mul
+      (i32.and
+        (local.get $x)
+        (i32.const 3))
+      (i32.const 2)))
+
+  ;; mask = 0b11 << shift;
+  (local.set $mask
+    (i32.shl
+      (i32.const 3)
+      (local.get $shift)))
+
+  ;; Use the first DRAW_COLOR as the pixel color
+  ;; color = *DRAW_COLORS & 0b11;
+  (local.set $color
+    (i32.and
+      (i32.load16_u (i32.const 0x14))
+      (i32.const 3)))
+
+  ;; Write to the framebuffer:
+  ;; FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask);
+  ;; 
+  ;; Note that WebAssembly doesn't have a bitwise not instruction, so
+  ;; `~n` becomes `n ^ ~0` (where -1 is used for ~0 below).
+  (i32.store8 offset=0xa0
+    (local.get $idx)
+    (i32.or
+      (i32.shl
+        (local.get $color)
+        (local.get $shift))
+      (i32.and
+        (i32.load8_u offset=0xa0 (local.get $idx))
+        (i32.xor
+          (local.get $mask)
+          (i32.const -1)))))
+)
 ```
 
 ```zig

@@ -90,6 +90,11 @@ fn update() {
 }
 ```
 
+```wasm
+(func (export "update")
+)
+```
+
 ```zig
 const w4 = @import("wasm4.zig");
 
@@ -196,6 +201,23 @@ mod palette; // Don't forget to add the module declaration!
 fn start() {
     palette::set_palette([0xfbf7f3, 0xe5b083, 0x426e5d, 0x20283d]);
 }
+```
+
+</Page>
+
+<Page value="wat">
+
+```wasm
+;; We must explicitly import the memory, otherwise we won't be able to use any
+;; load or store instructions. This imports 1 page of memory (i.e. 64KiB).
+(import "env" "memory" (memory 1))
+
+(func (export "start")
+  (i32.store (i32.const 0x04) (i32.const 0xfbf7f3))
+  (i32.store (i32.const 0x08) (i32.const 0xe5b083))
+  (i32.store (i32.const 0x0c) (i32.const 0x426e5d))
+  (i32.store (i32.const 0x10) (i32.const 0x20283d))
+)
 ```
 
 </Page>

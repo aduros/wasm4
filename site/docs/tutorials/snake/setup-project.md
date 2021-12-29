@@ -243,6 +243,29 @@ w4 watch
 
 </Page>
 
+<Page value="wat">
+
+To compile WebAssembly Text projects you will need to download [WABT](https://github.com/WebAssembly/wabt) and set the `$WABT_PATH` environment variable.
+
+```shell
+w4 new --wat snake
+cd snake
+```
+
+Compile the .wasm cartridge:
+
+```shell
+make
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 watch
+```
+
+</Page>
+
 <Page value="zig">
 
 To compile zig projects you will need `zig` installed.

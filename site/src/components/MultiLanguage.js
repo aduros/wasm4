@@ -15,6 +15,7 @@ const names = {
     "nim": "Nim",
     "odin": "Odin",
     "rust": "Rust",
+    "wat": "WebAssembly Text",
     "zig": "Zig",
 };
 

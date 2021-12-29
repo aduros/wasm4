@@ -64,20 +64,21 @@ w4 init --lang nim
 
 **Options:**
 
-| Option           | Default value | Description                             |
-| ---------------- | ------------- | --------------------------------------- |
-| --as             |               | Uses AssemblyScript for the new project |
-| --assemblyscript |               | Same as `--as`                          |
-| --c              |               | Uses C/C++  for the new project         |
-| --d              |               | Uses D for the new project              |
-| --go             |               | Uses Go for the new project             |
-| --nelua          |               | Uses Nelua for the new project          |
-| --nim            |               | Uses Nim for the new project            |
-| --odin           |               | Uses Odin for the new project           |
-| --rs             |               | Uses Rust for the new project           |
-| --rust           |               | Same as `--rs`                          |
-| --zig            |               | Uses Zig for the new project            |
-| --lang LANGUAGE  | as / W4_LANG  | Uses the provided language              |
+| Option           | Default value | Description                               |
+| ---------------- | ------------- | ----------------------------------------- |
+| --as             |               | Uses AssemblyScript for the new project   |
+| --assemblyscript |               | Same as `--as`                            |
+| --c              |               | Uses C/C++  for the new project           |
+| --d              |               | Uses D for the new project                |
+| --go             |               | Uses Go for the new project               |
+| --nelua          |               | Uses Nelua for the new project            |
+| --nim            |               | Uses Nim for the new project              |
+| --odin           |               | Uses Odin for the new project             |
+| --rs             |               | Uses Rust for the new project             |
+| --rust           |               | Same as `--rs`                            |
+| --wat            |               | Uses WebAssembly Text for the new project |
+| --zig            |               | Uses Zig for the new project              |
+| --lang LANGUAGE  | as / W4_LANG  | Uses the provided language                |
 
 **Description:**
 
@@ -229,24 +230,25 @@ w4 png2src --lang rust top.png down.png left.png right.png
 
 **Options:**
 
-| Option           | Default value | Description                             |
-| ---------------- | ------------- | --------------------------------------- |
-| --as             |               | Uses AssemblyScript for the new project |
-| --assemblyscript |               | Same as `--as`                          |
-| --c              |               | Uses C/C++  for the new project         |
-| --d              |               | Uses D for the new project              |
-| --go             |               | Uses Go for the new project             |
-| --nelua          |               | Uses Nelua for the new project          |
-| --nim            |               | Uses Nim for the new project            |
-| --odin           |               | Uses Odin for the new project           |
-| --rs             |               | Uses Rust for the new project           |
-| --rust           |               | Same as `--rs`                          |
-| --zig            |               | Uses Zig for the new project            |
-| --lang LANGUAGE  | as / W4_LANG  | Uses the provided language              |
-| -t FILE          |               | Uses a custom template file             |
-| --template FILE  |               | Same as `-t`                            |
-| -o FILE          |               | Use given file instead of stdout        |
-| --output FILE    |               | Same as `-o`                            |
+| Option           | Default value | Description                               |
+| ---------------- | ------------- | ----------------------------------------- |
+| --as             |               | Uses AssemblyScript for the new project   |
+| --assemblyscript |               | Same as `--as`                            |
+| --c              |               | Uses C/C++  for the new project           |
+| --d              |               | Uses D for the new project                |
+| --go             |               | Uses Go for the new project               |
+| --nelua          |               | Uses Nelua for the new project            |
+| --nim            |               | Uses Nim for the new project              |
+| --odin           |               | Uses Odin for the new project             |
+| --rs             |               | Uses Rust for the new project             |
+| --rust           |               | Same as `--rs`                            |
+| --wat            |               | Uses WebAssembly Text for the new project |
+| --zig            |               | Uses Zig for the new project              |
+| --lang LANGUAGE  | as / W4_LANG  | Uses the provided language                |
+| -t FILE          |               | Uses a custom template file               |
+| --template FILE  |               | Same as `-t`                              |
+| -o FILE          |               | Use given file instead of stdout          |
+| --output FILE    |               | Same as `-o`                              |
 
 **Description:**
 

@@ -349,7 +349,7 @@ Importing images in WASM-4 works a bit different compared to other game engines 
 
 Indexed PNG files can be created by several image apps like [Aseprite](https://www.aseprite.org/) or [GIMP](https://www.gimp.org/).
 
-The image we import is a 8x8 PNG file with exactly 4 colors. And it's this image here:
+The image we import is a 8x8 PNG file with exactly 4 colors:
 
 ![Zoomed Fruit](images/fruit-zoomed.webp)
 This image is zoomed by 800%.
@@ -599,7 +599,7 @@ But since you set the drawing colors, you need to change the drawing colors too:
     w4.blit(fruitSprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP)
 ```
 
-This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.
+This way, w4 uses the color palette in its default configuration. Except for one thing: The background will be transparent.
 
 </Page>
 
@@ -652,7 +652,7 @@ But since you set the drawing colors, you need to change the drawing colors too:
 	w4.Blit(&fruitSprite[0], fruit.X*8, fruit.Y*8, 8, 8, w4.BLIT_2BPP)
 ```
 
-This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.
+This way, w4 uses the color palette in its default configuration. Except for one thing: The background will be transparent.
 
 </Page>
 
@@ -692,7 +692,7 @@ But since you set the drawing colors, you need to change the drawing colors too:
   blit(fruit_sprite, fruit.x * 8, fruit.y * 8, 8, 8, BLIT_2BPP)
 ```
 
-This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.
+This way, w4 uses the color palette in its default configuration. Except for one thing: The background will be transparent.
 
 </Page>
 
@@ -721,7 +721,7 @@ In practice it looks like this:
 ```rust {10-17}
 // src/game.rs inside impl Game {} block
     pub fn update(&mut self) {
-        self.frame_count = self.frame_count.overflowing_add(1).0;
+        self.frame_count += 1;
 
         if self.frame_count % 15 == 0 {
             self.snake.update();
@@ -744,7 +744,7 @@ But since you set the drawing colors, you need to change the drawing colors too:
 ```rust {10}
 // src/game.rs inside impl Game {} block
     pub fn update(&mut self) {
-        self.frame_count = self.frame_count.overflowing_add(1).0;
+        self.frame_count += 1;
 
         if self.frame_count % 15 == 0 {
             self.snake.update();
@@ -763,7 +763,7 @@ But since you set the drawing colors, you need to change the drawing colors too:
     }
 ```
 
-This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.
+This way, w4 uses the color palette in its default configuration. Except for one thing: The background will be transparent.
 
 </Page>
 
@@ -802,7 +802,7 @@ But since you set the drawing colors, you need to change the drawing colors too:
     w4.blit(&fruit_sprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP);
 ```
 
-This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.
+This way, w4 uses the color palette in its default configuration. Except for one thing: The background will be transparent.
 
 </Page>
 

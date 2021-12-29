@@ -378,14 +378,14 @@ The easiest way is probably to count the frames and update the snake only every 
 
 <Page value="assemblyscript">
 
-For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
+For this, you'd need a new variable. You can call it whatever you like, just be sure you know what its purpose is.
 
 ```typescript {2}
 const snake = new Snake()
 let frameCount = 0
 ```
 
-This variable in main.ts keeps track of all frames so far. Just increase it's value in the main-update function:
+This variable in main.ts keeps track of all frames so far. Just increase its value in the main-update function:
 
 ```typescript {2}
 export function update(): void {
@@ -431,7 +431,7 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 
 <Page value="go">
 
-For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
+For this, you'd need a new variable. You can call it whatever you like, just be sure you know what its purpose is.
 
 ```go {10}
 var (
@@ -447,7 +447,7 @@ var (
 )
 ```
 
-This variable in main.go keeps track of all frames so far. Just increase it's value in the main-update function:
+This variable in main.go keeps track of all frames so far. Just increase its value in the main-update function:
 
 ```go {3}
 //go:export update
@@ -483,14 +483,14 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 
 <Page value="nelua">
 
-For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
+For this, you'd need a new variable. You can call it whatever you like, just be sure you know what its purpose is.
 
 ```lua {2}
 local snake = Snake.init()
 local frame_count = 0
 ```
 
-This variable in main.nelua keeps track of all frames so far. Just increase it's value in the main-update function:
+This variable in main.nelua keeps track of all frames so far. Just increase its value in the main-update function:
 
 ```lua {2}
 local function update()
@@ -535,7 +535,7 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 
 <Page value="rust">
 
-For this, you'd need to store a enw property inside `Game`. You can call it whatever you like, just be sure you know what it's purpose is.
+For this, you'd need to store a enw property inside `Game`. You can call it whatever you like, just be sure you know what its purpose is.
 
 ```rust {7,14}
 // src/game.rs
@@ -562,7 +562,7 @@ It keeps track of all frames so far. Just increase its value in `Game::update`.
 ```rust {3}
 // src/game.rs
 pub fn update(&mut self) {
-    self.frame_count = self.frame_count.overflowing_add(1).0;
+    self.frame_count += 1;
 
     self.snake.update();
     self.snake.draw();
@@ -574,7 +574,7 @@ Now all you need is to check if the passed frames are dividable by X:
 ```rust {3,5-7}
 // src/game.rs
 pub fn update(&mut self) {
-    self.frame_count = self.frame_count.overflowing_add(1).0;
+    self.frame_count += 1;
 
     if self.frame_count % 15 == 0 {
         self.snake.update();
@@ -589,14 +589,14 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 
 <Page value="zig">
 
-For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
+For this, you'd need a new variable. You can call it whatever you like, just be sure you know what its purpose is.
 
 ```zig {2}
 var snake: Snake = Snake.init();
 var frame_count: u32 = 0;
 ```
 
-This variable in main.ts keeps track of all frames so far. Just increase it's value in the main-update function:
+This variable in main.ts keeps track of all frames so far. Just increase its value in the main-update function:
 
 ```zig {2}
 export fn update() void {

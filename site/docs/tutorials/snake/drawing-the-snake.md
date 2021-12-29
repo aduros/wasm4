@@ -98,7 +98,7 @@ Simply loop through the body and draw it at `X*8` and `Y*8`. 8 is the width and 
 Keep in mind you need to import `cart/w4` in case your editor doesn't do this for you.
 :::
 
-That's all fine, but since there is no instance of the snake, nothing can be drawn. To fix this, simply create a new variable in main and call it's draw function:
+That's all fine, but since there is no instance of the snake, nothing can be drawn. To fix this, simply create a new variable in main and call its draw function:
 
 ```go {9-18,30}
 package main
@@ -166,7 +166,7 @@ end
 
 Simply loop through the body and draw it at `x * 8` and `y * 8`. 8 is the width and the height of a single part. On a 160x160 screen, it's big enough to fit snake that is 20*20=400 parts long.
 
-That's all fine, but since we haven't initialized the snake, nothing can be drawn. To fix this, simply create a new variable in main and call it's draw function:
+That's all fine, but since we haven't initialized the snake, nothing can be drawn. To fix this, simply create a new variable in main and call its draw function:
 
 ```lua {2-5, 17}
 require "wasm4"
@@ -348,7 +348,7 @@ pub const Snake = struct {
 
 Simply loop through the body and draw it at `x * 8` and `y * 8`. 8 is the width and the height of a single part. On a 160x160 screen, it's big enough to fit snake that is 20*20=400 parts long. This is where the 400 in the BoundedArray declaration comes from: we cap the number of elements to 400 at comptime so we don't have to deal with dynamically allocating memory for the points.
 
-That's all fine, but since we haven't initialized the snake, nothing can be drawn. To fix this, simply create a new variable in main and call it's draw function:
+That's all fine, but since we haven't initialized the snake, nothing can be drawn. To fix this, simply create a new variable in main and call its draw function:
 
 ```zig {2,4,16}
 const w4 = @import("wasm4.zig");
@@ -454,7 +454,7 @@ draw(): void {
 }
 ```
 
-This changes the color back and adds the darker green as it's outline.
+This changes the color back and adds the darker green as its outline.
 
 ![Snake with outline](images/draw-body-3.webp)
 
@@ -547,7 +547,7 @@ func (s *Snake) Draw() {
 }
 ```
 
-This changes the color back and adds the darker green as it's outline.
+This changes the color back and adds the darker green as its outline.
 
 ![Snake with outline](images/draw-body-3.webp)
 
@@ -628,7 +628,7 @@ function Snake:draw()
 end
 ```
 
-This changes the color back and adds the darker green as it's outline.
+This changes the color back and adds the darker green as its outline.
 
 ![Snake with outline](images/draw-body-3.webp)
 
@@ -716,7 +716,7 @@ pub fn draw(&self) {
 }
 ```
 
-This changes the color back and adds the darker green as it's outline.
+This changes the color back and adds the darker green as its outline.
 
 ![Snake with outline](images/draw-body-3.webp)
 
@@ -797,7 +797,7 @@ pub fn draw(this: @This()) void {
 }
 ```
 
-This changes the color back and adds the darker green as it's outline.
+This changes the color back and adds the darker green as its outline.
 
 ![Snake with outline](images/draw-body-3.webp)
 

@@ -34,7 +34,7 @@ fruit.X = rnd(20)
 fruit.Y = rnd(20)
 ```
 
-In it's final form, it could look like this:
+In its final form, it could look like this:
 
 ```typescript {4-9}
     if (frameCount % 15 == 0) {
@@ -88,7 +88,7 @@ fruit.X = rnd(20)
 fruit.Y = rnd(20)
 ```
 
-In it's final form, it could look like this:
+In its final form, it could look like this:
 
 ```go {4-8}
 	if frameCount%15 == 0 {
@@ -135,7 +135,7 @@ Just this however will realocate the fruit in the same places for every run beca
 math.randomseed(frame_count)
 ```
 
-In it's final form, it could look like this:
+In its final form, it could look like this:
 
 ```lua {4-9}
   if frame_count % 15 == 0 then
@@ -197,12 +197,12 @@ self.fruit.x = self.rng.i32(0..20);
 self.fruit.y = self.rng.i32(0..20);
 ```
 
-In it's final form, it could look like this:
+In its final form, it could look like this:
 
 ```rust
 // src/game.rs inside impl Game {} block
     pub fn update(&mut self) {
-        self.frame_count = self.frame_count.overflowing_add(1).0;
+        self.frame_count += 1;
 
         self.input();
 
@@ -247,7 +247,7 @@ fruit.x = rnd(20);
 fruit.y = rnd(20);
 ```
 
-In it's final form, it could look like this:
+In its final form, it could look like this:
 
 ```zig {4-9}
     if (frame_count % 15 == 0) {
@@ -270,7 +270,7 @@ Now you're almost done. Only "Game Over" is left to finish this game.
 
 ## Collision Detection with Itself
 
-For the player to have any sense of "danger", the game needs a possibility for the player to lose. Usually the snake can't touch itself or it dies. For this, just loop through the body and check if the piece and the head have the same coordinates. Just like with the fruit. But it might be a good idea to move this to it's own function:
+For the player to have any sense of "danger", the game needs a possibility for the player to lose. Usually the snake can't touch itself or it dies. For this, just loop through the body and check if the piece and the head have the same coordinates. Just like with the fruit. But it might be a good idea to move this to its own function:
 
 <MultiLanguage>
 
@@ -428,7 +428,7 @@ Now you can call this function to check if the snake died in this frame:
 ```rust
 // src/game.rs inside impl Game {} block
     pub fn update(&mut self) {
-        self.frame_count = self.frame_count.overflowing_add(1).0;
+        self.frame_count += 1;
 
         self.input();
 

@@ -6,7 +6,7 @@ With a moving snake, you've done a good part of the game. This part lets you giv
 
 That's it.
 
-But first, you need to understand how WASM-4 handles it's user input.
+But first, you need to understand how WASM-4 handles user input.
 
 ## Gamepad Basics
 
@@ -320,7 +320,7 @@ impl Game {
     }
 
     pub fn update(&mut self) {
-        self.frame_count = self.frame_count.overflowing_add(1).0;
+        self.frame_count += 1;
 
         if self.frame_count % 15 == 0 {
             self.snake.update();
@@ -356,7 +356,7 @@ The classic processing loop goes like this: Input, Process the input, output the
 
 <Page value="assemblyscript">
 
-It's a good idea to handle the input in it's own function. Something like this could be on your mind:
+It's a good idea to handle the input in its own function. Something like this could be on your mind:
 
 ```typescript {1-8,13}
 function input(): void {
@@ -469,7 +469,7 @@ To fix this, add those functions to your snake. Here's an example for `down`:
 
 <Page value="go">
 
-It's a good idea to handle the input in it's own function. Something like this could be on your mind:
+It's a good idea to handle the input in its own function. Something like this could be on your mind:
 
 ```go {1-7,13}
 func input() {
@@ -577,7 +577,7 @@ func (s *Snake) Down() {
 
 <Page value="nelua">
 
-It's a good idea to handle the input in it's own function. Something like this could be on your mind:
+It's a good idea to handle the input in its own function. Something like this could be on your mind:
 
 ```lua {1-8,13}
 local function input()
@@ -697,7 +697,7 @@ end
 
 <Page value="rust">
 
-It's a good idea to handle the input in it's own function. Something like this could be on your mind:
+It's a good idea to handle the input in its own function. Something like this could be on your mind:
 
 ```rust {21,29-36}
 // src/game.rs
@@ -718,7 +718,7 @@ impl Game {
     }
 
     pub fn update(&mut self) {
-        self.frame_count = self.frame_count.overflowing_add(1).0;
+        self.frame_count += 1;
 
         self.input();
 
@@ -785,7 +785,7 @@ impl Game {
     }
 
     pub fn update(&mut self) {
-        self.frame_count = self.frame_count.overflowing_add(1).0;
+        self.frame_count += 1;
 
         self.input();
 
@@ -862,7 +862,7 @@ To fix the errors, add those functions to your snake. Here's an example for `dow
 
 <Page value="zig">
 
-It's a good idea to handle the input in it's own function. Something like this could be on your mind:
+It's a good idea to handle the input in its own function. Something like this could be on your mind:
 
 ```zig {1-8,13}
 fn input() void {

@@ -107,7 +107,7 @@ Your game will be here: `zig-out/lib/cart.wasm`
 The WASM-4 project is still in it's early stages. The process of submitting your game onto the website is still not finished and a little rough around the edges.
 :::
 
-WASM-4 and it's website are stored in a Git-Repo (short for Repository) hosted on GitHub.
+WASM-4 and its website are stored in a Git-Repo (short for Repository) hosted on GitHub.
 
 To publish your game, you *need* a GitHub Account. If you don't have one already, [create one](https://github.com/join). In case you already have one, [login](https://github.com/login).
 

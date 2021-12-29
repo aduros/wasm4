@@ -87,6 +87,16 @@ wasm-opt target/wasm32-unknown-unknown/release/cart.wasm -o snake-cart-opt.wasm 
 
 `wasm-opt` has created a new file `./snake-cart-opt.wasm` that is likely far smaller than `target/wasm32-unknown-unknown/release/cart.wasm`.
 
+:::note Other tools
+
+If you're still having trouble with the cart size I suggest you to profile it using [`twiggy`](https://github.com/rustwasm/twiggy) and
+ then remove unused functions with [`wasm-snip`](https://github.com/rustwasm/wasm-snip):
+
+*wasm-snip replaces a WebAssembly function's body with an unreachable instruction.
+This is a rather heavy, blunt hammer for functions that kind of look like nails if you squint hard enough.*
+
+-- source: *[rustwasm book](https://rustwasm.github.io/book/reference/code-size.html#use-the-wasm-snip-tool)*
+:::
 </Page>
 
 <Page value="zig">

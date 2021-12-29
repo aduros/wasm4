@@ -84,6 +84,19 @@ const {{rustName}}: [u8; {{length}}] = [ {{bytes}} ];
 
 {{/sprites}}`,
 
+    wat:
+`{{#sprites}}
+;; {{name}}
+;; {{name}}_width: u32 = {{width}};
+;; {{name}}_height: u32 = {{height}};
+;; {{name}}_flags: u32 = {{flags}}; // {{flagsHumanReadable}}
+(data
+  (i32.const ???)
+  "{{wasmBytes}}"
+)
+
+{{/sprites}}`,
+
     zig:
 `{{#sprites}}
 // {{name}}
@@ -197,6 +210,9 @@ function run (sourceFile) {
     
     const data = dataBytes.join(',')
 
+    const wasmBytes = [...bytes]
+            .map((b) => "\\" + b.toString(16).padStart(2, "0"))
+
     const odinVarName = (varName.substr(0,1) + varName.substr(1)
         .replace(/[A-Z]/g, l => '_' + l))
         .toLocaleLowerCase()
@@ -211,6 +227,7 @@ function run (sourceFile) {
         "bytes": data,
         "firstByte": dataBytes[0],
         "restBytes": dataBytes.slice(1).join(','),
+        "wasmBytes": wasmBytes.join(''),
         "rustName": rustVarName,
         "odinName": odinVarName,
         "odinFlags": odinFlags,
@@ -245,6 +262,8 @@ function runAll (files, opts) {
             lang = "odin";
         } else if (opts.rust) {
             lang = "rust";
+        } else if (opts.wat) {
+            lang = "wat";
         } else if (opts.zig) {
             lang = "zig";
         }

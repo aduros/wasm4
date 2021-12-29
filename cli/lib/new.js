@@ -49,6 +49,11 @@ const HELP = {
         build: "cargo build --release",
         cart: "target/wasm32-unknown-unknown/release/cart.wasm",
     },
+    wat: {
+      name: 'WebAssembly Text',
+      build: 'make',
+      cart: 'build/cart.wasm',
+    },
     zig: {
       name: 'Zig',
       build: 'zig build -Drelease-small=true',
@@ -84,6 +89,8 @@ async function run (destDir, opts) {
         lang = "odin";
     } else if (opts.rust) {
         lang = "rust";
+    } else if (opts.wat) {
+        lang = "wat";
     } else if (opts.zig) {
         lang = "zig";
     }

@@ -177,7 +177,7 @@ function `set_palette`.
 
 
 ```rust
-// `src/palette.rs`
+// src/palette.rs
 use crate::wasm4;
 
 pub fn set_palette(palette: [u32; 4]) {

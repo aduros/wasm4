@@ -168,7 +168,58 @@ Now you're almost done. Only "Game Over" is left to finish this game.
 
 <Page value="rust">
 
-// TODO
+A simple
+
+```rust
+if self.snake.body[0] == fruit {
+    // Snake's head hits the fruit
+}
+```
+
+is enough already to check if the snake eats the fruit. And to make the snake "grow", simply increase the length of the snake using the [`push`](https://doc.rust-lang.org/std/vec/struct.Vec.html#method.push) method. Now it remains the question what values should this new piece have. The easiest would be to add the current last piece:
+
+```rust
+// src/game.rs
+let dropped_pos = self.snake.update();
+
+if self.snake.body[0] == self.fruit {
+    if let Some(last_pos) = dropped_pos {
+        self.snake.body.push(last_pos);
+    }
+}
+```
+
+Once this done, simply relocate the fruit:
+
+```rust
+// src/game.rs
+self.fruit.x = self.rng.i32(0..20);
+self.fruit.y = self.rng.i32(0..20);
+```
+
+In it's final form, it could look like this:
+
+```rust
+// src/game.rs inside impl Game {} block
+    pub fn update(&mut self) {
+        self.frame_count = self.frame_count.overflowing_add(1).0;
+
+        self.process_input();
+
+        if self.frame_count % 15 == 0 {
+            let dropped_pos = self.snake.update();
+
+            if self.snake.body[0] == self.fruit {
+                if let Some(last_pos) = dropped_pos {
+                    self.snake.body.push(last_pos);
+                }
+
+                self.fruit.x = self.rng.i32(0..20);
+                self.fruit.y = self.rng.i32(0..20);
+            }
+        }
+    }
+```
 
 </Page>
 
@@ -362,7 +413,45 @@ What you do, is up to you. You could stop the game and show the score. Or you co
 
 <Page value="rust">
 
-// TODO
+```rust
+// src/snake.rs inside impl Snake {} block
+    pub fn is_dead(&self) -> bool {
+        self.body
+            .iter()
+            .skip(1)
+            .any(|&body_section| body_section == self.body[0])
+    }
+```
+
+Now you can call this function to check if the snake died in this frame:
+
+```rust
+// src/game.rs inside impl Game {} block
+    pub fn update(&mut self) {
+        self.frame_count = self.frame_count.overflowing_add(1).0;
+
+        self.process_input();
+
+        if (self.snake.is_dead()) {
+            // Do something
+        }
+
+        if self.frame_count % 15 == 0 {
+            let dropped_pos = self.snake.update();
+
+            if self.snake.body[0] == self.fruit {
+                if let Some(last_pos) = dropped_pos {
+                    self.snake.body.push(last_pos);
+                }
+
+                self.fruit.x = self.rng.i32(0..20);
+                self.fruit.y = self.rng.i32(0..20);
+            }
+        }
+    }
+```
+
+What you do, is up to you. You could stop the game and show the score. Or you could simply reset the game. Up to you.
 
 </Page>
 

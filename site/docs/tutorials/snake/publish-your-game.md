@@ -78,6 +78,15 @@ cargo build --release
 
 Your game will be here: `target/wasm32-unknown-unknown/release/cart.wasm`
 
+If you have downloaded [binaryen](https://github.com/WebAssembly/binaryen) now it's the time to run [`wasm-opt`](https://github.com/WebAssembly/binaryen#wasm-opt):
+
+```bash
+# run with `--help` for more details about this command
+wasm-opt target/wasm32-unknown-unknown/release/cart.wasm -o snake-cart-opt.wasm -Oz --strip-dwarf --strip-producers --zero-filled-memory
+```
+
+`wasm-opt` has created a new file `./snake-cart-opt.wasm` that is likely far smaller than `target/wasm32-unknown-unknown/release/cart.wasm`.
+
 </Page>
 
 <Page value="zig">

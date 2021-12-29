@@ -149,7 +149,7 @@ But it lacks any functionality for now.
 To keep things tidy, I recommend to create a new file called `snake.rs`. 
 This file contains two structs:
 
-- The `Point` - Holding `x` and `y` coordinates.
+- The `Point` - Holds `x` and `y` coordinates.
 - The `Snake` - The actual snake implementation.
 
 `Snake` has an [associated function](https://doc.rust-lang.org/reference/items/associated-items.html#associated-functions-and-methods) `new` that returns a brand new snake.
@@ -157,7 +157,7 @@ This file contains two structs:
 We have also defined few derivable traits to `Point`:
 
 - `PartialEq` and `Eq` add the `==` operator to perform an equality checks between `Point` instances.
-- `Clone` and `Copy` relax the ownership rules when dealing with `Point` instances.
+- `Clone` and `Copy` simplify use of `Point` instance.
 
 You can learn more about these traits in the [rust-book](https://doc.rust-lang.org/stable/book/):
 

@@ -209,6 +209,19 @@ To compile Rust projects you will need to install the [rust toolchain using rust
 rustup target add wasm32-unknown-unknown
 ```
 
+:::note Binaryen
+
+It is not required but is **strongly recommended** that you download [binaryen](https://github.com/WebAssembly/binaryen) executables for your OS:
+
+- mac: via [brew](https://brew.sh/) or [github](https://github.com/WebAssembly/binaryen/releases).
+- linux: via distro package manager or [github](https://github.com/WebAssembly/binaryen/releases).
+- windows: [github](https://github.com/WebAssembly/binaryen/releases)
+
+**Note:** If you have previously used [`wasm-pack`](https://github.com/rustwasm/wasm-pack) you should already have it installed.
+
+We'll use [`wasm-opt`](https://github.com/WebAssembly/binaryen#wasm-opt) to significantly shrink the cartridge size.
+:::
+
 Create a new project 
 
 ```shell

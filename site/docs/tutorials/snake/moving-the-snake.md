@@ -135,7 +135,7 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 To achieve the first step (moving the body, excluding the head), we just remove the last body segment.
 
 ```rust
-// `src/lib/snake.rs`
+// src/snake.rs
     pub fn update(&mut self) -> Option<Point> {
         if self.body.len() > 1 {
             self.body.pop()
@@ -148,7 +148,7 @@ To achieve the first step (moving the body, excluding the head), we just remove 
 Don't forget to call the new function inside `Game::update`.
 
 ```rust {17}
-// src/lib/game.rs
+// src/game.rs
 use crate::snake::{Point, Snake};
 use crate::wasm4;
 
@@ -313,7 +313,7 @@ end
 This isn't hard either. Simple insert at `0` the new head position and then make sure the head stays within the boundaries:
 
 ```rust
-// `src/lib/snake.rs`
+// src/snake.rs
     pub fn update(&mut self) -> Option<Point> {
         self.body.insert(
             0,
@@ -538,7 +538,7 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 For this, you'd need to store a enw property inside `Game`. You can call it whatever you like, just be sure you know what it's purpose is.
 
 ```rust {7,14}
-// src/lib/game.rs
+// src/game.rs
 use crate::snake::{Point, Snake};
 use crate::wasm4;
 
@@ -560,7 +560,7 @@ impl Game {
 It keeps track of all frames so far. Just increase its value in `Game::update`.
 
 ```rust {3}
-// src/lib/game.rs
+// src/game.rs
 pub fn update(&mut self) {
     self.frame_count = self.frame_count.overflowing_add(1).0;
 
@@ -572,7 +572,7 @@ pub fn update(&mut self) {
 Now all you need is to check if the passed frames are dividable by X:
 
 ```rust {3,5-7}
-// src/lib/game.rs
+// src/game.rs
 pub fn update(&mut self) {
     self.frame_count = self.frame_count.overflowing_add(1).0;
 

@@ -302,7 +302,7 @@ end
 <Page value="rust">
 
 ```rust
-// src/lib/game.rs
+// src/game.rs
 use crate::snake::{Point, Snake};
 use crate::wasm4;
 
@@ -700,7 +700,7 @@ end
 It's a good idea to handle the input in it's own function. Something like this could be on your mind:
 
 ```rust
-// src/lib/game.rs
+// src/game.rs
 use crate::snake::{Point, Snake};
 use crate::wasm4;
 
@@ -743,7 +743,7 @@ If you try to compile this, you should get an error: `cannot find value prev_gam
 Just place `prev_gamepad` in `Game`.
 
 ```rust
-// src/lib/game.rs
+// src/game.rs
 use crate::snake::{Point, Snake};
 use crate::wasm4;
 
@@ -767,7 +767,7 @@ impl Game {
 To notice any change in the gamepad, you have to store the *current state* at the end of the input. This will make it the *previous state*. And while you're at it, why not add the other 3 directions along the way:
 
 ```rust
-// src/lib/game.rs
+// src/game.rs
 use crate::snake::{Point, Snake};
 use crate::wasm4;
 
@@ -819,7 +819,7 @@ impl Game {
 If you want to check if it works: Use the `trace` function provided by WASM-4. Here's an example:
 
 ```rust
-// `src/lib/game.rs`
+// src/game.rs
 if just_pressed & wasm4::BUTTON_DOWN != 0 {
     wasm4::trace("down");
 }
@@ -830,7 +830,7 @@ If you use `trace` in each if-statement, you should see the corresponding output
 Now, instead of using `trace` to confirm everything works as intended, you should replace it with something like this:
 
 ```rust
-// `src/lib/game.rs`
+// src/game.rs
 if just_pressed & wasm4::BUTTON_DOWN != 0 {
    self.snake.down();
 }
@@ -848,7 +848,7 @@ method not found in `Snake`
 To fix the errors, add those functions to your snake. Here's an example for `down`:
 
 ```rust
-// `src/lib/snake.rs`
+// `src/snake.rs`
     pub fn down(&mut self) {
         if self.direction.y == 0 {
             self.direction = Point { x: 0, y: 1 };

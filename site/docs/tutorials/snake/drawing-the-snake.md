@@ -226,7 +226,7 @@ pub fn rect(x: i32, y: i32, width: u32, height: u32);
 Simply loop through the body and draw it at `x * 8` and `y * 8` because our snake is made of 8x8 squares.
 
 ```rust
-// `src/lib/snake.rs` inside `impl Snake {}` block
+// src/snake.rs inside `impl Snake {}` block
 pub fn draw(&self) {
     for &Point { x, y } in self.body.iter() {
         wasm4::rect(x * 8, y * 8, 8, 8);
@@ -245,10 +245,10 @@ use crate::wasm4;
 ---
 
 That's all fine, but since there is no instance of the snake, nothing can be drawn. To fix this we are going to define a `Game` struct
-inside `src/lib/game.rs`.
+inside `src/game.rs`.
 
 ```rust
-// src/lib/game.rs
+// src/game.rs
 use crate::snake::{Point, Snake};
 use crate::wasm4;
 
@@ -304,7 +304,7 @@ fn update() {
 we have to declare inside the `dependencies` section of `Cargo.toml`, otherwise `rustc` does not know how to resolve it and will
 not compile our game.
 
-```toml
+```toml {3}
 [dependencies]
 buddy-alloc = { version = "0.4.1", optional = true }
 lazy_static = "1.4.0"
@@ -654,7 +654,7 @@ I think it's easier to pick `0`.
 Since the body is drawn, head is not much of a problem. Simply use the `rect` function again. But use a specific part instead:
 
 ```rust {8}
-// `src/lib/palette.rs` inside `impl Snake {}` block
+// src/snake.r` inside `impl Snake {}` block
 pub fn draw(&self) {
     for &Point { x, y } in self.body.iter() {
         wasm4::rect(x * 8, y * 8, 8, 8);
@@ -667,25 +667,28 @@ pub fn draw(&self) {
 Notice the difference? Me neither.
 The head should stand out a little. For this, you can use a different color.
 
-We'll create a helper function inside `src/lib/palette.rs` to confine the `unsafe` code.
+We'll create a helper function inside `src/palette.rs` to confine the `unsafe` code.
 
 ```rust
-// src/lib/palette.rs
-pub fn set_draw_color<T: Into<u16>>(idx: T) {
+// src/palette.rs
+pub fn set_draw_color(idx: u16) {
     unsafe { *wasm4::DRAW_COLORS = idx.into() }
 }
 ```
 
-Then we'll invoke `draw_color` inside `src/lib/snake.rs`:
+Then we'll invoke `draw_color` inside `src/snake.rs`:
 
-```rust {7}
-// src/lib/snake.rs
+```rust {2,8}
+// src/snake.rs
+use crate::palette::set_draw_color;
+
+// Inside inside `impl Snake {}` block
 pub fn draw(&self) {
     for &Point { x, y } in self.body.iter() {
         wasm4::rect(x * 8, y * 8, 8, 8);
     }
 
-    set_draw_color(0x4u16);
+    set_draw_color(0x4);
     wasm4::rect(self.body[0].x * 8, self.body[0].y * 8, 8, 8);
 }
 ```
@@ -697,15 +700,15 @@ Result:
 You'll see a change. The snake changed color. Not only the head, but the complete snake! Once you've set a color, it stays that way. So if you want to change only the head, you have to change color 1 again. Right before you draw the body.
 
 ```rust {3}
-// src/lib/snake.rs
+// src/snake.rs
 pub fn draw(&self) {
-    set_draw_color(0x43u16);
+    set_draw_color(0x43);
 
     for &Point { x, y } in self.body.iter() {
         wasm4::rect(x * 8, y * 8, 8, 8);
     }
 
-    set_draw_color(0x4u16);
+    set_draw_color(0x4);
     wasm4::rect(self.body[0].x * 8, self.body[0].y * 8, 8, 8);
 }
 ```

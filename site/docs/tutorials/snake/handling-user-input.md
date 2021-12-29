@@ -699,7 +699,7 @@ end
 
 It's a good idea to handle the input in it's own function. Something like this could be on your mind:
 
-```rust
+```rust {21,29-36}
 // src/game.rs
 use crate::snake::{Point, Snake};
 use crate::wasm4;
@@ -720,21 +720,21 @@ impl Game {
     pub fn update(&mut self) {
         self.frame_count = self.frame_count.overflowing_add(1).0;
 
+        self.input();
+
         if self.frame_count % 15 == 0 {
             self.snake.update();
         }
         self.snake.draw();
     }
 
-    pub fn process_input(&mut self) {
+    pub fn input(&mut self) {
         let gamepad = unsafe { *wasm4::GAMEPAD1 };
         let just_pressed = gamepad & (gamepad ^ prev_gamepad);
 
         if just_pressed & wasm4::BUTTON_UP != 0 {
           // Do something
         }
-
-        prev_gamepad = gamepad;
     }
 }
 ```
@@ -742,7 +742,7 @@ impl Game {
 If you try to compile this, you should get an error: `cannot find value prev_gamepad in this scope`.
 Just place `prev_gamepad` in `Game`.
 
-```rust
+```rust {8,16}
 // src/game.rs
 use crate::snake::{Point, Snake};
 use crate::wasm4;
@@ -787,13 +787,15 @@ impl Game {
     pub fn update(&mut self) {
         self.frame_count = self.frame_count.overflowing_add(1).0;
 
+        self.input();
+
         if self.frame_count % 15 == 0 {
             self.snake.update();
         }
         self.snake.draw();
     }
 
-    pub fn process_input(&mut self) {
+    pub fn input(&mut self) {
         let gamepad = unsafe { *wasm4::GAMEPAD1 };
         let just_pressed = gamepad & (gamepad ^ self.prev_gamepad);
 
@@ -848,7 +850,7 @@ method not found in `Snake`
 To fix the errors, add those functions to your snake. Here's an example for `down`:
 
 ```rust
-// `src/snake.rs`
+// src/snake.rs
     pub fn down(&mut self) {
         if self.direction.y == 0 {
             self.direction = Point { x: 0, y: 1 };

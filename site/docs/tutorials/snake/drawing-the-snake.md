@@ -653,7 +653,7 @@ I think it's easier to pick `0`.
 
 Since the body is drawn, head is not much of a problem. Simply use the `rect` function again. But use a specific part instead:
 
-```rust {8}
+```rust {7}
 // src/snake.r` inside `impl Snake {}` block
 pub fn draw(&self) {
     for &Point { x, y } in self.body.iter() {
@@ -678,7 +678,7 @@ pub fn set_draw_color(idx: u16) {
 
 Then we'll invoke `draw_color` inside `src/snake.rs`:
 
-```rust {2,8}
+```rust {2,10}
 // src/snake.rs
 use crate::palette::set_draw_color;
 
@@ -699,8 +699,11 @@ Result:
 
 You'll see a change. The snake changed color. Not only the head, but the complete snake! Once you've set a color, it stays that way. So if you want to change only the head, you have to change color 1 again. Right before you draw the body.
 
-```rust {3}
+```rust {6}
 // src/snake.rs
+use crate::palette::set_draw_color;
+
+// Inside inside `impl Snake {}` block
 pub fn draw(&self) {
     set_draw_color(0x43);
 

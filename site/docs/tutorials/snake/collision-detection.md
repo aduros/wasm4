@@ -204,7 +204,7 @@ In it's final form, it could look like this:
     pub fn update(&mut self) {
         self.frame_count = self.frame_count.overflowing_add(1).0;
 
-        self.process_input();
+        self.input();
 
         if self.frame_count % 15 == 0 {
             let dropped_pos = self.snake.update();
@@ -430,7 +430,7 @@ Now you can call this function to check if the snake died in this frame:
     pub fn update(&mut self) {
         self.frame_count = self.frame_count.overflowing_add(1).0;
 
-        self.process_input();
+        self.input();
 
         if (self.snake.is_dead()) {
             // Do something

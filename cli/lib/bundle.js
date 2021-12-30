@@ -71,7 +71,7 @@ async function bundleHtml (cartFile, htmlFile, opts) {
 
     await fs.writeFile(htmlFile, htmlFileContent);
 
-    console.log(`OK! Bundled ${htmlFile}.`);
+    console.log(`✔ Bundled ${htmlFile}`);
 }
 
 async function bundleExecutable (cartFile, sourceFile, outputFile, opts) {
@@ -92,7 +92,7 @@ async function bundleExecutable (cartFile, sourceFile, outputFile, opts) {
     // Make sure it's executable
     await fs.chmod(outputFile, "775");
 
-    console.log(`OK! Bundled ${outputFile}.`);
+    console.log(`✔ Bundled ${outputFile}`);
 }
 
 async function bundle(cartFile, opts) {

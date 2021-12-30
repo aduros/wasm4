@@ -105,7 +105,7 @@ async function run (destDir, opts) {
     }
 
     const help = HELP[lang];
-    console.log(`OK! Created ${help.name} project at ${path.resolve(destDir)}`);
+    console.log(`✔ Created ${help.name} project at ${path.resolve(destDir)}`);
     console.log();
     if (help.setup) {
         console.log(`First setup the project by running:`);

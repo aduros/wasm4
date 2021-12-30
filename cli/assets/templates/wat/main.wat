@@ -77,7 +77,7 @@
   ;; *DRAW_COLORS = 2
   (i32.store16 (i32.const 0x14) (i32.const 2))
 
-  ;; text("Hello from C!", 10, 10);
+  ;; text("Hello from Wat!", 10, 10);
   (call $text (i32.const 0x19a8) (i32.const 10) (i32.const 10))
 
   ;; uint8_t gamepad = *GAMEPAD1;

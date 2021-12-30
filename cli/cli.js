@@ -149,7 +149,7 @@ program
 // node 15+ throw on `unhandledRejection`.
 // @see https://nodejs.org/api/process.html#process_event_unhandledrejection
 process.on('unhandledRejection', unhandledRejectionError => {
-    console.log('[w4] error:\n');
-
-    throw unhandledRejectionError;
+    console.error(unhandledRejectionError.message);
+    process.exit(1);
+    // throw unhandledRejectionError;
 });

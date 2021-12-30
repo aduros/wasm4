@@ -38,7 +38,8 @@ w4.DiskW(unsafe.Pointer(&gameData), unsafe.Sizeof(gameData))
 ```
 
 ```lua
--- TODO
+local game_data: integer = 1337
+diskw(&game_data, #@decltype(game_data))
 ```
 
 ```nim
@@ -102,7 +103,8 @@ w4.DiskR(unsafe.Pointer(&gameData), unsafe.Sizeof(gameData))
 ```
 
 ```lua
--- TODO
+local game_data: integer
+diskr(&game_data, #@decltype(game_data))
 ```
 
 ```nim

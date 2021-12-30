@@ -73,7 +73,16 @@ var smiley = [8]byte {
 ```
 
 ```lua
--- TODO
+local smiley: []uint8 = {
+    0b11000011,
+    0b10000001,
+    0b00100100,
+    0b00100100,
+    0b00000000,
+    0b00100100,
+    0b10011001,
+    0b11000011
+}
 ```
 
 ```nim
@@ -151,7 +160,7 @@ w4.Blit(&smiley[0], 10, 10, 8, 8, w4.BLIT_1BPP)
 ```
 
 ```lua
--- TODO
+blit(smiley, 10, 10, 8, 8, BLIT_1BPP)
 ```
 
 ```nim
@@ -200,7 +209,7 @@ w4.Blit(&smiley[0], 10, 10, 8, 8, w4.BLIT_1BPP | w4.BLIT_FLIP_Y)
 ```
 
 ```lua
--- TODO
+blit(smiley, 10, 10, 8, 8, BLIT_1BPP | BLIT_FLIP_Y)
 ```
 
 ```nim

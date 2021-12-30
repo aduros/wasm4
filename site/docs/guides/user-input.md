@@ -48,7 +48,11 @@ if gamepad&w4.BUTTON_RIGHT != 0 {
 ```
 
 ```lua
--- TODO
+local gamepad = $GAMEPAD1
+
+if gamepad & BUTTON_RIGHT ~= 0 then
+    trace("Right button is down!")
+end
 ```
 
 ```nim
@@ -172,7 +176,21 @@ func update () {
 ```
 
 ```lua
--- TODO
+local previous_gamepad: uint8
+
+local function update()
+    local gamepad = $GAMEPAD1
+
+    -- Only the buttons that were pressed down this frame
+    local pressed_this_frame = gamepad & (gamepad ~ previous_gamepad)
+    previous_gamepad = gamepad
+
+    if pressed_this_frame & BUTTON_RIGHT ~= 0 then
+        trace("Right button was just pressed!")
+    end
+end
+
+## setup_wasm4_callbacks(update)
 ```
 
 ```nim

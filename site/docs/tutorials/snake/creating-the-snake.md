@@ -84,6 +84,54 @@ Creating our own type reduces the size of the cart.
 
 </Page>
 
+<Page value="nelua">
+
+To keep things tidy, I recommend you'd create a new file called `snake.nelua`. This file contains two records:
+
+- The `Point` - Holding X and Y coordinates
+- The `Snake` - The actual snake implementation
+
+The content is rather simple:
+
+```lua
+require "wasm4"
+local sequence = require "sequence"
+
+local snake = @record{}
+
+local snake.Point = @record{
+  x: int32,
+  y: int32,
+}
+
+local Point = snake.Point
+
+local snake.Snake = @record{
+  body: sequence(Point),
+  direction: Point,
+}
+
+local Snake = snake.Snake
+
+function Snake.init(): Snake
+  return Snake{
+    body = {
+      { x = 2, y = 0 },
+      { x = 1, y = 0 },
+      { x = 0, y = 0 },
+    },
+    direction = { x = 1, y = 0 },
+  }
+end
+
+return snake
+```
+
+The snake record contains the body and the current direction of the snake instance.
+But it lacks any functionality for now.
+
+</Page>
+
 <Page value="nim">
 
 // TODO
@@ -98,7 +146,57 @@ Creating our own type reduces the size of the cart.
 
 <Page value="rust">
 
-// TODO
+To keep things tidy, I recommend to create a new file called `snake.rs`. 
+This file contains two structs:
+
+- The `Point` - Holds `x` and `y` coordinates.
+- The `Snake` - The actual snake implementation.
+
+`Snake` has an [associated function](https://doc.rust-lang.org/reference/items/associated-items.html#associated-functions-and-methods) `new` that returns a brand new snake.
+
+We have also defined few derivable traits to `Point`:
+
+- `PartialEq` and `Eq` add the `==` operator to perform an equality checks between `Point` instances.
+- `Clone` and `Copy` simplify use of `Point` instance.
+
+You can learn more about these traits in the [rust-book](https://doc.rust-lang.org/stable/book/):
+
+- [PartialEq, Eq](https://doc.rust-lang.org/book/appendix-03-derivable-traits.html?highlight=partialEq#partialeq-and-eq-for-equality-comparisons)
+- [Clone, Copy](https://doc.rust-lang.org/book/appendix-03-derivable-traits.html?highlight=partialEq#clone-and-copy-for-duplicating-values) 
+
+```rust
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub struct Point {
+    pub x: i32,
+    pub y: i32,
+}
+
+pub struct Snake {
+    pub body: Vec<Point>,
+    pub direction: Point,
+}
+
+impl Snake {
+    pub fn new() -> Self {
+        Self {
+            body: vec![
+                Point { x: 2, y: 0 },
+                Point { x: 1, y: 0 },
+                Point { x: 0, y: 0 },
+            ],
+            direction: Point { x: 1, y: 0 },
+        }
+    }
+}
+```
+
+:::note
+Don't forget to declare this module in `lib.rs`.
+
+```rust
+mod snake;
+```
+:::
 
 </Page>
 

@@ -51,7 +51,7 @@ pub const SYSTEM_HIDE_GAMEPAD_OVERLAY: u8 = 2;
 pub extern fn blit(sprite: [*]const u8, x: i32, y: i32, width: i32, height: i32, flags: u32) void;
 
 /// Copies a subregion within a larger sprite atlas to the framebuffer.
-pub extern fn blitSub(sprite: [*]const u8, x: i32, y: i32, width: i32, height: i32, src_x: u32, src_y: u32, strie: i32, flags: u32) void;
+pub extern fn blitSub(sprite: [*]const u8, x: i32, y: i32, width: i32, height: i32, src_x: u32, src_y: u32, stride: i32, flags: u32) void;
 
 pub const BLIT_2BPP: u32 = 1;
 pub const BLIT_1BPP: u32 = 0;
@@ -121,3 +121,13 @@ pub fn trace(x: []const u8) void {
     traceUtf8(x.ptr, x.len);
 }
 extern fn traceUtf8(strPtr: [*]const u8, strLen: usize) void;
+
+/// Use with caution, as there's no compile-time type checking.
+///
+/// * %c, %d, and %x expect 32-bit integers.
+/// * %f expects 64-bit floats.
+/// * %s expects a *zero-terminated* string pointer.
+///
+/// See https://github.com/aduros/wasm4/issues/244 for discussion and type-safe
+/// alternatives.
+pub extern fn tracef(x: [*:0]const u8, ...) void;

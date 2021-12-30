@@ -334,14 +334,15 @@ export class Framebuffer {
                 // Sample the sprite to get a color index
                 let colorIdx;
                 const x = srcX + sx, y = srcY + sy;
+                const bitIndex = y * srcStride + x;
                 if (bpp2) {
-                    const byte = sprite[(y * srcStride + x) >>> 2];
-                    const shift = 6 - ((x & 0x03) << 1);
+                    const byte = sprite[bitIndex >>> 2];
+                    const shift = 6 - ((bitIndex & 0x03) << 1);
                     colorIdx = (byte >>> shift) & 0b11;
 
                 } else {
-                    const byte = sprite[(y * srcStride + x) >>> 3];
-                    const shift = 7 - (x & 0x07);
+                    const byte = sprite[bitIndex >>> 3];
+                    const shift = 7 - (bitIndex & 0x7);
                     colorIdx = (byte >>> shift) & 0b1;
                 }
 

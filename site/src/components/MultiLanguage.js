@@ -1,4 +1,7 @@
-import React, {useState, cloneElement, Children} from 'react';
+import React, {useState, cloneElement, Children, useRef, useEffect, useLayoutEffect } from 'react';
+import Link from '@docusaurus/Link';
+import { useHistory } from 'react-router-dom';
+import clsx from 'clsx';
 import useUserPreferencesContext from '@theme/hooks/useUserPreferencesContext';
 
 import "./MultiLanguage.css";
@@ -15,6 +18,20 @@ const names = {
     "zig": "Zig",
 };
 
+/**
+ * @type {(val: unknown) => val is keyof typeof names}
+ */
+function isValidLanguageValue(value) {
+    return typeof value === 'string' && Object.prototype.hasOwnProperty.call(names, value);
+}
+
+/**
+ * @type {(val: string | null | undefined) => string}
+ */
+function normalizeLanguageValue(val) {
+    return (val ?? '').trim().toLowerCase()
+}
+
 export function Page ({children, hidden, className}) {
     return (
         <div {...{hidden, className}}>
@@ -23,33 +40,84 @@ export function Page ({children, hidden, className}) {
     );
 }
 
+/**
+ * @type {() => { activeLang: string, updateLang: (nextLang: string) => void}}
+ */
+function useLanguageCode() {
+    const {tabGroupChoices, setTabGroupChoices} = useUserPreferencesContext();
+    const [activeLang, setActiveLang] = useState("assemblyscript");
+
+    /**
+     * @type {(val: string) => void}
+     */
+    const updateLang = (value) => {
+        const isValid = isValidLanguageValue(value);
+
+        if(value !== activeLang && isValid) {
+            setActiveLang(value);
+            setTabGroupChoices("language", value);
+        } else if(!isValid) {
+            console.warn(`MultilanguageCode: invalid code-lang received: "${value}"`);
+        }
+    };
+
+    // @see https://overreacted.io/making-setinterval-declarative-with-react-hooks/
+    const updateLangRef = useRef(updateLang);
+
+    useEffect(()=> {
+        updateLangRef.current = updateLang;
+    });
+
+    const search = (typeof window !== 'undefined' ? window.location.search : '');
+    const rawLanguagePreference = tabGroupChoices.language;
+
+    useLayoutEffect(() => {
+        const langFromPreferences = normalizeLanguageValue(rawLanguagePreference);
+
+        if(isValidLanguageValue(langFromPreferences)) {
+            setActiveLang(langFromPreferences);
+        }
+
+    }, [rawLanguagePreference]);
+
+    useEffect(() => {
+        const currentQueryParams = new URLSearchParams(search);
+        const langFromQueryParams = normalizeLanguageValue(currentQueryParams.get('code-lang'));
+
+        if(isValidLanguageValue(langFromQueryParams)) {
+            updateLangRef.current(langFromQueryParams);
+        }
+    }, [search])
+
+   return { activeLang, updateLang };
+}
+
+
 export default function MultiLanguage (props) {
     const children = Children.toArray(props.children);
-    const {tabGroupChoices, setTabGroupChoices} = useUserPreferencesContext();
-    const [selectedValue, setSelectedValue] = useState("assemblyscript");
-
-    function handleChange (value) {
-        // TODO(2021-11-26): Hide the dropdown?
-        setSelectedValue(value);
-        setTabGroupChoices("language", value);
-    }
-
-    const relevantTabGroupChoice = tabGroupChoices.language;
-    if (relevantTabGroupChoice != null && relevantTabGroupChoice != selectedValue) {
-        setSelectedValue(relevantTabGroupChoice);
-    }
+    const { activeLang } = useLanguageCode();
+    const history = useHistory();
 
     const dropdown = (
         <div className="dropdown dropdown--hoverable dropdown--right">
-            <a className="navbar__link">{names[selectedValue]} </a>
+            <a className="navbar__link">{names[activeLang]} </a>
             <ul className="dropdown__menu text--left">
-                {Object.entries(names).map(([value, name]) => 
-                    <li>
-                        <a className={`dropdown__link ${value == selectedValue ? "dropdown__link--active" : ""}`}
-                            onClick={() => handleChange(value)}>
-                            {name}
-                        </a>
-                    </li>
+                {Object.entries(names).map(([value, name]) => {
+                    // We use `#no-scroll` to prevent scroll to top on page change.
+                    // @see https://github.com/facebook/docusaurus/blob/73ee356949e6baf70732c69cf6be8d8919f3f75a/packages/docusaurus/src/client/PendingNavigation.tsx#L79
+                    const to = `${history.location.pathname}?code-lang=${value}${history.location.hash || '#no-scroll'}`
+
+                    return (<li key={value}>
+                        <Link 
+                          to={to} 
+                          replace
+                          className={clsx('dropdown__link', value == activeLang && "dropdown__link--active")}
+                        >
+                        {name}
+                        </Link>
+                    </li>);
+                }
+       
                 )}
             </ul>
         </div>
@@ -61,10 +129,10 @@ export default function MultiLanguage (props) {
                 {dropdown}
             </div>
             <div>
-                {children.map((item, i) =>
+                {children.map((item) =>
                     cloneElement(item, {
-                        key: i,
-                        hidden: item.props.value !== selectedValue,
+                        key: item.props.value,
+                        hidden: item.props.value !== activeLang,
                     })
                 )}
             </div>

@@ -50,13 +50,29 @@ export const SYSTEM_HIDE_GAMEPAD_OVERLAY = 2;
 /** Copies pixels to the framebuffer. */
 // @ts-ignore: decorator
 @external("env", "blit")
-export declare function blit (spritePtr: usize, x: i32, y: i32, width: u32, height: u32, flags: u32): void;
+export declare function blit (
+    spritePtr: usize,
+    x: i32,
+    y: i32,
+    width: u32,
+    height: u32,
+    flags: u32
+): void;
 
 /** Copies a subregion within a larger sprite atlas to the framebuffer. */
 // @ts-ignore: decorator
 @external("env", "blitSub")
-export declare function blitSub (spritePtr: usize, x: i32, y: i32, width: u32, height: u32,
-    srcX: u32, srcY: u32, stride: i32, flags: u32): void;
+export declare function blitSub (
+    spritePtr: usize,
+    x: i32,
+    y: i32,
+    width: u32,
+    height: u32,
+    srcX: u32,
+    srcY: u32,
+    stride: i32,
+    flags: u32
+): void;
 
 export const BLIT_1BPP: u32 = 0;
 export const BLIT_2BPP: u32 = 1;
@@ -153,7 +169,12 @@ export function trace (str: string): void {
 declare function traceUtf16 (str: usize, byteLength: u32): void;
 
 // Pass abort messages to trace()
-function abortHandler (message: string | null, fileName: string | null, lineNumber: u32, columnNumber: u32) :void {
+function abortHandler (
+    message: string | null,
+    fileName: string | null,
+    lineNumber: u32,
+    columnNumber: u32
+): void {
     const ptr = changetype<usize>(message);
     if (ptr != 0) {
         const byteLength = load<u32>(ptr - 4);

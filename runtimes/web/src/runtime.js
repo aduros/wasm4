@@ -3,7 +3,7 @@ import * as z85 from "./z85";
 import { APU } from "./apu";
 import { Framebuffer } from "./framebuffer";
 import { WebGLCompositor, Canvas2DCompositor } from "./compositor";
-import { websocket } from "./devkit";
+import * as devkit from "./devkit";
 
 export class Runtime {
     constructor () {
@@ -29,6 +29,7 @@ export class Runtime {
         this.reset();
 
         this.paused = false;
+        this.crashed = false;
     }
 
     setMouse (x, y, buttons) {
@@ -83,7 +84,7 @@ export class Runtime {
         const ctx = this.apu.ctx;
         if (ctx.state == "running") {
             ctx.suspend();
-        } 
+        }
     }
 
     reset (zeroMemory) {
@@ -92,6 +93,7 @@ export class Runtime {
         if (zeroMemory) {
             mem32.fill(0);
         }
+        this.crashed = false;
         mem32.set(constants.COLORS, constants.ADDR_PALETTE >> 2);
         this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
 
@@ -101,6 +103,18 @@ export class Runtime {
     }
 
     async load (wasmBuffer) {
+        const limit = 0xffff;
+        if (wasmBuffer.byteLength > limit) {
+            if (devkit.ENABLED) {
+                if (!this.warnedFileSize) {
+                    this.warnedFileSize = true;
+                    this.print(`Warning: Cart is larger than ${limit} bytes. Ensure the release build of your cart is small enough to be bundled.`);
+                }
+            } else {
+                throw new Error("Cart too big!");
+            }
+        }
+
         const env = {
             memory: this.memory,
 
@@ -129,15 +143,32 @@ export class Runtime {
             tracef: this.tracef.bind(this),
         };
 
-        const module = await WebAssembly.instantiate(wasmBuffer, { env });
-        this.wasm = module.instance;
+        await this.safeCall(async () => {
+            const module = await WebAssembly.instantiate(wasmBuffer, { env });
+            this.wasm = module.instance;
 
-        // Call the WASI _start/_initialize function (different from WASM-4's start callback!)
-        if (this.wasm.exports._start != null) {
-            this.wasm.exports._start();
-        }
-        if (this.wasm.exports._initialize != null) {
-            this.wasm.exports._initialize();
+            // Call the WASI _start/_initialize function (different from WASM-4's start callback!)
+            if (this.wasm.exports._start != null) {
+                this.wasm.exports._start();
+            }
+            if (this.wasm.exports._initialize != null) {
+                this.wasm.exports._initialize();
+            }
+        });
+    }
+
+    async safeCall (fn) {
+        if (fn != null) {
+            try {
+                await fn();
+            } catch (err) {
+                if (err instanceof WebAssembly.RuntimeError) {
+                    this.blueScreen(err);
+                } else {
+                    // if we don't know what it is, throw it again
+                    throw err;
+                }
+            }
         }
     }
 
@@ -215,10 +246,14 @@ export class Runtime {
         return str;
     }
 
-    print (str) {
-        console.log(str);
-        if (websocket != null && websocket.readyState == 1) {
-            websocket.send(str);
+    print (str, error = false) {
+        if (error) {
+            console.error(str);
+        } else {
+            console.log(str);
+        }
+        if (devkit.websocket != null && devkit.websocket.readyState == 1) {
+            devkit.websocket.send(str);
         }
     }
 
@@ -274,9 +309,7 @@ export class Runtime {
     }
 
     start () {
-        if (this.wasm.exports.start != null) {
-            this.wasm.exports.start();
-        }
+        this.safeCall(this.wasm.exports.start);
     }
 
     update () {
@@ -288,11 +321,45 @@ export class Runtime {
             this.framebuffer.clear();
         }
 
-        if (this.wasm.exports.update != null) {
-            this.wasm.exports.update();
-        }
+        this.safeCall(this.wasm.exports.update);
 
         this.composite();
+    }
+
+    blueScreen(err) {
+        this.crashed = true;
+
+        const COLORS = [
+            0x1111ee, // blue
+            0x86c06c,
+            0xaaaaaa, // grey
+            0xffffff, // white
+        ];
+
+        const toCharArr = (s) => [...s].map(x => x.charCodeAt(0));
+
+        const title = ` ${constants.CRASH_TITLE} `;
+        const headerTitle = title;
+        const headerWidth = (8 * title.length);
+        const headerX = (160 - (8 * title.length)) / 2;
+        const headerY = 20;
+        const messageX = 9;
+        const messageY = 60;
+
+        const mem32 = new Uint32Array(this.memory.buffer);
+        mem32.set(COLORS, constants.ADDR_PALETTE >> 2);
+        this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
+        this.framebuffer.clear();
+        this.framebuffer.drawHLine(headerX, headerY-1, headerWidth);
+        this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1131, true);
+        this.framebuffer.drawText(toCharArr(headerTitle), headerX, headerY);
+        this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
+        const errorExplanation = errorToBlueScreenText(err);
+        this.framebuffer.drawText(toCharArr(errorExplanation), messageX, messageY);
+        this.composite();
+
+        // to help with debugging
+        this.print(err.stack, true);
     }
 
     composite () {
@@ -310,4 +377,17 @@ export class Runtime {
             this.unlockAudio();
         }
     }
+}
+
+function errorToBlueScreenText(err) {
+    let message = `${err.name}:\n${err.message}`;
+
+    // hand written messages for specific errors
+    if (err.message.match(/unreachable/)) {
+        message = "The cartridge has\nreached a code \nsegment marked as\nunreachable.";
+    } else if (err.message.match(/out of bounds/)) {
+        message = "The cartridge has\nattempted a memory\naccess that is\nout of bounds.";
+    }
+    message += "\n\n\n\n\nHit R to reboot.";
+    return message;
 }

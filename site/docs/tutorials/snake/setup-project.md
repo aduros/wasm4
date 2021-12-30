@@ -122,6 +122,29 @@ w4 watch
 
 </Page>
 
+<Page value="nelua">
+
+To compile Nelua projects you will need `nelua` installed.
+
+```shell
+w4 new --nelua snake
+cd snake
+```
+
+Compile the .wasm cartridge:
+
+```shell
+make
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 watch
+```
+
+</Page>
+
 <Page value="nim">
 
 :::note Work in Progress
@@ -178,12 +201,28 @@ w4 watch
 
 <Page value="rust">
 
-:::note Work in Progress
-The tutorial for Rust is currently a Work-in-Progress. Most of the language specific instructions are currently missing.
+### Requirements
+
+To compile Rust projects you will need to install the [rust toolchain using rustup](https://www.rust-lang.org/tools/install) then add `wasm32-unknown-unknown` target:
+
+```bash
+rustup target add wasm32-unknown-unknown
+```
+
+:::note Binaryen
+
+It is not required but is **strongly recommended** that you download [binaryen](https://github.com/WebAssembly/binaryen) executables for your OS:
+
+- mac: via [brew](https://brew.sh/) or [github](https://github.com/WebAssembly/binaryen/releases).
+- linux: via distro package manager or [github](https://github.com/WebAssembly/binaryen/releases).
+- windows: [github](https://github.com/WebAssembly/binaryen/releases)
+
+**Note:** If you have previously used [`wasm-pack`](https://github.com/rustwasm/wasm-pack) you should already have it installed.
+
+We'll use [`wasm-opt`](https://github.com/WebAssembly/binaryen#wasm-opt) to significantly shrink the cartridge size.
 :::
 
-To compile Rust projects you will need `cargo` installed. You will also need the wasm32 target,
-which can be installed with `rustup target add wasm32-unknown-unknown`.
+Create a new project 
 
 ```shell
 w4 new --rust snake

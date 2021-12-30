@@ -48,6 +48,16 @@ Your game will be here: `build/cart.wasm`
 
 </Page>
 
+<Page value="nelua">
+
+```shell
+make
+```
+
+Your game will be here: `build/cart.wasm`
+
+</Page>
+
 <Page value="nim">
 
 // TODO
@@ -68,6 +78,25 @@ cargo build --release
 
 Your game will be here: `target/wasm32-unknown-unknown/release/cart.wasm`
 
+If you have downloaded [binaryen](https://github.com/WebAssembly/binaryen) now it's the time to run [`wasm-opt`](https://github.com/WebAssembly/binaryen#wasm-opt):
+
+```bash
+# run with `--help` for more details about this command
+wasm-opt target/wasm32-unknown-unknown/release/cart.wasm -o snake-cart-opt.wasm -Oz --strip-dwarf --strip-producers --zero-filled-memory
+```
+
+`wasm-opt` has created a new file `./snake-cart-opt.wasm` that is likely far smaller than `target/wasm32-unknown-unknown/release/cart.wasm`.
+
+:::note Other tools
+
+If you're still having trouble with the cart size I suggest you to profile it using [`twiggy`](https://github.com/rustwasm/twiggy) and
+ then remove unused functions with [`wasm-snip`](https://github.com/rustwasm/wasm-snip):
+
+*wasm-snip replaces a WebAssembly function's body with an unreachable instruction.
+This is a rather heavy, blunt hammer for functions that kind of look like nails if you squint hard enough.*
+
+-- source: *[rustwasm book](https://rustwasm.github.io/book/reference/code-size.html#use-the-wasm-snip-tool)*
+:::
 </Page>
 
 <Page value="zig">
@@ -88,7 +117,7 @@ Your game will be here: `zig-out/lib/cart.wasm`
 The WASM-4 project is still in it's early stages. The process of submitting your game onto the website is still not finished and a little rough around the edges.
 :::
 
-WASM-4 and it's website are stored in a Git-Repo (short for Repository) hosted on GitHub.
+WASM-4 and its website are stored in a Git-Repo (short for Repository) hosted on GitHub.
 
 To publish your game, you *need* a GitHub Account. If you don't have one already, [create one](https://github.com/join). In case you already have one, [login](https://github.com/login).
 

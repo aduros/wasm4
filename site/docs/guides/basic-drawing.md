@@ -236,7 +236,8 @@ for i := range w4.FRAMEBUFFER {
 ```
 
 ```lua
--- TODO
+require "memory"
+memory.set(FRAMEBUFFER, (3 | (3 << 2) | (3 << 4) | (3 << 6)), 160*160/4)
 ```
 
 ```nim
@@ -342,7 +343,20 @@ func pixel (x int, y int) {
 ```
 
 ```lua
--- TODO
+local function pixel(x: integer, y: integer)
+    -- The byte index into the framebuffer that contains (x, y)
+    local idx = (y*160 + x) >> 2
+
+    -- Calculate the bits within the byte that corresponds to our position
+    local shift = (x & 0b11) << 1
+    local mask = 0b11 << shift
+
+    -- Use the first DRAW_COLOR as the pixel color
+    local color = $DRAW_COLORS & 0b11
+
+    -- Write to the framebuffer
+    FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask)
+end
 ```
 
 ```nim

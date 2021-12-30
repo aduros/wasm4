@@ -29,7 +29,8 @@ To achieve the first step (moving the body, excluding the head), a simple loop i
 
 ```typescript
     update(): void {
-        for (let i = this.body.length - 1; i > 0; i--) {
+        let body = this.body;
+        for (let i = body.length - 1; i > 0; i--) {
             unchecked(body[i].x = body[i - 1].x)
             unchecked(body[i].y = body[i - 1].y)
         }
@@ -92,6 +93,32 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 
 </Page>
 
+<Page value="nelua">
+To achieve the first step (moving the body, excluding the head), a simple loop is all you need:
+
+```lua
+function Snake:update()
+  for i = #self.body, 2, -1 do
+    self.body[i] = self.body[i - 1]
+  end
+end
+```
+
+Don't forget to call the new function in the main-loop:
+
+```lua {2}
+local function update()
+  snake:update()
+  snake:draw()
+end
+```
+
+Now if you execute this, you'd notice that you can't see much. In fact, you might see the snake for a short moment before the head is all that's left.
+
+![](images/snake_move_head_only.webp)
+
+</Page>
+
 <Page value="nim">
 
 // TODO
@@ -106,7 +133,47 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 
 <Page value="rust">
 
-// TODO
+To achieve the first step (moving the body, excluding the head), we just remove the last body segment.
+
+```rust
+// src/snake.rs
+    pub fn update(&mut self) -> Option<Point> {
+        if self.body.len() > 1 {
+            self.body.pop()
+        } else {
+            None
+        }
+    }
+```
+
+Don't forget to call the new function inside `Game::update`.
+
+```rust {17}
+// src/game.rs
+use crate::snake::{Point, Snake};
+use crate::wasm4;
+
+pub struct Game {
+    snake: Snake,
+}
+
+impl Game {
+    pub fn new() -> Self {
+      Self {
+          snake: Snake::new(),
+      }
+    }
+
+    pub fn update(&mut self) {
+        self.snake.update();
+        self.snake.draw();
+    }
+}
+```
+
+Now if you execute this, you'd notice that you can't see much. In fact, you might see the snake for a short moment before the head is all that's left.
+
+![](images/snake_move_head_only.webp)
 
 </Page>
 
@@ -150,21 +217,22 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 
 This isn't hard either. Simple add the add the direction to the current head. And then make sure the head stays within the boundaries:
 
-```typescript {7-15}
+```typescript {8-16}
     update(): void {
-        for (let i = this.body.length - 1; i > 0; i--) {
+        let body = this.body;
+        for (let i = body.length - 1; i > 0; i--) {
             unchecked(body[i].x = body[i - 1].x)
             unchecked(body[i].y = body[i - 1].y)
         }
 
-        this.body[0].x = (this.body[0].x + this.direction.x) % 20
-        this.body[0].y = (this.body[0].y + this.direction.y) % 20
+        body[0].x = (body[0].x + this.direction.x) % 20
+        body[0].y = (body[0].y + this.direction.y) % 20
 
-        if (this.body[0].x < 0) {
-            this.body[0].x = 19
+        if (body[0].x < 0) {
+            body[0].x = 19
         }
-        if (this.body[0].y < 0) {
-            this.body[0].y = 19
+        if (body[0].y < 0) {
+            body[0].y = 19
         }
     }
 ```
@@ -206,6 +274,30 @@ func (s *Snake) Update() {
 
 </Page>
 
+<Page value="nelua">
+
+This isn't hard either. Simple add the add the direction to the current head. And then make sure the head stays within the boundaries:
+
+```lua {6-14}
+function Snake:update()
+  for i = #self.body, 2, -1 do
+    self.body[i] = self.body[i - 1]
+  end
+
+  self.body[1].x = (self.body[1].x + self.direction.x) % 20
+  self.body[1].y = (self.body[1].y + self.direction.y) % 20
+
+  if self.body[1].x < 0 then
+    self.body[1].x = 19
+  end
+  if self.body[1].y < 0 then
+    self.body[1].y = 19
+  end
+end
+```
+
+</Page>
+
 <Page value="nim">
 
 // TODO
@@ -220,7 +312,30 @@ func (s *Snake) Update() {
 
 <Page value="rust">
 
-// TODO
+This isn't hard either. Simple insert at `0` the new head position and then make sure the head stays within the boundaries:
+
+```rust
+// src/snake.rs
+    pub fn update(&mut self) -> Option<Point> {
+        self.body.insert(
+            0,
+            Point {
+                x: (self.body[0].x + self.direction.x) % 20,
+                y: (self.body[0].y + self.direction.y) % 20,
+            },
+        );
+
+        if self.body[0].x < 0 {
+            self.body[0].x = 19;
+        }
+
+        if self.body[0].y < 0 {
+            self.body[0].y = 19;
+        }
+
+        self.body.pop()
+    }
+```
 
 </Page>
 
@@ -265,14 +380,14 @@ The easiest way is probably to count the frames and update the snake only every 
 
 <Page value="assemblyscript">
 
-For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
+For this, you'd need a new variable. You can call it whatever you like, just be sure you know what its purpose is.
 
 ```typescript {2}
 const snake = new Snake()
 let frameCount = 0
 ```
 
-This variable in main.ts keeps track of all frames so far. Just increase it's value in the main-update function:
+This variable in main.ts keeps track of all frames so far. Just increase its value in the main-update function:
 
 ```typescript {2}
 export function update(): void {
@@ -318,7 +433,7 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 
 <Page value="go">
 
-For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
+For this, you'd need a new variable. You can call it whatever you like, just be sure you know what its purpose is.
 
 ```go {10}
 var (
@@ -334,7 +449,7 @@ var (
 )
 ```
 
-This variable in main.go keeps track of all frames so far. Just increase it's value in the main-update function:
+This variable in main.go keeps track of all frames so far. Just increase its value in the main-update function:
 
 ```go {3}
 //go:export update
@@ -368,6 +483,45 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 
 </Page>
 
+<Page value="nelua">
+
+For this, you'd need a new variable. You can call it whatever you like, just be sure you know what its purpose is.
+
+```lua {2}
+local snake = Snake.init()
+local frame_count = 0
+```
+
+This variable in main.nelua keeps track of all frames so far. Just increase its value in the main-update function:
+
+```lua {2}
+local function update()
+  frame_count = frame_count + 1
+  snake:update()
+  snake:draw()
+end
+```
+
+Now all you need is to check if the passed frames are dividable by X:
+
+```lua {4-6}
+local function update()
+  frame_count = frame_count + 1
+
+  if frame_count % 15 == 0 then
+    snake:update()
+  end
+
+  snake:draw()
+end
+```
+
+That's it. Your snake should be quite a bit slower now. This reduces the snake from 60 units per second to 4 units per second (60/15 = 4).
+
+![Moving Snake (slow)](images/snake-motion-slow.webp)
+
+</Page>
+
 <Page value="nim">
 
 // TODO
@@ -383,20 +537,68 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 
 <Page value="rust">
 
-// TODO
+For this, you'd need to store a enw property inside `Game`. You can call it whatever you like, just be sure you know what its purpose is.
+
+```rust {7,14}
+// src/game.rs
+use crate::snake::{Point, Snake};
+use crate::wasm4;
+
+pub struct Game {
+    snake: Snake,
+    frame_count: u32,
+}
+
+impl Game {
+    pub fn new() -> Self {
+      Self {
+          snake: Snake::new(),
+          frame_count: 0,
+      }
+    }
+}
+```
+
+It keeps track of all frames so far. Just increase its value in `Game::update`.
+
+```rust {3}
+// src/game.rs
+pub fn update(&mut self) {
+    self.frame_count += 1;
+
+    self.snake.update();
+    self.snake.draw();
+}
+```
+
+Now all you need is to check if the passed frames are dividable by X:
+
+```rust {3,5-7}
+// src/game.rs
+pub fn update(&mut self) {
+    self.frame_count += 1;
+
+    if self.frame_count % 15 == 0 {
+        self.snake.update();
+    }
+    self.snake.draw();
+}
+```
+
+That's it. Your snake should be quite a bit slower now. This reduces the snake from 60 units per second to 4 units per second (60/15 = 4).
 
 </Page>
 
 <Page value="zig">
 
-For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
+For this, you'd need a new variable. You can call it whatever you like, just be sure you know what its purpose is.
 
 ```zig {2}
 var snake: Snake = Snake.init();
 var frame_count: u32 = 0;
 ```
 
-This variable in main.ts keeps track of all frames so far. Just increase it's value in the main-update function:
+This variable in main.ts keeps track of all frames so far. Just increase its value in the main-update function:
 
 ```zig {2}
 export fn update() void {

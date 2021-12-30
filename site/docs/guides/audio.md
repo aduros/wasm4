@@ -175,8 +175,13 @@ tone(262 | (523 << 16), 60, 100, TONE_PULSE1);
 ```
 
 ```wasm
-;; 262 | (523 << 16) is 0x20b0106
-(call $tone (i32.const 0x20b0106) (i32.const 60) (i32.const 100) (i32.const 0))
+(call $tone
+  (i32.or
+    (i32.const 262)
+    (i32.shl (i32.const 523) (i32.const 16)))
+  (i32.const 60)
+  (i32.const 100)
+  (i32.const 0))
 ```
 
 ```zig
@@ -233,8 +238,15 @@ tone(262, 60 | (30 << 8), 100, TONE_PULSE1);
 ```
 
 ```wasm
-;; 60 | (30 << 8) is 0x1e3c
-(call $tone (i32.const 262) (i32.const 0x1e3c) (i32.const 100) (i32.const 0))
+(call $tone
+  (i32.const 262)
+  (i32.or
+    (i32.const 60)
+    (i32.shl
+      (i32.const 30)
+      (i32.const 8)))
+  (i32.const 100)
+  (i32.const 0))
 ```
 
 ```zig

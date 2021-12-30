@@ -57,16 +57,12 @@
 (; Prints a message to the debug console. ;)
 (import "env" "tracef" (func $tracef (param i32 i32)))
 
-(data (i32.const 0x19a0)
-  ;; smiley @ 0x19a0
-  "\c3\81\24\24\00\24\99\c3"
+;; smiley
+(data (i32.const 0x19a0) "\c3\81\24\24\00\24\99\c3")
 
-  ;; 0x19a8
-  "Hello from Wat!\00"
+(data (i32.const 0x19a8) "Hello from Wat!\00")
 
-  ;; 0x19b8
-  "Press X to blink\00"
-)
+(data (i32.const 0x19b8) "Press X to blink\00")
 
 (func (export "start")
 )

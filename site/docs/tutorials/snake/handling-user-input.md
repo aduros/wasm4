@@ -1027,7 +1027,7 @@ If you want to check if it works: Use the `trace` function provided by WASM-4. H
   (import "env" "trace" (func $trace (param i32)))
 
   ;; Put the string somewhere unused in memory.
-  (data (i32.const 0x3000) "down")
+  (data (i32.const 0x3000) "down\00")
 
   (func $input
     ...

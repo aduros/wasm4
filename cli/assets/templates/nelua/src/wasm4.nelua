@@ -3,7 +3,7 @@
 -- Configure compiler.
 -- NOTE: This must come first because it changes some compiler settings!
 ##[[
-ldflags "-Wl,-zstack-size=2048,--no-entry,--import-memory -mexec-model=reactor"
+ldflags "-Wl,-zstack-size=8192,--no-entry,--import-memory -mexec-model=reactor"
 ldflags "-Wl,--initial-memory=65536,--max-memory=65536,--global-base=6560,--export-dynamic"
 
 if DEBUG then

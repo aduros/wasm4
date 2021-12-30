@@ -80,7 +80,7 @@ if gamepad & BUTTON_RIGHT != 0 {
 (data (i32.const 0x2000) "Right button is down!\00")
 
 (local $gamepad i32)
-(local.set $gamepad (i32.load8_u offset=0x16))
+(local.set $gamepad (i32.load8_u (i32.const 0x16)))
 
 (if (i32.and (local.get $gamepad) (i32.const 32))
   (then

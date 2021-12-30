@@ -1,0 +1,38 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+section {
+  padding: 0.4em 0;
+}
+
+article {
+  padding: 0.4em 0;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0.2em 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0.4em 0;
+  font-size: 1em;
+}
+
+p {
+  padding: 0;
+  margin: 0;
+}
+
+[hidden] {
+  display: none !important;
+}

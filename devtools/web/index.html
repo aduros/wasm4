@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@wasm4/web-devtools components demo</title>
+    <script type="module" src="/src/index.ts"></script>
+    <script type="module">
+      import { updateCompletedEventType } from '/src/events/update-completed.ts';
+
+      window.addEventListener('load', () => {
+        const detail = {
+          memory: {
+            getUint8() {
+              return 128;
+            },
+            byteLen: 65536,
+            pointerPos: { x: 24, y: -30 },
+            mouseButtons: {
+              left: true,
+              right: false,
+              middle: false,
+            },
+            gamepads: [0, 0, 0, 0],
+            systemFlags: 0,
+            palette: [0xfff6d3, 0xf9a875, 0xeb6b6f, 0x7c3f58],
+            drawColors: 354,
+          },
+          fps: 60,
+          storedValue: null,
+        };
+        window.dispatchEvent(
+          new CustomEvent(updateCompletedEventType, {
+            detail,
+          })
+        );
+
+        document.querySelector('wasm4-palette').palette = detail.memory.palette;
+        document.querySelector('wasm4-memory-view').memoryView = detail.memory;
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Components demo</h1>
+    <h2>&lt;wasm4-devtools&gt;&lt;/wasm4-devtools&gt;</h2>
+    <wasm4-devtools></wasm4-devtools>
+    <br />
+    <h2>&lt;wasm4-palette&gt;&lt;/wasm4-palette&gt;</h2>
+    <wasm4-palette></wasm4-palette>
+    <br />
+    <h2>&lt;wasm4-gamepad&gt;&lt;/wasm4-gamepad&gt;</h2>
+    <wasm4-gamepad></wasm4-gamepad>
+    <br />
+    <h2>&lt;wasm4-mouse-buttons&gt;&lt;/wasm4-mouse-buttons&gt;</h2>
+    <wasm4-mouse-buttons></wasm4-mouse-buttons>
+    <br />
+    <h2>&lt;wasm4-controls-view&gt;&lt;/wasm4-controls-view&gt;</h2>
+    <wasm4-controls-view></wasm4-controls-view>
+    <br />
+    <h2>&lt;wasm4-info-view&gt;&lt;/wasm4-info-view&gt;</h2>
+    <wasm4-info-view></wasm4-info-view>
+    <br />
+    <h2>&lt;wasm4-memory-view&gt;&lt;/wasm4-memory-view&gt;</h2>
+    <wasm4-memory-view></wasm4-memory-view>
+  </body>
+</html>

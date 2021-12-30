@@ -3,7 +3,11 @@
   "private": true,
   "scripts": {
     "build": "webpack --mode production",
-    "start": "webpack serve --mode development --content-base dist --devtool inline-source-map --host 0.0.0.0"
+    "start": "webpack serve --mode development --content-base dist --devtool inline-source-map --host 0.0.0.0",
+    "prepare": "npm --prefix '../../devtools/web' i"
+  },
+  "dependencies": {
+    "@wasm4/web-devtools": "file:../../devtools/web"
   },
   "devDependencies": {
     "css-loader": "^6.2.0",
@@ -12,6 +16,7 @@
     "style-loader": "^3.2.1",
     "webpack": "^5.41.0",
     "webpack-cli": "^4.7.2",
+    "webpack-merge": "^5.8.0",
     "webpack-dev-server": "^3.11.2"
   }
 }

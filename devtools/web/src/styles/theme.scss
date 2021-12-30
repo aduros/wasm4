@@ -1,0 +1,130 @@
+$theme: (
+  bg-primary: #202020,
+  bg-secondary: #444,
+  text-primary: #fff,
+  text-secondary: rgba(255, 255, 255, 0.7),
+  text-size: 16px,
+  window-z-index: 11,
+);
+
+@function theme-get($theme-key) {
+  @if map-get($theme, $theme-key) == null {
+    @error "#{$theme-key} is not a valid property key.";
+  }
+
+  @return var(--wasm4-devtools-#{$theme-key}, map-get($theme, $theme-key));
+}
+
+/* Theme */
+:host {
+  color: theme-get(text-primary);
+  background-color: theme-get(bg-primary);
+}
+
+.text-primary {
+  color: theme-get(text-primary) !important;
+}
+
+.text-secondary {
+  color: theme-get(text-secondary) !important;
+}
+
+.bg-primary {
+  background-color: theme-get(bg-primary) !important;
+}
+
+.bg-secondary {
+  background-color: theme-get(bg-secondary) !important;
+}
+
+/* Typography */
+:host {
+  font-size: theme-get(text-size);
+  font-family: monospace;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.text-align-left {
+  text-align: left !important;
+}
+
+.text-align-right {
+  text-align: right !important;
+}
+
+.text-align-center {
+  text-align: center !important;
+}
+
+.active {
+  color: theme-get(text-primary);
+}
+
+.dim {
+  opacity: 0.4;
+}
+
+.info-box {
+  text-align: center;
+  padding: 0.2em 0.4em;
+  color: theme-get(text-secondary);
+  background: theme-get(bg-secondary);
+  border-radius: 4px;
+  min-width: 60px;
+  display: inline-block;
+  font-size: 0.875em;
+}
+
+.table {
+  text-align: left;
+  overflow: hidden;
+  border-collapse: collapse;
+  margin-bottom: 0;
+  border-style: solid;
+  border-color: currentColor;
+  border-width: 1px;
+  max-width: 100%;
+  font-size: theme-get(text-size);
+
+  tbody,
+  thead,
+  tfoot,
+  tr,
+  td,
+  th {
+    overflow-wrap: break-word;
+    text-align: inherit;
+    font-size: inherit;
+  }
+
+  td,
+  th {
+    border-width: 0;
+    border-style: none;
+    border-color: inherit;
+    font-size: 0.875em;
+    padding: 0.3em 0.4em;
+    min-width: 50px;
+    border-bottom: 1px solid currentColor;
+  }
+}
+
+a,
+a:visited {
+  color: theme-get(text-primary);
+  outline: none;
+  font-size: 0.875em;
+}
+
+a:focus {
+  color: theme-get(text-secondary);
+}
+
+.list {
+  padding-left: 1.2em;
+
+  li {
+    list-style: disc;
+  }
+}

@@ -2,7 +2,6 @@ import * as constants from "./constants";
 import { Runtime } from "./runtime";
 import { websocket } from "./devkit";
 import * as z85 from "./z85";
-
 import "./styles.css";
 
 const qs = new URL(document.location).searchParams;
@@ -58,6 +57,12 @@ async function loadCartWasm () {
     document.getElementById("content").appendChild(canvas);
     let wasmBuffer = await loadCartWasm();
     await runtime.load(wasmBuffer);
+
+    let devtoolsManager = { toggleDevtools(){} };
+    /* `ENABLE_DEVTOOLS` is a compile-time flag, see `webpack.config.js` */
+    if(ENABLE_DEVTOOLS) {
+        devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager())
+    }
 
     if (screenshot != null) {
         // Wait until the initial focus before starting the runtime
@@ -190,6 +195,7 @@ async function loadCartWasm () {
         "2": saveState,
         "4": loadState,
         "r": reboot,
+        "F8": devtoolsManager.toggleDevtools,
         "F9": takeScreenshot,
         "F10": recordVideo,
         "F11": requestFullscreen,
@@ -456,8 +462,7 @@ async function loadCartWasm () {
     window.addEventListener("pointermove", onPointerEvent);
     window.addEventListener("pointerup", onPointerEvent);
 
-    const gamepadOverlay = document.getElementById("gamepad");
-
+    const gamepadOverlay = document.getElementById("gamepad"); 
     // https://gist.github.com/addyosmani/5434533#file-limitloop-js-L60
 
     const INTERVAL = 1000 / 60;
@@ -479,6 +484,10 @@ async function loadCartWasm () {
 
             gamepadOverlay.style.display = runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY)
                 ? "none" : "";
+
+            if(ENABLE_DEVTOOLS) {
+                devtoolsManager.updateCompleted(runtime.data, deltaFrame);  
+            }
         }
 
         requestAnimationFrame(loop);

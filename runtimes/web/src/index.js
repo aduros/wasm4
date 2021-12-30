@@ -59,7 +59,7 @@ async function loadCartWasm () {
     await runtime.load(wasmBuffer);
 
     let devtoolsManager = { toggleDevtools(){} };
-    if (ENABLE_DEVTOOLS) {
+    if (DEVELOPER_BUILD) {
         devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager())
     }
 
@@ -86,7 +86,7 @@ async function loadCartWasm () {
 
     runtime.start();
 
-    if (ENABLE_DEVTOOLS) {
+    if (DEVELOPER_BUILD) {
         devkit.websocket.addEventListener("message", async event => {
             switch (event.data) {
             case "reload":
@@ -484,7 +484,7 @@ async function loadCartWasm () {
             gamepadOverlay.style.display = runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY)
                 ? "none" : "";
 
-            if (ENABLE_DEVTOOLS) {
+            if (DEVELOPER_BUILD) {
                 devtoolsManager.updateCompleted(runtime.data, deltaFrame);  
             }
         }

@@ -35,10 +35,10 @@ const commonWebpackConfig = {
 module.exports = [
   merge(commonWebpackConfig, {
     output: { filename: 'wasm4-developer.js' },
-    plugins: [new webpack.DefinePlugin({ ENABLE_DEVTOOLS: true })],
+    plugins: [new webpack.DefinePlugin({ DEVELOPER_BUILD: true })],
   }),
   merge(commonWebpackConfig, {
     output: { filename: 'wasm4.js' },
-    plugins: [new webpack.DefinePlugin({ ENABLE_DEVTOOLS: false })],
+    plugins: [new webpack.DefinePlugin({ DEVELOPER_BUILD: false })],
   }),
 ];

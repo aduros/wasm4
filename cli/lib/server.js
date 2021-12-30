@@ -19,8 +19,12 @@ function start (cartFile, opts) {
     app.get("/cart.wasm.map", (req, res) => {
         fs.createReadStream(cartFile+".map").pipe(res);
     });
-    app.all("/wasm4.js", (req, res) => {
-        res.redirect(301, "/wasm4-developer.js");
+    app.use((req, res, next) => {
+        if (req.url == "/wasm4.js") {
+            // Serve up the development version of wasm4.js
+            req.url = "/wasm4-developer.js";
+        }
+        next();
     });
     app.use(express.static(__dirname+"/../assets/runtime"));
 

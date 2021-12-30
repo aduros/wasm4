@@ -83,7 +83,7 @@ fn update () {
 (import "env" "rect" (func $rect (param i32 i32 i32 i32)))
 
 (func (export "update")
-  ;; Draw a rectangle at (10,10) with size (32, 32).
+  ;; Draw a rectangle at (10, 10) with size (32, 32).
   (call $rect (i32.const 10) (i32.const 10) (i32.const 32) (i32.const 32))
 )
 ```

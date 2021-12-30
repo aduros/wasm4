@@ -1,5 +1,11 @@
 const CARTS = [
     {
+        slug: "racer",
+        title: "Racer",
+        author: "Claudio Mattera",
+        github: "claudiomattera",
+    },
+    {
         slug: "miku-15",
         title: "MIKU-15",
         author: "Mr.Rafael",
@@ -50,12 +56,6 @@ const CARTS = [
     {
         slug: "game-of-life",
         title: "Game of Life",
-        author: "Claudio Mattera",
-        github: "claudiomattera",
-    },
-    {
-        slug: "racer",
-        title: "Racer",
         author: "Claudio Mattera",
         github: "claudiomattera",
     },

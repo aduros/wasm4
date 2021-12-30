@@ -195,14 +195,14 @@ To achieve the first step (moving the body, excluding the head), a loop is all y
       ;; body[i].x = body[i - 1].x
       ;;
       ;; The - 8 offset is baked into the i32.load offset.
-      (i32.store offset=0x19a4
+      (i32.store offset=0x19ac
         (local.get $offset)
-        (i32.load offset=0x199c (local.get $offset)))
+        (i32.load offset=0x19a4 (local.get $offset)))
 
       ;; body[i].y = body[i - 1].y
-      (i32.store offset=0x19a8
+      (i32.store offset=0x19b0
         (local.get $offset)
-        (i32.load offset=0x19a0 (local.get $offset)))
+        (i32.load offset=0x19a8 (local.get $offset)))
 
       (br_if $loop
         (i32.gt_s
@@ -393,7 +393,7 @@ This isn't hard either. Simple insert at `0` the new head position and then make
 This isn't hard either. Simply add the add the direction to the current head. And then make sure the head stays within the boundaries:
 
 ```wasm
-(function $snake-update
+(func $snake-update
   (local $body-x i32)
   (local $body-y i32)
 

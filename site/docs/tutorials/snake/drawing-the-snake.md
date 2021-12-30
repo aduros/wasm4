@@ -343,8 +343,8 @@ With that out the way, let's see what a first draft could look like. In the WebA
   (loop $loop
     ;; rect(part.x * 8, part.y * 8, 8, 8)
     ;; 
-    ;; Note that the array starts at 0x19a4, so the first x-coordinate starts
-    ;; at 0x19a4 and the first y-coordinate starts at 0x19a8. We can bake these
+    ;; Note that the array starts at 0x19ac, so the first x-coordinate starts
+    ;; at 0x19ac and the first y-coordinate starts at 0x19b0. We can bake these
     ;; offsets directly into the instruction to reduce the code size.
     (call $rect
       (i32.mul (i32.load offset=0x19ac (local.get $offset)) (i32.const 8))

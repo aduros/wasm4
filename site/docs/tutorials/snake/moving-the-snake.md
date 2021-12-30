@@ -690,13 +690,14 @@ For this, you'd need a new variable. You can call it whatever you like, just be 
 WebAssembly memory is initialized to 0, so we don't need to add any code. We just have to know which address we want to use.
 
 ```wasm
-;; frame_count = 0x262c
+;; frame-count = 0x262c
 ```
 
 This variable keeps track of all frames so far. Just increase its value in the main-update function:
 
 ```wasm
 (func (export "update")
+  ;; frame-count = frame-count + 1;
   (i32.store (i32.const 0x262c)
     (i32.add
       (i32.load (i32.const 0x262c))
@@ -713,12 +714,14 @@ Now all you need is to check if the passed frames are divisible by X:
 (func (export "update")
   (local $frame-count i32)
 
+  ;; frame-count = frame-count + 1;
   (i32.store (i32.const 0x262c)
     (local.tee $frame-count
       (i32.add
         (i32.load (i32.const 0x262c))
         (i32.const 1))))
 
+  ;; if ((frame-count % 15) == 0) ...
   (if (i32.eqz (i32.rem_u (local.get $frame-count) (i32.const 15)))
     (then
       (call $snake-update)))

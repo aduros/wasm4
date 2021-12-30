@@ -322,7 +322,7 @@ See also:
 To draw the snake, you can loop through each point using the `loop` instruction. To make it a little easier, it's a good idea to use the `Rect` function of WASM-4:
 
 ```wasm
-// Rect draws a rectangle. It uses color 1 to fill and color 2 for the outline
+;; Rect draws a rectangle. It uses color 1 to fill and color 2 for the outline
 (import "env" "rect" (func $rect (param i32 i32 i32 i32)))
 ```
 

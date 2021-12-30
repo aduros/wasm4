@@ -170,7 +170,7 @@ rect(10, 10, 32, 32);
 ;; Set DRAW_COLORS (at address 0x14) to 2.
 (i32.store16 (i32.const 0x14) (i32.const 2))
 
-;; Draw a rectangle at (10,10) with size (32, 32).
+;; Draw a rectangle at (10, 10) with size (32, 32).
 (call $rect (i32.const 10) (i32.const 10) (i32.const 32) (i32.const 32))
 ```
 

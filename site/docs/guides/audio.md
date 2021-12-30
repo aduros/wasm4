@@ -64,7 +64,7 @@ tone(262, 60, 100, TONE_PULSE1);
 ```wasm
 (import "env" "tone" (func $tone (param i32 i32 i32 i32)))
 
-(call $tone (i32.const 262) (i32.const 60) (i32.const 100) (i32.const 0))
+(call $tone (i32.const 262) (i32.const 60) (i32.const 100) (global.get $TONE_PULSE1))
 ```
 
 ```zig
@@ -122,8 +122,13 @@ tone(262, 60, 100, TONE_PULSE1 | TONE_MODE3);
 ```
 
 ```wasm
-;; TONE_MODE3 => 8
-(call $tone (i32.const 262) (i32.const 60) (i32.const 100) (i32.const 8))
+(call $tone
+  (i32.const 262)
+  (i32.const 60)
+  (i32.const 100)
+  (i32.or
+    (global.get $TONE_PULSE1)
+    (global.get $TONE_MODE3)))
 ```
 
 ```zig
@@ -181,7 +186,7 @@ tone(262 | (523 << 16), 60, 100, TONE_PULSE1);
     (i32.shl (i32.const 523) (i32.const 16)))
   (i32.const 60)
   (i32.const 100)
-  (i32.const 0))
+  (global.get $TONE_PULSE1))
 ```
 
 ```zig
@@ -246,7 +251,7 @@ tone(262, 60 | (30 << 8), 100, TONE_PULSE1);
       (i32.const 30)
       (i32.const 8)))
   (i32.const 100)
-  (i32.const 0))
+  (global.get $TONE_PULSE1))
 ```
 
 ```zig

@@ -213,10 +213,10 @@ fn start() {
 (import "env" "memory" (memory 1))
 
 (func (export "start")
-  (i32.store (i32.const 0x04) (i32.const 0xfbf7f3))
-  (i32.store (i32.const 0x08) (i32.const 0xe5b083))
-  (i32.store (i32.const 0x0c) (i32.const 0x426e5d))
-  (i32.store (i32.const 0x10) (i32.const 0x20283d))
+  (i32.store (global.get $PALETTE0) (i32.const 0xfbf7f3))
+  (i32.store (global.get $PALETTE1) (i32.const 0xe5b083))
+  (i32.store (global.get $PALETTE2) (i32.const 0x426e5d))
+  (i32.store (global.get $PALETTE3) (i32.const 0x20283d))
 )
 ```
 

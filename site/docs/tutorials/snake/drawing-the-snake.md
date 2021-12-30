@@ -842,10 +842,10 @@ The draw function should now look like this:
 
 Notice the difference? Me neither.
 
-The head should stand out a little. For this, you can use a different color (remember that `DRAW_COLORS` is located at address 0x14):
+The head should stand out a little. For this, you can use a different color:
 
 ```wasm
-  (i32.store16 (i32.const 0x14) (i32.const 0x0004))
+  (i32.store16 (global.get $DRAW_COLORS) (i32.const 0x0004))
 ```
 
 You can set the colors with this variable. You can look at this variable like a table that is read from right to left.
@@ -867,7 +867,7 @@ If you change the source to
   ...
 
   ;; Set the head color.
-  (i32.store16 (i32.const 0x14) (i32.const 0x0004))
+  (i32.store16 (global.get $DRAW_COLORS) (i32.const 0x0004))
 
   ;; Draw the head.
   (call $rect
@@ -887,11 +887,11 @@ You'll see a change. The snake changed color. Not only the head, but the complet
 ```wasm
 (func $snake-draw
   ;; Set the body color.
-  (i32.store16 (i32.const 0x14) (i32.const 0x0043))
+  (i32.store16 (global.get $DRAW_COLORS) (i32.const 0x0043))
   ...
 
   ;; Set the head color.
-  (i32.store16 (i32.const 0x14) (i32.const 0x0004))
+  (i32.store16 (global.get $DRAW_COLORS) (i32.const 0x0004))
 
   ;; Draw the head.
   (call $rect

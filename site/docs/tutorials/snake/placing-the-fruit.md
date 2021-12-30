@@ -344,10 +344,10 @@ This allows you to call `rnd(20)` to get a number between `0` and `19`. Now you 
 
 ```wasm
 (func (export "start")
-  (i32.store (i32.const 0x04) (i32.const 0xfbf7f3))
-  (i32.store (i32.const 0x08) (i32.const 0xe5b083))
-  (i32.store (i32.const 0x0c) (i32.const 0x426e5d))
-  (i32.store (i32.const 0x10) (i32.const 0x20283d))
+  (i32.store (global.get $PALETTE0) (i32.const 0xfbf7f3))
+  (i32.store (global.get $PALETTE1) (i32.const 0xe5b083))
+  (i32.store (global.get $PALETTE2) (i32.const 0x426e5d))
+  (i32.store (global.get $PALETTE3) (i32.const 0x20283d))
 
   ;; fruit.x = rnd(20)
   (i32.store (i32.const 0x2630) (call $rnd (i32.const 20)))
@@ -916,7 +916,7 @@ But since you set the drawing colors, you need to change the drawing colors too:
   ...
 
   ;; Set fruit colors.
-  (i32.store16 (i32.const 0x14) (i32.const 0x4320))
+  (i32.store16 (global.get $DRAW_COLORS) (i32.const 0x4320))
 
   ;; Draw fruit.
   (call $blit

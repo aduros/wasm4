@@ -687,10 +687,10 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 
 For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
 
-WebAssembly memory is initialized to 0, so we don't need to add any code. We just have to know which address we want to use.
+We'll use a WebAssembly global for this, rather than memory:
 
 ```wasm
-;; frame-count = 0x262c
+(global $frame-count (mut i32) (i32.const 0))
 ```
 
 This variable keeps track of all frames so far. Just increase its value in the main-update function:
@@ -698,10 +698,7 @@ This variable keeps track of all frames so far. Just increase its value in the m
 ```wasm
 (func (export "update")
   ;; frame-count = frame-count + 1;
-  (i32.store (i32.const 0x262c)
-    (i32.add
-      (i32.load (i32.const 0x262c))
-      (i32.const 1)))
+  (global.set $frame-count (i32.add (global.get $frame-count) (i32.const 1)))
 
   (call $snake-update)
   (call $snake-draw)
@@ -712,17 +709,11 @@ Now all you need is to check if the passed frames are divisible by X:
 
 ```wasm
 (func (export "update")
-  (local $frame-count i32)
-
   ;; frame-count = frame-count + 1;
-  (i32.store (i32.const 0x262c)
-    (local.tee $frame-count
-      (i32.add
-        (i32.load (i32.const 0x262c))
-        (i32.const 1))))
+  (global.set $frame-count (i32.add (global.get $frame-count) (i32.const 1)))
 
   ;; if ((frame-count % 15) == 0) ...
-  (if (i32.eqz (i32.rem_u (local.get $frame-count) (i32.const 15)))
+  (if (i32.eqz (i32.rem_u (global.get $frame-count) (i32.const 15)))
     (then
       (call $snake-update)))
 

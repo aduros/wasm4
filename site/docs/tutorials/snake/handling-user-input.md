@@ -144,7 +144,7 @@ if just_pressed & wasm4::BUTTON_UP != 0 {
 (local $just-pressed i32)
 
 ;; gamepad = *GAMEPAD;
-(local.set $gamepad (i32.load8_u (i32.const 0x16)))
+(local.set $gamepad (i32.load8_u (global.get $GAMEPAD1)))
 
 ;; just-pressed = gamepad & (gamepad ^ prev-state);
 (local.set $just-pressed
@@ -159,7 +159,7 @@ if just_pressed & wasm4::BUTTON_UP != 0 {
 The local variable `just-pressed` now holds all buttons that were pressed this frame. You can check the state of a single button like this:
 
 ```wasm
-(if (i32.and (local.get $just-pressed) (i32.const 0x10))
+(if (i32.and (local.get $just-pressed) (global.get $BUTTON_UP))
   (then
     ;; Do something
   )
@@ -367,17 +367,11 @@ impl Game {
 
 ```wasm
 (func (export "update")
-  (local $frame-count i32)
-
   ;; frame-count = frame-count + 1;
-  (i32.store (i32.const 0x262c)
-    (local.tee $frame-count
-      (i32.add
-        (i32.load (i32.const 0x262c))
-        (i32.const 1))))
+  (global.set $frame-count (i32.add (global.get $frame-count) (i32.const 1)))
 
   ;; if ((frame-count % 15) == 0) ...
-  (if (i32.eqz (i32.rem_u (local.get $frame-count) (i32.const 15)))
+  (if (i32.eqz (i32.rem_u (global.get $frame-count) (i32.const 15)))
     (then
       (call $snake-update)))
 
@@ -925,7 +919,7 @@ It's a good idea to handle the input in its own function. Something like this co
   (local $just-pressed i32)
 
   ;; gamepad = *GAMEPAD;
-  (local.set $gamepad (i32.load8_u (i32.const 0x16)))
+  (local.set $gamepad (i32.load8_u (global.get $GAMEPAD1)))
 
   ;; just-pressed = gamepad & (gamepad ^ prev-state);
   (local.set $just-pressed
@@ -935,8 +929,7 @@ It's a good idea to handle the input in its own function. Something like this co
         (local.get $gamepad)
         (global.get $prev-state))))
 
-  ;; LEFT
-  (if (i32.and (local.get $just-pressed) (i32.const 0x10))
+  (if (i32.and (local.get $just-pressed) (global.get $BUTTON_LEFT))
     (then
       ;; Do something
     )
@@ -944,19 +937,13 @@ It's a good idea to handle the input in its own function. Something like this co
 )
 
 (func (export "update")
-  (local $frame-count i32)
-
   ;; frame-count = frame-count + 1;
-  (i32.store (i32.const 0x262c)
-    (local.tee $frame-count
-      (i32.add
-        (i32.load (i32.const 0x262c))
-        (i32.const 1))))
+  (global.set $frame-count (i32.add (global.get $frame-count) (i32.const 1)))
 
   (call $input)
 
   ;; if ((frame-count % 15) == 0) ...
-  (if (i32.eqz (i32.rem_u (local.get $frame-count) (i32.const 15)))
+  (if (i32.eqz (i32.rem_u (global.get $frame-count) (i32.const 15)))
     (then
       (call $snake-update)))
 
@@ -979,7 +966,7 @@ To notice any change in the gamepad, you have to store the *current state* at th
   (local $just-pressed i32)
 
   ;; gamepad = *GAMEPAD;
-  (local.set $gamepad (i32.load8_u (i32.const 0x16)))
+  (local.set $gamepad (i32.load8_u (global.get $GAMEPAD1)))
 
   ;; just-pressed = gamepad & (gamepad ^ prev-state);
   (local.set $just-pressed
@@ -989,29 +976,25 @@ To notice any change in the gamepad, you have to store the *current state* at th
         (local.get $gamepad)
         (global.get $prev-state))))
 
-  ;; LEFT
-  (if (i32.and (local.get $just-pressed) (i32.const 0x10))
+  (if (i32.and (local.get $just-pressed) (global.get $BUTTON_LEFT))
     (then
       ;; Do something
     )
   )
 
-  ;; RIGHT
-  (if (i32.and (local.get $just-pressed) (i32.const 0x20))
+  (if (i32.and (local.get $just-pressed) (global.get $BUTTON_RIGHT))
     (then
       ;; Do something
     )
   )
 
-  ;; UP
-  (if (i32.and (local.get $just-pressed) (i32.const 0x40))
+  (if (i32.and (local.get $just-pressed) (global.get $BUTTON_UP))
     (then
       ;; Do something
     )
   )
 
-  ;; DOWN
-  (if (i32.and (local.get $just-pressed) (i32.const 0x80))
+  (if (i32.and (local.get $just-pressed) (global.get $BUTTON_DOWN))
     (then
       ;; Do something
     )
@@ -1033,7 +1016,7 @@ If you want to check if it works: Use the `trace` function provided by WASM-4. H
     ...
 
     ;; LEFT
-    (if (i32.and (local.get $just-pressed) (i32.const 0x80))
+    (if (i32.and (local.get $just-pressed) (global.get $BUTTON_LEFT))
       (then
         (call $trace (i32.const 0x3000))
       )
@@ -1048,7 +1031,7 @@ If you use `trace` in each if-statement, you should see the corresponding output
 Now, instead of using `trace` to confirm everything works as intended, you should replace it with something like this:
 
 ```wasm
-    (if (i32.and (local.get $just-pressed) (i32.const 0x80))
+    (if (i32.and (local.get $just-pressed) (global.get $BUTTON_LEFT))
       (then
         (call $snake-down)))
 ```

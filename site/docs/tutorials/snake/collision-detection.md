@@ -286,7 +286,7 @@ In it's final form, it could look like this:
 
   ...
 
-  (if (i32.eqz (i32.rem_u (local.get $frame-count) (i32.const 15)))
+  (if (i32.eqz (i32.rem_u (global.get $frame-count) (i32.const 15)))
     (then
       (call $snake-update)
 

@@ -71,14 +71,10 @@ unsafe {
 ```
 
 ```wasm
-;; PALETTE[0]
-(i32.store (i32.const 0x04) (i32.const 0xfff6d3))
-;; PALETTE[1]
-(i32.store (i32.const 0x08) (i32.const 0xf9a875))
-;; PALETTE[2]
-(i32.store (i32.const 0x0c) (i32.const 0xeb6b6f))
-;; PALETTE[3]
-(i32.store (i32.const 0x10) (i32.const 0x7c3f58))
+(i32.store (global.get $PALETTE0) (i32.const 0xfff6d3))
+(i32.store (global.get $PALETTE1) (i32.const 0xf9a875))
+(i32.store (global.get $PALETTE2) (i32.const 0xeb6b6f))
+(i32.store (global.get $PALETTE3) (i32.const 0x7c3f58))
 ```
 
 ```zig
@@ -154,8 +150,8 @@ rect(10, 10, 32, 32);
 ```
 
 ```wasm
-;; Set DRAW_COLORS (at address 0x14) to 0x42.
-(i32.store16 (i32.const 0x14) (i32.const 0x42))
+;; Set DRAW_COLORS to 0x42.
+(i32.store16 (global.get $DRAW_COLORS) (i32.const 0x42))
 
 ;; Draw a rectangle at (10, 10) with size (32, 32).
 (call $rect (i32.const 10) (i32.const 10) (i32.const 32) (i32.const 32))
@@ -491,7 +487,7 @@ fn pixel(x: i32, y: i32) {
   ;; color = *DRAW_COLORS & 0b11;
   (local.set $color
     (i32.and
-      (i32.load16_u (i32.const 0x14))
+      (i32.load16_u (global.get $DRAW_COLORS))
       (i32.const 3)))
 
   ;; Write to the framebuffer:

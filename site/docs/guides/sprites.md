@@ -201,7 +201,7 @@ blit(&smiley, 10, 10, 8, 8, BLIT_1BPP);
   ;; width, height
   (i32.const 8) (i32.const 8)
   ;; BLIT_1BPP
-  (i32.const 0))
+  (global.get $BLIT_1BPP))
 ```
 
 ```zig
@@ -263,7 +263,9 @@ blit(&smiley, 10, 10, 8, 8, BLIT_1BPP | BLIT_FLIP_Y);
   ;; width, height
   (i32.const 8) (i32.const 8)
   ;; BLIT_1BPP | BLIT_FLIP_Y
-  (i32.const 4))
+  (i32.or
+    (global.get $BLIT_1BPP)
+    (global.get $BLIT_FLIP_Y)))
 ```
 
 ```zig

@@ -137,6 +137,37 @@ if just_pressed & wasm4::BUTTON_UP != 0 {
 
 </Page>
 
+<Page value="wat">
+
+```wasm
+(local $gamepad i32)
+(local $just-pressed i32)
+
+;; gamepad = *GAMEPAD;
+(local.set $gamepad (i32.load8_u (global.get $GAMEPAD1)))
+
+;; just-pressed = gamepad & (gamepad ^ prev-state);
+(local.set $just-pressed
+  (i32.and
+    (local.get $gamepad)
+    (i32.xor
+      (local.get $gamepad)
+      (global.get $prev-state))))
+
+```
+
+The local variable `just-pressed` now holds all buttons that were pressed this frame. You can check the state of a single button like this:
+
+```wasm
+(if (i32.and (local.get $just-pressed) (global.get $BUTTON_UP))
+  (then
+    ;; Do something
+  )
+)
+```
+
+</Page>
+
 <Page value="zig">
 
 ```zig
@@ -328,6 +359,24 @@ impl Game {
         self.snake.draw();
     }
 }
+```
+
+</Page>
+
+<Page value="wat">
+
+```wasm
+(func (export "update")
+  ;; frame-count = frame-count + 1;
+  (global.set $frame-count (i32.add (global.get $frame-count) (i32.const 1)))
+
+  ;; if ((frame-count % 15) == 0) ...
+  (if (i32.eqz (i32.rem_u (global.get $frame-count) (i32.const 15)))
+    (then
+      (call $snake-update)))
+
+  (call $snake-draw)
+)
 ```
 
 </Page>
@@ -856,6 +905,169 @@ To fix the errors, add those functions to your snake. Here's an example for `dow
             self.direction = Point { x: 0, y: 1 };
         }
     }
+```
+
+</Page>
+
+<Page value="wat">
+
+It's a good idea to handle the input in its own function. Something like this could be on your mind:
+
+```wasm
+(func $input
+  (local $gamepad i32)
+  (local $just-pressed i32)
+
+  ;; gamepad = *GAMEPAD;
+  (local.set $gamepad (i32.load8_u (global.get $GAMEPAD1)))
+
+  ;; just-pressed = gamepad & (gamepad ^ prev-state);
+  (local.set $just-pressed
+    (i32.and
+      (local.get $gamepad)
+      (i32.xor
+        (local.get $gamepad)
+        (global.get $prev-state))))
+
+  (if (i32.and (local.get $just-pressed) (global.get $BUTTON_LEFT))
+    (then
+      ;; Do something
+    )
+  )
+)
+
+(func (export "update")
+  ;; frame-count = frame-count + 1;
+  (global.set $frame-count (i32.add (global.get $frame-count) (i32.const 1)))
+
+  (call $input)
+
+  ;; if ((frame-count % 15) == 0) ...
+  (if (i32.eqz (i32.rem_u (global.get $frame-count) (i32.const 15)))
+    (then
+      (call $snake-update)))
+
+  (call $snake-draw)
+)
+```
+
+
+If you try to compile this, you should get an error: `error: undefined local variable "$prev-state"`. This is easily fixed. Just create a `$prev-state` global variable:
+
+```wasm
+(global $prev-state (mut i32) (i32.const 0))
+```
+
+To notice any change in the gamepad, you have to store the *current state* at the end of the input. This will make it the *previous state*. And while you're at it, why not add the other 3 directions along the way:
+
+```wasm
+(func $input
+  (local $gamepad i32)
+  (local $just-pressed i32)
+
+  ;; gamepad = *GAMEPAD;
+  (local.set $gamepad (i32.load8_u (global.get $GAMEPAD1)))
+
+  ;; just-pressed = gamepad & (gamepad ^ prev-state);
+  (local.set $just-pressed
+    (i32.and
+      (local.get $gamepad)
+      (i32.xor
+        (local.get $gamepad)
+        (global.get $prev-state))))
+
+  (if (i32.and (local.get $just-pressed) (global.get $BUTTON_LEFT))
+    (then
+      ;; Do something
+    )
+  )
+
+  (if (i32.and (local.get $just-pressed) (global.get $BUTTON_RIGHT))
+    (then
+      ;; Do something
+    )
+  )
+
+  (if (i32.and (local.get $just-pressed) (global.get $BUTTON_UP))
+    (then
+      ;; Do something
+    )
+  )
+
+  (if (i32.and (local.get $just-pressed) (global.get $BUTTON_DOWN))
+    (then
+      ;; Do something
+    )
+  )
+
+  (global.set $prev-state (local.get $gamepad))
+)
+```
+
+If you want to check if it works: Use the `trace` function provided by WASM-4. Here's an example:
+
+```wasm
+  (import "env" "trace" (func $trace (param i32)))
+
+  ;; Put the string somewhere unused in memory.
+  (data (i32.const 0x3000) "down\00")
+
+  (func $input
+    ...
+
+    ;; LEFT
+    (if (i32.and (local.get $just-pressed) (global.get $BUTTON_LEFT))
+      (then
+        (call $trace (i32.const 0x3000))
+      )
+    )
+
+    ...
+  )
+```
+
+If you use `trace` in each if-statement, you should see the corresponding output in the console.
+
+Now, instead of using `trace` to confirm everything works as intended, you should replace it with something like this:
+
+```wasm
+    (if (i32.and (local.get $just-pressed) (global.get $BUTTON_LEFT))
+      (then
+        (call $snake-down)))
+```
+
+I'll leave it to you, to finish the other 3 directions.
+
+You'll be - once again - rewarded with error messages:
+
+```
+main.wat:127:13: error: undefined function variable "$snake-left"
+      (call $snake-left)
+            ^^^^^^^^^^^
+main.wat:134:13: error: undefined function variable "$snake-right"
+      (call $snake-right)
+            ^^^^^^^^^^^^
+main.wat:141:13: error: undefined function variable "$snake-up"
+      (call $snake-up)
+            ^^^^^^^^^
+main.wat:148:13: error: undefined function variable "$snake-down"
+      (call $snake-down)
+            ^^^^^^^^^^^
+```
+
+To fix this, add those functions to your snake. Here's an example for `down`:
+
+```wasm
+(func $snake-down
+  ;; if (direction.y == 0) {
+  ;;   direction.x = 0;
+  ;;   direction.y = 1;
+  ;; }
+  (if (i32.eq (i32.load (i32.const 0x19a4)) (i32.const 0))
+    (then
+      (i32.store (i32.const 0x19a0) (i32.const 0))
+      (i32.store (i32.const 0x19a4) (i32.const 1))))
+)
 ```
 
 </Page>

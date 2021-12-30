@@ -223,6 +223,116 @@ In its final form, it could look like this:
 
 </Page>
 
+<Page value="wat">
+
+The following
+
+```wasm
+;; if (body[0].x == fruit.x && body[0].y == fruit.y)
+(if (i32.and
+      (i32.eq (i32.load (i32.const 0x19ac)) (i32.load (i32.const 0x2630)))
+      (i32.eq (i32.load (i32.const 0x19b0)) (i32.load (i32.const 0x2634))))
+  (then
+    ;; Snake's head hits the fruit
+  )
+)
+```
+
+is enough already to check if the snake eats the fruit. And to make the snake "grow", simply increase the length and add a new piece to the body. Now it remains the question what values should this new piece have. The easiest would be to add the current last piece:
+
+```wasm
+(local $body-length i32)
+(local $tail-offset i32)
+(local $tail-x i32)
+(local $tail-y i32)
+
+;; tail-offset = (body-length - 1) * 8
+(local.set $tail-offset
+  (i32.mul
+    (i32.sub
+      (local.tee $body-length
+        (i32.load (i32.const 0x19a8)))
+      (i32.const 1))
+    (i32.const 8)))
+
+;; Increment body_length
+(i32.store
+  (i32.const 0x19a8)
+  (i32.add
+    (local.get $body-length)
+    (i32.const 1)))
+
+;; Copy tail to next point in body.
+(i32.store offset=0x19b4 (local.get $tail-offset) (i32.load (i32.const 0x19ac)))
+(i32.store offset=0x19b8 (local.get $tail-offset) (i32.load (i32.const 0x19b0)))
+```
+
+Once this done, simply relocate the fruit:
+
+```wasm
+;; fruit.x = rnd(20);
+(i32.store (i32.const 0x2630) (call $rnd (i32.const 20)))
+;; fruit.y = rnd(20);
+(i32.store (i32.const 0x2634) (call $rnd (i32.const 20)))
+```
+
+In it's final form, it could look like this:
+
+```wasm
+  (local $body-length i32)
+  (local $tail-offset i32)
+  (local $tail-x i32)
+  (local $tail-y i32)
+
+  ...
+
+  (if (i32.eqz (i32.rem_u (global.get $frame-count) (i32.const 15)))
+    (then
+      (call $snake-update)
+
+      ;; if (body[0].x == fruit.x && body[0].y == fruit.y)
+      (if (i32.and
+            (i32.eq (i32.load (i32.const 0x19ac)) (i32.load (i32.const 0x2630)))
+            (i32.eq (i32.load (i32.const 0x19b0)) (i32.load (i32.const 0x2634))))
+        (then
+          ;; Snake's head hits the fruit
+
+          ;; tail-offset = (body-length - 1) * 8
+          (local.set $tail-offset
+            (i32.mul
+              (i32.sub
+                (local.tee $body-length
+                  (i32.load (i32.const 0x19a8)))
+                (i32.const 1))
+              (i32.const 8)))
+
+          ;; Increment body_length
+          (i32.store
+            (i32.const 0x19a8)
+            (i32.add
+              (local.get $body-length)
+              (i32.const 1)))
+
+          ;; Copy tail to next point in body.
+          (i32.store offset=0x19b4 (local.get $tail-offset)
+            (i32.load offset=0x19ac (local.get $tail-offset)))
+          (i32.store offset=0x19b8 (local.get $tail-offset)
+            (i32.load offset=0x19b0 (local.get $tail-offset)))
+
+          ;; fruit.x = rnd(20);
+          (i32.store (i32.const 0x2630) (call $rnd (i32.const 20)))
+          ;; fruit.y = rnd(20);
+          (i32.store (i32.const 0x2634) (call $rnd (i32.const 20)))
+        )
+      )
+    )
+  )
+```
+
+Now you're almost done. Only "Game Over" is left to finish this game.
+
+</Page>
+
 <Page value="zig">
 
 A simple
@@ -449,6 +559,64 @@ Now you can call this function to check if the snake died in this frame:
             }
         }
     }
+```
+
+What you do, is up to you. You could stop the game and show the score. Or you could simply reset the game. Up to you.
+
+</Page>
+
+<Page value="wat">
+
+```wasm
+(func $snake-is-dead (result i32)
+  (local $offset i32)
+  (local $offset-end i32)
+
+  ;; offset = 8
+  (local.set $offset (i32.const 8))
+
+  ;; offset-end = body_length * 8
+  (local.set $offset-end
+    (i32.mul
+      (i32.load (i32.const 0x19a8))  ;; body_length
+      (i32.const 8)))
+
+  ;; loop over all points in the body (except the head)
+  (loop $loop
+    ;; If the head is at the same place as this piece of the body, then return
+    ;; true.
+    (if (i32.and
+          (i32.eq
+            (i32.load (i32.const 0x19ac))
+            (i32.load offset=0x19ac (local.get $offset)))
+          (i32.eq
+            (i32.load (i32.const 0x19b0))
+            (i32.load offset=0x19b0 (local.get $offset))))
+      (then
+        (return (i32.const 1))))
+
+    ;; Add 8 to offset, and loop if offset < offset-end.
+    (br_if $loop
+      (i32.lt_u
+        (local.tee $offset (i32.add (local.get $offset) (i32.const 8)))
+        (local.get $offset-end)))
+  )
+
+  ;; return false
+  (i32.const 0)
+)
+```
+
+Now you can call this function to check if the snake died in this frame:
+
+```wasm
+    (call $snake-update)
+
+    (if (call $snake-is-dead)
+      (then
+        ;; Do something
+      )
+    )
 ```
 
 What you do, is up to you. You could stop the game and show the score. Or you could simply reset the game. Up to you.

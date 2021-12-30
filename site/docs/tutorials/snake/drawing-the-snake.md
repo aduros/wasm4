@@ -317,6 +317,66 @@ See also:
 
 </Page>
 
+<Page value="wat">
+
+To draw the snake, you can loop through each point using the `loop` instruction. To make it a little easier, it's a good idea to use the `Rect` function of WASM-4:
+
+```wasm
+;; Rect draws a rectangle. It uses color 1 to fill and color 2 for the outline
+(import "env" "rect" (func $rect (param i32 i32 i32 i32)))
+```
+
+With that out the way, let's see what a first draft could look like. In the WebAssembly text format, it's often simpler to use an address directly rather than an array index. However, since we know that the array starts at 0x19ac, we can use that as a direct index in the load instructions. So we'll actually use a byte offset to access each point of the snake.
+
+```wasm
+(func $snake-draw
+  (local $offset i32)      ;; offset is initialized to 0
+  (local $offset-end i32)
+
+  ;; offset-end = body_length * 8
+  (local.set $offset-end
+    (i32.mul
+      (i32.load (i32.const 0x19a8))  ;; body_length
+      (i32.const 8)))
+
+  ;; loop over all points in the body
+  (loop $loop
+    ;; rect(part.x * 8, part.y * 8, 8, 8)
+    ;; 
+    ;; Note that the array starts at 0x19ac, so the first x-coordinate starts
+    ;; at 0x19ac and the first y-coordinate starts at 0x19b0. We can bake these
+    ;; offsets directly into the instruction to reduce the code size.
+    (call $rect
+      (i32.mul (i32.load offset=0x19ac (local.get $offset)) (i32.const 8))
+      (i32.mul (i32.load offset=0x19b0 (local.get $offset)) (i32.const 8))
+      (i32.const 8)
+      (i32.const 8))
+
+    ;; Add 8 to offset, and loop if offset < offset-end.
+    (br_if $loop
+      (i32.lt_u
+        (local.tee $offset (i32.add (local.get $offset) (i32.const 8)))
+        (local.get $offset-end)))
+  )
+)
+```
+
+Simply loop through the body and draw it at `x * 8` and `y * 8`. 8 is the width and the height of a single part. On a 160x160 screen, it's big enough to fit snake that is 20*20=400 parts long.
+
+That's all fine, but nothing will be drawn until we call this function from `update`:
+
+```wasm
+(func (export "update")
+  (call $snake-draw)
+)
+```
+
+You should see some green blocks at the top.
+
+![Snake Body](images/draw-body.webp)
+
+</Page>
+
 <Page value="zig">
 
 To draw the snake, you can take advantage of zig's `for` syntax.
@@ -717,6 +777,132 @@ pub fn draw(&self) {
 ```
 
 This changes the color back and adds the darker green as its outline.
+
+![Snake with outline](images/draw-body-3.webp)
+
+</Page>
+
+<Page value="wat">
+
+But where is the head? You can pick a side. Either position `[0]` or position `[body_length - 1]`.
+
+I think it's easier to pick `[0]`.
+
+Since the body is drawn, head is not much of a problem. Simply use the `rect` function again. But use a specific part instead:
+
+```wasm
+(call $rect
+  (i32.mul (i32.load (i32.const 0x19ac)) (i32.const 8))
+  (i32.mul (i32.load (i32.const 0x19b0)) (i32.const 8))
+  (i32.const 8)
+  (i32.const 8))
+```
+
+The draw function should now look like this:
+
+```wasm
+(func $snake-draw
+  (local $offset i32)      ;; offset is initialized to 0
+  (local $offset-end i32)
+
+  ;; offset-end = body_length * 8
+  (local.set $offset-end
+    (i32.mul
+      (i32.load (i32.const 0x19a8))  ;; body_length
+      (i32.const 8)))
+
+  ;; loop over all points in the body
+  (loop $loop
+    ;; rect(part.x * 8, part.y * 8, 8, 8)
+    ;; 
+    ;; Note that the array starts at 0x19a4, so the first x-coordinate starts
+    ;; at 0x19a4 and the first y-coordinate starts at 0x19a8. We can bake these
+    ;; offsets directly into the instruction to reduce the code size.
+    (call $rect
+      (i32.mul (i32.load offset=0x19ac (local.get $offset)) (i32.const 8))
+      (i32.mul (i32.load offset=0x19b0 (local.get $offset)) (i32.const 8))
+      (i32.const 8)
+      (i32.const 8))
+
+    ;; Add 8 to offset, and loop if offset < offset-end.
+    (br_if $loop
+      (i32.lt_u
+        (local.tee $offset (i32.add (local.get $offset) (i32.const 8)))
+        (local.get $offset-end)))
+  )
+
+  ;; Draw the head.
+  (call $rect
+    (i32.mul (i32.load (i32.const 0x19ac)) (i32.const 8))
+    (i32.mul (i32.load (i32.const 0x19b0)) (i32.const 8))
+    (i32.const 8)
+    (i32.const 8))
+)
+```
+
+Notice the difference? Me neither.
+
+The head should stand out a little. For this, you can use a different color:
+
+```wasm
+  (i32.store16 (global.get $DRAW_COLORS) (i32.const 0x0004))
+```
+
+You can set the colors with this variable. You can look at this variable like a table that is read from right to left.
+
+The value for each digit can be  0 up to 4:
+
+- 0 = Use transparency
+- 1 = Use the 1st color from the color palette
+- 2 = Use the 2nd color from the color palette
+- 3 = Use the 3rd color from the color palette
+- 4 = Use the 4th color from the color palette
+
+The snippet above reads like this: "Color 1 uses Color 4 of the color palette, Color 2 to Color 4 don't use any color." The basic drawing functions use "Color 1" to fill the shape and "Color 2" for the border.
+
+If you change the source to
+
+```wasm
+(func $snake-draw
+  ...
+
+  ;; Set the head color.
+  (i32.store16 (global.get $DRAW_COLORS) (i32.const 0x0004))
+
+  ;; Draw the head.
+  (call $rect
+    (i32.mul (i32.load (i32.const 0x19ac)) (i32.const 8))
+    (i32.mul (i32.load (i32.const 0x19b0)) (i32.const 8))
+    (i32.const 8)
+    (i32.const 8))
+)
+```
+
+Result:
+
+![Changing Color](images/draw-body-2.webp)
+
+You'll see a change. The snake changed color. Not only the head, but the complete snake! Once you've set a color, it stays that way. So if you want to change only the head, you have to change Color 1 again. Right before you draw the body.
+
+```wasm
+(func $snake-draw
+  ;; Set the body color.
+  (i32.store16 (global.get $DRAW_COLORS) (i32.const 0x0043))
+  ...
+
+  ;; Set the head color.
+  (i32.store16 (global.get $DRAW_COLORS) (i32.const 0x0004))
+
+  ;; Draw the head.
+  (call $rect
+    (i32.mul (i32.load (i32.const 0x19ac)) (i32.const 8))
+    (i32.mul (i32.load (i32.const 0x19b0)) (i32.const 8))
+    (i32.const 8)
+    (i32.const 8))
+)
+```
+
+This changes the color back and adds the darker green as it's outline.
 
 ![Snake with outline](images/draw-body-3.webp)
 

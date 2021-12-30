@@ -61,6 +61,12 @@ w4.tone(262, 60, 100, .Pulse1)
 tone(262, 60, 100, TONE_PULSE1);
 ```
 
+```wasm
+(import "env" "tone" (func $tone (param i32 i32 i32 i32)))
+
+(call $tone (i32.const 262) (i32.const 60) (i32.const 100) (global.get $TONE_PULSE1))
+```
+
 ```zig
 w4.tone(262, 60, 100, w4.TONE_PULSE1);
 ```
@@ -115,6 +121,16 @@ w4.tone(262, 60, 100, .Pulse1, .Half)
 tone(262, 60, 100, TONE_PULSE1 | TONE_MODE3);
 ```
 
+```wasm
+(call $tone
+  (i32.const 262)
+  (i32.const 60)
+  (i32.const 100)
+  (i32.or
+    (global.get $TONE_PULSE1)
+    (global.get $TONE_MODE3)))
+```
+
 ```zig
 w4.tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_MODE3);
 ```
@@ -161,6 +177,16 @@ w4.tone(262 | (523 << 16), 60, 100, .Pulse1)
 
 ```rust
 tone(262 | (523 << 16), 60, 100, TONE_PULSE1);
+```
+
+```wasm
+(call $tone
+  (i32.or
+    (i32.const 262)
+    (i32.shl (i32.const 523) (i32.const 16)))
+  (i32.const 60)
+  (i32.const 100)
+  (global.get $TONE_PULSE1))
 ```
 
 ```zig
@@ -214,6 +240,18 @@ w4.tone(262, 60 | (30 << 8), 100, .Pulse1)
 
 ```rust
 tone(262, 60 | (30 << 8), 100, TONE_PULSE1);
+```
+
+```wasm
+(call $tone
+  (i32.const 262)
+  (i32.or
+    (i32.const 60)
+    (i32.shl
+      (i32.const 30)
+      (i32.const 8)))
+  (i32.const 100)
+  (global.get $TONE_PULSE1))
 ```
 
 ```zig

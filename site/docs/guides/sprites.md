@@ -124,6 +124,20 @@ const smiley: [u8; 8] = [
 ];
 ```
 
+```wasm
+(data (i32.const 0x2000)
+  ;; 0b11000011,
+  ;; 0b10000001,
+  ;; 0b00100100,
+  ;; 0b00100100,
+  ;; 0b00000000,
+  ;; 0b00100100,
+  ;; 0b10011001,
+  ;; 0b11000011,
+  "\c3\81\24\24\00\24\99\c3"
+)
+```
+
 ```zig
 const smiley = [8]u8{
     0b11000011,
@@ -178,6 +192,18 @@ w4.blit(&smiley[0], 10, 10, 8, 8)
 blit(&smiley, 10, 10, 8, 8, BLIT_1BPP);
 ```
 
+```wasm
+(call $blit
+  ;; smiley
+  (i32.const 0x2000)
+  ;; x, y
+  (i32.const 10) (i32.const 10)
+  ;; width, height
+  (i32.const 8) (i32.const 8)
+  ;; BLIT_1BPP
+  (global.get $BLIT_1BPP))
+```
+
 ```zig
 w4.blit(&smiley, 10, 10, 8, 8, w4.BLIT_1BPP);
 ```
@@ -226,6 +252,20 @@ w4.blit(&smiley[0], 10, 10, 8, 8, {.FLIPY})
 
 ```rust
 blit(&smiley, 10, 10, 8, 8, BLIT_1BPP | BLIT_FLIP_Y);
+```
+
+```wasm
+(call $blit
+  ;; smiley
+  (i32.const 0x2000)
+  ;; x, y
+  (i32.const 10) (i32.const 10)
+  ;; width, height
+  (i32.const 8) (i32.const 8)
+  ;; BLIT_1BPP | BLIT_FLIP_Y
+  (i32.or
+    (global.get $BLIT_1BPP)
+    (global.get $BLIT_FLIP_Y)))
 ```
 
 ```zig

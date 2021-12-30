@@ -177,6 +177,55 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 
 </Page>
 
+<Page value="wat">
+
+To achieve the first step (moving the body, excluding the head), a loop is all you need:
+
+```wasm
+(func $snake-update
+  (local $offset i32)
+
+  ;; loop backward from the end to the beginning.
+  (local.set $offset
+    (i32.mul
+      (i32.sub (i32.load (i32.const 0x19a8)) (i32.const 1))
+      (i32.const 8)))
+
+  (loop $loop
+    ;; body[i].x = body[i - 1].x
+    ;;
+    ;; The - 8 offset is baked into the i32.load offset.
+    (i32.store offset=0x19ac
+      (local.get $offset)
+      (i32.load offset=0x19a4 (local.get $offset)))
+
+    ;; body[i].y = body[i - 1].y
+    (i32.store offset=0x19b0
+      (local.get $offset)
+      (i32.load offset=0x19a8 (local.get $offset)))
+
+    (br_if $loop
+      (i32.gt_s
+        (local.tee $offset (i32.sub (local.get $offset) (i32.const 8)))
+        (i32.const 0))))
+)
+```
+
+Don't forget to call the new function in the main-loop:
+
+```wasm
+(func (export "update")
+  (call $snake-update)
+  (call $snake-draw)
+)
+```
+
+Now if you execute this, you'd notice that you can't see much. In fact, you might see the snake for a short moment before the head is all that's left.
+
+![](images/snake_move_head_only.webp)
+
+</Page>
+
 <Page value="zig">
 To achieve the first step (moving the body, excluding the head), a simple loop is all you need:
 
@@ -335,6 +384,51 @@ This isn't hard either. Simple insert at `0` the new head position and then make
 
         self.body.pop()
     }
+```
+
+</Page>
+
+<Page value="wat">
+
+This isn't hard either. Simply add the add the direction to the current head. And then make sure the head stays within the boundaries:
+
+```wasm
+(func $snake-update
+  (local $body-x i32)
+  (local $body-y i32)
+
+  ...
+
+  ;; body[0].x = (body[0].x + direction.x) % 20
+  (i32.store
+    (i32.const 0x19ac)
+    (local.tee $body-x
+      (i32.rem_s
+        (i32.add
+          (i32.load (i32.const 0x19ac))
+          (i32.load (i32.const 0x19a0)))
+        (i32.const 20))))
+
+  ;; body[0].y = (body[0].y + direction.y) % 20
+  (i32.store
+    (i32.const 0x19b0)
+    (local.tee $body-y
+      (i32.rem_s
+        (i32.add
+          (i32.load (i32.const 0x19b0))
+          (i32.load (i32.const 0x19a4)))
+        (i32.const 20))))
+
+  ;; if (body[0].x < 0) body[0].x = 19;
+  (if (i32.lt_s (local.get $body-x) (i32.const 0))
+    (then
+      (i32.store (i32.const 0x19ac) (i32.const 19))))
+
+  ;; if (body[0].y < 0) body[0].y = 19;
+  (if (i32.lt_s (local.get $body-y) (i32.const 0))
+    (then
+      (i32.store (i32.const 0x19b0) (i32.const 19))))
+)
 ```
 
 </Page>
@@ -586,6 +680,50 @@ pub fn update(&mut self) {
 ```
 
 That's it. Your snake should be quite a bit slower now. This reduces the snake from 60 units per second to 4 units per second (60/15 = 4).
+
+</Page>
+
+<Page value="wat">
+
+For this, you'd need a new variable. You can call it whatever you like, just be sure you know what it's purpose is.
+
+We'll use a WebAssembly global for this, rather than memory:
+
+```wasm
+(global $frame-count (mut i32) (i32.const 0))
+```
+
+This variable keeps track of all frames so far. Just increase its value in the main-update function:
+
+```wasm
+(func (export "update")
+  ;; frame-count = frame-count + 1;
+  (global.set $frame-count (i32.add (global.get $frame-count) (i32.const 1)))
+
+  (call $snake-update)
+  (call $snake-draw)
+)
+```
+
+Now all you need is to check if the passed frames are divisible by X:
+
+```wasm
+(func (export "update")
+  ;; frame-count = frame-count + 1;
+  (global.set $frame-count (i32.add (global.get $frame-count) (i32.const 1)))
+
+  ;; if ((frame-count % 15) == 0) ...
+  (if (i32.eqz (i32.rem_u (global.get $frame-count) (i32.const 15)))
+    (then
+      (call $snake-update)))
+
+  (call $snake-draw)
+)
+```
+
+That's it. Your snake should be quite a bit slower now. This reduces the snake from 60 units per second to 4 units per second (60/15 = 4).
+
+![Moving Snake (slow)](images/snake-motion-slow.webp)
 
 </Page>
 

@@ -72,7 +72,29 @@ local prev_state = 0
 
 <Page value="rust">
 
-// TODO
+To place (and eat) a fruit, you first need to define it in `Game`. Since it's simply a point on the grid, `Point` will do:
+
+```rust {8,16}
+// src/game.rs
+use crate::snake::{Point, Snake};
+use crate::wasm4;
+
+pub struct Game {
+    snake: Snake,
+    frame_count: u32,
+    fruit: Point,
+}
+
+impl Game {
+    pub fn new() -> Self {
+        Self {
+            snake: Snake::new(),
+            frame_count: 0,
+            fruit: Point { x: 0, y: 0 },
+        }
+    }
+}
+```
 
 </Page>
 
@@ -204,7 +226,57 @@ local prev_state = 0
 
 <Page value="rust">
 
-// TODO
+There are several random random generators available on [crates.io](https://crates.io), including some that are cryptographically secure.
+
+We don't need anything our snake game to be cryptographically secure so we'll use [`fastrand`](https://crates.io/crates/fastrand) crate:
+
+it provides [`fastrand::Rng`](https://docs.rs/fastrand/1.6.0/fastrand/), a simple seedable pseudo-random number generator.
+
+Let's add `fastrand` to `Cargo.toml`:
+
+```toml {4}
+[dependencies]
+buddy-alloc = { version = "0.4.1", optional = true }
+lazy_static = "1.4.0"
+fastrand = "1.6.0"
+```
+
+We'll then store an instance of `fastrand::Rng` in our `Game` and initialize fruit coordinates with
+[Rng::i32](https://docs.rs/fastrand/1.6.0/fastrand/struct.Rng.html#method.i32):
+
+a method that returns a random `i32` number within the input range.
+
+```rust {7,15,22-23,25}
+// src/game.rs
+use crate::snake::{Point, Snake};
+use crate::wasm4;
+use fastrand::Rng;
+
+pub struct Game {
+    rng: Rng,
+    snake: Snake,
+    frame_count: u32,
+    fruit: Point,
+}
+
+impl Game {
+    pub fn new() -> Self {
+        let rng = Rng::with_seed(235);
+
+        Self {
+            frame_count: 0,
+            snake: Snake::new(),
+            prev_gamepad: 0,
+            fruit: Point {
+                x: rng.i32(0..20),
+                y: rng.i32(0..20),
+            },
+            rng,
+        }
+    }
+}
+```
+
 
 </Page>
 
@@ -277,7 +349,7 @@ Importing images in WASM-4 works a bit different compared to other game engines 
 
 Indexed PNG files can be created by several image apps like [Aseprite](https://www.aseprite.org/) or [GIMP](https://www.gimp.org/).
 
-The image we import is a 8x8 PNG file with exactly 4 colors. And it's this image here:
+The image we import is a 8x8 PNG file with exactly 4 colors:
 
 ![Zoomed Fruit](images/fruit-zoomed.webp)
 This image is zoomed by 800%.
@@ -413,7 +485,42 @@ With that out of the way, it's time to actually render the newly imported sprite
 
 <Page value="rust">
 
-// TODO
+Now you need to import the image. For this, the WASM-4 CLI tool `w4` comes with another tool: `png2src`. You can use it like this:
+
+```bash
+w4 png2src --rust fruit.png
+```
+
+
+This will output the following content in the terminal:
+
+```rust
+const FRUIT_WIDTH: u32 = 8;
+const FRUIT_HEIGHT: u32 = 8;
+const FRUIT_FLAGS: u32 = 1; // BLIT_2BPP
+const FRUIT: [u8; 16] = [ 0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0 ];
+```
+
+Let's copy `FRUIT` and add it to our project;
+we'll also rename it `FRUIT_SPRITE`.
+
+```rust {6-8}
+// src/game.rs
+use crate::snake::{Point, Snake};
+use crate::wasm4;
+use fastrand::Rng;
+
+const FRUIT_SPRITE: [u8; 16] = [
+    0x00, 0xa0, 0x02, 0x00, 0x0e, 0xf0, 0x36, 0x5c, 0xd6, 0x57, 0xd5, 0x57, 0x35, 0x5c, 0x0f, 0xf0,
+];
+
+pub struct Game {
+    rng: Rng,
+    snake: Snake,
+    frame_count: u32,
+    fruit: Point,
+}
+```
 
 </Page>
 
@@ -492,7 +599,7 @@ But since you set the drawing colors, you need to change the drawing colors too:
     w4.blit(fruitSprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP)
 ```
 
-This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.
+This way, w4 uses the color palette in its default configuration. Except for one thing: The background will be transparent.
 
 </Page>
 
@@ -545,7 +652,7 @@ But since you set the drawing colors, you need to change the drawing colors too:
 	w4.Blit(&fruitSprite[0], fruit.X*8, fruit.Y*8, 8, 8, w4.BLIT_2BPP)
 ```
 
-This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.
+This way, w4 uses the color palette in its default configuration. Except for one thing: The background will be transparent.
 
 </Page>
 
@@ -585,7 +692,7 @@ But since you set the drawing colors, you need to change the drawing colors too:
   blit(fruit_sprite, fruit.x * 8, fruit.y * 8, 8, 8, BLIT_2BPP)
 ```
 
-This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.
+This way, w4 uses the color palette in its default configuration. Except for one thing: The background will be transparent.
 
 </Page>
 
@@ -603,7 +710,60 @@ This way, w4 uses the color palette in it's default configuration. Except for on
 
 <Page value="rust">
 
-// TODO
+Rendering the sprite is rather simple. Just call the blit function of w4:
+
+```rust
+pub fn blit(sprite: &[u8], x: i32, y: i32, width: u32, height: u32, flags: u32);
+```
+
+In practice it looks like this:
+
+```rust {10-17}
+// src/game.rs inside impl Game {} block
+    pub fn update(&mut self) {
+        self.frame_count += 1;
+
+        if self.frame_count % 15 == 0 {
+            self.snake.update();
+        }
+        self.snake.draw();
+
+        wasm4::blit(
+            &FRUIT_SPRITE,
+            self.fruit.x * 8,
+            self.fruit.y * 8,
+            8,
+            8,
+            wasm4::BLIT_2BPP,
+        );
+    }
+```
+
+But since you set the drawing colors, you need to change the drawing colors too:
+
+```rust {10}
+// src/game.rs inside impl Game {} block
+    pub fn update(&mut self) {
+        self.frame_count += 1;
+
+        if self.frame_count % 15 == 0 {
+            self.snake.update();
+        }
+        self.snake.draw();
+
+        set_draw_color(0x4320);
+        wasm4::blit(
+            &FRUIT_SPRITE,
+            self.fruit.x * 8,
+            self.fruit.y * 8,
+            8,
+            8,
+            wasm4::BLIT_2BPP,
+        );
+    }
+```
+
+This way, w4 uses the color palette in its default configuration. Except for one thing: The background will be transparent.
 
 </Page>
 
@@ -642,7 +802,7 @@ But since you set the drawing colors, you need to change the drawing colors too:
     w4.blit(&fruit_sprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP);
 ```
 
-This way, w4 uses the color palette in it's default configuration. Except for one thing: The background will be transparent.
+This way, w4 uses the color palette in its default configuration. Except for one thing: The background will be transparent.
 
 </Page>
 

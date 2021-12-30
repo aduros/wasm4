@@ -1,3 +1,5 @@
+
+import MultiLanguage, {Page} from '@site/src/components/MultiLanguage';
 import MultiLanguageCode from '@site/src/components/MultiLanguageCode';
 
 # Setting Color Palette
@@ -79,7 +81,13 @@ end
 ```
 
 ```rust
-# TODO
+#[cfg(feature = "buddy-alloc")]
+mod alloc;
+mod wasm4;
+
+#[no_mangle]
+fn update() {
+}
 ```
 
 ```zig
@@ -94,7 +102,9 @@ The update function is required. Or WASM-4 won't be able to show anything. To se
 
 So in most cases, you'd add a "start" function and export it too. WASM-4 will execute it once at the start.
 
-<MultiLanguageCode>
+<MultiLanguage>
+
+<Page value="assemblyscript">
 
 ```typescript
 export function start(): void {
@@ -104,14 +114,22 @@ export function start(): void {
     store<u32>(w4.PALETTE, 0x20283d, 3 * sizeof<u32>())
 }
 ```
+</Page>
+
+<Page value="c">
 
 ```c
 // TODO
 ```
+</Page>
 
+<Page value="d">
 ```d
 // TODO
 ```
+</Page>
+
+<Page value="go">
 
 ```go
 //go:export start
@@ -122,6 +140,9 @@ func start() {
 	w4.PALETTE[3] = 0x20283d
 }
 ```
+</Page>
+
+<Page value="nelua">
 
 ```lua
 require "wasm4"
@@ -135,17 +156,51 @@ $PALETTE = {
 }
 ```
 
-```nim
-# TODO
-```
+</Page>
 
-```odin
+<Page value="nim">
+
 // TODO
-```
+
+</Page>
+
+<Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="rust">
+
+Let's create a new file `palette.rs` inside `src/` directory with a helper
+function `set_palette`. 
+
 
 ```rust
-# TODO
+// src/palette.rs
+use crate::wasm4;
+
+pub fn set_palette(palette: [u32; 4]) {
+    unsafe {
+        *wasm4::PALETTE = palette;
+    }
+}
 ```
+
+We'll then use this function to customize the palette in `src/lib.rs`.
+
+```rust
+mod palette; // Don't forget to add the module declaration!
+
+#[no_mangle]
+fn start() {
+    palette::set_palette([0xfbf7f3, 0xe5b083, 0x426e5d, 0x20283d]);
+}
+```
+
+</Page>
+
+<Page value="zig">
 
 ```zig
 export fn start() void {
@@ -157,5 +212,6 @@ export fn start() void {
     };
 }
 ```
+</Page>
 
-</MultiLanguageCode>
+</MultiLanguage>

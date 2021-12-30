@@ -6,7 +6,7 @@ With a moving snake, you've done a good part of the game. This part lets you giv
 
 That's it.
 
-But first, you need to understand how WASM-4 handles it's user input.
+But first, you need to understand how WASM-4 handles user input.
 
 ## Gamepad Basics
 
@@ -122,7 +122,18 @@ end
 
 <Page value="rust">
 
-// TODO
+```rust
+let gamepad = unsafe { *wasm4::GAMEPAD1 };
+let just_pressed = gamepad & (gamepad ^ prev_gamepad);
+```
+
+The constant `just_pressed` now holds all buttons that were pressed this frame. You can check the state of a single button like this:
+
+```rust
+if just_pressed & wasm4::BUTTON_UP != 0 {
+  // Do something
+}
+```
 
 </Page>
 
@@ -290,7 +301,34 @@ end
 
 <Page value="rust">
 
-// TODO
+```rust
+// src/game.rs
+use crate::snake::{Point, Snake};
+use crate::wasm4;
+
+pub struct Game {
+    snake: Snake,
+    frame_count: u32,
+}
+
+impl Game {
+    pub fn new() -> Self {
+        Self {
+            snake: Snake::new(),
+            frame_count: 0,
+        }
+    }
+
+    pub fn update(&mut self) {
+        self.frame_count += 1;
+
+        if self.frame_count % 15 == 0 {
+            self.snake.update();
+        }
+        self.snake.draw();
+    }
+}
+```
 
 </Page>
 
@@ -318,7 +356,7 @@ The classic processing loop goes like this: Input, Process the input, output the
 
 <Page value="assemblyscript">
 
-It's a good idea to handle the input in it's own function. Something like this could be on your mind:
+It's a good idea to handle the input in its own function. Something like this could be on your mind:
 
 ```typescript {1-8,13}
 function input(): void {
@@ -431,7 +469,7 @@ To fix this, add those functions to your snake. Here's an example for `down`:
 
 <Page value="go">
 
-It's a good idea to handle the input in it's own function. Something like this could be on your mind:
+It's a good idea to handle the input in its own function. Something like this could be on your mind:
 
 ```go {1-7,13}
 func input() {
@@ -539,7 +577,7 @@ func (s *Snake) Down() {
 
 <Page value="nelua">
 
-It's a good idea to handle the input in it's own function. Something like this could be on your mind:
+It's a good idea to handle the input in its own function. Something like this could be on your mind:
 
 ```lua {1-8,13}
 local function input()
@@ -659,13 +697,172 @@ end
 
 <Page value="rust">
 
-// TODO
+It's a good idea to handle the input in its own function. Something like this could be on your mind:
+
+```rust {21,29-36}
+// src/game.rs
+use crate::snake::{Point, Snake};
+use crate::wasm4;
+
+pub struct Game {
+    snake: Snake,
+    frame_count: u32,
+}
+
+impl Game {
+    pub fn new() -> Self {
+        Self {
+            snake: Snake::new(),
+            frame_count: 0,
+        }
+    }
+
+    pub fn update(&mut self) {
+        self.frame_count += 1;
+
+        self.input();
+
+        if self.frame_count % 15 == 0 {
+            self.snake.update();
+        }
+        self.snake.draw();
+    }
+
+    pub fn input(&mut self) {
+        let gamepad = unsafe { *wasm4::GAMEPAD1 };
+        let just_pressed = gamepad & (gamepad ^ prev_gamepad);
+
+        if just_pressed & wasm4::BUTTON_UP != 0 {
+          // Do something
+        }
+    }
+}
+```
+
+If you try to compile this, you should get an error: `cannot find value prev_gamepad in this scope`.
+Just place `prev_gamepad` in `Game`.
+
+```rust {8,16}
+// src/game.rs
+use crate::snake::{Point, Snake};
+use crate::wasm4;
+
+pub struct Game {
+    snake: Snake,
+    frame_count: u32,
+    prev_gamepad: u8,
+}
+
+impl Game {
+    pub fn new() -> Self {
+        Self {
+            snake: Snake::new(),
+            frame_count: 0,
+            prev_gamepad: 0,
+        }
+    }
+}
+```
+
+To notice any change in the gamepad, you have to store the *current state* at the end of the input. This will make it the *previous state*. And while you're at it, why not add the other 3 directions along the way:
+
+```rust
+// src/game.rs
+use crate::snake::{Point, Snake};
+use crate::wasm4;
+
+pub struct Game {
+    snake: Snake,
+    frame_count: u32,
+}
+
+impl Game {
+    pub fn new() -> Self {
+        Self {
+            snake: Snake::new(),
+            frame_count: 0,
+        }
+    }
+
+    pub fn update(&mut self) {
+        self.frame_count += 1;
+
+        self.input();
+
+        if self.frame_count % 15 == 0 {
+            self.snake.update();
+        }
+        self.snake.draw();
+    }
+
+    pub fn input(&mut self) {
+        let gamepad = unsafe { *wasm4::GAMEPAD1 };
+        let just_pressed = gamepad & (gamepad ^ self.prev_gamepad);
+
+        if just_pressed & wasm4::BUTTON_LEFT != 0 {
+            // Do something
+        }
+        if just_pressed & wasm4::BUTTON_RIGHT != 0 {
+            // Do something
+        }
+        if just_pressed & wasm4::BUTTON_UP != 0 {
+            // Do something
+        }
+        if just_pressed & wasm4::BUTTON_DOWN != 0 {
+            // Do something
+        }
+
+        self.prev_gamepad = gamepad;
+    }
+}
+```
+
+
+If you want to check if it works: Use the `trace` function provided by WASM-4. Here's an example:
+
+```rust
+// src/game.rs
+if just_pressed & wasm4::BUTTON_DOWN != 0 {
+    wasm4::trace("down");
+}
+```
+
+If you use `trace` in each if-statement, you should see the corresponding output in the console.
+
+Now, instead of using `trace` to confirm everything works as intended, you should replace it with something like this:
+
+```rust
+// src/game.rs
+if just_pressed & wasm4::BUTTON_DOWN != 0 {
+   self.snake.down();
+}
+```
+
+I'll leave it to you, to finish the other 3 directions.
+
+You'll be - once again - rewarded with an error message:
+
+```
+no method named `down` found for struct `Snake` in the current scope
+method not found in `Snake`
+```
+
+To fix the errors, add those functions to your snake. Here's an example for `down`:
+
+```rust
+// src/snake.rs
+    pub fn down(&mut self) {
+        if self.direction.y == 0 {
+            self.direction = Point { x: 0, y: 1 };
+        }
+    }
+```
 
 </Page>
 
 <Page value="zig">
 
-It's a good idea to handle the input in it's own function. Something like this could be on your mind:
+It's a good idea to handle the input in its own function. Something like this could be on your mind:
 
 ```zig {1-8,13}
 fn input() void {

@@ -1,10 +1,13 @@
 #!/bin/sh -e
 
 runtime=$PWD/runtimes/web
+devtools=$PWD/devtools/web
 site=$PWD/site
 cli=$PWD/cli
 
 # Build runtime
+cd "$devtools"
+npm ci
 cd "$runtime"
 npm ci
 npm run build

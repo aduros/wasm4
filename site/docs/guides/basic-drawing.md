@@ -300,7 +300,7 @@ unsafe {
   (local.set $i (i32.add (local.get $i) (i32.const 1)))
 
   ;; loop while i < 160*160/4
-  (br_if (i32.lt_u (local.get $i) (i32.const 6400)))
+  (br_if $loop (i32.lt_u (local.get $i) (i32.const 6400)))
 )
 ```
 

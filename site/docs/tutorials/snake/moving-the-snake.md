@@ -182,33 +182,33 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 To achieve the first step (moving the body, excluding the head), a loop is all you need:
 
 ```wasm
-  (func $snake-update
-    (local $offset i32)
+(func $snake-update
+  (local $offset i32)
 
-    ;; loop backward from the end to the beginning.
-    (local.set $offset
-      (i32.mul
-        (i32.sub (i32.load (i32.const 0x19a8)) (i32.const 1))
-        (i32.const 8)))
+  ;; loop backward from the end to the beginning.
+  (local.set $offset
+    (i32.mul
+      (i32.sub (i32.load (i32.const 0x19a8)) (i32.const 1))
+      (i32.const 8)))
 
-    (loop $loop
-      ;; body[i].x = body[i - 1].x
-      ;;
-      ;; The - 8 offset is baked into the i32.load offset.
-      (i32.store offset=0x19ac
-        (local.get $offset)
-        (i32.load offset=0x19a4 (local.get $offset)))
+  (loop $loop
+    ;; body[i].x = body[i - 1].x
+    ;;
+    ;; The - 8 offset is baked into the i32.load offset.
+    (i32.store offset=0x19ac
+      (local.get $offset)
+      (i32.load offset=0x19a4 (local.get $offset)))
 
-      ;; body[i].y = body[i - 1].y
-      (i32.store offset=0x19b0
-        (local.get $offset)
-        (i32.load offset=0x19a8 (local.get $offset)))
+    ;; body[i].y = body[i - 1].y
+    (i32.store offset=0x19b0
+      (local.get $offset)
+      (i32.load offset=0x19a8 (local.get $offset)))
 
-      (br_if $loop
-        (i32.gt_s
-          (local.tee $offset (i32.sub (local.get $offset) (i32.const 8)))
-          (i32.const 0))))
-  )
+    (br_if $loop
+      (i32.gt_s
+        (local.tee $offset (i32.sub (local.get $offset) (i32.const 8)))
+        (i32.const 0))))
+)
 ```
 
 Don't forget to call the new function in the main-loop:
@@ -406,7 +406,7 @@ This isn't hard either. Simply add the add the direction to the current head. An
       (i32.rem_s
         (i32.add
           (i32.load (i32.const 0x19ac))
-          (i32.load (i32.const 0x19a4)))
+          (i32.load (i32.const 0x19a0)))
         (i32.const 20))))
 
   ;; body[0].y = (body[0].y + direction.y) % 20
@@ -416,7 +416,7 @@ This isn't hard either. Simply add the add the direction to the current head. An
       (i32.rem_s
         (i32.add
           (i32.load (i32.const 0x19b0))
-          (i32.load (i32.const 0x19a8)))
+          (i32.load (i32.const 0x19a4)))
         (i32.const 20))))
 
   ;; if (body[0].x < 0) body[0].x = 19;

@@ -314,8 +314,10 @@ In it's final form, it could look like this:
               (i32.const 1)))
 
           ;; Copy tail to next point in body.
-          (i32.store offset=0x19b4 (local.get $tail-offset) (i32.load (i32.const 0x19ac)))
-          (i32.store offset=0x19b8 (local.get $tail-offset) (i32.load (i32.const 0x19b0)))
+          (i32.store offset=0x19b4 (local.get $tail-offset)
+            (i32.load offset=0x19ac (local.get $tail-offset)))
+          (i32.store offset=0x19b8 (local.get $tail-offset)
+            (i32.load offset=0x19b0 (local.get $tail-offset)))
 
           ;; fruit.x = rnd(20);
           (i32.store (i32.const 0x2630) (call $rnd (i32.const 20)))
@@ -570,8 +572,8 @@ What you do, is up to you. You could stop the game and show the score. Or you co
   (local $offset i32)
   (local $offset-end i32)
 
-  ;; offset = 1
-  (local.set $offset (i32.const 1))
+  ;; offset = 8
+  (local.set $offset (i32.const 8))
 
   ;; offset-end = body_length * 8
   (local.set $offset-end
@@ -585,10 +587,10 @@ What you do, is up to you. You could stop the game and show the score. Or you co
     ;; true.
     (if (i32.and
           (i32.eq
-            (i32.load (i32.const 0x19a4))
+            (i32.load (i32.const 0x19ac))
             (i32.load offset=0x19ac (local.get $offset)))
           (i32.eq
-            (i32.load (i32.const 0x19a4))
+            (i32.load (i32.const 0x19b0))
             (i32.load offset=0x19b0 (local.get $offset))))
       (then
         (return (i32.const 1))))

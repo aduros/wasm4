@@ -13,7 +13,7 @@ const pkg = require('../package.json');
 async function bundleHtml (cartFile, htmlFile, opts) {
     const runtimeDir = path.resolve(__dirname, '../assets/runtime');
     const wasm4CssFilepath = path.resolve(runtimeDir, './wasm4.css');
-    const wasm4jsFilepath = path.resolve(runtimeDir, './wasm4-release.js');
+    const wasm4JsFilepath = path.resolve(runtimeDir, './wasm4.js');
 
     if (!require('fs').existsSync(htmlFile)) {
         await fs.mkdir(path.dirname(htmlFile), {
@@ -30,7 +30,7 @@ async function bundleHtml (cartFile, htmlFile, opts) {
     let [cart, wasm4Css, wasm4js, iconUrl] = await Promise.all([
         fs.readFile(cartFile),
         fs.readFile(wasm4CssFilepath, 'utf8'),
-        fs.readFile(wasm4jsFilepath, 'utf8'),
+        fs.readFile(wasm4JsFilepath, 'utf8'),
         iconPromise,
     ]);
 

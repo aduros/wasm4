@@ -1,3 +1,2 @@
-export const ENABLED = (location.port == "4444");
-
-export const websocket = ENABLED ? new WebSocket("ws://"+location.host) : null;
+/* `ENABLE_DEVTOOLS` is a compile-time flag, see `webpack.config.js` */
+export const websocket = ENABLE_DEVTOOLS ? new WebSocket("ws://"+location.host) : null;

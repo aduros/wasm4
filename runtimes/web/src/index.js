@@ -1,6 +1,6 @@
 import * as constants from "./constants";
 import { Runtime } from "./runtime";
-import { websocket } from "./devkit";
+import * as devkit from "./devkit";
 import * as z85 from "./z85";
 import "./styles.css";
 
@@ -59,8 +59,7 @@ async function loadCartWasm () {
     await runtime.load(wasmBuffer);
 
     let devtoolsManager = { toggleDevtools(){} };
-    /* `ENABLE_DEVTOOLS` is a compile-time flag, see `webpack.config.js` */
-    if(ENABLE_DEVTOOLS) {
+    if (ENABLE_DEVTOOLS) {
         devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager())
     }
 
@@ -87,8 +86,8 @@ async function loadCartWasm () {
 
     runtime.start();
 
-    if (websocket != null) {
-        websocket.addEventListener("message", async event => {
+    if (ENABLE_DEVTOOLS) {
+        devkit.websocket.addEventListener("message", async event => {
             switch (event.data) {
             case "reload":
                 wasmBuffer = await loadCartWasm();
@@ -485,7 +484,7 @@ async function loadCartWasm () {
             gamepadOverlay.style.display = runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY)
                 ? "none" : "";
 
-            if(ENABLE_DEVTOOLS) {
+            if (ENABLE_DEVTOOLS) {
                 devtoolsManager.updateCompleted(runtime.data, deltaFrame);  
             }
         }

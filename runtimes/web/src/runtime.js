@@ -3,7 +3,7 @@ import * as z85 from "./z85";
 import { APU } from "./apu";
 import { Framebuffer } from "./framebuffer";
 import { WebGLCompositor, Canvas2DCompositor } from "./compositor";
-import { websocket } from "./devkit";
+import * as devkit from "./devkit";
 
 export class Runtime {
     constructor () {
@@ -103,6 +103,16 @@ export class Runtime {
     }
 
     async load (wasmBuffer) {
+        const limit = 0xffff;
+        if (devkit.ENABLED) {
+            if (!this.warnedFileSize && wasmBuffer.byteLength > limit) {
+                this.warnedFileSize = true;
+                this.print(`Warning: Cart is larger than ${limit} bytes. Ensure the release build of your cart is small enough to be bundled.`);
+            }
+        } else {
+            throw new Error("Cart too big!");
+        }
+
         const env = {
             memory: this.memory,
 
@@ -240,8 +250,8 @@ export class Runtime {
         } else {
             console.log(str);
         }
-        if (websocket != null && websocket.readyState == 1) {
-            websocket.send(str);
+        if (devkit.websocket != null && devkit.websocket.readyState == 1) {
+            devkit.websocket.send(str);
         }
     }
 

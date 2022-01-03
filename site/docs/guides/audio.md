@@ -68,7 +68,7 @@ tone(262, 60, 100, TONE_PULSE1);
 ```
 
 ```zig
-w4.tone(262, 60, 100, w4.TONE_PULSE1);
+w4.tone(.{ .start = 262 }, .{ .sustain = 60 }, 100, .{ .channel = .pulse1 });
 ```
 
 </MultiLanguageCode>
@@ -132,7 +132,7 @@ tone(262, 60, 100, TONE_PULSE1 | TONE_MODE3);
 ```
 
 ```zig
-w4.tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_MODE3);
+w4.tone(.{ .start = 262 }, .{ .sustain = 60 }, 100, .{ .channel = .pulse1, .mode = .p50 });
 ```
 
 </MultiLanguageCode>
@@ -190,7 +190,7 @@ tone(262 | (523 << 16), 60, 100, TONE_PULSE1);
 ```
 
 ```zig
-w4.tone(262 | (523 << 16), 60, 100, w4.TONE_PULSE1);
+w4.tone(.{ .start = 262, .end = 523 }, .{ .sustain = 60 }, 100, .{ .channel = .pulse1 });
 ```
 
 </MultiLanguageCode>
@@ -255,7 +255,7 @@ tone(262, 60 | (30 << 8), 100, TONE_PULSE1);
 ```
 
 ```zig
-w4.tone(262, 60 | (30 << 8), 100, w4.TONE_PULSE1);
+w4.tone(.{ .start = 262 }, .{ .sustain = 60, .release = 30 }, 100, .{ .channel = .pulse1 });
 ```
 
 </MultiLanguageCode>

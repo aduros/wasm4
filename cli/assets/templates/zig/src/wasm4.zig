@@ -86,17 +86,56 @@ pub extern fn hline(x: i32, y: i32, len: u32) void;
 // │                                                                           │
 // └───────────────────────────────────────────────────────────────────────────┘
 
-/// Plays a sound tone.
-pub extern fn tone(frequency: u32, duration: u32, volume: u32, flags: u32) void;
+const externs = struct {
+    extern fn tone(frequency: u32, duration: u32, volume: u32, flags: u32) void;
+};
 
-pub const TONE_PULSE1: u32 = 0;
-pub const TONE_PULSE2: u32 = 1;
-pub const TONE_TRIANGLE: u32 = 2;
-pub const TONE_NOISE: u32 = 3;
-pub const TONE_MODE1: u32 = 0;
-pub const TONE_MODE2: u32 = 4;
-pub const TONE_MODE3: u32 = 8;
-pub const TONE_MODE4: u32 = 12;
+/// Plays a sound tone.
+pub fn tone(frequency: ToneFrequency, duration: ToneDuration, volume: u32, flags: ToneFlags) void {
+    return externs.tone(@bitCast(u32, frequency), @bitCast(u32, duration), volume, @bitCast(u8, flags));
+}
+pub const ToneFrequency = packed struct {
+    start: u16,
+    end: u16 = 0,
+
+    comptime {
+        if(@sizeOf(@This()) != @sizeOf(u32)) unreachable;
+    }
+};
+
+pub const ToneDuration = packed struct {
+    sustain: u8,
+    release: u8 = 0,
+    decay: u8 = 0,
+    attack: u8 = 0,
+
+    comptime {
+        if(@sizeOf(@This()) != @sizeOf(u32)) unreachable;
+    }
+};
+
+pub const ToneFlags = packed struct {
+    pub const Channel = enum(u2) {
+        pulse1,
+        pulse2,
+        triangle,
+        noise,
+    };
+    pub const Mode = enum(u2) {
+        p12_5,
+        p25,
+        p50,
+        p75,
+    };
+
+    channel: Channel,
+    mode: Mode = .p12_5,
+    _: u4 = 0,
+
+    comptime {
+        if(@sizeOf(@This()) != @sizeOf(u8)) unreachable;
+    }
+};
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │

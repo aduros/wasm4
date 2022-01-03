@@ -92,7 +92,7 @@ if gamepad & BUTTON_RIGHT != 0 {
 ```zig
 const gamepad = w4.GAMEPAD1.*;
 
-if (gamepad & w4.BUTTON_RIGHT != 0) {
+if (gamepad.button_right) {
     w4.trace("Right button is down!");
 }
 ```
@@ -289,15 +289,17 @@ fn update() {
 ```
 
 ```zig
-var previous_gamepad: u8 = 0;
+var previous_gamepad: w4.Gamepad = @bitCast(w4.Gamepad, @as(u8, 0));
 
 export fn update() void {
     const gamepad = w4.GAMEPAD1.*;
 
-    const pressed_this_frame = gamepad & (gamepad ^ previous_gamepad);
+    const pressed_this_frame = @bitCast(w4.Gamepad,
+        @bitCast(u8, gamepad) & (@bitCast(u8, gamepad) ^ @bitCast(u8, previous_gamepad))
+    );
     previous_gamepad = gamepad;
 
-    if (pressed_this_frame & w4.BUTTON_RIGHT != 0) {
+    if (pressed_this_frame.button_right) {
         w4.trace("Right button was just pressed!");
     }
 }

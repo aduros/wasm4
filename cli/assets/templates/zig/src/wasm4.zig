@@ -17,26 +17,67 @@ pub const CANVAS_SIZE: u32 = 160;
 
 pub const PALETTE: *[4]u32 = @intToPtr(*[4]u32, 0x04);
 pub const DRAW_COLORS: *u16 = @intToPtr(*u16, 0x14);
-pub const GAMEPAD1: *const u8 = @intToPtr(*const u8, 0x16);
-pub const GAMEPAD2: *const u8 = @intToPtr(*const u8, 0x17);
-pub const GAMEPAD3: *const u8 = @intToPtr(*const u8, 0x18);
-pub const GAMEPAD4: *const u8 = @intToPtr(*const u8, 0x19);
-pub const MOUSE_X: *const i16 = @intToPtr(*const i16, 0x1a);
-pub const MOUSE_Y: *const i16 = @intToPtr(*const i16, 0x1c);
-pub const MOUSE_BUTTONS: *const u8 = @intToPtr(*const u8, 0x1e);
-pub const SYSTEM_FLAGS: *u8 = @intToPtr(*u8, 0x1f);
+pub const GAMEPAD1: *const Gamepad = @intToPtr(*const Gamepad, 0x16);
+pub const GAMEPAD2: *const Gamepad = @intToPtr(*const Gamepad, 0x17);
+pub const GAMEPAD3: *const Gamepad = @intToPtr(*const Gamepad, 0x18);
+pub const GAMEPAD4: *const Gamepad = @intToPtr(*const Gamepad, 0x19);
+
+pub const MOUSE: *const Mouse = @intToPtr(*const Mouse, 0x1a);
+pub const SYSTEM_FLAGS: *SystemFlags = @intToPtr(*SystemFlags, 0x1f);
 pub const FRAMEBUFFER: *[6400]u8 = @intToPtr(*[6400]u8, 0xA0);
 
-pub const BUTTON_1: u8 = 1;
-pub const BUTTON_2: u8 = 2;
-pub const BUTTON_LEFT: u8 = 16;
-pub const BUTTON_RIGHT: u8 = 32;
-pub const BUTTON_UP: u8 = 64;
-pub const BUTTON_DOWN: u8 = 128;
+pub const Gamepad = packed struct {
+    button_1: bool,
+    button_2: bool,
+    _: u2 = 0,
+    button_left: bool,
+    button_right: bool,
+    button_up: bool,
+    button_down: bool,
+    comptime {
+        if(@sizeOf(@This()) != @sizeOf(u8)) unreachable;
+    }
 
-pub const MOUSE_LEFT: u8 = 1;
-pub const MOUSE_RIGHT: u8 = 2;
-pub const MOUSE_MIDDLE: u8 = 4;
+    pub fn format(value: @This(), comptime _: []const u8, _: @import("std").fmt.FormatOptions, writer: anytype) !void {
+        if(value.button_1) try writer.writeAll("1");
+        if(value.button_2) try writer.writeAll("2");
+        if(value.button_left) try writer.writeAll("<");//"←");
+        if(value.button_right) try writer.writeAll(">");
+        if(value.button_up) try writer.writeAll("^");
+        if(value.button_down) try writer.writeAll("v");
+    }
+};
+
+pub const Mouse = packed struct {
+    x: i16,
+    y: i16,
+    buttons: MouseButtons,
+    pub fn pos(mouse: Mouse) Vec2 {
+        return .{mouse.x, mouse.y};
+    }
+    comptime {
+        if(@sizeOf(@This()) != 5) unreachable;
+    }
+};
+
+pub const MouseButtons = packed struct {
+    left: bool,
+    right: bool,
+    middle: bool,
+    _: u5 = 0,
+    comptime {
+        if(@sizeOf(@This()) != @sizeOf(u8)) unreachable;
+    }
+};
+
+pub const SystemFlags = packed struct {
+    preserve_framebuffer: bool,
+    hide_gamepad_overlay: bool,
+    _: u6 = 0,
+    comptime {
+        if(@sizeOf(@This()) != @sizeOf(u8)) unreachable;
+    }
+};
 
 pub const SYSTEM_PRESERVE_FRAMEBUFFER: u8 = 1;
 pub const SYSTEM_HIDE_GAMEPAD_OVERLAY: u8 = 2;

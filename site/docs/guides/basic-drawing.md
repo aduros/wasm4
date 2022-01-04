@@ -101,7 +101,7 @@ The first color in the palette register is used as the screen background color.
 
 ## The `DRAW_COLORS` Register
 
-All drawing functions are affected by the `DRAW_COLORS` memory register. `DRAW_COLORS` is a 16 bit value that can store up to 4 colors.
+All drawing functions are affected by the `DRAW_COLORS` memory register. `DRAW_COLORS` is a 16 bit value that can store up to 4 colors, using 4 bits each.
 
 For example, `rect()` uses the first draw color for the fill color, and the
 second draw color as the outline color. To draw a light-green (palette color 2)
@@ -235,7 +235,9 @@ For info on other shape drawing functions like `line()` and `oval()`, see the [F
 ## Direct Framebuffer Access
 
 The `FRAMEBUFFER` memory region contains the framebuffer, with each byte containing 4 pixels (2 bits
-per pixel). For example, to clear the entire screen to palette color 3:
+per pixel). In the framebuffer, the palette colors 1-4 are represented numerically as 0-3.
+
+For example, to clear the entire screen to palette color 4, we write 3 into each position:
 
 <MultiLanguageCode>
 
@@ -322,8 +324,13 @@ function pixel (x: i32, y: i32): void {
     const shift = u8((x & 0b11) << 1);
     const mask = u8(0b11 << shift);
 
-    // Use the first DRAW_COLOR as the pixel color
-    const color = u8(load<u16>(w4.DRAW_COLORS) & 0b11);
+    // Use the first DRAW_COLOR as the pixel color.
+    const palette_color = u8(load<u16>(w4.DRAW_COLORS) & 0b1111);
+    if (color == 0) {
+        // Transparent
+        return;
+    }
+   const color = palette_color - 1;
 
     // Write to the framebuffer
     store<u8>(w4.FRAMEBUFFER + idx, (color << shift) | (load<u8>(w4.FRAMEBUFFER + idx) & ~mask));
@@ -357,7 +364,12 @@ void pixel(int x, int y) {
     int mask = 0b11 << shift;
 
     // Use the first draw color as the pixel color
-    int color = *w4.drawColors & 0b11;
+    int palette_color = *w4.drawColors & 0b1111;
+    if (palette_color == 0) {
+        // Transparent
+        return;
+    }
+    int color = palette_color - 1;
 
     // Write to the framebuffer
     w4.framebuffer[idx] =
@@ -375,7 +387,12 @@ func pixel (x int, y int) {
     var mask = uint8(0b11 << shift)
 
     // Use the first DRAW_COLOR as the pixel color
-    var color = uint8(*w4.DRAW_COLORS & 0b11)
+    var palette_color = uint8(*w4.DRAW_COLORS & 0b1111)
+    if (palette_color == 0) {
+        // Transparent
+        return;
+    }
+    var color = uint8(palette_color - 1);
 
     // Write to the framebuffer
     w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &^ mask)
@@ -392,7 +409,12 @@ local function pixel(x: integer, y: integer)
     local mask = 0b11 << shift
 
     -- Use the first DRAW_COLOR as the pixel color
-    local color = $DRAW_COLORS & 0b11
+    local palette_color = $DRAW_COLORS & 0b1111
+    if (palette_color == 0) {
+        // Transparent
+        return;
+    }
+    var color = palette_color - 1;
 
     -- Write to the framebuffer
     FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask)
@@ -409,7 +431,12 @@ proc pixel(x, y: int32) =
   let mask = uint8(0b11 shl shift)
   
   # Use the first DRAW_COLOR as the pixel color
-  let color = uint8(DRAW_COLORS[] and 0b11)
+  let palette_color = uint8(DRAW_COLORS[] and 0b1111)
+  if (palette_color == 0) {
+      // Transparent
+      return;
+  }
+  let color = palette_color - 1
 
   # Write to the framebuffer
   FRAMEBUFFER[idx] = uint8((color shl shift) or (FRAMEBUFFER[idx] and not mask))
@@ -425,7 +452,12 @@ pixel :: proc "c" (x : int, y : int) {
     mask := u8(0b11 << shift)
 
     // Use the first DRAW_COLOR as the pixel color
-    color := u8(w4.DRAW_COLORS^ & 0b11)
+    palette_color := u8(w4.DRAW_COLORS^ & 0b1111)
+    if (palette_color == 0) {
+        // Transparent
+        return
+    }
+    color := palette_color - 1;
 
     // Write to the framebuffer
     w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &~ mask)
@@ -442,7 +474,13 @@ fn pixel(x: i32, y: i32) {
     let mask = 0b11 << shift;
 
     unsafe {
-        let color: u8 = (*DRAW_COLORS & 0x3) as u8;
+        let palette_color: u8 = (*DRAW_COLORS & 0xf) as u8;
+        if (palette_color == 0) {
+            // Transparent
+            return;
+        }
+        let color = palette_color - 1;
+
         let framebuffer = FRAMEBUFFER.as_mut().expect("framebuffer ref");
 
         framebuffer[idx] = (color << shift) | (framebuffer[idx] & !mask);
@@ -484,11 +522,12 @@ fn pixel(x: i32, y: i32) {
       (local.get $shift)))
 
   ;; Use the first DRAW_COLOR as the pixel color
-  ;; color = *DRAW_COLORS & 0b11;
+  ;; color = *DRAW_COLORS & 0b1111;
   (local.set $color
     (i32.and
       (i32.load16_u (global.get $DRAW_COLORS))
-      (i32.const 3)))
+      (i32.const 15)))
+  ;; FIXME: return if $color is zero, then subtract 1.
 
   ;; Write to the framebuffer:
   ;; FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask);
@@ -519,7 +558,12 @@ fn pixel(x: i32, y: i32) void {
     const mask = @as(u8, 0b11) << shift;
 
     // Use the first DRAW_COLOR as the pixel color
-    const color = @intCast(u8, w4.DRAW_COLORS.* & 0b11);
+    const palette_color = @intCast(u8, w4.DRAW_COLORS.* & 0b1111);
+    if (palette_color == 0) {
+        // Transparent
+        return;
+    }
+    const color = palette_color - 1;
 
     // Write to the framebuffer
     w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] & ~mask);

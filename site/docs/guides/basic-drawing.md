@@ -527,7 +527,9 @@ fn pixel(x: i32, y: i32) {
     (i32.and
       (i32.load16_u (global.get $DRAW_COLORS))
       (i32.const 15)))
-  ;; FIXME: return if $color is zero, then subtract 1.
+  ;; return if $color is zero, then subtract 1.
+  (br_if (i32.eqz (local.get $color)))
+  (local.set $color (i32.sub (local.get $color) (i32.const 1)))
 
   ;; Write to the framebuffer:
   ;; FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask);

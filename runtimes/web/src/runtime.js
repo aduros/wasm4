@@ -372,7 +372,7 @@ export class Runtime {
         this.paused = !document.body.classList.contains('focus');
 
         if(this.paused) {
-           this.pauseAudio();
+            this.pauseAudio();
         } else {
             this.unlockAudio();
         }

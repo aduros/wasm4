@@ -99,8 +99,12 @@ async function loadCartWasm () {
 
     async function reboot () {
         runtime.reset(true);
+        // By indicating that the runtime has crashed,
+        // we avoid calling update until we're done rebooting
+        runtime.crashed = true;
         await runtime.load(wasmBuffer);
         runtime.start();
+        runtime.crashed = false;
     }
 
     function takeScreenshot () {
@@ -461,7 +465,7 @@ async function loadCartWasm () {
     window.addEventListener("pointermove", onPointerEvent);
     window.addEventListener("pointerup", onPointerEvent);
 
-    const gamepadOverlay = document.getElementById("gamepad"); 
+    const gamepadOverlay = document.getElementById("gamepad");
     // https://gist.github.com/addyosmani/5434533#file-limitloop-js-L60
 
     const INTERVAL = 1000 / 60;
@@ -485,7 +489,7 @@ async function loadCartWasm () {
                 ? "none" : "";
 
             if (DEVELOPER_BUILD) {
-                devtoolsManager.updateCompleted(runtime.data, deltaFrame);  
+                devtoolsManager.updateCompleted(runtime.data, deltaFrame);
             }
         }
 

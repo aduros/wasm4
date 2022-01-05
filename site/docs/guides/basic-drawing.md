@@ -330,7 +330,7 @@ function pixel (x: i32, y: i32): void {
         // Transparent
         return;
     }
-   const color = palette_color - 1;
+    const color = (palette_color - 1) & 0b11;
 
     // Write to the framebuffer
     store<u8>(w4.FRAMEBUFFER + idx, (color << shift) | (load<u8>(w4.FRAMEBUFFER + idx) & ~mask));
@@ -347,7 +347,12 @@ void pixel (int x, int y) {
     int mask = 0b11 << shift;
 
     // Use the first DRAW_COLOR as the pixel color
-    int color = *DRAW_COLORS & 0b11;
+    int palette_color = *DRAW_COLORS & 0b1111;
+    if (color == 0) {
+        // Transparent
+        return;
+    }
+    int color = (palette_color - 1) & 0b11;   
 
     // Write to the framebuffer
     FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask);
@@ -369,7 +374,7 @@ void pixel(int x, int y) {
         // Transparent
         return;
     }
-    int color = palette_color - 1;
+    int color = (palette_color - 1) & 0b11;
 
     // Write to the framebuffer
     w4.framebuffer[idx] =
@@ -392,7 +397,7 @@ func pixel (x int, y int) {
         // Transparent
         return;
     }
-    var color = uint8(palette_color - 1);
+    var color = uint8((palette_color - 1) & 0b11);
 
     // Write to the framebuffer
     w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &^ mask)
@@ -414,7 +419,7 @@ local function pixel(x: integer, y: integer)
         // Transparent
         return;
     }
-    var color = palette_color - 1;
+    var color = (palette_color - 1) & 0b11;
 
     -- Write to the framebuffer
     FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask)
@@ -436,7 +441,7 @@ proc pixel(x, y: int32) =
       // Transparent
       return;
   }
-  let color = palette_color - 1
+  let color = (palette_color - 1) & 0b11
 
   # Write to the framebuffer
   FRAMEBUFFER[idx] = uint8((color shl shift) or (FRAMEBUFFER[idx] and not mask))
@@ -457,7 +462,7 @@ pixel :: proc "c" (x : int, y : int) {
         // Transparent
         return
     }
-    color := palette_color - 1;
+    color := (palette_color - 1) & 0b11;
 
     // Write to the framebuffer
     w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &~ mask)
@@ -479,7 +484,7 @@ fn pixel(x: i32, y: i32) {
             // Transparent
             return;
         }
-        let color = palette_color - 1;
+        let color = (palette_color - 1) & 0b11;
 
         let framebuffer = FRAMEBUFFER.as_mut().expect("framebuffer ref");
 
@@ -527,9 +532,11 @@ fn pixel(x: i32, y: i32) {
     (i32.and
       (i32.load16_u (global.get $DRAW_COLORS))
       (i32.const 15)))
-  ;; return if $color is zero, then subtract 1.
+  ;; return if $color is zero, then subtract 1 and mask.
   (if (i32.eqz (local.get $color)) (then (return)))
-  (local.set $color (i32.sub (local.get $color) (i32.const 1)))
+  (local.set $color (i32.and
+                      (i32.const 3)
+                      (i32.sub (local.get $color) (i32.const 1))))
 
   ;; Write to the framebuffer:
   ;; FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask);
@@ -565,7 +572,7 @@ fn pixel(x: i32, y: i32) void {
         // Transparent
         return;
     }
-    const color = palette_color - 1;
+    const color = (palette_color - 1) & 0b11;
 
     // Write to the framebuffer
     w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] & ~mask);

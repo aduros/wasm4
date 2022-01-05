@@ -162,7 +162,8 @@ export class Runtime {
             try {
                 await fn();
             } catch (err) {
-                if (err instanceof WebAssembly.RuntimeError) {
+                if (err instanceof WebAssembly.RuntimeError 
+                    || err instanceof WebAssembly.LinkError) {
                     this.blueScreen(err);
                 } else {
                     // if we don't know what it is, throw it again

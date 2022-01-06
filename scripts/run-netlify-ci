@@ -1,10 +1,12 @@
 #!/bin/sh -e
 
-repo-root=$PWD
 runtime=$PWD/runtimes/web
 devtools=$PWD/devtools/web
 site=$PWD/site
 cli=$PWD/cli
+
+echo "node version: $(node --version)"
+echo "npm version: $(npm --version)"
 
 npm ci
 # Build runtime

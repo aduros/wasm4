@@ -1,20 +1,17 @@
 #!/bin/sh -e
 
+repo-root=$PWD
 runtime=$PWD/runtimes/web
 devtools=$PWD/devtools/web
 site=$PWD/site
 cli=$PWD/cli
 
+npm ci
 # Build runtime
-cd "$devtools"
-npm ci
-cd "$runtime"
-npm ci
-npm run build
+npm -w wasm4-runtime run build
 
 # Build and deploy site
-cd "$site"
-rm -rf static/embed
-cp -r "$runtime/dist" static/embed
-npm ci
-npm run build
+rm -rf "$site/static/embed"
+cp -r "$runtime/dist" "$site/static/embed"
+npm -w site run build
+

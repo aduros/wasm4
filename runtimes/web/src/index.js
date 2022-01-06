@@ -194,6 +194,7 @@ async function loadCartWasm () {
         "2": saveState,
         "4": loadState,
         "r": reboot,
+        "R": reboot,
         "F8": devtoolsManager.toggleDevtools,
         "F9": takeScreenshot,
         "F10": recordVideo,

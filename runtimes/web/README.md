@@ -1,4 +1,6 @@
-This directory contains the web runtime.
+# wasm4-runtime
+
+This workspace contains the web runtime.
 
 ## Development
 

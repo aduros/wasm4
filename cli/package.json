@@ -11,7 +11,8 @@
   "bugs": "https://github.com/aduros/wasm4/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aduros/wasm4.git"
+    "url": "https://github.com/aduros/wasm4.git",
+    "directory": "cli"
   },
   "keywords": [
     "2d game engine",

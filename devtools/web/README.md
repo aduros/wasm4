@@ -32,37 +32,43 @@ All exported components can be customized using the following css variables:
 
 ### Install dependencies
 
+This package is part of the `wasm4-monorepo`:
+Do not run `npm i` from `runtimes/web`, run instead:
+
 ```bash
-npm --prefix devtools/web-devtools i
+# working directory is repository root (`wasm4`)
+npm i
 ```
+
+### Dependencies
 
 This package relies on [lit](https://lit.dev) library to manage custom elements:
 docs are available [here](https://lit.dev/docs/).
 
-### Test locally
+### Develop locally
 
 Starts local server
 
 ```bash
-npm --prefix devtools/web-devtools run dev
+npm -w @wasm4/web-devtools run start
 ```
 
-### Build package & web runtime
+### Build devtools then web runtime
 
 ```bash
-npm --prefix devtools/web-devtools/ run build && npm --prefix runtimes/web/ run build
+npm -w @wasm4/web-devtools -w wasm4-runtime run build
 ```
 
 ### Build package
 
 ```bash
-npm --prefix devtools/web-devtools run build
+npm -w @wasm4/web-devtools run build
 ```
 
 ### Run formatter
 
 ```bash
-npm --prefix devtools/web-devtools run prettify
+npm -w @wasm4/web-devtools run prettify
 ```
 
 ## License

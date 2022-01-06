@@ -1,0 +1,24 @@
+{
+  "name": "wasm4-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "monorepo",
+  "scripts": {
+    "build:all": "npm --workspaces --if-present run build",
+    "clean:all": "npm --workspaces --if-present run clean"
+  },
+  "author": "Bruno Garcia <b@aduros.com>",
+  "license": "ISC",
+  "homepage": "https://wasm4.org",
+  "bugs": "https://github.com/aduros/wasm4/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aduros/wasm4.git"
+  },
+  "workspaces": [
+    "devtools/web",
+    "runtimes/web",
+    "site",
+    "cli"
+  ]
+}

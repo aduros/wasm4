@@ -4,10 +4,10 @@
   "scripts": {
     "build": "webpack --mode production",
     "start": "webpack serve --mode development --content-base dist --devtool inline-source-map --host 0.0.0.0",
-    "prepare": "npm --prefix '../../devtools/web' i"
+    "clean": "rimraf dist"
   },
   "dependencies": {
-    "@wasm4/web-devtools": "file:../../devtools/web"
+    "@wasm4/web-devtools": "^1.0.0"
   },
   "devDependencies": {
     "css-loader": "^6.2.0",
@@ -17,6 +17,7 @@
     "webpack": "^5.41.0",
     "webpack-cli": "^4.7.2",
     "webpack-merge": "^5.8.0",
+    "rimraf": "^3.0.2",
     "webpack-dev-server": "^3.11.2"
   }
 }

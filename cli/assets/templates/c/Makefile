@@ -47,7 +47,7 @@ all: build/cart.wasm
 build/cart.wasm: $(OBJECTS)
 	$(CXX) -o $@ $(OBJECTS) $(LDFLAGS)
 ifneq ($(DEBUG), 1)
-ifeq (, $(shell which $(WASM_OPT)))
+ifeq (, $(shell command -v $(WASM_OPT)))
 	@echo Tip: $(WASM_OPT) was not found. Install it from binaryen for smaller builds!
 else
 	$(WASM_OPT) $(WASM_OPT_FLAGS) $@ -o $@

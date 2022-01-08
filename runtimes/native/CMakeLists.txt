@@ -13,26 +13,28 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
 
-# GLFW options
+# General options
 set(BUILD_SHARED_LIBS OFF)
-# set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-# set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-# set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(BUILD_TESTS OFF)
+set(BUILD_TOOLS OFF)
 
 # MiniFB options
 set(MINIFB_BUILD_EXAMPLES OFF)
 set(USE_OPENGL_API OFF)
 # set(USE_METAL_API OFF)
 
+# Cubeb options
+set(USE_SANITIZERS OFF)
+
 # add_subdirectory(vendor/glfw)
 add_subdirectory(vendor/minifb)
-add_subdirectory(vendor/portaudio)
+add_subdirectory(vendor/cubeb)
 
 file(GLOB COMMON_SOURCES RELATIVE "${CMAKE_SOURCE_DIR}" "src/*.c")
 file(GLOB M3_SOURCES RELATIVE "${CMAKE_SOURCE_DIR}" "vendor/wasm3/source/*.c")
 
 #
-# Desktop (minifb + portaudio) backend
+# Desktop (minifb + cubeb) backend
 #
 
 set(MINIFB_SOURCES
@@ -42,12 +44,12 @@ set(MINIFB_SOURCES
 )
 add_executable(wasm4 ${COMMON_SOURCES} ${MINIFB_SOURCES} ${M3_SOURCES})
 target_include_directories(wasm4 PRIVATE "${CMAKE_SOURCE_DIR}/vendor/wasm3/source")
-target_link_libraries(wasm4 minifb PortAudio)
+target_link_libraries(wasm4 minifb cubeb)
 set_target_properties(wasm4 PROPERTIES C_STANDARD 99)
 install(TARGETS wasm4)
 
 # #
-# # Desktop (glfw + portaudio) backend
+# # Desktop (glfw + cubeb) backend
 # #
 # 
 # set(GLFW_SOURCES
@@ -60,7 +62,7 @@ install(TARGETS wasm4)
 # target_sources(wasm4_glfw PRIVATE ${COMMON_SOURCES} ${GLFW_SOURCES} ${M3_SOURCES})
 # target_include_directories(wasm4_glfw PRIVATE "${CMAKE_SOURCE_DIR}/vendor/wasm3/source")
 # target_include_directories(wasm4_glfw PRIVATE "${CMAKE_SOURCE_DIR}/vendor/glad/include")
-# target_link_libraries(wasm4_glfw glfw PortAudio)
+# target_link_libraries(wasm4_glfw glfw cubeb)
 # set_target_properties(wasm4_glfw PROPERTIES C_STANDARD 99)
 # install(TARGETS wasm4_glfw)
 

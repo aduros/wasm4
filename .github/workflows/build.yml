@@ -45,7 +45,7 @@ jobs:
                   cmake --build build --config Release --parallel
 
             - name: Install
-              run: cmake --install build --prefix instdir --config Release --strip
+              run: cmake --install build --component wasm4 --prefix instdir --config Release --strip
 
             - name: Upload wasm4 artifact
               uses: actions/upload-artifact@v2

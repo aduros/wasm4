@@ -37,7 +37,7 @@ typedef struct {
     float dutyCycle;
 } Channel;
 
-static Channel channels[4] = { };
+static Channel channels[4] = { 0 };
 
 /** The current time, in samples. */
 static unsigned long long time = 0;

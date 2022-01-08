@@ -4,7 +4,7 @@
   "scripts": {
     "build": "webpack --mode production",
     "start": "webpack serve --mode development --content-base dist --devtool inline-source-map --host 0.0.0.0",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist/wasm4-developer.js dist/wasm4.js dist/wasm4.css dist/wasm4-developer.js.LICENSE.txt"
   },
   "dependencies": {
     "@wasm4/web-devtools": "^1.0.0"

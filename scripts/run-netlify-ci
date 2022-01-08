@@ -5,6 +5,9 @@ devtools=$PWD/devtools/web
 site=$PWD/site
 cli=$PWD/cli
 
+# Node and npm versions are set using the `.nvmrc` file:
+# see https://docs.netlify.com/configure-builds/manage-dependencies/#node-js-and-javascript
+# see https://github.com/nvm-sh/nvm
 echo "node version: $(node --version)"
 echo "npm version: $(npm --version)"
 

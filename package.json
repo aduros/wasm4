@@ -2,10 +2,14 @@
   "name": "wasm4-monorepo",
   "version": "1.0.0",
   "private": true,
-  "description": "monorepo",
   "scripts": {
     "build:all": "npm --workspaces --if-present run build",
-    "clean:all": "npm --workspaces --if-present run clean"
+    "clean:all": "npm --workspaces --if-present run clean",
+    "postinstall": "check-node-version --package"
+  },
+  "engines": {
+    "node": "^16.13.0",
+    "npm": "^8.0.0"
   },
   "author": "Bruno Garcia <b@aduros.com>",
   "license": "ISC",
@@ -20,5 +24,8 @@
     "runtimes/web",
     "site",
     "cli"
-  ]
+  ],
+  "devDependencies": {
+    "check-node-version": "^4.2.1"
+  }
 }

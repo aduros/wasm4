@@ -78,7 +78,7 @@ jobs:
             - name: Import web runtime
               run: |
                   rm -f cli/assets/runtime
-                  cp -r runtimes/web/dist assets/runtime
+                  cp -r runtimes/web/dist cli/assets/runtime
 
             - name: Download artifacts
               uses: actions/download-artifact@v2

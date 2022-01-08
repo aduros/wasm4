@@ -6,14 +6,13 @@ This workspace contains the web runtime.
 
 ## Development
 
+Read the [development-guide](/development-guide.md) first.
+
 ### Install dependencies
 
-Set `wasm4/` as working directory then run `npm i`.
+This package is managed by the `wasm4-monorepo`, to install 
+set `wasm4/` as working directory then run `npm i`.
 
-```bash
-# working directory: wasm4/
-npm i
-```
 
 ### Develop locally
 

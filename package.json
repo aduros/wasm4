@@ -5,7 +5,7 @@
   "scripts": {
     "build:all": "npm --workspaces --if-present run build",
     "clean:all": "npm --workspaces --if-present run clean",
-    "postinstall": "check-node-version --package"
+    "prepare": "check-node-version --package"
   },
   "engines": {
     "node": "^16.13.0",

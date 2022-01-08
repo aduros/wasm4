@@ -10,7 +10,7 @@ git submodule update --init
 
 Linux only: You'll need to install dependencies for X11 development. On Ubuntu these can be
 installed with: `sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
-libxext-dev`
+libxext-dev libasound2-dev libpulse-dev`
 
 Building:
 

@@ -274,3 +274,9 @@ export const FONT = Uint8Array.of(
 );
 
 export const showDevToolsQueryKey = 'devtools-open';
+
+export const pauseFlags = {
+    unfocused: 1,
+    crashed: 2,
+    rebooting: 4
+}

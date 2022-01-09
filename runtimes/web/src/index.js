@@ -99,12 +99,10 @@ async function loadCartWasm () {
 
     async function reboot () {
         runtime.reset(true);
-        // By indicating that the runtime has crashed,
-        // we avoid calling update until we're done rebooting
-        runtime.crashed = true;
+        runtime.pauseState |= constants.pauseFlags.rebooting;
         await runtime.load(wasmBuffer);
         runtime.start();
-        runtime.crashed = false;
+        runtime.pauseState &= ~constants.pauseFlags.rebooting;
     }
 
     function takeScreenshot () {
@@ -481,9 +479,7 @@ async function loadCartWasm () {
 
         if (deltaFrame >= INTERVAL) {
             lastFrame = now - (deltaFrame % INTERVAL);
-            if (!runtime.crashed) {
-                runtime.update();
-            }
+            runtime.update();
 
             gamepadOverlay.style.display = runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY)
                 ? "none" : "";

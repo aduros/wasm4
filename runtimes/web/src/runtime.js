@@ -92,7 +92,7 @@ export class Runtime {
         if (zeroMemory) {
             mem32.fill(0);
         }
-        this.pauseState &= ~constants.pauseFlags.crashed;
+        this.pauseState &= ~constants.PAUSE_CRASHED;
         mem32.set(constants.COLORS, constants.ADDR_PALETTE >> 2);
         this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
 
@@ -312,7 +312,7 @@ export class Runtime {
     }
 
     update () {
-        if (this.pauseState > 0) {
+        if (this.pauseState != 0) {
             return;
         }
 
@@ -326,7 +326,7 @@ export class Runtime {
     }
 
     blueScreen(err) {
-        this.pauseState |= constants.pauseFlags.crashed;
+        this.pauseState |= constants.PAUSE_CRASHED;
 
         const COLORS = [
             0x1111ee, // blue
@@ -372,10 +372,10 @@ export class Runtime {
 
         if (lostFocus) {
             this.pauseAudio();
-            this.pauseState |= constants.pauseFlags.unfocused;
+            this.pauseState |= constants.PAUSE_UNFOCUSED;
         } else {
             this.unlockAudio();
-            this.pauseState &= ~constants.pauseFlags.unfocused;
+            this.pauseState &= ~constants.PAUSE_UNFOCUSED;
         }
     }
 }

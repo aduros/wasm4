@@ -99,10 +99,10 @@ async function loadCartWasm () {
 
     async function reboot () {
         runtime.reset(true);
-        runtime.pauseState |= constants.pauseFlags.rebooting;
+        runtime.pauseState |= constants.PAUSE_REBOOTING;
         await runtime.load(wasmBuffer);
         runtime.start();
-        runtime.pauseState &= ~constants.pauseFlags.rebooting;
+        runtime.pauseState &= ~constants.PAUSE_REBOOTING;
     }
 
     function takeScreenshot () {

@@ -28,8 +28,7 @@ export class Runtime {
 
         this.reset();
 
-        this.paused = false;
-        this.crashed = false;
+        this.pauseState = 0;
     }
 
     setMouse (x, y, buttons) {
@@ -93,7 +92,7 @@ export class Runtime {
         if (zeroMemory) {
             mem32.fill(0);
         }
-        this.crashed = false;
+        this.pauseState &= ~constants.pauseFlags.crashed;
         mem32.set(constants.COLORS, constants.ADDR_PALETTE >> 2);
         this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
 
@@ -313,7 +312,7 @@ export class Runtime {
     }
 
     update () {
-        if (this.paused) {
+        if (this.pauseState > 0) {
             return;
         }
 
@@ -327,7 +326,7 @@ export class Runtime {
     }
 
     blueScreen(err) {
-        this.crashed = true;
+        this.pauseState |= constants.pauseFlags.crashed;
 
         const COLORS = [
             0x1111ee, // blue
@@ -369,12 +368,14 @@ export class Runtime {
     }
 
     updateIdleState = () => {
-        this.paused = !document.body.classList.contains('focus');
+        const lostFocus = !document.body.classList.contains('focus');
 
-        if(this.paused) {
-           this.pauseAudio();
+        if (lostFocus) {
+            this.pauseAudio();
+            this.pauseState |= constants.pauseFlags.unfocused;
         } else {
             this.unlockAudio();
+            this.pauseState &= ~constants.pauseFlags.unfocused;
         }
     }
 }

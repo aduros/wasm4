@@ -49,6 +49,10 @@ void retro_set_environment (retro_environment_t cb) {
     };
     environ_cb(RETRO_ENVIRONMENT_SET_CONTENT_INFO_OVERRIDE, exts);
 
+    // WASM-4 requires content to run
+    bool no_game = false;
+    environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &no_game);
+
     // if (cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &logging))
     //    log_cb = logging.log;
     // else
@@ -131,6 +135,7 @@ void retro_get_system_info (struct retro_system_info* info) {
     info->library_name = "WASM-4";
     info->library_version = "v1";
     info->valid_extensions = "wasm";
+    info->need_fullpath = false;
 }
 
 unsigned retro_get_region () {

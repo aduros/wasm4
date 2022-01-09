@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "apu.h"
 #include "framebuffer.h"
 #include "wasm.h"
 #include "window.h"
@@ -56,6 +57,7 @@ void w4_runtimeInit (uint8_t* memoryBytes, uint8_t* diskBytes) {
     memory->mouseX = 0x7fff;
     memory->mouseY = 0x7fff;
 
+    w4_apuInit();
     w4_framebufferInit(&memory->drawColors, memory->framebuffer);
 }
 
@@ -126,7 +128,8 @@ void w4_runtimeTextUtf16 (const uint16_t* str, int byteLength, int x, int y) {
 }
 
 void w4_runtimeTone (int frequency, int duration, int volume, int flags) {
-    printf("TODO: tone: %d, %d, %d, %d\n", frequency, duration, volume, flags);
+    // printf("tone: %d, %d, %d, %d\n", frequency, duration, volume, flags);
+    w4_apuTone(frequency, duration, volume, flags);
 }
 
 int w4_runtimeDiskr (uint8_t* dest, int size) {

@@ -8,10 +8,8 @@ rustflags = [
     "-C", "link-arg=--initial-memory=65536",
     "-C", "link-arg=--max-memory=65536",
 
-    # Reserve a certain amount of Rust stack space, offset from 6560.
+    # Temporary workaround for #255 issue.
+    # Reserve 8192 bytes of Rust stack space, offset from 6560.
     # Bump this value, 16-byte aligned, if the framebuffer gets corrupted.
-    "-C", "link-arg=-zstack-size=8624",
-
-    # Not working? https://github.com/rust-lang/rust/issues/46645#issuecomment-423912553
-    # "-C", "link-arg=--global-base=6560",
+    "-C", "link-arg=-zstack-size=14752",
 ]

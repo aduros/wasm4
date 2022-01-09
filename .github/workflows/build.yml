@@ -37,7 +37,7 @@ jobs:
               name: Install local dependencies
               run: |
                   sudo apt update
-                  sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev
+                  sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libasound2-dev libpulse-dev
 
             - name: Build
               run: |
@@ -45,7 +45,7 @@ jobs:
                   cmake --build build --config Release --parallel
 
             - name: Install
-              run: cmake --install build --prefix instdir --config Release --strip
+              run: cmake --install build --prefix instdir --config Release --strip || true
 
             - name: Upload wasm4 artifact
               uses: actions/upload-artifact@v2

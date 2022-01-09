@@ -1,16 +1,21 @@
-#include <libretro.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "../wasm.h"
+#include <libretro.h>
+
+#include "../apu.h"
 #include "../runtime.h"
+#include "../wasm.h"
+
+#define AUDIO_BUFFER_FRAMES 256
 
 static retro_environment_t environ_cb;
 static retro_video_refresh_t video_cb;
 static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
+static retro_audio_sample_batch_t audio_batch_cb;
 
 static uint8_t* wasmData;
 static size_t wasmLength;
@@ -20,6 +25,15 @@ static uint8_t* memory;
 
 // 1024 bytes plus the 2 byte size header
 static uint8_t disk[1026] = { 0 };
+
+static void audio_set_state (bool enable) {
+}
+
+static void audio_callback () {
+    static int16_t output[2*AUDIO_BUFFER_FRAMES];
+    w4_apuWriteSamples(output, AUDIO_BUFFER_FRAMES);
+    audio_batch_cb(output, AUDIO_BUFFER_FRAMES);
+}
 
 unsigned retro_api_version () {
     return RETRO_API_VERSION;
@@ -46,7 +60,7 @@ void retro_set_audio_sample (retro_audio_sample_t cb) {
 }
 
 void retro_set_audio_sample_batch (retro_audio_sample_batch_t cb) {
-    // audio_batch_cb = cb;
+    audio_batch_cb = cb;
 }
 
 void retro_set_input_poll (retro_input_poll_t cb) {
@@ -185,6 +199,9 @@ bool retro_load_game (const struct retro_game_info* game) {
         { 0 },
     };
     environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, descs);
+
+    struct retro_audio_callback audio_cb = { audio_callback, audio_set_state };
+    environ_cb(RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK, &audio_cb);
 
     memory = w4_wasmInit();
     w4_runtimeInit(memory, disk);

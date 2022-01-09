@@ -135,6 +135,11 @@ void update () {
         int volume = values[6];
         int channel = values[7];
         int mode = values[8];
+        tracef("freq1=%d freq2=%d attack=%d decay=%d sustain=%d release=%d volume=%d channel=%d mode=%d",
+            freq1, freq2, attack, decay, sustain, release, volume, channel, mode);
+        tracef("tone(%d | (%d << 16), (%d << 24) | (%d << 16) | %d | (%d << 8), %d, %d | (%d << 2))",
+            freq1, freq2, attack, decay, sustain, release, volume, channel, mode);
+        trace("");
         tone(freq1 | (freq2 << 16), (attack << 24) | (decay << 16) | sustain | (release << 8), volume, channel | (mode << 2));
     }
 }

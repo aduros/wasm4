@@ -161,7 +161,9 @@ export class Runtime {
             try {
                 await fn();
             } catch (err) {
-                if (err instanceof WebAssembly.RuntimeError) {
+                if (err instanceof WebAssembly.RuntimeError
+                        || err instanceof WebAssembly.LinkError
+                        || err instanceof WebAssembly.CompileError) {
                     this.blueScreen(err);
                 } else {
                     // if we don't know what it is, throw it again
@@ -384,11 +386,17 @@ function errorToBlueScreenText(err) {
     let message = `${err.name}:\n${err.message}`;
 
     // hand written messages for specific errors
-    if (err.message.match(/unreachable/)) {
-        message = "The cartridge has\nreached a code \nsegment marked as\nunreachable.";
-    } else if (err.message.match(/out of bounds/)) {
-        message = "The cartridge has\nattempted a memory\naccess that is\nout of bounds.";
+    if (err instanceof WebAssembly.RuntimeError) {
+        if (err.message.match(/unreachable/)) {
+            message = "The cartridge has\nreached a code \nsegment marked as\nunreachable.";
+        } else if (err.message.match(/out of bounds/)) {
+            message = "The cartridge has\nattempted a memory\naccess that is\nout of bounds.";
+        }
+        message += "\n\n\n\n\nHit R to reboot.";
+    } else if (err instanceof WebAssembly.LinkError) {
+        message = "The cartridge has\ntried to import\na missing function.\n\n\n\nSee console for\nmore details.";
+    } else if (err instanceof WebAssembly.CompileError) {
+        message = "The cartridge is\ncorrupted.\n\n\n\nSee console for\nmore details.";
     }
-    message += "\n\n\n\n\nHit R to reboot.";
     return message;
 }

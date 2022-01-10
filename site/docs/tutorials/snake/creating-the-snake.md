@@ -44,7 +44,72 @@ But it lacks any functionality for now.
 
 <Page value="c">
 
-// TODO
+In this section we will define a structure to hold our snake.
+
+Create a new file called `snake.h` and fill it with the code-snippet below.
+
+```c
+#pragma once
+
+#include <stdint.h>
+
+struct point {
+    int16_t x;
+    int16_t y;
+};
+
+struct snake {
+    struct point* body;
+    struct point direction;
+    uint16_t length;
+};
+```
+The snake type contains the body and the current direction of the snake instance. We also need to define a point struct to hold the x and y coordinates of our snake body parts.
+
+We need to fill out the implementation of the snake. Function declarations will be added to `snake.h` and the definitions to a new file called `snake.c`.
+
+We will work on two functions, one to create the snake, and one to add a body part to the snake.
+
+Add the following declarations to the bottom of the `snake.h` file:
+
+```c
+void snake_create(struct snake *snake);
+void snake_push(struct snake *snake, struct point p);
+```
+
+Then in the `snake.c` file, we need to include our header files:
+```c
+#include "snake.h"
+#include "wasm4.h"
+#include <stdlib.h>
+```
+The file `stdlib.h` is required for `realloc`. The `snake_create` function `free`s any previous snake body that may have been allocated and initializes the snake struct body pointer to `NULL`, and the length to `0`.
+
+```c
+void snake_create(struct snake *snake)
+{
+    if(snake->body != NULL)
+    {
+            free(snake->body);
+            snake->body = NULL;
+    }
+    snake->length = 0;
+}
+```
+
+The `snake_push` function will use the `realloc` function to allocate memory for each snake body part and assign the passed point struct value to it. When `realloc` is passed a `NULL` pointer it behaves the same as `malloc` so we can forego a `NULL` pointer check and just use `realloc`. The result of `realloc` is stored in a temporary `body` variable, when it succeeds the `snake->body` pointer is updated and the point value set.
+
+```c
+void snake_push(struct snake *snake, struct point p)
+{
+    struct point* body = realloc(snake->body, sizeof body * (snake->length+1));
+    if(body)
+    {
+        snake->body = body;
+        snake->body[snake->length++] = p;
+    }
+}
+```
 
 </Page>
 

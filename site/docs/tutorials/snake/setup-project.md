@@ -47,10 +47,6 @@ w4 watch
 
 <Page value="c">
 
-:::note Work in Progress
-The tutorial for C/C++ is currently a Work-in-Progress. Most of the language specific instructions are currently missing.
-:::
-
 To compile C/C++ projects you will need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
 
 ```shell

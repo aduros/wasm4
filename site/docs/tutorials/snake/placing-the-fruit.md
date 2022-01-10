@@ -20,8 +20,14 @@ let frameCount = 0
 
 <Page value="c">
 
-// TODO
+To place (and eat) a fruit, you first need to make a variable for this. Since it's simply a point on the grid, a `struct point` will do:
 
+```c {4}
+struct snake snake;
+int frame_count = 0;
+uint8_t prev_state = 0;
+struct point fruit;
+```
 </Page>
 
 <Page value="d">
@@ -156,8 +162,27 @@ let frameCount = 0
 
 <Page value="c">
 
-// TODO
+C provides us with pretty much everything we could need to create random numbers. Since we have already included `stdlib.h` we can use the `rand` function to generate random numbers. `rand()` returns and `int` between `0` and 
+`RAND_MAX` which is guaranteed to be at least a 16-bit value. To limit the value returned by `rand()` to the screen grid coordinates we can divide it by `20` and use the remainder as our value using the modulus operator:
 
+```c
+fruit.x = rand()%20;
+fruit.y = rand()%20;
+```
+
+As we can not use the system time to seed our random function, we need to explore some other ways of randomizing our fruit placement: as it stands every time we run the game the fruit will always appear at the same locations and the same sequence. In order to seed the random number generator we need a value that will be different every time the game starts, unfortunately we do not have access to any but once the game starts we can use a combination of the `frame_count` and user input to seed the randomness as the user will not always press the button at the exact same time.
+
+To set the seed when the user inputs something, add the following line of code at the start of the `input` function in `main.c`:
+
+```c {3}
+void input()
+{
+    srand(frame_count);
+    
+    ...
+```
+
+The initial fruit placement will be the same every run, but subsequent placements will be based off of this seed which should hopefully be unique each time.
 </Page>
 
 <Page value="d">
@@ -473,7 +498,34 @@ With that out of the way, it's time to actually render the newly imported sprite
 
 <Page value="c">
 
-// TODO
+Now you need to import the image. For this, the WASM-4 CLI tool `w4` comes with another tool: `png2src`. You can use it like this:
+
+`w4 png2src --c fruit.png`
+
+This will output some code ending in the following to the terminal:
+
+```c
+cconst uint8_t fruit_sprite[] = {
+    0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0
+};
+```
+We need to add that array to the top of our `main.c` file:
+
+```c {9-11}
+#include "wasm4.h"
+#include "snake.h"
+#include <stdlib.h>
+
+struct snake snake;
+int frame_count = 0;
+uint8_t prev_state = 0;
+struct point fruit;
+const uint8_t fruit_sprite[] = {
+    0x00,0xa0,0x02,0x00,0x0e,0xf0,0x36,0x5c,0xd6,0x57,0xd5,0x57,0x35,0x5c,0x0f,0xf0
+};
+```
+
+With that out of the way, it's time to actually render the newly imported sprite.
 
 </Page>
 
@@ -721,7 +773,44 @@ This way, w4 uses the color palette in its default configuration. Except for one
 
 <Page value="c">
 
-// TODO
+Rendering the sprite is rather simple. Just call the `blit` function of w4:
+
+```c
+// blit draws a sprite at position x, y and uses DRAW_COLORS accordingly
+void blit (const uint8_t* data, int32_t x, int32_t y, uint32_t width, uint32_t height, uint32_t flags);
+```
+
+In practice it looks like this:
+
+```c {14}
+void update () 
+{
+    frame_count++;
+
+    input();
+
+    if (frame_count % 15 == 0)
+    {
+        snake_update(&snake);
+    }
+
+    snake_draw(&snake);
+
+    blit(fruit_sprite,fruit.x*8,fruit.y*8,8,8,BLIT_2BPP);
+}
+
+```
+
+But since you set the drawing colors, you need to change the drawing colors too:
+
+```c {3}
+    snake_draw(&snake);
+
+    *DRAW_COLORS = 0x4320;
+    blit(fruit_sprite,fruit.x*8,fruit.y*8,8,8,BLIT_2BPP);
+```
+
+This way, w4 uses the color palette in its default configuration. Except for one thing: The background will be transparent.
 
 </Page>
 

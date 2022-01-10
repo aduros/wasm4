@@ -5,7 +5,7 @@ const mustache = require("mustache");
 
 const TEMPLATES = {
     assemblyscript:
-`{{#sprites}}
+        `{{#sprites}}
 // {{name}}
 const {{name}}Width = {{width}};
 const {{name}}Height = {{height}};
@@ -15,7 +15,7 @@ const {{name}} = memory.data<u8>([ {{bytes}} ]);
 {{/sprites}}`,
 
     c:
-`{{#sprites}}
+        `{{#sprites}}
 // {{name}}
 #define {{name}}Width {{width}}
 #define {{name}}Height {{height}}
@@ -25,7 +25,7 @@ const uint8_t {{name}}[{{length}}] = { {{bytes}} };
 {{/sprites}}`,
 
     d:
-`{{#sprites}}
+        `{{#sprites}}
 // {{name}}
 enum {{name}}Width = {{width}};
 enum {{name}}Height = {{height}};
@@ -35,7 +35,7 @@ immutable ubyte[] {{name}} = [ {{bytes}} ];
 {{/sprites}}`,
 
     go:
-`{{#sprites}}
+        `{{#sprites}}
 // {{name}}
 const {{name}}Width = {{width}}
 const {{name}}Height = {{height}}
@@ -45,7 +45,7 @@ var {{name}} = [{{length}}]byte { {{bytes}} }
 {{/sprites}}`,
 
     nelua:
-`{{#sprites}}
+        `{{#sprites}}
 -- {{name}}
 local {{name}}_width <comptime> = {{width}}
 local {{name}}_height <comptime> = {{height}}
@@ -55,7 +55,7 @@ local {{name}}: [{{length}}]uint8 <const> = { {{bytes}} }
 {{/sprites}}`,
 
     nim:
-`{{#sprites}}
+        `{{#sprites}}
 # {{name}}
 const {{name}}Width = {{width}}
 const {{name}}Height = {{height}}
@@ -64,8 +64,8 @@ var {{name}}: array[uint8, {{length}}] = [{{firstByte}}'u8,{{restBytes}}]
 
 {{/sprites}}`,
 
-    odin: 
-`{{#sprites}}
+    odin:
+        `{{#sprites}}
 // {{name}}
 {{odinName}}_width : u32 : {{width}}
 {{odinName}}_height : u32 : {{height}}
@@ -74,8 +74,8 @@ var {{name}}: array[uint8, {{length}}] = [{{firstByte}}'u8,{{restBytes}}]
 
 {{/sprites}}`,
 
-    rust: 
-`{{#sprites}}
+    rust:
+        `{{#sprites}}
 // {{name}}
 const {{rustName}}_WIDTH: u32 = {{width}};
 const {{rustName}}_HEIGHT: u32 = {{height}};
@@ -85,7 +85,7 @@ const {{rustName}}: [u8; {{length}}] = [ {{bytes}} ];
 {{/sprites}}`,
 
     wat:
-`{{#sprites}}
+        `{{#sprites}}
 ;; {{name}}
 ;; {{name}}_width: u32 = {{width}};
 ;; {{name}}_height: u32 = {{height}};
@@ -98,7 +98,7 @@ const {{rustName}}: [u8; {{length}}] = [ {{bytes}} ];
 {{/sprites}}`,
 
     zig:
-`{{#sprites}}
+        `{{#sprites}}
 // {{name}}
 const {{name}}_width = {{width}};
 const {{name}}_height = {{height}};
@@ -114,38 +114,59 @@ const ALIASES = {
     cpp: "c",
 };
 
-function run (sourceFile) {
+function run(sourceFile) {
     const png = pngjs.PNG.sync.read(fs.readFileSync(sourceFile), {
         colorType: 1,
         inputColorType: 1,
     });
 
-    if (!png.palette) {
-        throw new Error("Does not have indexed color palette");
-    }
-
-    // Map rgba to palette index
-    const palette = new Map();
-    for (let ii = 0; ii < png.palette.length; ++ii) {
-        const rgba = png.palette[ii];
-        const packed = (rgba[0] << 24) | (rgba[1] << 16) | (rgba[2] << 8) | rgba[3];
-        palette.set(packed, ii);
+    const palette = {};
+    let colorCount = 0;
+    for (let y = 0; y < png.height; ++y) {
+        for (let x = 0; x < png.width; ++x) {
+            const idx = 4 * (png.width * y + x);
+            const r = png.data[idx];
+            const g = png.data[idx + 1];
+            const b = png.data[idx + 2];
+            const a = png.data[idx + 3];
+            const packed = (r << 24) | (g << 16) | (b << 8) | a;
+            let s = palette[packed]
+            if (!s) {
+                if (colorCount >= 4) {
+                    let RGBs = [];
+                    for (let key in palette) {
+                        RGBs.push(`- (R: ${palette[key].r}, G: ${palette[key].g}, B: ${palette[key].b}, A: ${palette[key].a}); first seen at (${palette[key].x}, ${palette[key].y})`)
+                    }
+                    throw new Error(`
+Too many colors: maximum is 4. The previous colors were:
+${RGBs.join("\n")}
+The first occurrence of another color is at (${x}, ${y}) and has the value of (R: ${r}, G: ${g}, B: ${b}, A: ${a})`);
+                }
+                palette[packed] = {
+                    r: r,
+                    g: g,
+                    b: b,
+                    a: a,
+                    i: colorCount++,
+                    x: x,
+                    y: y,
+                };
+            }
+        }
     }
 
     let flags, flagsHumanReadable, odinFlags;
     let bpp;
-    if (palette.size <= 2) {
+    if (colorCount <= 2) {
         bpp = 1;
         flags = 0;
         flagsHumanReadable = "BLIT_1BPP";
         odinFlags = "nil"
-    } else if (palette.size <= 4) {
+    } else if (colorCount <= 4) {
         bpp = 2;
         flags = 1;
         flagsHumanReadable = "BLIT_2BPP";
         odinFlags = "{ .USE_2BPP }"
-    } else {
-        throw new Error("Palette is larger than 4 colors");
     }
 
     const factor = 8 / bpp;
@@ -153,37 +174,37 @@ function run (sourceFile) {
         throw new Error(`${bpp}BPP sprites must have a width divisible by ${factor}`);
     }
 
-    const bytes = new Uint8Array(png.width*png.height*bpp/8);
+    const bytes = new Uint8Array(png.width * png.height * bpp / 8);
 
     // Read a color (palette index) from the source png
-    function readColor (x, y) {
-        const idx = 4*(png.width*y + x);
+    function readColor(x, y) {
+        const idx = 4 * (png.width * y + x);
         const r = png.data[idx];
-        const g = png.data[idx+1];
-        const b = png.data[idx+2];
-        const a = png.data[idx+3];
+        const g = png.data[idx + 1];
+        const b = png.data[idx + 2];
+        const a = png.data[idx + 3];
         const packed = (r << 24) | (g << 16) | (b << 8) | a;
-        return palette.get(packed);
+        return palette[packed].i;
     }
 
     // Write a color (palette index) to the output buffer
-    function writeColor (color, x, y) {
+    function writeColor(color, x, y) {
         let idx, shift, mask;
         switch (bpp) {
-        case 1:
-            idx = (y*png.width + x) >> 3;
-            shift = 7 - (x & 0x07);
-            mask = 0x1 << shift;
-            break;
+            case 1:
+                idx = (y * png.width + x) >> 3;
+                shift = 7 - (x & 0x07);
+                mask = 0x1 << shift;
+                break;
 
-        case 2:
-            idx = (y*png.width + x) >> 2;
-            shift = 6 - ((x & 0x3) << 1);
-            mask = 0x3 << shift;
-            break;
+            case 2:
+                idx = (y * png.width + x) >> 2;
+                shift = 6 - ((x & 0x3) << 1);
+                mask = 0x3 << shift;
+                break;
 
-        default:
-            throw new Error("assert");
+            default:
+                throw new Error("assert");
         }
 
         bytes[idx] = (color << shift) | (bytes[idx] & (~mask));
@@ -201,19 +222,19 @@ function run (sourceFile) {
         .replace(/[^0-9A-Za-z]+/g, "_")
         .replace(/^([0-9])/, "_$1");
 
-    const rustVarName = (varName.substr(0,1) + varName.substr(1)
+    const rustVarName = (varName.substr(0, 1) + varName.substr(1)
         .replace(/[A-Z]/g, l => '_' + l))
         .toLocaleUpperCase()
 
     const dataBytes = [...bytes]
-            .map((b) => "0x" + b.toString(16).padStart(2, "0"))
-    
+        .map((b) => "0x" + b.toString(16).padStart(2, "0"))
+
     const data = dataBytes.join(',')
 
     const wasmBytes = [...bytes]
-            .map((b) => "\\" + b.toString(16).padStart(2, "0"))
+        .map((b) => "\\" + b.toString(16).padStart(2, "0"))
 
-    const odinVarName = (varName.substr(0,1) + varName.substr(1)
+    const odinVarName = (varName.substr(0, 1) + varName.substr(1)
         .replace(/[A-Z]/g, l => '_' + l))
         .toLocaleLowerCase()
 
@@ -236,9 +257,9 @@ function run (sourceFile) {
 
 exports.run = run;
 
-function runAll (files, opts) {
+function runAll(files, opts) {
     if (opts.template) {
-        template = fs.readFileSync(opts.template, {encoding: 'utf8'});
+        template = fs.readFileSync(opts.template, { encoding: 'utf8' });
 
     } else {
         // TODO(2021-12-20): Refactor into a common file and remove duplication with new.js
@@ -269,7 +290,7 @@ function runAll (files, opts) {
         }
         template = TEMPLATES[lang];
     }
-    
+
     let output = { "sprites": [] };
     for (let ii = 0; ii < files.length; ++ii) {
         const file = files[ii];
@@ -281,7 +302,7 @@ function runAll (files, opts) {
 
             output.sprites.push(run(file));
         } catch (error) {
-            console.error("Error processing "+file+": "+error.message);
+            console.error("Error processing " + file + ": " + error.message);
             break;
         }
     }

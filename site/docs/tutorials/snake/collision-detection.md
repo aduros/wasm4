@@ -55,7 +55,28 @@ Now you're almost done. Only "Game Over" is left to finish this game.
 
 <Page value="c">
 
-// TODO
+ In our `update` function in `main.c` after calling `snake_update`, an if statement comparing the location of the snake's head with the location of the fruit
+
+```c
+if(snake.body[0].x == fruit.x && snake.body[0].y == fruit.y)
+{
+  //snake's head hits the fruit
+}
+```
+
+is enough already to check if the snake eats the fruit. To add to the snake we will create a copy of the snake's last body part, and add it to the snake using `snake_push`, and then relocate the fruit:
+
+```c
+if(snake.body[0].x == fruit.x && snake.body[0].y == fruit.y)
+{
+  struct point p = snake.body[snake.length-1];
+  snake_push(&snake,p);
+  fruit.x = rand()%20;
+  fruit.y = rand()%20;
+}
+```
+
+Now you're almost done. Only "Game Over" is left to finish this game.
 
 </Page>
 
@@ -424,7 +445,73 @@ What you do, is up to you. You could stop the game and show the score. Or you co
 
 <Page value="c">
 
-// TODO
+```c
+int snake_isdead(struct snake *snake)
+{
+    for(size_t i = 1; i < snake->length; i++)
+    {
+        if(snake->body[i].x == snake->body[0].x && snake->body[i].y == snake->body[0].y)
+        {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+```
+
+Add the above function to the `snake.c` file and add a corresponding declaration to `snake.h`.
+
+Now you can call this function from `update` in `main.c`to check if the snake died in this frame:
+
+```c {5-8}
+    if (frame_count % 15 == 0)
+    {
+        snake_update(&snake);
+
+        if(snake_isdead(&snake))
+        {
+          //snake is dead
+        }
+
+        if(snake.body[0].x == fruit.x && snake.body[0].y == fruit.y)
+        {
+            struct point p = snake.body[snake.length-1];
+            snake_push(&snake,p);
+            fruit.x = rand()%20;
+            fruit.y = rand()%20;
+        }
+    }
+
+```
+
+What you do, is up to you. You could stop the game and show the score. Or you could simply reset the game like so:
+
+```c
+    if (frame_count % 15 == 0)
+    {
+        snake_update(&snake);
+
+        if(snake_isdead(&snake))
+        {
+            snake_create(&snake);
+           
+            snake_push(&snake,(struct point){2,0}); 
+            snake_push(&snake,(struct point){1,0});
+            snake_push(&snake,(struct point){0,0});
+
+            snake.direction = (struct point){1,0};
+        }
+
+        if(snake.body[0].x == fruit.x && snake.body[0].y == fruit.y)
+        {
+            struct point p = snake.body[snake.length-1];
+            snake_push(&snake,p);
+            fruit.x = rand()%20;
+            fruit.y = rand()%20;
+        }
+    }
+```
 
 </Page>
 

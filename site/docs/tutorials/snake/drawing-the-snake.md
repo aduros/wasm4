@@ -62,7 +62,66 @@ You should see some green blocks at the top.
 
 <Page value="c">
 
-// TODO
+To draw the snake, we will use a for loop to iterate over the body.
+To make it a little easier, it's a good idea to use the `rect` function of WASM-4:
+
+```c
+// rect draws a rectangle. It uses color 1 to fill and color 2 for the outline
+void rect (int32_t x, int32_t y, uint32_t width, uint32_t height);
+```
+
+With that out the way, let's see what a first draft could look like. Add the following code to `snake.c` and a corresponding declaration to `snake.h`.
+
+```c
+void snake_draw(struct snake *snake)
+{
+    *DRAW_COLORS = 0x0043;
+    for(size_t i = 0; i < snake->length; ++i)
+    {
+        rect(snake->body[i].x*8, snake->body[i].y*8,8,8);  
+    }
+}
+```
+
+Simply loop through the body and draw it at `x*8` and `y*8`. 8 is the width and the height of a single part. On a 160x160 screen, it's big enough to fit snake that is 20*20=400 parts long.
+
+That's all fine, but since there is no instance of the snake, nothing can be drawn. To fix this, simply create a new variable in main and call its draw function:
+
+```c {5,14-19,24}
+#include "wasm4.h"
+#include "snake.h"
+#include <stdlib.h>
+
+struct snake snake;
+
+void start() 
+{
+    PALETTE[0] = 0xfbf7f3;
+    PALETTE[1] = 0xe5b083;
+    PALETTE[2] = 0x426e5d;
+    PALETTE[3] = 0x20283d;
+
+    snake_create(&snake);
+    snake_push(&snake,(struct point){2,0});
+    snake_push(&snake,(struct point){1,0});
+    snake_push(&snake,(struct point){0,0});
+   
+    snake.direction = (struct point){1,0};
+}
+
+void update () 
+{
+  snake_draw(&snake);
+}
+```
+
+Creating a global instance of a snake with some default values.
+
+After that, simply call the `snake_draw` function.
+
+You should see some green blocks at the top.
+
+![Snake Body](images/draw-body.webp)
 
 </Page>
 
@@ -522,7 +581,88 @@ This changes the color back and adds the darker green as its outline.
 
 <Page value="c">
 
-// TODO
+But where is the head? You can pick a side. Either position `[0]` or position `[snake->length-1]`.
+
+I think it's easier to pick `[0]`.
+
+Since the body is drawn, head is not much of a problem. Simply use the `rect` function again. But use a specific part instead:
+
+```c
+rect(snake->body[0].x*8,snake->body[0].y*8,8,8);
+```
+
+The draw function should now look like this:
+
+```c {8}
+void snake_draw(struct snake *snake)
+{
+    for(size_t i = 0; i < snake->length; ++i)
+    {
+        rect(snake->body[i].x*8, snake->body[i].y*8,8,8);  
+    }
+
+    rect(snake->body[0].x*8,snake->body[0].y*8,8,8);
+}
+```
+
+Notice the difference? Me neither.
+
+The head should stand out a little. For this, you can use a different color:
+
+```c
+*DRAW_COLORS = 0x0004;
+```
+
+You can set the colors with this variable. You can look at this variable like a table that is read from right to left.
+
+The value for each digit can be  0 up to 4:
+
+- 0 = Use transparency
+- 1 = Use the 1st color from the color palette
+- 2 = Use the 2nd color from the color palette
+- 3 = Use the 3rd color from the color palette
+- 4 = Use the 4th color from the color palette
+
+The snippet above reads like this: "Color 1 uses Color 4 of the color palette, Color 2 to Color 4 don't use any color." The basic drawing functions use "Color 1" to fill the shape and "Color 2" for the border.
+
+If you change the source to:
+
+```c {8}
+void snake_draw(struct snake *snake)
+{
+    for(size_t i = 0; i < snake->length; ++i)
+    {
+        rect(snake->body[i].x*8, snake->body[i].y*8,8,8);  
+    }
+
+    *DRAW_COLORS = 0x0004;
+    rect(snake->body[0].x*8,snake->body[0].y*8,8,8);
+}
+```
+
+Result:
+
+![Changing Color](images/draw-body-2.webp)
+
+You'll see a change. The snake changed color. Not only the head, but the complete snake! Once you've set a color, it stays that way. So if you want to change only the head, you have to change Color 1 again. Right before you draw the body.
+
+```c {3}
+void snake_draw(struct snake *snake)
+{
+    *DRAW_COLORS = 0x0043;
+    for(size_t i = 0; i < snake->length; ++i)
+    {
+        rect(snake->body[i].x*8, snake->body[i].y*8,8,8);  
+    }
+
+    *DRAW_COLORS = 0x0004;
+    rect(snake->body[0].x*8,snake->body[0].y*8,8,8);
+}
+```
+
+This changes the color back and adds the darker green as its outline.
+
+![Snake with outline](images/draw-body-3.webp)
 
 </Page>
 

@@ -135,7 +135,7 @@ function run(sourceFile) {
                 if (colorCount >= 4) {
                     let RGBs = [];
                     for (let key in palette) {
-                        RGBs.push(`- (R: ${palette[key].r}, G: ${palette[key].g}, B: ${palette[key].b}, A: ${palette[key].a})`)
+                        RGBs.push(`- (R: ${palette[key].r}, G: ${palette[key].g}, B: ${palette[key].b}, A: ${palette[key].a}); first seen at (${palette[key].x}, ${palette[key].y})`)
                     }
                     throw new Error(`
 Too many colors: maximum is 4. The previous colors were:
@@ -147,7 +147,9 @@ The first occurrence of another color is at (${x}, ${y}) and has the value of (R
                     g: g,
                     b: b,
                     a: a,
-                    i: colorCount++
+                    i: colorCount++,
+                    x: x,
+                    y: y,
                 };
             }
         }

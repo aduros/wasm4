@@ -120,7 +120,8 @@ function run(sourceFile) {
         inputColorType: 1,
     });
 
-    const palette = [];
+    const palette = {};
+    let colorCount = 0;
     for (let y = 0; y < png.height; ++y) {
         for (let x = 0; x < png.width; ++x) {
             const idx = 4 * (png.width * y + x);
@@ -129,29 +130,41 @@ function run(sourceFile) {
             const b = png.data[idx + 2];
             const a = png.data[idx + 3];
             const packed = (r << 24) | (g << 16) | (b << 8) | a;
-            let s = palette.findIndex(v => v === packed);
-            if (s === -1) {
-                palette.push(packed);
+            let s = palette[packed]
+            if (!s) {
+                if (colorCount >= 4) {
+                    let RGBs = [];
+                    for (let key in palette) {
+                        RGBs.push(`- (R: ${palette[key].r}, G: ${palette[key].g}, B: ${palette[key].b}, A: ${palette[key].a})`)
+                    }
+                    throw new Error(`
+Too many colors: maximum is 4. The previous colors were:
+${RGBs.join("\n")}
+The first occurrence of another color is at (${x}, ${y}) and has the value of (R: ${r}, G: ${g}, B: ${b}, A: ${a})`);
+                }
+                palette[packed] = {
+                    r: r,
+                    g: g,
+                    b: b,
+                    a: a,
+                    i: colorCount++
+                };
             }
         }
     }
-    palette.sort();
-    console.log(palette);
 
     let flags, flagsHumanReadable, odinFlags;
     let bpp;
-    if (palette.length <= 2) {
+    if (colorCount <= 2) {
         bpp = 1;
         flags = 0;
         flagsHumanReadable = "BLIT_1BPP";
         odinFlags = "nil"
-    } else if (palette.length <= 4) {
+    } else if (colorCount <= 4) {
         bpp = 2;
         flags = 1;
         flagsHumanReadable = "BLIT_2BPP";
         odinFlags = "{ .USE_2BPP }"
-    } else {
-        throw new Error(`Palette has ${palette.length} colors. But you can only have 4 colors.`);
     }
 
     const factor = 8 / bpp;
@@ -169,7 +182,7 @@ function run(sourceFile) {
         const b = png.data[idx + 2];
         const a = png.data[idx + 3];
         const packed = (r << 24) | (g << 16) | (b << 8) | a;
-        return palette.findIndex(v => v == packed);
+        return palette[packed].i;
     }
 
     // Write a color (palette index) to the output buffer

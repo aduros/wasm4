@@ -60,7 +60,7 @@ local {{name}}: [{{length}}]uint8 <const> = { {{bytes}} }
 const {{name}}Width = {{width}}
 const {{name}}Height = {{height}}
 const {{name}}Flags = {{flagsHumanReadable}}
-var {{name}}: array[uint8, {{length}}] = [{{firstByte}}'u8,{{restBytes}}]
+var {{name}}: array[{{length}}, uint8] = [{{firstByte}}'u8,{{restBytes}}]
 
 {{/sprites}}`,
 

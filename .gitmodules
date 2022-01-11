@@ -1,12 +1,12 @@
 [submodule "runtimes/native/vendor/wasm3"]
 	path = runtimes/native/vendor/wasm3
-	url = git://github.com/wasm3/wasm3
+	url = https://github.com/wasm3/wasm3
 [submodule "runtimes/native/vendor/glfw"]
 	path = runtimes/native/vendor/glfw
-	url = git://github.com/glfw/glfw
+	url = https://github.com/glfw/glfw
 [submodule "runtimes/native/vendor/minifb"]
 	path = runtimes/native/vendor/minifb
-	url = git://github.com/emoon/minifb
+	url = https://github.com/emoon/minifb
 [submodule "runtimes/native/vendor/cubeb"]
 	path = runtimes/native/vendor/cubeb
-	url = git://github.com/mozilla/cubeb
+	url = https://github.com/mozilla/cubeb

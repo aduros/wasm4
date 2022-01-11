@@ -52,7 +52,7 @@ export class APU {
             const bit1 = seed & 1;
             const feedback = (bit0 ^ bit1);
             seed |= feedback << 14;
-            noiseData[ii] = feedback;
+            noiseData[ii] = 2*feedback - 1;
         }
         this.noiseBuffer = noiseBuffer;
     }

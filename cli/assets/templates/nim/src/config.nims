@@ -33,7 +33,7 @@ switch("clang.linkerexe", wasi / "bin" / "clang")
 
 switch("passC", "--sysroot=" & (wasi / "share" / "wasi-sysroot"))
 
-switch("passL", "-Wl,-zstack-size=8192,--no-entry,--import-memory -mexec-model=reactor -Wl,--initial-memory=65536,--max-memory=65536,--global-base=6560")
+switch("passL", "-Wl,-zstack-size=14752,--no-entry,--import-memory -mexec-model=reactor -Wl,--initial-memory=65536,--max-memory=65536,--stack-first")
 
 when not defined(release):
   switch("assertions", "off")

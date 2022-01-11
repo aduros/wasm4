@@ -16,8 +16,8 @@
     "--import-memory",
     "--initial-memory=65536",
     "--max-memory=65536",
-    "--global-base=6560",
-    "-zstack-size=8192",
+    "--stack-first",
+    "-zstack-size=14752",
     "--strip-all"
   ],
   "emulator": [ "w4", "run" ],

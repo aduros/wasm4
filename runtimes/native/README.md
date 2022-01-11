@@ -26,3 +26,10 @@ Running:
 ```
 
 For release builds, pass `-DCMAKE_BUILD_TYPE=Release` to cmake.
+
+If you want to build only one target:
+
+``` shell
+cmake --build build --target wasm4_libretro
+cmake --build build --target wasm4
+```

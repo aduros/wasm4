@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.7)
 project(WASM4)
 
 # Prevent BUILD_SHARED_LIBS and other options from being cleared by vendor CMakeLists
@@ -6,6 +6,8 @@ project(WASM4)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 # Enable LTO in release builds
+if (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.11)
+cmake_minimum_required(VERSION 3.12)
 set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     include(CheckIPOSupported)
@@ -15,6 +17,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     else()
         message(WARNING "IPO is not supported: ${output}")
     endif ()
+endif ()
 endif ()
 
 # General options
@@ -30,12 +33,16 @@ set(USE_OPENGL_API OFF)
 # Cubeb options
 set(USE_SANITIZERS OFF)
 
+if (NOT LIBRETRO)
 # add_subdirectory(vendor/glfw)
 add_subdirectory(vendor/minifb)
 add_subdirectory(vendor/cubeb)
+endif ()
 
 file(GLOB COMMON_SOURCES RELATIVE "${CMAKE_SOURCE_DIR}" "src/*.c")
 file(GLOB M3_SOURCES RELATIVE "${CMAKE_SOURCE_DIR}" "vendor/wasm3/source/*.c")
+
+if (NOT LIBRETRO)
 
 #
 # Desktop (minifb + cubeb) backend
@@ -47,10 +54,12 @@ set(MINIFB_SOURCES
     src/backend/window_minifb.c
 )
 add_executable(wasm4 ${COMMON_SOURCES} ${MINIFB_SOURCES} ${M3_SOURCES})
+
 target_include_directories(wasm4 PRIVATE "${CMAKE_SOURCE_DIR}/vendor/wasm3/source")
 target_link_libraries(wasm4 minifb cubeb)
 set_target_properties(wasm4 PROPERTIES C_STANDARD 99)
 install(TARGETS wasm4)
+endif ()
 
 # #
 # # Desktop (glfw + cubeb) backend
@@ -81,7 +90,10 @@ add_library(wasm4_libretro SHARED ${COMMON_SOURCES} ${LIBRETRO_SOURCES} ${M3_SOU
 target_include_directories(wasm4_libretro PRIVATE "${CMAKE_SOURCE_DIR}/vendor/wasm3/source")
 target_include_directories(wasm4_libretro PRIVATE "${CMAKE_SOURCE_DIR}/vendor/libretro/include")
 set_target_properties(wasm4_libretro PROPERTIES C_STANDARD 99)
-install(TARGETS wasm4_libretro)
+install(TARGETS wasm4_libretro
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  COMPONENT library)
 
 # Hide all symbols by default
 set_target_properties(wasm4_libretro PROPERTIES
@@ -92,4 +104,8 @@ set_target_properties(wasm4_libretro PROPERTIES
 set_target_properties(wasm4_libretro PROPERTIES PREFIX "")
 if (ANDROID)
     set_target_properties(wasm4_libretro PROPERTIES SUFFIX "_android.so")
+elseif(EMSCRIPTEN)
+    set_target_properties(wasm4_libretro PROPERTIES SUFFIX "${LIBRETRO_SUFFIX}.bc")
+elseif(LIBRETRO_STATIC)
+    set_target_properties(wasm4_libretro PROPERTIES SUFFIX "${LIBRETRO_SUFFIX}.a")
 endif ()

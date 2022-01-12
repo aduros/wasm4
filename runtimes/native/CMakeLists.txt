@@ -88,5 +88,8 @@ set_target_properties(wasm4_libretro PROPERTIES
     C_VISIBILITY_PRESET hidden
     VISIBILITY_INLINES_HIDDEN 1)
 
-# Don't prefix with lib*
+# Follow naming conventions for libretro cores
 set_target_properties(wasm4_libretro PROPERTIES PREFIX "")
+if (ANDROID)
+    set_target_properties(wasm4_libretro PROPERTIES SUFFIX "_android.so")
+endif ()

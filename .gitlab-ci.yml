@@ -26,6 +26,9 @@
 .core-defs-android:
   extends: .core-defs
 
+.core-defs-emscripten:
+  extends: .core-defs
+
 # Inclusion templates, required for the build to work
 include:
   ################################## DESKTOPS ################################
@@ -46,10 +49,16 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/android-cmake.yml'
 
+  ################################## MISC ####################################
+  # Emscripten
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/emscripten-static-cmake.yml' 
+
 # Stages for building
 stages:
   - build-prepare
   - build-shared
+  - build-static
 
 ##############################################################################
 #################################### STAGES ##################################
@@ -110,3 +119,11 @@ android-x86:
   extends:
     - .libretro-android-cmake-x86
     - .core-defs-android
+
+################################### MISC #####################################
+
+# Emscripten
+libretro-build-emscripten:
+  extends:
+    - .libretro-emscripten-static-cmake-retroarch-master
+    - .core-defs-emscripten

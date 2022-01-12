@@ -1,23 +1,25 @@
 const std = @import("std");
-const expect = std.testing.expect;
-const expectEqualStrings = std.testing.expectEqualStrings;
 
 fn version_supports_stack_first(zig_version: std.SemanticVersion) !bool {
-    if (zig_version.major > 0) return true;
-    if (zig_version.minor > 10) return true;
+    if (zig_version.minor == 9 and zig_version.order(try std.SemanticVersion.parse("0.9.0")).compare(.gt))
+        return true;
+    return zig_version.order(try std.SemanticVersion.parse("0.10.0-dev.258")).compare(.gte);
+}
 
-    if (zig_version.minor == 10) {
-        if (zig_version.pre) |pre| {
-            try expect(pre.len >= 5);
-            try expectEqualStrings(pre[0..4], "dev.");
-            const number = try std.fmt.parseUnsigned(u32, pre[4..], 10);
-            if (number >= 258) return true;
-        } else return true;
-    }
+test "stack version check" {
+    const expect = std.testing.expect;
+    const parse = std.SemanticVersion.parse;
+    try expect(!try version_supports_stack_first(try parse("0.8.0")));
 
-    if (zig_version.minor == 9 and zig_version.pre == null and zig_version.patch >= 1) return true;
+    try expect(!try version_supports_stack_first(try parse("0.9.0")));
+    try expect(try version_supports_stack_first(try parse("0.9.1")));
 
-    return false;
+    try expect(!try version_supports_stack_first(try parse("0.10.0-dev.257")));
+    try expect(try version_supports_stack_first(try parse("0.10.0-dev.258")));
+    try expect(try version_supports_stack_first(try parse("0.10.0-dev.259")));
+    try expect(try version_supports_stack_first(try parse("0.10.0")));
+
+    try expect(try version_supports_stack_first(try parse("1.0.0")));
 }
 
 pub fn build(b: *std.build.Builder) !void {

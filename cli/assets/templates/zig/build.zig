@@ -37,6 +37,10 @@ test "stack version check" {
     try expect(try version_supports_stack_first(try parse("0.10.0-dev.259")));
     try expect(try version_supports_stack_first(try parse("0.10.0")));
 
+    try expect(try version_supports_stack_first(try parse("0.10.1-dev.100")));
+    try expect(try version_supports_stack_first(try parse("0.10.1-dev.300")));
+    try expect(try version_supports_stack_first(try parse("0.10.1")));
+
     try expect(try version_supports_stack_first(try parse("1.0.0")));
 }
 

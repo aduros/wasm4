@@ -8,6 +8,10 @@
 #include "../wasm.h"
 #include "../window.h"
 
+#if defined(_WIN32)
+#include <windows.h>
+#endif
+
 typedef struct {
     // Should be the 4 byte ASCII string "CART" (1414676803)
     uint32_t magic;
@@ -31,6 +35,12 @@ static void audioStateCallback (cubeb_stream* stream, void* userData, cubeb_stat
 
 static void audioInit () {
     cubeb* ctx;
+
+#if defined(_WIN32)
+    // This initialziation is required for cubeb on windows
+    // It's safe to ignore the return value of this, as there's no real failure mode
+    CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
+#endif
     if (cubeb_init(&ctx, "WASM-4", NULL)) {
         fprintf(stderr, "Could not init audio\n");
         return;
@@ -60,6 +70,12 @@ static void audioInit () {
         fprintf(stderr, "Could not start the stream\n");
         return;
     }
+}
+
+static void audioUninit () {
+#if defined(_WIN32)
+    CoUninitialize();
+#endif
 }
 
 int main (int argc, const char* argv[]) {
@@ -111,4 +127,6 @@ int main (int argc, const char* argv[]) {
     w4_wasmLoadModule(cartBytes, cartLength);
 
     w4_windowBoot(title);
+
+    audioUninit();
 }

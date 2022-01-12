@@ -3,9 +3,20 @@ const std = @import("std");
 // Returns true if the version includes https://github.com/ziglang/zig/pull/10572/commits.
 // When this is false, trying to place the stack first will result in data corruption.
 fn version_supports_stack_first(zig_version: std.SemanticVersion) !bool {
-    // TODO, also allow corresponding 0.9.x+ if and when the fix has been backported.
-    // As of today it hasn't been backported yet: https://github.com/ziglang/zig/commits/0.9.x
-    return zig_version.order(try std.SemanticVersion.parse("0.10.0-dev.258")).compare(.gte);
+    if (zig_version.order(try std.SemanticVersion.parse("0.10.0")).compare(.gte)) {
+        // Merged here: https://github.com/ziglang/zig/pull/10572
+        return true;
+    }
+    if (zig_version.major == 0 and zig_version.minor == 10) {
+        // Check for 0.10.0-dev.258+. Conservatively check the prefix of the tag
+        // in case zig uses other prefixes that don't respect semver ordering.
+        if (zig_version.pre) |pre| {
+            // Merged here: https://github.com/ziglang/zig/pull/10572
+            return std.mem.startsWith(u8, pre, "dev.") and zig_version.order(try std.SemanticVersion.parse("0.10.0-dev.258")).compare(.gte);
+        }
+    }
+    // Backported here: https://github.com/ziglang/zig/commit/6f49233ac6a6569b909b689f22fc260dc8c19234
+    return zig_version.order(try std.SemanticVersion.parse("0.9.1")).compare(.gte);
 }
 
 test "stack version check" {
@@ -14,7 +25,12 @@ test "stack version check" {
     try expect(!try version_supports_stack_first(try parse("0.8.0")));
 
     try expect(!try version_supports_stack_first(try parse("0.9.0")));
-    try expect(!try version_supports_stack_first(try parse("0.9.1")));
+    try expect(!try version_supports_stack_first(try parse("0.9.1-dev.259")));
+    try expect(try version_supports_stack_first(try parse("0.9.1")));
+
+    // Conservatively don't recognize tags other than 'dev'.
+    try expect(!try version_supports_stack_first(try parse("0.10.0-aev.259")));
+    try expect(!try version_supports_stack_first(try parse("0.10.0-zev.259")));
 
     try expect(!try version_supports_stack_first(try parse("0.10.0-dev.257")));
     try expect(try version_supports_stack_first(try parse("0.10.0-dev.258")));

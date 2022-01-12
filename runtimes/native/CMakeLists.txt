@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.7)
 project(WASM4)
 
 # Prevent BUILD_SHARED_LIBS and other options from being cleared by vendor CMakeLists
@@ -6,6 +6,8 @@ project(WASM4)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
 # Enable LTO in release builds
+if (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER 3.11)
+cmake_minimum_required(VERSION 3.12)
 set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     include(CheckIPOSupported)
@@ -15,6 +17,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     else()
         message(WARNING "IPO is not supported: ${output}")
     endif ()
+endif ()
 endif ()
 
 # General options
@@ -81,7 +84,10 @@ add_library(wasm4_libretro SHARED ${COMMON_SOURCES} ${LIBRETRO_SOURCES} ${M3_SOU
 target_include_directories(wasm4_libretro PRIVATE "${CMAKE_SOURCE_DIR}/vendor/wasm3/source")
 target_include_directories(wasm4_libretro PRIVATE "${CMAKE_SOURCE_DIR}/vendor/libretro/include")
 set_target_properties(wasm4_libretro PROPERTIES C_STANDARD 99)
-install(TARGETS wasm4_libretro)
+install(TARGETS wasm4_libretro
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  COMPONENT library)
 
 # Hide all symbols by default
 set_target_properties(wasm4_libretro PROPERTIES

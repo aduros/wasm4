@@ -33,12 +33,16 @@ set(USE_OPENGL_API OFF)
 # Cubeb options
 set(USE_SANITIZERS OFF)
 
+if (NOT LIBRETRO)
 # add_subdirectory(vendor/glfw)
 add_subdirectory(vendor/minifb)
 add_subdirectory(vendor/cubeb)
+endif ()
 
 file(GLOB COMMON_SOURCES RELATIVE "${CMAKE_SOURCE_DIR}" "src/*.c")
 file(GLOB M3_SOURCES RELATIVE "${CMAKE_SOURCE_DIR}" "vendor/wasm3/source/*.c")
+
+if (NOT LIBRETRO)
 
 #
 # Desktop (minifb + cubeb) backend
@@ -50,10 +54,12 @@ set(MINIFB_SOURCES
     src/backend/window_minifb.c
 )
 add_executable(wasm4 ${COMMON_SOURCES} ${MINIFB_SOURCES} ${M3_SOURCES})
+
 target_include_directories(wasm4 PRIVATE "${CMAKE_SOURCE_DIR}/vendor/wasm3/source")
 target_link_libraries(wasm4 minifb cubeb)
 set_target_properties(wasm4 PROPERTIES C_STANDARD 99)
 install(TARGETS wasm4)
+endif ()
 
 # #
 # # Desktop (glfw + cubeb) backend

@@ -9,7 +9,7 @@
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
     CORENAME: wasm4
-    CORE_ARGS: -DCMAKE_BUILD_TYPE=Release
+    CORE_ARGS: -DCMAKE_BUILD_TYPE=Release -DLIBRETRO=ON
     CMAKE_SOURCE_ROOT: runtimes/native
 
 .core-defs-linux:

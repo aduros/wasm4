@@ -57,6 +57,7 @@ async function loadCartWasm () {
     document.getElementById("content").appendChild(canvas);
     let wasmBuffer = await loadCartWasm();
     await runtime.load(wasmBuffer);
+    let playerSwapIdx = 0;
 
     let devtoolsManager = { toggleDevtools(){} };
     if (DEVELOPER_BUILD) {
@@ -172,6 +173,10 @@ async function loadCartWasm () {
         }
     }
 
+    function swapPlayerControls() {
+      playerSwapIdx = (playerSwapIdx + 1) % 3;
+    }
+
     const onMouseEvent = event => {
         // Unhide the cursor if it was hidden by the keyboard handler
         document.body.style.cursor = "";
@@ -197,6 +202,7 @@ async function loadCartWasm () {
         "4": loadState,
         "r": reboot,
         "R": reboot,
+        "F7": swapPlayerControls,
         "F8": devtoolsManager.toggleDevtools,
         "F9": takeScreenshot,
         "F10": recordVideo,
@@ -252,28 +258,28 @@ async function loadCartWasm () {
             mask = constants.BUTTON_RIGHT;
             break;
 
-        case "ShiftLeft": case "Tab":
-            playerIdx = 1;
+        case "Numpad7": case "Numpad0":
+            playerIdx = 1 + playerSwapIdx;
             mask = constants.BUTTON_X;
             break;
-        case "KeyA": case "KeyQ":
-            playerIdx = 1;
+        case "Numpad9": case "Numpad1":
+            playerIdx = 1 + playerSwapIdx;
             mask = constants.BUTTON_Z;
             break;
-        case "KeyE":
-            playerIdx = 1;
+        case "Numpad8":
+            playerIdx = 1 + playerSwapIdx;
             mask = constants.BUTTON_UP;
             break;
-        case "KeyD":
-            playerIdx = 1;
+        case "Numpad5":
+            playerIdx = 1 + playerSwapIdx;
             mask = constants.BUTTON_DOWN;
             break;
-        case "KeyS":
-            playerIdx = 1;
+        case "Numpad4":
+            playerIdx = 1 + playerSwapIdx;
             mask = constants.BUTTON_LEFT;
             break;
-        case "KeyF":
-            playerIdx = 1;
+        case "Numpad6":
+            playerIdx = 1 + playerSwapIdx;
             mask = constants.BUTTON_RIGHT;
             break;
         }

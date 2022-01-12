@@ -57,7 +57,7 @@ pub fn build(b: *std.build.Builder) !void {
         lib.stack_size = 14752;
     } else {
         // `--stack-first` option have been reenabled on wasm targets with https://github.com/ziglang/zig/pull/10572
-        std.log.warn("Update to Zig >0.9.1 or >0.10.0-dev.258 to detect stack overflows at runtime.", .{});
+        std.log.warn("Update to Zig >=0.9.1 or >=0.10.0-dev.258 to detect stack overflows at runtime.", .{});
         lib.global_base = 6560;
         lib.stack_size = 8192;
     }

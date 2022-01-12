@@ -1,8 +1,10 @@
 const std = @import("std");
 
+// Returns true if the version includes https://github.com/ziglang/zig/pull/10572/commits.
+// When this is false, trying to place the stack first will result in data corruption.
 fn version_supports_stack_first(zig_version: std.SemanticVersion) !bool {
-    if (zig_version.minor == 9 and zig_version.order(try std.SemanticVersion.parse("0.9.0")).compare(.gt))
-        return true;
+    // TODO, also allow corresponding 0.9.x+ if and when the fix has been backported.
+    // As of today it hasn't been backported yet: https://github.com/ziglang/zig/commits/0.9.x
     return zig_version.order(try std.SemanticVersion.parse("0.10.0-dev.258")).compare(.gte);
 }
 
@@ -12,7 +14,7 @@ test "stack version check" {
     try expect(!try version_supports_stack_first(try parse("0.8.0")));
 
     try expect(!try version_supports_stack_first(try parse("0.9.0")));
-    try expect(try version_supports_stack_first(try parse("0.9.1")));
+    try expect(!try version_supports_stack_first(try parse("0.9.1")));
 
     try expect(!try version_supports_stack_first(try parse("0.10.0-dev.257")));
     try expect(try version_supports_stack_first(try parse("0.10.0-dev.258")));

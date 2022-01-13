@@ -35,7 +35,8 @@ export default function PlayCart ({ cart }) {
             <div className="container game-container">
                 <Embed {... cart}/>
 
-                <p>Controls: Arrow Keys, X, Z/Y/C</p>
+                <p>Player 1 controls: Arrows, X, Z/C</p>
+                <p>Player 2 controls: ESDF, Tab/Shift, Q/A</p>
 
                 <a className="button button--primary button--outline" href={`/carts/${cart.slug}.wasm`}>Download this game </a>
 

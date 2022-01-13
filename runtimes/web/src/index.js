@@ -487,7 +487,7 @@ async function loadCartWasm () {
         const deltaFrame = now - lastFrame;
 
         if (deltaFrame >= INTERVAL) {
-            lastFrame = now - (deltaFrame % INTERVAL);
+            lastFrame = now;
             runtime.update();
 
             gamepadOverlay.style.display = runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY)

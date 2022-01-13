@@ -317,38 +317,28 @@ void w4_framebufferTextUtf16 (const uint16_t* str, int byteLength, int x, int y)
 void w4_framebufferBlit (const uint8_t* sprite, int dstX, int dstY, int width, int height,
     int srcX, int srcY, int srcStride, bool bpp2, bool flipX, bool flipY, bool rotate) {
 
-    int clipXMin = w4_max(0, dstX) - dstX;
-    int clipYMin = w4_max(0, dstY) - dstY;
-    int clipXMax = w4_min(width, WIDTH - dstX);
-    int clipYMax = w4_min(height, HEIGHT - dstY);
     uint16_t colors = *drawColors;
 
     if (rotate) {
         flipX = !flipX;
     }
 
-    for (int row = clipYMin; row < clipYMax; ++row) {
-        for (int col = clipXMin; col < clipXMax; ++col) {
-            // Determine the local position on the sprite
-            int sx, sy;
-            if (rotate) {
-                sx = row;
-                sy = col;
-            } else {
-                sx = col;
-                sy = row;
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            // Calculate sprite target coords
+            const int tx = dstX + (rotate ? y : x);
+            const int ty = dstY + (rotate ? x : y);
+            if (tx < 0 || ty < 0 || tx >= WIDTH || ty >= HEIGHT) {
+                continue;
             }
-            if (flipX) {
-                sx = clipXMax - sx - 1;
-            }
-            if (flipY) {
-                sy = clipYMax - sy - 1;
-            }
+
+            // Calculate sprite source coords
+            const int sx = srcX + (flipX ? width - x - 1 : x);
+            const int sy = srcY + (flipY ? height - y - 1 : y);
 
             // Sample the sprite to get a color index
             int colorIdx;
-            int x = srcX + sx, y = srcY + sy;
-            int bitIndex = y * srcStride + x;
+            int bitIndex = sy * srcStride + sx;
             if (bpp2) {
                 uint8_t byte = sprite[bitIndex >> 2];
                 int shift = 6 - ((bitIndex & 0x03) << 1);
@@ -363,7 +353,7 @@ void w4_framebufferBlit (const uint8_t* sprite, int dstX, int dstY, int width, i
             // Get the final color using the drawColors indirection
             uint8_t dc = (colors >> (colorIdx << 2)) & 0x0f;
             if (dc != 0) {
-                drawPoint((dc - 1) & 0x03, dstX + col, dstY + row);
+                drawPoint((dc - 1) & 0x03, tx, ty);
             }
         }
     }

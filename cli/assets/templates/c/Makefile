@@ -34,10 +34,10 @@ OBJECTS += $(patsubst src/%.cpp, build/%.o, $(wildcard src/*.cpp))
 DEPS = $(OBJECTS:.o=.d)
 
 ifeq ($(OS), Windows_NT)
-	MKDIR = md
+	MKDIR_BUILD = if not exist build md build
 	RMDIR = rd /s /q
 else
-	MKDIR = mkdir -p
+	MKDIR_BUILD = mkdir -p build
 	RMDIR = rm -rf
 endif
 
@@ -56,12 +56,12 @@ endif
 
 # Compile C sources
 build/%.o: src/%.c
-	@$(MKDIR) build
+	@$(MKDIR_BUILD)
 	$(CC) -c $< -o $@ $(CFLAGS)
 
 # Compile C++ sources
 build/%.o: src/%.cpp
-	@$(MKDIR) build
+	@$(MKDIR_BUILD)
 	$(CXX) -c $< -o $@ $(CFLAGS)
 
 .PHONY: clean

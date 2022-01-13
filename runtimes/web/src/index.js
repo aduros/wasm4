@@ -99,8 +99,10 @@ async function loadCartWasm () {
 
     async function reboot () {
         runtime.reset(true);
+        runtime.pauseState |= constants.PAUSE_REBOOTING;
         await runtime.load(wasmBuffer);
         runtime.start();
+        runtime.pauseState &= ~constants.PAUSE_REBOOTING;
     }
 
     function takeScreenshot () {
@@ -170,6 +172,13 @@ async function loadCartWasm () {
         }
     }
 
+    // Temporary hack to allow developers to build 3-4 player games until we have a better solution
+    let swapKeyboardControls = false;
+    function toggleSwapKeyboardControls () {
+        swapKeyboardControls = !swapKeyboardControls;
+        runtime.print(`Keyboard swapped to control gamepads ${swapKeyboardControls ? "3 and 4" : "1 and 2"}`);
+    }
+
     const onMouseEvent = event => {
         // Unhide the cursor if it was hidden by the keyboard handler
         document.body.style.cursor = "";
@@ -195,6 +204,7 @@ async function loadCartWasm () {
         "4": loadState,
         "r": reboot,
         "R": reboot,
+        "F7": toggleSwapKeyboardControls,
         "F8": devtoolsManager.toggleDevtools,
         "F9": takeScreenshot,
         "F10": recordVideo,
@@ -277,7 +287,7 @@ async function loadCartWasm () {
         }
         if (mask != 0) {
             event.preventDefault();
-            runtime.maskGamepad(playerIdx, mask, down);
+            runtime.maskGamepad(playerIdx + (swapKeyboardControls ? 2 : 0), mask, down);
         }
     };
     window.addEventListener("keydown", onKeyboardEvent);
@@ -462,7 +472,7 @@ async function loadCartWasm () {
     window.addEventListener("pointermove", onPointerEvent);
     window.addEventListener("pointerup", onPointerEvent);
 
-    const gamepadOverlay = document.getElementById("gamepad"); 
+    const gamepadOverlay = document.getElementById("gamepad");
     // https://gist.github.com/addyosmani/5434533#file-limitloop-js-L60
 
     const INTERVAL = 1000 / 60;
@@ -478,15 +488,13 @@ async function loadCartWasm () {
 
         if (deltaFrame >= INTERVAL) {
             lastFrame = now - (deltaFrame % INTERVAL);
-            if (!runtime.crashed) {
-                runtime.update();
-            }
+            runtime.update();
 
             gamepadOverlay.style.display = runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY)
                 ? "none" : "";
 
             if (DEVELOPER_BUILD) {
-                devtoolsManager.updateCompleted(runtime.data, deltaFrame);  
+                devtoolsManager.updateCompleted(runtime.data, deltaFrame);
             }
         }
 

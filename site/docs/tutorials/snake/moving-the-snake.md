@@ -54,7 +54,31 @@ Now if you execute this, you'd notice that you can't see much. In fact, you migh
 
 <Page value="c">
 
-// TODO
+To achieve the first step (moving the body, excluding the head), a for loop is used:
+
+```c
+void snake_update(struct snake *snake)
+{
+    for(int i = (snake->length)-1; i > 0; i--)
+    { 
+        snake->body[i] = snake->body[i-1];
+    }
+}
+```
+
+Don't forget to call the new function in the main-loop:
+
+```c {3}
+void update () 
+{
+  snake_update(&snake);
+  snake_draw(&snake);
+}
+```
+
+Now if you execute this, you'd notice that you can't see much. In fact, you might see the snake for a short moment before the head is all that's left.
+
+![](images/snake_move_head_only.webp)
 
 </Page>
 
@@ -290,7 +314,29 @@ This isn't hard either. Simple add the add the direction to the current head. An
 
 <Page value="c">
 
-// TODO
+To move the head we need to add the direction to the current head. And then make sure the head stays within the boundaries:
+
+```c {8-18}
+void snake_update(struct snake *snake)
+{
+    for(int i = (snake->length)-1; i > 0; i--)
+    { 
+        snake->body[i] = snake->body[i-1];
+    }
+
+    snake->body[0].x = (snake->body[0].x + snake->direction.x) % 20;
+    snake->body[0].y = (snake->body[0].y + snake->direction.y) % 20;
+     
+    if(snake->body[0].x < 0)
+    {
+        snake->body[0].x = 19;
+    }
+    if(snake->body[0].y < 0)
+    {
+        snake->body[0].x = 19;
+    }
+}
+```
 
 </Page>
 
@@ -515,7 +561,45 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 
 <Page value="c">
 
-// TODO
+For this, a new variable `frame_count` is needed. Add this at the top of `main.c` and initialize it to `0`:
+
+```c {6}
+#include "wasm4.h"
+#include "snake.h"
+#include <stdlib.h>
+
+struct snake snake;
+int frame_count = 0;
+```
+
+This variable keeps track of all frames so far. Just increase its value in the update function:
+
+```c {3}
+void update () 
+{
+    frame_count++;
+    snake_update(&snake);
+    snake_draw(&snake);
+}
+```
+
+Now add a check to see if the current frame is divisible by 15, and only updates the movement four times per second instead of 60:
+
+```c {4-7}
+void update () 
+{
+    frame_count++;
+    if(frame_count % 15 == 0)
+    {
+      snake_update(&snake);
+    }
+    snake_draw(&snake);
+}
+```
+
+That's it. Your snake should be quite a bit slower now. This reduces the snake from 60 units per second to 4 units per second (60/15 = 4).
+
+![Moving Snake (slow)](images/snake-motion-slow.webp)
 
 </Page>
 

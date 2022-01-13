@@ -21,8 +21,8 @@ else
 endif
 
 # Linker flags
-LDFLAGS = -Wl,-zstack-size=8192,--no-entry,--import-memory -mexec-model=reactor \
-	-Wl,--initial-memory=65536,--max-memory=65536,--global-base=6560
+LDFLAGS = -Wl,-zstack-size=14752,--no-entry,--import-memory -mexec-model=reactor \
+	-Wl,--initial-memory=65536,--max-memory=65536,--stack-first
 ifeq ($(DEBUG), 1)
 	LDFLAGS += -Wl,--export-all,--no-gc-sections
 else
@@ -34,10 +34,10 @@ OBJECTS += $(patsubst src/%.cpp, build/%.o, $(wildcard src/*.cpp))
 DEPS = $(OBJECTS:.o=.d)
 
 ifeq ($(OS), Windows_NT)
-	MKDIR = md
+	MKDIR_BUILD = if not exist build md build
 	RMDIR = rd /s /q
 else
-	MKDIR = mkdir -p
+	MKDIR_BUILD = mkdir -p build
 	RMDIR = rm -rf
 endif
 
@@ -56,12 +56,12 @@ endif
 
 # Compile C sources
 build/%.o: src/%.c
-	@$(MKDIR) build
+	@$(MKDIR_BUILD)
 	$(CC) -c $< -o $@ $(CFLAGS)
 
 # Compile C++ sources
 build/%.o: src/%.cpp
-	@$(MKDIR) build
+	@$(MKDIR_BUILD)
 	$(CXX) -c $< -o $@ $(CFLAGS)
 
 .PHONY: clean

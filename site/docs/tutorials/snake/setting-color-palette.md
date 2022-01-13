@@ -46,7 +46,12 @@ export function update(): void {
 ```
 
 ```c
-// TODO
+#include "wasm4.h"
+
+void update()
+{
+
+}
 ```
 
 ```d
@@ -124,7 +129,12 @@ export function start(): void {
 <Page value="c">
 
 ```c
-// TODO
+void start() {
+	PALETTE[0] = 0xfbf7f3
+	PALETTE[1] = 0xe5b083
+	PALETTE[2] = 0x426e5d
+	PALETTE[3] = 0x20283d
+}
 ```
 </Page>
 

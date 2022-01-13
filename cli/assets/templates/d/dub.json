@@ -10,12 +10,12 @@
       "lflags": [
         "--strip-all",
         "--allow-undefined",
-        "--global-base=6560",
+        "--stack-first",
         "--import-memory",
         "--initial-memory=65536",
         "--max-memory=65536",
         "--no-entry",
-        "-zstack-size=8192"
+        "-zstack-size=14752"
       ]
     },
     {
@@ -28,12 +28,12 @@
       "lflags": [
         "--strip-all",
         "--allow-undefined",
-        "--global-base=6560",
+        "--stack-first",
         "--import-memory",
         "--initial-memory=65536",
         "--max-memory=65536",
         "--no-entry",
-        "-zstack-size=8192",
+        "-zstack-size=14752",
         "$WASI_SDK_PATH/share/wasi-sysroot/lib/wasm32-wasi/libc.a"
       ]
     }

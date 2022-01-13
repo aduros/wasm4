@@ -28,8 +28,7 @@ export class Runtime {
 
         this.reset();
 
-        this.paused = false;
-        this.crashed = false;
+        this.pauseState = 0;
     }
 
     setMouse (x, y, buttons) {
@@ -93,7 +92,7 @@ export class Runtime {
         if (zeroMemory) {
             mem32.fill(0);
         }
-        this.crashed = false;
+        this.pauseState &= ~constants.PAUSE_CRASHED;
         mem32.set(constants.COLORS, constants.ADDR_PALETTE >> 2);
         this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
 
@@ -162,7 +161,9 @@ export class Runtime {
             try {
                 await fn();
             } catch (err) {
-                if (err instanceof WebAssembly.RuntimeError) {
+                if (err instanceof WebAssembly.RuntimeError
+                        || err instanceof WebAssembly.LinkError
+                        || err instanceof WebAssembly.CompileError) {
                     this.blueScreen(err);
                 } else {
                     // if we don't know what it is, throw it again
@@ -313,7 +314,7 @@ export class Runtime {
     }
 
     update () {
-        if (this.paused) {
+        if (this.pauseState != 0) {
             return;
         }
 
@@ -327,7 +328,7 @@ export class Runtime {
     }
 
     blueScreen(err) {
-        this.crashed = true;
+        this.pauseState |= constants.PAUSE_CRASHED;
 
         const COLORS = [
             0x1111ee, // blue
@@ -369,12 +370,14 @@ export class Runtime {
     }
 
     updateIdleState = () => {
-        this.paused = !document.body.classList.contains('focus');
+        const lostFocus = !document.body.classList.contains('focus');
 
-        if(this.paused) {
-           this.pauseAudio();
+        if (lostFocus) {
+            this.pauseAudio();
+            this.pauseState |= constants.PAUSE_UNFOCUSED;
         } else {
             this.unlockAudio();
+            this.pauseState &= ~constants.PAUSE_UNFOCUSED;
         }
     }
 }
@@ -383,11 +386,17 @@ function errorToBlueScreenText(err) {
     let message = `${err.name}:\n${err.message}`;
 
     // hand written messages for specific errors
-    if (err.message.match(/unreachable/)) {
-        message = "The cartridge has\nreached a code \nsegment marked as\nunreachable.";
-    } else if (err.message.match(/out of bounds/)) {
-        message = "The cartridge has\nattempted a memory\naccess that is\nout of bounds.";
+    if (err instanceof WebAssembly.RuntimeError) {
+        if (err.message.match(/unreachable/)) {
+            message = "The cartridge has\nreached a code \nsegment marked as\nunreachable.";
+        } else if (err.message.match(/out of bounds/)) {
+            message = "The cartridge has\nattempted a memory\naccess that is\nout of bounds.";
+        }
+        message += "\n\n\n\n\nHit R to reboot.";
+    } else if (err instanceof WebAssembly.LinkError) {
+        message = "The cartridge has\ntried to import\na missing function.\n\n\n\nSee console for\nmore details.";
+    } else if (err instanceof WebAssembly.CompileError) {
+        message = "The cartridge is\ncorrupted.\n\n\n\nSee console for\nmore details.";
     }
-    message += "\n\n\n\n\nHit R to reboot.";
     return message;
 }

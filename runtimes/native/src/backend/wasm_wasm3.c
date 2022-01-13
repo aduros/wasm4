@@ -191,6 +191,11 @@ void w4_wasmDestroy () {
 
 void w4_wasmLoadModule (const uint8_t* wasmBuffer, int byteLength) {
     check(m3_ParseModule(env, &module, wasmBuffer, byteLength));
+
+    // wasm3 will reallocate a new memory if the module doesn't import a memory. We set this to
+    // prevent that from happening: https://github.com/aduros/wasm4/issues/292
+    module->memoryImported = true;
+
     check(m3_LoadModule(runtime, module));
 
     m3_LinkRawFunction(module, "env", "blit", "v(iiiiii)", blit);

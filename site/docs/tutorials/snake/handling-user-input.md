@@ -65,7 +65,18 @@ if (justPressed & w4.BUTTON_UP) {
 
 <Page value="c">
 
-// TODO
+```c
+const uint8_t just_pressed = *GAMEPAD1 & (*GAMEPAD1 ^ prev_state);
+```
+
+The variable `just_pressed` now holds all buttons that were pressed this frame, `prev_state` which we will define in a moment, holds the gamepad state from the previous frame. You can check the state of a single button like this:
+
+```c
+if (just_pressed & BUTTON_UP)
+{
+    //move snake up
+} 
+```
 
 </Page>
 
@@ -275,7 +286,20 @@ export function update(): void {
 
 <Page value="c">
 
-// TODO
+
+```c
+void update () 
+{
+    frame_count++;
+    if(frame_count % 15 == 0)
+    {
+      snake_update(&snake);
+    }
+    snake_draw(&snake);
+}
+```
+
+
 
 </Page>
 
@@ -506,7 +530,113 @@ To fix this, add those functions to your snake. Here's an example for `down`:
 
 <Page value="c">
 
-// TODO
+It's a good idea to handle the input in its own function. Something like this could be on your mind:
+
+```c {1-9,15}
+void input()
+{
+  const uint8_t just_pressed = *GAMEPAD1 & (*GAMEPAD1 ^ prev_state);
+
+  if (just_pressed & BUTTON_UP)
+  {
+    //move snake up
+  } 
+}
+
+void update () 
+{
+  frame_count++;
+
+  input();
+
+  if(frame_count % 15 == 0)
+  {
+    snake_update(&snake);
+  }
+  snake_draw(&snake);
+}
+```
+
+If you try to compile this, you should get an error as `prev_state` is not yet declared. Place `prev_state` at the top of `main.c`:
+
+```c {7}
+#include "wasm4.h"
+#include "snake.h"
+#include <stdlib.h>
+
+struct snake snake;
+int frame_count = 0;
+uint8_t prev_state = 0;
+```
+
+To notice any change in the gamepad, you have to store the *current state* at the end of the input. This will make it the *previous state*. And while you're at it, why not add the other 3 directions along the way:
+
+```c {9-23}
+void input()
+{
+    const uint8_t just_pressed = *GAMEPAD1 & (*GAMEPAD1 ^ prev_state);
+
+    if (just_pressed & BUTTON_UP)
+    {
+        //move snake up
+    } 
+    if(just_pressed & BUTTON_DOWN)
+    {
+        //move snake down
+    }
+    if(just_pressed & BUTTON_LEFT)
+    {
+        //move snake left
+    }
+    if(just_pressed & BUTTON_RIGHT)
+    {
+        //move snake right
+    }
+ 
+    prev_state = *GAMEPAD1;
+}
+```
+
+If you want to check if it works: Use the `trace` function provided by WASM-4. Here's an example:
+
+```c
+    if (just_pressed & BUTTON_UP)
+    {
+        trace("Button up");
+    } 
+```
+
+If you use `trace` in each if-statement, you should see the corresponding output in the console.
+
+Now, instead of using `trace` to confirm everything works as intended, you should replace it with something like this:
+
+```c
+    if (just_pressed & BUTTON_UP)
+    {
+        snake_up(&snake);
+    } 
+```
+
+Fill in equivalent code for the remaining three directions and then add the function declarations to the `snake.h` file:
+
+```c
+void snake_up(struct snake *snake);
+void snake_down(struct snake *snake);
+void snake_left(struct snake *snake);
+void snake_right(struct snake *snake);
+```
+
+Now add the bodies of these functions to `snake.c`. Here's an example for `snake_down`:
+
+```c
+void snake_down(struct snake *snake)
+{
+    if(snake->direction.y == 0)
+    { 
+        snake->direction = (struct point){0,1};
+    }
+}
+```
 
 </Page>
 

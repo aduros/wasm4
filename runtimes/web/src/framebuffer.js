@@ -305,19 +305,27 @@ export class Framebuffer {
     ) {
         const drawColors = this.drawColors[0];
 
+        // Clip rectangle to screen
+        let clipXMin, clipYMin, clipXMax, clipYMax;
         if (rotate) {
             flipX = !flipX;
+            clipXMin = Math.max(0, dstY) - dstY;
+            clipYMin = Math.max(0, dstX) - dstX;
+            clipXMax = Math.min(width, HEIGHT - dstY);
+            clipYMax = Math.min(height, WIDTH - dstX);
+        } else {
+            clipXMin = Math.max(0, dstX) - dstX;
+            clipYMin = Math.max(0, dstY) - dstY;
+            clipXMax = Math.min(width, WIDTH - dstX);
+            clipYMax = Math.min(height, HEIGHT - dstY);
         }
 
         // Iterate pixels in rectangle
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
+        for (let y = clipYMin; y < clipYMax; y++) {
+            for (let x = clipXMin; x < clipXMax; x++) {
                 // Calculate sprite target coords
                 const tx = dstX + (rotate ? y : x);
                 const ty = dstY + (rotate ? x : y);
-                if (tx < 0 || ty < 0 || tx >= WIDTH || ty >= HEIGHT) {
-                    continue;
-                }
 
                 // Calculate sprite source coords
                 const sx = srcX + (flipX ? width - x - 1 : x);

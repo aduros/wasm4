@@ -319,18 +319,27 @@ void w4_framebufferBlit (const uint8_t* sprite, int dstX, int dstY, int width, i
 
     uint16_t colors = *drawColors;
 
+    // Clip rectangle to screen
+    int clipXMin, clipYMin, clipXMax, clipYMax;
     if (rotate) {
         flipX = !flipX;
+        clipXMin = w4_max(0, dstY) - dstY;
+        clipYMin = w4_max(0, dstX) - dstX;
+        clipXMax = w4_min(width, HEIGHT - dstY);
+        clipYMax = w4_min(height, WIDTH - dstX);
+    } else {
+        clipXMin = w4_max(0, dstX) - dstX;
+        clipYMin = w4_max(0, dstY) - dstY;
+        clipXMax = w4_min(width, WIDTH - dstX);
+        clipYMax = w4_min(height, HEIGHT - dstY);
     }
 
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
+    // Iterate pixels in rectangle
+    for (int y = clipYMin; y < clipYMax; y++) {
+        for (int x = clipXMin; x < clipXMax; x++) {
             // Calculate sprite target coords
             const int tx = dstX + (rotate ? y : x);
             const int ty = dstY + (rotate ? x : y);
-            if (tx < 0 || ty < 0 || tx >= WIDTH || ty >= HEIGHT) {
-                continue;
-            }
 
             // Calculate sprite source coords
             const int sx = srcX + (flipX ? width - x - 1 : x);

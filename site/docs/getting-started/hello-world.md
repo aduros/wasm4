@@ -234,3 +234,7 @@ w4.trace("Hello world!");
 ```
 
 </MultiLanguageCode>
+
+:::tip
+Press `F7` to toggle the WASM-4 developer tools, which displays system state, memory usage, and more.
+:::

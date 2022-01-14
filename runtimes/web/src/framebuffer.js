@@ -303,43 +303,41 @@ export class Framebuffer {
         flipY = false,
         rotate = false
     ) {
-        const clipXMin = Math.max(0, dstX) - dstX;
-        const clipYMin = Math.max(0, dstY) - dstY;
-        const clipXMax = Math.min(width, WIDTH - dstX);
-        const clipYMax = Math.min(height, HEIGHT - dstY);
         const drawColors = this.drawColors[0];
 
+        // Clip rectangle to screen
+        let clipXMin, clipYMin, clipXMax, clipYMax;
         if (rotate) {
             flipX = !flipX;
+            clipXMin = Math.max(0, dstY) - dstY;
+            clipYMin = Math.max(0, dstX) - dstX;
+            clipXMax = Math.min(width, HEIGHT - dstY);
+            clipYMax = Math.min(height, WIDTH - dstX);
+        } else {
+            clipXMin = Math.max(0, dstX) - dstX;
+            clipYMin = Math.max(0, dstY) - dstY;
+            clipXMax = Math.min(width, WIDTH - dstX);
+            clipYMax = Math.min(height, HEIGHT - dstY);
         }
 
-        for (let row = clipYMin; row < clipYMax; ++row) {
-            for (let col = clipXMin; col < clipXMax; ++col) {
-                // Determine the local position on the sprite
-                let sx, sy;
-                if (rotate) {
-                    sx = row;
-                    sy = col;
-                } else {
-                    sx = col;
-                    sy = row;
-                }
-                if (flipX) {
-                    sx = clipXMax - sx - 1;
-                }
-                if (flipY) {
-                    sy = clipYMax - sy - 1;
-                }
+        // Iterate pixels in rectangle
+        for (let y = clipYMin; y < clipYMax; y++) {
+            for (let x = clipXMin; x < clipXMax; x++) {
+                // Calculate sprite target coords
+                const tx = dstX + (rotate ? y : x);
+                const ty = dstY + (rotate ? x : y);
+
+                // Calculate sprite source coords
+                const sx = srcX + (flipX ? width - x - 1 : x);
+                const sy = srcY + (flipY ? height - y - 1 : y);
 
                 // Sample the sprite to get a color index
                 let colorIdx;
-                const x = srcX + sx, y = srcY + sy;
-                const bitIndex = y * srcStride + x;
+                const bitIndex = sy * srcStride + sx;
                 if (bpp2) {
                     const byte = sprite[bitIndex >>> 2];
                     const shift = 6 - ((bitIndex & 0x03) << 1);
                     colorIdx = (byte >>> shift) & 0b11;
-
                 } else {
                     const byte = sprite[bitIndex >>> 3];
                     const shift = 7 - (bitIndex & 0x7);
@@ -350,7 +348,7 @@ export class Framebuffer {
                 // TODO(2021-08-11): Use a lookup table here?
                 const dc = (drawColors >>> (colorIdx << 2)) & 0x0f;
                 if (dc !== 0) {
-                    this.drawPoint((dc - 1) & 0x03, dstX + col, dstY + row);
+                    this.drawPoint((dc - 1) & 0x03, tx, ty);
                 }
             }
         }

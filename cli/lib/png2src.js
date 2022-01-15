@@ -124,7 +124,7 @@ function run(sourceFile) {
     let colorCount = 0;
     if (png.palette) {
         colorCount = png.palette.length;
-        if (colorCount >= 4) {
+        if (colorCount > 4) {
             throw new Error('Indexed PNG has too many colors: maximum is 4.');
         }
         for (let i = 0; i < colorCount; ++i) {

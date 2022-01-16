@@ -33,13 +33,20 @@ typedef struct {
     /** Used for time tracking. */
     float phase;
 
-    /** Duty cycle for pulse channels. */
-    float dutyCycle;
+    union {
+        struct {
+            /** Duty cycle for pulse channels. */
+            float dutyCycle;
+        } pulse;
 
-    /** Noise generation state. */
-    uint16_t noiseSeed;
-    int16_t noiseSample;
-    float noiseProgress;
+        struct {
+            /** Noise generation state. */
+            uint16_t seed;
+
+            /** The last generated random number, either -1 or 1. */
+            int16_t lastRandom;
+        } noise;
+    };
 } Channel;
 
 static Channel channels[4] = { 0 };
@@ -77,9 +84,7 @@ static int16_t getCurrentVolume (const Channel* channel) {
 }
 
 void w4_apuInit () {
-    for (int ci = 0; ci < 4; ++ci) {
-        channels[ci].noiseSeed = 0x0001;
-    }
+    channels[3].noise.seed = 0x0001;
 }
 
 void w4_apuTone (int frequency, int duration, int volume, int flags) {
@@ -105,22 +110,24 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     channel->releaseTime = channel->sustainTime + SAMPLE_RATE*release/60;
     channel->volume = MAX_VOLUME * volume/100;
 
-    switch (mode) {
-    case 0:
-        channel->dutyCycle = 0.125f;
-        break;
-    default: // case 1: case 3:
-        channel->dutyCycle = 0.25f;
-        break;
-    case 2:
-        channel->dutyCycle = 0.5f;
-        break;
+    if (channelIdx == 0 || channelIdx == 1) {
+        switch (mode) {
+        case 0:
+            channel->pulse.dutyCycle = 0.125f;
+            break;
+        case 1: case 3: default:
+            channel->pulse.dutyCycle = 0.25f;
+            break;
+        case 2:
+            channel->pulse.dutyCycle = 0.5f;
+            break;
+        }
     }
 }
 
 void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
     for (int ii = 0; ii < frames; ++ii, ++time) {
-        int16_t mixed = 0;
+        int16_t sum = 0;
 
         for (int channelIdx = 0; channelIdx < 4; ++channelIdx) {
             Channel* channel = &channels[channelIdx];
@@ -128,51 +135,49 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
             if (time < channel->releaseTime) {
                 uint16_t freq = getCurrentFrequency(channel);
                 int16_t volume = getCurrentVolume(channel);
-
-                channel->phase += (float)freq / SAMPLE_RATE;
-                if (channel->phase > 1) {
-                    channel->phase -= 1;
-                }
-
                 int16_t sample;
-                switch (channelIdx) {
-                default:
-                    // Pulse channel
-                    sample = channel->phase < channel->dutyCycle ? volume : -volume;
-                    break;
 
-                case 2:
-                    // Triangle channel
-                    if (channel->phase < 0.25) {
-                        sample = lerp(0, volume, 4*channel->phase);
-                    } else if (channel->phase < 0.75) {
-                        sample = lerp(volume, -volume, 2*channel->phase - 0.5);
-                    } else {
-                        sample = lerp(-volume, 0, 4*channel->phase - 3);
-                    }
-                    break;
-
-                case 3:
+                if (channelIdx == 3) {
                     // Noise channel
-                    channel->noiseProgress += freq * freq / 1000000.f;
-                    while (channel->noiseProgress > 0) {
-                        channel->noiseProgress--;
-                        const int bit0 = channel->noiseSeed & 1;
-                        channel->noiseSeed >>= 1;
-                        const int bit1 = channel->noiseSeed & 1;
+                    channel->phase += freq * freq / 1000000.f;
+                    while (channel->phase > 0) {
+                        channel->phase--;
+                        const int bit0 = channel->noise.seed & 1;
+                        channel->noise.seed >>= 1;
+                        const int bit1 = channel->noise.seed & 1;
                         const int feedback = (bit0 ^ bit1);
-                        channel->noiseSeed |= feedback << 14;
-                        channel->noiseSample = 2 * feedback - 1;
+                        channel->noise.seed |= feedback << 14;
+                        channel->noise.lastRandom = 2 * feedback - 1;
                     }
-                    sample = volume * channel->noiseSample;
-                    break;
+                    sample = volume * channel->noise.lastRandom;
+
+                } else {
+                    channel->phase += (float)freq / SAMPLE_RATE;
+                    if (channel->phase > 1) {
+                        channel->phase--;
+                    }
+
+                    if (channelIdx == 2) {
+                        // Triangle channel
+                        if (channel->phase < 0.25) {
+                            sample = lerp(0, volume, 4*channel->phase);
+                        } else if (channel->phase < 0.75) {
+                            sample = lerp(volume, -volume, 2*channel->phase - 0.5);
+                        } else {
+                            sample = lerp(-volume, 0, 4*channel->phase - 3);
+                        }
+
+                    } else {
+                        // Pulse channel
+                        sample = channel->phase < channel->pulse.dutyCycle ? volume : -volume;
+                    }
                 }
 
-                mixed += sample;
+                sum += sample;
             }
         }
 
-        *output++ = mixed;
-        *output++ = mixed;
+        *output++ = sum;
+        *output++ = sum;
     }
 }

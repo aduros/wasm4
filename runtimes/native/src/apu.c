@@ -35,6 +35,11 @@ typedef struct {
 
     /** Duty cycle for pulse channels. */
     float dutyCycle;
+
+    /** Noise generation state. */
+    uint16_t noiseSeed;
+    int16_t noiseSample;
+    float noiseProgress;
 } Channel;
 
 static Channel channels[4] = { 0 };
@@ -72,6 +77,9 @@ static int16_t getCurrentVolume (const Channel* channel) {
 }
 
 void w4_apuInit () {
+    for (int ci = 0; ci < 4; ++ci) {
+        channels[ci].noiseSeed = 0x0001;
+    }
 }
 
 void w4_apuTone (int frequency, int duration, int volume, int flags) {
@@ -146,9 +154,17 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
 
                 case 3:
                     // Noise channel
-                    // TODO(2022-01-08): Make frequency have an effect on noise pitch
-                    // TODO(2022-01-08): Use LFSR instead of rand()
-                    sample = volume * (float)rand() / RAND_MAX;
+                    channel->noiseProgress += freq * freq / 1000000.f;
+                    while (channel->noiseProgress > 0) {
+                        channel->noiseProgress--;
+                        const int bit0 = channel->noiseSeed & 1;
+                        channel->noiseSeed >>= 1;
+                        const int bit1 = channel->noiseSeed & 1;
+                        const int feedback = (bit0 ^ bit1);
+                        channel->noiseSeed |= feedback << 14;
+                        channel->noiseSample = 2 * feedback - 1;
+                    }
+                    sample = volume * channel->noiseSample;
                     break;
                 }
 

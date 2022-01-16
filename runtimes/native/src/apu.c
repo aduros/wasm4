@@ -38,6 +38,9 @@ typedef struct {
     /** Used for time tracking. */
     float phase;
 
+    /** Tone panning. 0 = center, 1 = only left, 2 = only right. */
+    uint8_t pan;
+
     union {
         struct {
             /** Duty cycle for pulse channels. */
@@ -126,6 +129,7 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
 
     int channelIdx = flags & 0x03;
     int mode = (flags >> 2) & 0x3;
+    const int pan = ((flags >> 4) & 0x3) % 3;
 
     // TODO(2022-01-08): Thread safety
     Channel* channel = &channels[channelIdx];
@@ -142,10 +146,10 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     channel->decayTime = channel->attackTime + SAMPLE_RATE*decay/60;
     channel->sustainTime = channel->decayTime + SAMPLE_RATE*sustain/60;
     channel->releaseTime = channel->sustainTime + SAMPLE_RATE*release/60;
-
     int16_t maxVolume = (channelIdx == 2) ? MAX_VOLUME_TRIANGLE : MAX_VOLUME;
     channel->sustainVolume = maxVolume * sustainVolume/100;
     channel->peakVolume = peakVolume ? maxVolume * peakVolume/100 : maxVolume;
+    channel->pan = pan;
 
     if (channelIdx == 0 || channelIdx == 1) {
         switch (mode) {
@@ -170,7 +174,7 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
 
 void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
     for (int ii = 0; ii < frames; ++ii, ++time) {
-        int16_t sum = 0;
+        int16_t mix_left = 0, mix_right = 0;
 
         for (int channelIdx = 0; channelIdx < 4; ++channelIdx) {
             Channel* channel = &channels[channelIdx];
@@ -223,11 +227,16 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
                     }
                 }
 
-                sum += sample;
+                if (channel->pan != 1) {
+                    mix_right += sample;
+                }
+                if (channel->pan != 2) {
+                    mix_left += sample;
+                }
             }
         }
 
-        *output++ = sum;
-        *output++ = sum;
+        *output++ = mix_left;
+        *output++ = mix_right;
     }
 }

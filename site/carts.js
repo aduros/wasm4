@@ -1,5 +1,11 @@
 const CARTS = [
     {
+        slug: "image-carousel",
+        title: "Image Carousel",
+        author: "pfg",
+        github: "pfgithub",
+    },
+    {
         slug: "piano",
         title: "Piano",
         author: "pfg",

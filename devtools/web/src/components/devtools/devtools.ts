@@ -1,21 +1,26 @@
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { UpdateController } from '../../controllers/UpdateController';
+import {
+  UpdateController,
+  UpdateControllerState,
+} from '../../controllers/UpdateController';
 import { createCloseDevtoolsEvent } from '../../events/close-devtools';
 import devtoolsCss from './devtools.scss';
 import { withTheme } from '../../styles/commons';
 import {
+  MAX_CART_SIZE,
   SYSTEM_HIDE_GAMEPAD_OVERLAY,
   SYSTEM_PRESERVE_FRAMEBUFFER,
 } from '../../constants';
 import { classMap } from 'lit/directives/class-map.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { bitmask, identity } from '../../utils/functions';
-import { MemoryView } from '../../models/MemoryView';
 
 export const wasm4DevtoolsTagName = 'wasm4-devtools' as const;
 
 const tabs = ['general', 'controls', 'mem', 'info'] as const;
+
+const colorMasks = [bitmask(3), bitmask(7, 3), bitmask(11, 7), bitmask(15, 11)];
 
 /**
  * ### Programmatic usage
@@ -62,14 +67,12 @@ export class Wasm4Devtools extends LitElement {
     this._fixedPosition = this._fixedPosition === 'left' ? 'right' : 'left';
   };
 
-  private _renderGeneralView = (memoryView: MemoryView, fps: number) => {
+  private _renderGeneralView = ({
+    memoryView,
+    fps,
+    wasmBufferByteLen,
+  }: UpdateControllerState) => {
     const drawColors = memoryView.drawColors ?? 0;
-    const colorMasks = [
-      bitmask(3),
-      bitmask(7, 3),
-      bitmask(11, 7),
-      bitmask(15, 11),
-    ];
 
     return html`<article>
       <wasm4-palette
@@ -107,6 +110,16 @@ export class Wasm4Devtools extends LitElement {
         <h4>fps</h4>
         <span class="info-box text-primary">${fps}</span>
       </section>
+      <section class="cart-size-wrapper">
+        <h4>cartridge size ${wasmBufferByteLen > MAX_CART_SIZE ? `⚠️` : ''}</h4>
+        <div class="size-box">
+          current
+          <span class="info-box text-primary">${wasmBufferByteLen}B</span>
+        </div>
+        <div class="size-box">
+          limit <span class="info-box text-primary">${MAX_CART_SIZE}B</span>
+        </div>
+      </section>
       <section class="flags-section">
         <h4>system flags</h4>
         <div class="flags-wrapper">
@@ -131,7 +144,7 @@ export class Wasm4Devtools extends LitElement {
     return html` <wasm4-info-view></wasm4-info-view> `;
   };
 
-  private _renderControls = (memoryView: MemoryView, _: number) => {
+  private _renderControls = ({ memoryView }: UpdateControllerState) => {
     return html`<wasm4-controls-view
       .mouseButtons=${memoryView.mouseBtnByte}
       .mouseX=${memoryView.pointerPos.x}
@@ -140,13 +153,13 @@ export class Wasm4Devtools extends LitElement {
     ></wasm4-controls-view>`;
   };
 
-  private _renderMemory = (memoryView: MemoryView, _: number) => {
+  private _renderMemory = ({ memoryView }: UpdateControllerState) => {
     return html`<wasm4-memory-view
       .memoryView=${memoryView}
     ></wasm4-memory-view>`;
   };
 
-  private _renderTab = (memoryView: MemoryView, fps: number) => {
+  private _renderTab = (updateControllerState: UpdateControllerState) => {
     let renderTab;
     switch (this._activeTab) {
       case 'controls':
@@ -162,15 +175,13 @@ export class Wasm4Devtools extends LitElement {
         renderTab = this._renderGeneralView;
     }
 
-    return renderTab.call(this, memoryView, fps);
+    return renderTab.call(this, updateControllerState);
   };
 
   render() {
     if (!this.updateController.state) {
       return null;
     }
-
-    const { memoryView, fps } = this.updateController.state;
 
     const fixedPosBtnLabel = `move ${
       this._fixedPosition === 'left' ? 'right' : 'left'
@@ -260,7 +271,7 @@ export class Wasm4Devtools extends LitElement {
                 </li>`
             )}
           </ul>
-          ${this._renderTab(memoryView, fps)}
+          ${this._renderTab(this.updateController.state)}
         </div>
       </div>
     </div>`;

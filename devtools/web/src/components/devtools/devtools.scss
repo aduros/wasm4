@@ -136,6 +136,19 @@ $devtools-body-max-height: calc(
   }
 }
 
+.cart-size-wrapper {
+  display: grid;
+  grid-auto-flow: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  grid-gap: 0.25em;
+
+  .size-box {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
 .flags-wrapper {
   display: grid;
   grid-template-rows: 1fr 1fr;

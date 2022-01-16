@@ -5,6 +5,7 @@ export const updateCompletedEventType = 'wasm4-update-completed';
 export interface UpdateCompletedDetails {
   memory: MemoryView;
   fps: number;
+  wasmBufferByteLen: number;
   storedValue: string | null;
 }
 
@@ -24,6 +25,13 @@ function getStoredValue(): string | null {
   }
 }
 
+export interface UpdateCompletedData {
+  dataView: DataView;
+  fps: number;
+  bufferedData: BufferedMemoryData;
+  wasmBufferByteLen: number;
+}
+
 /**
  * An event that is meant to be triggered after a `runtime.update` that provides
  * infos regarding the console runtime.
@@ -34,9 +42,7 @@ function getStoredValue(): string | null {
  * @returns
  */
 export function createUpdateCompletedEvent(
-  dataView: DataView,
-  fps: number,
-  bufferedData: BufferedMemoryData,
+  { dataView, fps, bufferedData, wasmBufferByteLen }: UpdateCompletedData,
   eventInit: EventInit = { bubbles: true }
 ): Wasm4UpdateCompletedEvent {
   return new CustomEvent(updateCompletedEventType, {
@@ -44,6 +50,7 @@ export function createUpdateCompletedEvent(
     detail: {
       memory: new MemoryView(dataView, bufferedData),
       fps,
+      wasmBufferByteLen,
       storedValue: getStoredValue(),
     },
   });

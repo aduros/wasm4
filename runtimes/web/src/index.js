@@ -498,7 +498,7 @@ async function loadCartWasm () {
                 ? "none" : "";
 
             if (DEVELOPER_BUILD) {
-                devtoolsManager.updateCompleted(runtime.data, deltaTime);
+                devtoolsManager.updateCompleted(runtime, deltaTime);
             }
         }
 

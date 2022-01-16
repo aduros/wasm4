@@ -86,14 +86,13 @@ const ALIASES = {
     );
 
     const readmeRender =  Mustache.render(readmeTemplate, { 
+        name: path.basename(path.resolve(destDir)),
         lang: HELP[lang],
         'code-lang': lang,
     });
 
     return fs.writeFile(path.join(destDir, 'README.md'), readmeRender, { encoding: 'utf-8', flag: 'w+' })
 }
-
-  
 
 async function run (destDir, opts) {
     let lang = opts.lang;
@@ -143,7 +142,7 @@ async function run (destDir, opts) {
         console.log(`    ${help.setup}`);
         console.log();
     }
-    console.log("Build it by running:");
+    console.log("Build the cart by running:");
     console.log();
     console.log(`    ${help.build}`);
     console.log();

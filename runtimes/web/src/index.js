@@ -477,24 +477,28 @@ async function loadCartWasm () {
 
     const INTERVAL = 1000 / 60;
 
-    // lastFrame is not a real time, it has frame-gap correction
     let lastFrame = performance.now();
+
+    // used for keeping a consistent framerate. not a real time.
+    let lastFrameGapCorrected = lastFrame;
 
     function loop () {
         processGamepad();
 
         const now = performance.now();
-        const deltaFrame = now - lastFrame;
+        const deltaFrameGapCorrected = now - lastFrameGapCorrected;
 
-        if (deltaFrame >= INTERVAL) {
-            lastFrame = now - (deltaFrame % INTERVAL);
+        if (deltaFrameGapCorrected >= INTERVAL) {
+            const deltaTime = now - lastFrame;
+            lastFrame = now;
+            lastFrameGapCorrected = now - (deltaFrameGapCorrected % INTERVAL);
             runtime.update();
 
             gamepadOverlay.style.display = runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY)
                 ? "none" : "";
 
             if (DEVELOPER_BUILD) {
-                devtoolsManager.updateCompleted(runtime.data, deltaFrame);
+                devtoolsManager.updateCompleted(runtime.data, deltaTime);
             }
         }
 

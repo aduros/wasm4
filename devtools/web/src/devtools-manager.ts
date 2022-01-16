@@ -42,6 +42,11 @@ class BufferedRuntimeData implements BufferedData {
   };
 }
 
+interface RuntimeInfo {
+  data: DataView;
+  wasmBufferByteLen: number;
+}
+
 export class DevtoolsManager {
   /**
    * @private
@@ -56,11 +61,18 @@ export class DevtoolsManager {
   /**
    * Notifies the devtools that the web runtime has completed an update.
    */
-  updateCompleted = (dataView: DataView, deltaFrame: number) => {
+  updateCompleted = <Info extends RuntimeInfo>(
+    runtimeInfo: Info,
+    deltaFrame: number
+  ) => {
     if (this._enabled) {
       const fps = Math.floor(1_000 / deltaFrame);
-      this._bufferedData.update(dataView);
-      this._notifyUpdateCompleted(dataView, fps);
+      this._bufferedData.update(runtimeInfo.data);
+      this._notifyUpdateCompleted(
+        runtimeInfo.data,
+        runtimeInfo.wasmBufferByteLen,
+        fps
+      );
     }
   };
 
@@ -87,9 +99,14 @@ export class DevtoolsManager {
   };
 
   private _notifyUpdateCompleted = throttle(
-    (dataView: DataView, fps: number) => {
+    (dataView: DataView, wasmBufferByteLen: number, fps: number) => {
       window.dispatchEvent(
-        createUpdateCompletedEvent(dataView, fps, this._bufferedData.flush())
+        createUpdateCompletedEvent({
+          dataView,
+          wasmBufferByteLen,
+          fps,
+          bufferedData: this._bufferedData.flush(),
+        })
       );
     },
     200

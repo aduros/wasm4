@@ -5,10 +5,11 @@ import {
 } from '../events/update-completed';
 import { MemoryView } from '../models/MemoryView';
 
-interface UpdateControllerState {
+export interface UpdateControllerState {
   memoryView: MemoryView;
   storedValue: string | null;
   fps: number;
+  wasmBufferByteLen: number;
 }
 
 /**
@@ -30,6 +31,7 @@ export class UpdateController implements ReactiveController {
         memoryView: detail.memory,
         storedValue: detail.storedValue ?? null,
         fps: detail.fps,
+        wasmBufferByteLen: detail.wasmBufferByteLen,
       };
 
       this.state = nextState;

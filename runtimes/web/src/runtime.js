@@ -29,6 +29,7 @@ export class Runtime {
         this.reset();
 
         this.pauseState = 0;
+        this.wasmBufferByteLen = 0;
     }
 
     setMouse (x, y, buttons) {
@@ -103,6 +104,8 @@ export class Runtime {
 
     async load (wasmBuffer) {
         const limit = 0xffff;
+        this.wasmBufferByteLen = wasmBuffer.byteLength;
+
         if (wasmBuffer.byteLength > limit) {
             if (DEVELOPER_BUILD) {
                 if (!this.warnedFileSize) {

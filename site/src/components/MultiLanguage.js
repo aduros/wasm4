@@ -54,7 +54,7 @@ function useLanguageCode() {
     const updateLang = (value) => {
         const isValid = isValidLanguageValue(value);
 
-        if(value !== activeLang && isValid) {
+        if(isValid) {
             setActiveLang(value);
             setTabGroupChoices("language", value);
         } else if(!isValid) {

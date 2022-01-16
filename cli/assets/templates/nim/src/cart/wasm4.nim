@@ -44,6 +44,8 @@ const
   TONE_MODE2* = 4
   TONE_MODE3* = 8
   TONE_MODE4* = 12
+  TONE_PAN_LEFT* = 16
+  TONE_PAN_RIGHT* = 32
 
 {.push importc, codegenDecl: "__attribute__((import_name(\"$2\"))) $1 $2$3".}
 proc blit*(data: ptr uint8; x: int32; y: int32; width: uint32; height: uint32;

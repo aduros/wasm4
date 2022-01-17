@@ -86,7 +86,11 @@ set(LIBRETRO_SOURCES
     src/backend/main_libretro.c
     src/backend/wasm_wasm3.c
 )
-add_library(wasm4_libretro SHARED ${COMMON_SOURCES} ${LIBRETRO_SOURCES} ${M3_SOURCES})
+if(LIBRETRO_STATIC)
+  add_library(wasm4_libretro STATIC ${COMMON_SOURCES} ${LIBRETRO_SOURCES} ${M3_SOURCES})
+else()
+  add_library(wasm4_libretro SHARED ${COMMON_SOURCES} ${LIBRETRO_SOURCES} ${M3_SOURCES})
+endif()
 target_include_directories(wasm4_libretro PRIVATE "${CMAKE_SOURCE_DIR}/vendor/wasm3/source")
 target_include_directories(wasm4_libretro PRIVATE "${CMAKE_SOURCE_DIR}/vendor/libretro/include")
 set_target_properties(wasm4_libretro PROPERTIES C_STANDARD 99)

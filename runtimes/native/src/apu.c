@@ -130,6 +130,12 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
             channel->pulse.dutyCycle = 0.5f;
             break;
         }
+
+    } else if (channelIdx == 2) {
+        // For the triangle channel, prevent popping on hard stops by adding a 1 ms release
+        if (release == 0) {
+            channel->releaseTime += SAMPLE_RATE/1000;
+        }
     }
 }
 

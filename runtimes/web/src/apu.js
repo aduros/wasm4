@@ -185,6 +185,12 @@ export class APU {
                 channel.pulseDutyCycle = 0.5;
                 break;
             }
+
+        } else if (channelIdx == 2) {
+            // For the triangle channel, prevent popping on hard stops by adding a 1 ms release
+            if (release == 0) {
+                channel.releaseTime += (SAMPLE_RATE/1000) >>> 0;
+            }
         }
     }
 }

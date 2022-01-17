@@ -158,6 +158,12 @@ export class APU {
         const mode = (flags >> 2) & 0x3;
 
         const channel = this.channels[channelIdx];
+
+        // Restart the phase if this channel wasn't already playing
+        if (this.time > channel.releaseTime) {
+            channel.phase = 0;
+        }
+
         channel.freq1 = freq1;
         channel.freq2 = freq2;
         channel.startTime = this.time;

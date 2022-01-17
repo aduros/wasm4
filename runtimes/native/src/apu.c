@@ -103,6 +103,12 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
 
     // TODO(2022-01-08): Thread safety
     Channel* channel = &channels[channelIdx];
+
+    // Restart the phase if this channel wasn't already playing
+    if (time > channel->releaseTime) {
+        channel->phase = 0;
+    }
+
     channel->freq1 = freq1;
     channel->freq2 = freq2;
     channel->startTime = time;

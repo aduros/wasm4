@@ -93,12 +93,6 @@ export class APU {
 
                             if (channelIdx == 2) {
                                 // Triangle channel
-                                // if (channel.phase < 0.5) {
-                                //     sample = lerp(-volume, volume, 2*channel.phase);
-                                // } else {
-                                //     sample = lerp(volume, -volume, 2*channel.phase - 1);
-                                // }
-                                // TODO(2022-01-16): Fix popping
                                 if (channel.phase < 0.25) {
                                     sample = lerp(0, volume, 4*channel.phase);
                                 } else if (channel.phase < 0.75) {
@@ -144,8 +138,10 @@ export class APU {
             return channel.volume;
         } else if (time > channel.attackTime) {
             return this.ramp(MAX_VOLUME, channel.volume, channel.attackTime, channel.decayTime);
-        } else {
+        } else if (channel.startTime != channel.attackTime) {
             return this.ramp(0, MAX_VOLUME, channel.startTime, channel.attackTime);
+        } else {
+            return channel.volume;
         }
     }
 

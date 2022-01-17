@@ -78,8 +78,10 @@ static int16_t getCurrentVolume (const Channel* channel) {
         return channel->volume;
     } else if (time > channel->attackTime) {
         return ramp(MAX_VOLUME, channel->volume, channel->attackTime, channel->decayTime);
-    } else {
+    } else if (channel->startTime != channel->attackTime) {
         return ramp(0, MAX_VOLUME, channel->startTime, channel->attackTime);
+    } else {
+        return channel->volume;
     }
 }
 

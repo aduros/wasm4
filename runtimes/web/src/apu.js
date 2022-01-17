@@ -20,11 +20,17 @@ const NOISE_LENGTH = 0x8000;
 //     440.0 / 44100,
 // ].reverse();
 
+const twelvth_root_of_2 = Math.pow(2, 1/12);
+function midiToFreq(pitch) {
+    return 440 * Math.pow(twelvth_root_of_2, (pitch / 256) - 69);
+}
+
 export class APU {
     constructor () {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
         this.ctx = ctx;
 
+        this.frequency_mode = 0;
         this.nodes = new Array(4);
         this.gains = new Array(4);
 
@@ -58,8 +64,13 @@ export class APU {
     }
 
     tone (frequency, duration, volume, flags) {
-        const freq1 = frequency & 0xffff;
-        const freq2 = (frequency >> 16) & 0xffff;
+        var freq1 = frequency & 0xffff;
+        var freq2 = (frequency >> 16) & 0xffff;
+
+        if (this.frequency_mode == 1) {
+            freq1 = midiToFreq(freq1);
+            freq2 = (freq2 == 0) ? 0 : midiToFreq(freq2);
+        }
 
         const sustain = (duration & 0xff) / 60;
         const release = ((duration >> 8) & 0xff) / 60;

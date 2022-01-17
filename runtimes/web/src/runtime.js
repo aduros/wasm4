@@ -324,6 +324,7 @@ export class Runtime {
         if (!this.getSystemFlag(constants.SYSTEM_PRESERVE_FRAMEBUFFER)) {
             this.framebuffer.clear();
         }
+        this.apu.frequency_mode = this.getSystemFlag(constants.SYSTEM_MIDI_FREQUENCY_MODE) ? 1 : 0;
 
         this.safeCall(this.wasm.exports.update);
 

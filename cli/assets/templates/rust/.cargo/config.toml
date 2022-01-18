@@ -1,6 +1,9 @@
 [alias]
 xtask = "run --package xtask --"
 
+[env]
+CARGO_XTASK_LOG = "info"
+
 [target.wasm32-unknown-unknown]
 rustflags = [
     # Import memory from WASM-4

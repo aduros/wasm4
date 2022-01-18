@@ -19,4 +19,5 @@ default = ["buddy-alloc"]
 [workspace]
 members = [
   "xtask",
+  "xtask/xtask-build",
 ]

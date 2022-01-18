@@ -19,7 +19,7 @@ function start (opts) {
 
     } else if (fs.existsSync("Cargo.toml")) {
         buildCommand = "cargo";
-        buildParams = ["build", "--quiet"];
+        buildParams = ["xtask", "build", "--profile", "dev"];
         buildOutput = "target/wasm32-unknown-unknown/debug/cart.wasm";
 
     } else if (fs.existsSync("package.json")) {

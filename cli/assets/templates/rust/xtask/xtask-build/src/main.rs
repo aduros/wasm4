@@ -1,4 +1,4 @@
-use cargo_metadata::{Artifact, Message};
+use cargo_metadata::{camino::Utf8PathBuf, Artifact, Message};
 use log::{debug, error, info, warn};
 use std::{
     env, io,
@@ -14,7 +14,25 @@ fn main() {
 }
 
 fn build(args: Vec<String>) {
-    wasm_opt(cargo_build(args))
+    let cargo_output = cargo_build(args);
+    let cargo_output = Message::parse_stream(cargo_output.as_slice())
+        .filter_map(|msg| match msg.expect("parsing `cargo build` output") {
+            Message::CompilerArtifact(Artifact {
+                executable: Some(e),
+                ..
+            }) if matches!(e.extension(), Some("wasm")) => {
+                let e = e
+                    .strip_prefix(env::current_dir().unwrap())
+                    .unwrap_or(&e)
+                    .to_owned();
+                info!(target: "cargo-build", "built cartridge at: {}", e);
+                Some(e)
+            }
+            _ => None,
+        })
+        .collect();
+
+    wasm_opt(cargo_output)
 }
 
 fn cargo_build(args: Vec<String>) -> Vec<u8> {
@@ -48,22 +66,14 @@ fn cargo_build(args: Vec<String>) -> Vec<u8> {
     output.stdout
 }
 
-fn wasm_opt(cargo_output: Vec<u8>) {
+fn wasm_opt(wasm_modules: Vec<Utf8PathBuf>) {
     let mut skip = false;
-    for msg in Message::parse_stream(cargo_output.as_slice()) {
-        let wasm_module = match msg.expect("parsing `cargo build` output") {
-            Message::CompilerArtifact(Artifact {
-                executable: Some(m),
-                ..
-            }) if matches!(m.extension(), Some("wasm")) => m,
-            _ => continue,
-        };
-
+    for wasm_module in wasm_modules {
         if !skip {
             skip = !wasm_opt_once(wasm_module.as_str());
         }
         if skip {
-            debug!("skipping wasm-opt size optimizations for: {}", wasm_module);
+            debug!(target: "wasm-opt", "skipping wasm-opt size optimizations for: {}", wasm_module);
         }
     }
 }

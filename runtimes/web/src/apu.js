@@ -66,6 +66,9 @@ export class APU {
         const decay = ((duration >> 16) & 0xff) / 60;
         const attack = ((duration >> 24) & 0xff) / 60;
 
+        const sustainVolume = volume & 0xff;
+        const peakVolume = (volume >> 8) & 0xff;
+
         const channel = flags & 0x3;
         const mode = (flags >> 2) & 0x3;
 
@@ -75,9 +78,12 @@ export class APU {
         const sustainTime = decayTime + sustain;
         const releaseTime = sustainTime + release;
 
-        // Peak level of any channel should be -12 dB, or a quarter of full volume
-        let peakLevel = 0.25;
-        let sustainLevel = volume/100 * peakLevel;
+        // Maximum level of any channel should be -12 dB, or a quarter of full volume
+        let maxLevel = 0.25;
+        // The level reached by the attack phase
+        let peakLevel = peakVolume ? peakVolume/100 * maxLevel : maxLevel;
+        // The level sustained for the duration of the sustain phase 
+        let sustainLevel = sustainVolume/100 * maxLevel;
 
         let node;
         const existingNode = this.nodes[channel];

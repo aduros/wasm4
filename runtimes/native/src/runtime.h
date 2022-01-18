@@ -15,6 +15,11 @@
 #define W4_MOUSE_RIGHT 2
 #define W4_MOUSE_MIDDLE 4
 
+typedef struct {
+    uint16_t size;
+    uint8_t data[1024];
+} w4_Disk;
+
 void w4_runtimeInit (uint8_t* memory, uint8_t* disk);
 
 void w4_runtimeSetGamepad (int idx, uint8_t gamepad);

@@ -48,6 +48,10 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/ctr-static-cmake.yml' 
 
+  # VITA
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/vita-static-cmake.yml'
+
   ################################## MISC ####################################
   # Emscripten
   - project: 'libretro-infrastructure/ci-templates'
@@ -124,6 +128,12 @@ android-x86:
 libretro-build-ctr:
   extends:
     - .libretro-ctr-static-cmake-retroarch-master
+    - .core-defs
+
+# VITA
+libretro-build-vita:
+  extends:
+    - .libretro-vita-static-cmake-retroarch-master
     - .core-defs
 
 ################################### MISC #####################################

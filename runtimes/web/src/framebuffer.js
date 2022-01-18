@@ -109,12 +109,11 @@ export class Framebuffer {
         const drawColors = this.drawColors[0];
         const dc0 = drawColors & 0xf;
         const dc1 = (drawColors >>> 4) & 0xf;
-        const offset = +(dc1 !== 0)
 
         if (dc0 !== 0) {
             const fillColor = (dc0 - 1) & 0x3;
-            for (let yy = startY + offset; yy < endY - offset; ++yy) {
-                this.drawHLineFast(fillColor, startX + offset, yy, endX - offset);
+            for (let yy = startY; yy < endY; ++yy) {
+                this.drawHLineFast(fillColor, startX, yy, endX);
             }
         }
 
@@ -123,23 +122,27 @@ export class Framebuffer {
 
             // Left edge
             if (x >= 0 && x < WIDTH) {
-                for (let yy = startY; yy < endY - 1; ++yy) {
+                for (let yy = startY; yy < endY; ++yy) {
                     this.drawPoint(strokeColor, x, yy);
                 }
             }
 
             // Right edge
-            if (endX > 0 && endXUnclamped < WIDTH + 1) {
-                for (let yy = startY; yy < endY - 1; ++yy) {
-                    this.drawPoint(strokeColor, endX - 1, yy);
+            if (endXUnclamped >= 0 && endXUnclamped <= WIDTH) {
+                for (let yy = startY; yy < endY; ++yy) {
+                    this.drawPoint(strokeColor, endXUnclamped - 1, yy);
                 }
             }
 
             // Top edge
-            this.drawHLineFast(strokeColor, startX, startY, endX);
+            if (y >= 0 && y < HEIGHT) {
+                this.drawHLineFast(strokeColor, startX, y, endX);
+            }
 
             // Bottom edge
-            this.drawHLineFast(strokeColor, startX, endY - 1, endX);
+            if (endYUnclamped >= 0 && endYUnclamped <= HEIGHT) {
+                this.drawHLineFast(strokeColor, startX, endYUnclamped - 1, endX);
+            }
         }
     }
 

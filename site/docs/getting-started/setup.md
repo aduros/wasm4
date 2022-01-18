@@ -211,7 +211,7 @@ cd hello-world
 Compile the .wasm cartridge:
 
 ```shell
-cargo build --release
+cargo xtask build
 ```
 
 Run it in WASM-4 with:

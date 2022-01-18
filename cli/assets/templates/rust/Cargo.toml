@@ -4,8 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-[lib]
-crate-type = ["cdylib"]
 
 [dependencies]
 buddy-alloc = { version = "0.4.1", optional = true }
@@ -17,3 +15,8 @@ lto = true
 [features]
 # use `--no-default-features` or comment out next line to disable allocator
 default = ["buddy-alloc"]
+
+[workspace]
+members = [
+  "xtask",
+]

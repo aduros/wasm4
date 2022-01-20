@@ -162,7 +162,7 @@ int main (int argc, const char* argv[]) {
     audioInit();
 
     uint8_t* memory = w4_wasmInit();
-    w4_runtimeInit(memory, (uint8_t*)&disk);
+    w4_runtimeInit(memory, &disk);
 
     w4_wasmLoadModule(cartBytes, cartLength);
 

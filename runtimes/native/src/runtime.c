@@ -37,9 +37,9 @@ static Memory* memory;
 static w4_Disk* disk;
 static bool firstFrame;
 
-void w4_runtimeInit (uint8_t* memoryBytes, uint8_t* diskBytes) {
+void w4_runtimeInit (uint8_t* memoryBytes, w4_Disk* diskBytes) {
     memory = (Memory*)memoryBytes;
-    disk = (w4_Disk*)diskBytes;
+    disk = diskBytes;
     firstFrame = true;
 
     // Set memory to initial state

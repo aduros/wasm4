@@ -20,7 +20,7 @@ typedef struct {
     uint8_t data[1024];
 } w4_Disk;
 
-void w4_runtimeInit (uint8_t* memory, uint8_t* disk);
+void w4_runtimeInit (uint8_t* memory, w4_Disk* disk);
 
 void w4_runtimeSetGamepad (int idx, uint8_t gamepad);
 void w4_runtimeSetMouse (int16_t x, int16_t y, uint8_t buttons);

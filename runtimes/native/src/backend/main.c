@@ -105,6 +105,18 @@ static void saveDiskFile (const w4_Disk* disk, const char *diskPath) {
     }
 }
 
+static void trimFileExtension (char *path) {
+    size_t len = strlen(path);
+    while (len--) {
+        if (path[len] == '.') {
+            path[len] = 0; // Set null terminator
+            return;
+        } else if (path[len] == '/' || path[len] == '\\') {
+            return;
+        }
+    }
+}
+
 int main (int argc, const char* argv[]) {
     uint8_t* cartBytes;
     size_t cartLength;
@@ -135,6 +147,9 @@ int main (int argc, const char* argv[]) {
         // Look for disk file
         diskPath = malloc(strlen(argv[0]) + sizeof(DISK_FILE_EXT));
         strcpy(diskPath, argv[0]);
+#ifdef _WIN32
+        trimFileExtension(diskPath); // Trim .exe on Windows
+#endif
         strcat(diskPath, DISK_FILE_EXT);
         loadDiskFile(&disk, diskPath);
     } else {

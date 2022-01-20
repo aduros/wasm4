@@ -279,10 +279,7 @@ for _, i in w4.FRAMEBUFFER {
 
 ```rust
 unsafe {
-    FRAMEBUFFER
-        .as_mut()
-        .expect("framebuffer ref")
-        .fill(3 | (3 << 2) | (3 << 4) | (3 << 6));
+    (&mut *FRAMEBUFFER).fill(3 | (3 << 2) | (3 << 4) | (3 << 6));
 }
 ```
 
@@ -486,7 +483,7 @@ fn pixel(x: i32, y: i32) {
         }
         let color = (palette_color - 1) & 0b11;
 
-        let framebuffer = FRAMEBUFFER.as_mut().expect("framebuffer ref");
+        let framebuffer = &mut *FRAMEBUFFER;
 
         framebuffer[idx] = (color << shift) | (framebuffer[idx] & !mask);
     }

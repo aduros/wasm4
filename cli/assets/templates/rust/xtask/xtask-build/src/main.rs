@@ -19,14 +19,14 @@ fn main() {
 fn build(args: Vec<String>) {
     let wasm_modules = parse_executables(cargo_build(args));
     for wasm_module in &wasm_modules {
-        info!(target: "cargo-build", "built cartridge at: {wasm_module}");
+        info!(target: "cargo-build", "built cartridge at: {}", wasm_module);
     }
     let wasm_opt_bin = pick_wasm_opt_binary();
     for wasm_module in &wasm_modules {
         let wasm_opt_bin = match &wasm_opt_bin {
             Some(b) => b,
             None => {
-                debug!(target: "wasm-opt", "skipping wasm-opt size optimizations for {wasm_module}");
+                debug!(target: "wasm-opt", "skipping wasm-opt size optimizations for {}", wasm_module);
                 continue;
             }
         };
@@ -72,11 +72,11 @@ fn cargo_build(args: Vec<String>) -> Vec<u8> {
         .args(args)
         .stderr(process::Stdio::inherit());
 
-    debug!(target: "cargo-build", "running command: {command:?}");
+    debug!(target: "cargo-build", "running command: {:?}", command);
 
     let process::Output { status, stdout, .. } = command.output().unwrap();
     if !status.success() {
-        error!(target: "cargo-build", "build command failed with status: {status:?}");
+        error!(target: "cargo-build", "build command failed with status: {:?}", status);
         silent_panic(Box::new(status));
     }
 
@@ -95,12 +95,12 @@ fn wasm_opt(wasm_opt_bin: &Path, wasm_module: &str) {
         "--output",
         wasm_module,
     ]);
-    debug!(target: "wasm-opt", "running command: {command:?}");
+    debug!(target: "wasm-opt", "running command: {:?}", command);
 
     let status = command.status().unwrap();
 
     if !status.success() {
-        error!(target: "wasm-opt", "wasm-opt command failed with status: {status:?}");
+        error!(target: "wasm-opt", "wasm-opt command failed with status: {:?}", status);
         silent_panic(Box::new(status))
     }
 }
@@ -108,7 +108,7 @@ fn wasm_opt(wasm_opt_bin: &Path, wasm_module: &str) {
 fn pick_wasm_opt_binary() -> Option<PathBuf> {
     let bin = "wasm-opt".as_ref();
     if let Some(version) = wasm_opt_version(bin) {
-        debug!(target: "wasm-opt", "using installed {version}");
+        debug!(target: "wasm-opt", "using installed {}", version);
         return Some(bin.into());
     }
 
@@ -124,7 +124,7 @@ fn pick_wasm_opt_binary() -> Option<PathBuf> {
 fn wasm_opt_version(path: &Path) -> Option<String> {
     let mut command = Command::new(path);
     command.arg("--version");
-    debug!(target: "wasm-opt", "running: {command:?}");
+    debug!(target: "wasm-opt", "running: {:?}", command);
 
     command
         .output()
@@ -147,7 +147,7 @@ fn wasm_opt_cache(cache: &Cache) -> Option<PathBuf> {
             unimplemented!("this target is not supported")
         }
     };
-    let platform = {
+    let os = {
         if cfg!(target_os = "windows") {
             "windows"
         } else if cfg!(target_os = "linux") {
@@ -159,7 +159,10 @@ fn wasm_opt_cache(cache: &Cache) -> Option<PathBuf> {
         }
     };
     let url = format!(
-        "https://github.com/WebAssembly/binaryen/releases/download/{version}/binaryen-{version}-{arch}-{platform}.tar.gz",
+        "https://github.com/WebAssembly/binaryen/releases/download/{version}/binaryen-{version}-{arch}-{os}.tar.gz",
+        version = version,
+        arch = arch,
+        os = os,
     );
 
     let try_download = |install_permitted| {

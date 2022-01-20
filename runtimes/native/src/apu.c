@@ -72,11 +72,11 @@ static uint16_t getCurrentFrequency (const Channel* channel) {
 }
 
 static int16_t getCurrentVolume (const Channel* channel) {
-    if (time > channel->sustainTime) {
+    if (time >= channel->sustainTime) {
         return ramp(channel->volume, 0, channel->sustainTime, channel->releaseTime);
-    } else if (time > channel->decayTime) {
+    } else if (time >= channel->decayTime) {
         return channel->volume;
-    } else if (time > channel->attackTime) {
+    } else if (time >= channel->attackTime) {
         return ramp(MAX_VOLUME, channel->volume, channel->attackTime, channel->decayTime);
     } else {
         return ramp(0, MAX_VOLUME, channel->startTime, channel->attackTime);

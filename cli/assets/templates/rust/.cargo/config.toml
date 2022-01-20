@@ -2,7 +2,11 @@
 xtask = "run --package xtask --"
 
 [env]
+# Log levels available: "error", "warn", "info", "debug", "trace"
 CARGO_XTASK_LOG = "info"
+# Uncomment this to forbid wasm-opt installation and skip the prompt
+# WASM_OPT_NOINSTALL = "1"
+WASM_OPT_INSTALL_VERSION = "version_105"
 
 [target.wasm32-unknown-unknown]
 rustflags = [

@@ -52,6 +52,10 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/vita-static-cmake.yml'
 
+  # WiiU
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/wiiu-static-cmake.yml'
+
   ################################## MISC ####################################
   # Emscripten
   - project: 'libretro-infrastructure/ci-templates'
@@ -134,6 +138,12 @@ libretro-build-ctr:
 libretro-build-vita:
   extends:
     - .libretro-vita-static-cmake-retroarch-master
+    - .core-defs
+
+# WiiU
+libretro-build-wiiu:
+  extends:
+    - .libretro-wiiu-static-cmake-retroarch-master
     - .core-defs
 
 ################################### MISC #####################################

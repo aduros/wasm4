@@ -114,12 +114,11 @@ void w4_framebufferRect (int x, int y, int width, int height) {
     uint8_t dc01 = drawColors[0];
     uint8_t dc0 = dc01 & 0xf;
     uint8_t dc1 = (dc01 >> 4) & 0xf;
-    int offset = (dc1 != 0) ? 1 : 0;
 
     if (dc0 != 0) {
         uint8_t fillColor = (dc0 - 1) & 0x3;
-        for (int yy = startY + offset; yy < endY - offset; ++yy) {
-            drawHLine(fillColor, startX + offset, yy, endX - offset);
+        for (int yy = startY; yy < endY; ++yy) {
+            drawHLine(fillColor, startX, yy, endX);
         }
     }
 
@@ -128,23 +127,27 @@ void w4_framebufferRect (int x, int y, int width, int height) {
 
         // Left edge
         if (x >= 0 && x < WIDTH) {
-            for (int yy = startY; yy < endY - 1; ++yy) {
+            for (int yy = startY; yy < endY; ++yy) {
                 drawPoint(strokeColor, x, yy);
             }
         }
 
         // Right edge
-        if (endX > 0 && endXUnclamped < WIDTH + 1) {
-            for (int yy = startY; yy < endY - 1; ++yy) {
-                drawPoint(strokeColor, endX - 1, yy);
+        if (endXUnclamped >= 0 && endXUnclamped <= WIDTH) {
+            for (int yy = startY; yy < endY; ++yy) {
+                drawPoint(strokeColor, endXUnclamped - 1, yy);
             }
         }
 
         // Top edge
-        drawHLine(strokeColor, startX, startY, endX);
+        if (y >= 0 && y < HEIGHT) {
+            drawHLine(strokeColor, startX, y, endX);
+        }
 
         // Bottom edge
-        drawHLine(strokeColor, startX, endY - 1, endX);
+        if (endYUnclamped >= 0 && endYUnclamped <= HEIGHT) {
+            drawHLine(strokeColor, startX, endYUnclamped - 1, endX);
+        }
     }
 }
 

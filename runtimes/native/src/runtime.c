@@ -29,23 +29,18 @@ typedef struct {
 } Memory;
 
 typedef struct {
-    uint16_t size;
-    uint8_t data[1024];
-} Disk;
-
-typedef struct {
     Memory memory;
-    Disk disk;
+    w4_Disk disk;
     bool firstFrame;
 } SerializedState;
 
 static Memory* memory;
-static Disk* disk;
+static w4_Disk* disk;
 static bool firstFrame;
 
-void w4_runtimeInit (uint8_t* memoryBytes, uint8_t* diskBytes) {
+void w4_runtimeInit (uint8_t* memoryBytes, w4_Disk* diskBytes) {
     memory = (Memory*)memoryBytes;
-    disk = (Disk*)diskBytes;
+    disk = diskBytes;
     firstFrame = true;
 
     // Set memory to initial state
@@ -203,13 +198,13 @@ int w4_runtimeSerializeSize () {
 void w4_runtimeSerialize (void* dest) {
     SerializedState* state = dest;
     memcpy(&state->memory, memory, 0xffff);
-    memcpy(&state->disk, disk, sizeof(Disk));
+    memcpy(&state->disk, disk, sizeof(w4_Disk));
     state->firstFrame = firstFrame;
 }
 
 void w4_runtimeUnserialize (const void* src) {
     const SerializedState* state = src;
     memcpy(memory, &state->memory, 0xffff);
-    memcpy(disk, &state->disk, sizeof(Disk));
+    memcpy(disk, &state->disk, sizeof(w4_Disk));
     firstFrame = state->firstFrame;
 }

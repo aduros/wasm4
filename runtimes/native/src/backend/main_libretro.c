@@ -23,8 +23,7 @@ static bool wasmCopy = false;
 
 static uint8_t* memory;
 
-// 1024 bytes plus the 2 byte size header
-static uint8_t disk[1026] = { 0 };
+static w4_Disk disk = { 0 };
 
 static void audio_set_state (bool enable) {
 }
@@ -111,7 +110,7 @@ void retro_cheat_set (unsigned index, bool enabled, const char *code) {
 void* retro_get_memory_data (unsigned id) {
     switch (id) {
     case RETRO_MEMORY_SAVE_RAM:
-        return disk;
+        return &disk;
     case RETRO_MEMORY_SYSTEM_RAM:
         return memory;
     default:
@@ -209,7 +208,7 @@ bool retro_load_game (const struct retro_game_info* game) {
     environ_cb(RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK, &audio_cb);
 
     memory = w4_wasmInit();
-    w4_runtimeInit(memory, disk);
+    w4_runtimeInit(memory, &disk);
     w4_wasmLoadModule(wasmData, wasmLength);
 
     return true;
@@ -227,7 +226,7 @@ void retro_unload_game () {
 }
 
 void retro_reset () {
-    w4_runtimeInit(memory, disk);
+    w4_runtimeInit(memory, &disk);
     w4_wasmLoadModule(wasmData, wasmLength);
 }
 

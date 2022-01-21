@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <cubeb/cubeb.h>
 
@@ -11,6 +12,8 @@
 #if defined(_WIN32)
 #include <windows.h>
 #endif
+
+#define DISK_FILE_EXT ".disk"
 
 typedef struct {
     // Should be the 4 byte ASCII string "CART" (1414676803)
@@ -78,10 +81,48 @@ static void audioUninit () {
 #endif
 }
 
+static void loadDiskFile (w4_Disk* disk, const char *diskPath) {
+    FILE *file = fopen(diskPath, "rb");
+    if (file) {
+        fseek(file, 0, SEEK_END);
+        uint16_t saveSz = ftell(file);
+        fseek(file, 0, SEEK_SET);
+        if (saveSz > sizeof(disk->data)) {
+            saveSz = sizeof(disk->data);
+        }
+        disk->size = fread(disk->data, 1, saveSz, file);
+        fclose(file);
+    }
+}
+
+static void saveDiskFile (const w4_Disk* disk, const char *diskPath) {
+    if (disk->size) {
+        FILE* file = fopen(diskPath, "wb");
+        fwrite(disk->data, 1, disk->size, file);
+        fclose(file);
+    } else {
+        remove(diskPath);
+    }
+}
+
+static void trimFileExtension (char *path) {
+    size_t len = strlen(path);
+    while (len--) {
+        if (path[len] == '.') {
+            path[len] = 0; // Set null terminator
+            return;
+        } else if (path[len] == '/' || path[len] == '\\') {
+            return;
+        }
+    }
+}
+
 int main (int argc, const char* argv[]) {
     uint8_t* cartBytes;
     size_t cartLength;
+    w4_Disk disk = {0};
     const char* title = "WASM-4";
+    char* diskPath = NULL;
 
     if (argc < 2) {
         FILE* file = fopen(argv[0], "rb");
@@ -103,6 +144,14 @@ int main (int argc, const char* argv[]) {
         cartLength = fread(cartBytes, 1, footer.cartLength, file);
         fclose(file);
 
+        // Look for disk file
+        diskPath = malloc(strlen(argv[0]) + sizeof(DISK_FILE_EXT));
+        strcpy(diskPath, argv[0]);
+#ifdef _WIN32
+        trimFileExtension(diskPath); // Trim .exe on Windows
+#endif
+        strcat(diskPath, DISK_FILE_EXT);
+        loadDiskFile(&disk, diskPath);
     } else {
         FILE* file = fopen(argv[1], "rb");
         if (file == NULL) {
@@ -117,16 +166,24 @@ int main (int argc, const char* argv[]) {
         cartBytes = malloc(cartLength);
         cartLength = fread(cartBytes, 1, cartLength, file);
         fclose(file);
+
+        // Look for disk file
+        diskPath = malloc(strlen(argv[1]) + sizeof(DISK_FILE_EXT));
+        strcpy(diskPath, argv[1]);
+        strcat(diskPath, DISK_FILE_EXT);
+        loadDiskFile(&disk, diskPath);
     }
 
     audioInit();
 
     uint8_t* memory = w4_wasmInit();
-    w4_runtimeInit(memory, NULL);
+    w4_runtimeInit(memory, &disk);
 
     w4_wasmLoadModule(cartBytes, cartLength);
 
     w4_windowBoot(title);
 
     audioUninit();
+
+    saveDiskFile(&disk, diskPath);
 }

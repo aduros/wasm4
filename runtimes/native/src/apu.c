@@ -28,7 +28,7 @@ typedef struct {
     unsigned long long releaseTime;
 
     /** Sustain volume level. */
-    int16_t volume;
+    int16_t sustainVolume;
 
      /** Peak volume level (at the end of the attack phase). */
     int16_t peakVolume;
@@ -76,11 +76,11 @@ static uint16_t getCurrentFrequency (const Channel* channel) {
 
 static int16_t getCurrentVolume (const Channel* channel) {
     if (time > channel->sustainTime) {
-        return ramp(channel->volume, 0, channel->sustainTime, channel->releaseTime);
+        return ramp(channel->sustainVolume, 0, channel->sustainTime, channel->releaseTime);
     } else if (time > channel->decayTime) {
-        return channel->volume;
+        return channel->sustainVolume;
     } else if (time > channel->attackTime) {
-        return ramp(channel->peakVolume, channel->volume, channel->attackTime, channel->decayTime);
+        return ramp(channel->peakVolume, channel->sustainVolume, channel->attackTime, channel->decayTime);
     } else {
         return ramp(0, channel->peakVolume, channel->startTime, channel->attackTime);
     }
@@ -114,7 +114,7 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     channel->decayTime = channel->attackTime + SAMPLE_RATE*decay/60;
     channel->sustainTime = channel->decayTime + SAMPLE_RATE*sustain/60;
     channel->releaseTime = channel->sustainTime + SAMPLE_RATE*release/60;
-    channel->volume = MAX_VOLUME * sustainVolume/100;
+    channel->sustainVolume = MAX_VOLUME * sustainVolume/100;
     channel->peakVolume = peakVolume ? MAX_VOLUME * peakVolume/100 : MAX_VOLUME;
 
     if (channelIdx == 0 || channelIdx == 1) {

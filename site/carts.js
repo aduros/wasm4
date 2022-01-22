@@ -1,5 +1,11 @@
 const CARTS = [
     {
+        slug: "pocket-dust",
+        title: "Pocket Dust",
+        author: "Colby Hubscher",
+        github: "colbyhub",
+    },
+    {
         slug: "hills-moonlight",
         title: "Hills in the Moonlight",
         author: "Samarth Hattangady",

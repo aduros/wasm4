@@ -30,6 +30,9 @@ typedef struct {
     /** Sustain volume level. */
     int16_t volume;
 
+     /** Peak volume level (at the end of the attack phase). */
+    int16_t peakVolume;
+
     /** Used for time tracking. */
     float phase;
 
@@ -77,9 +80,9 @@ static int16_t getCurrentVolume (const Channel* channel) {
     } else if (time > channel->decayTime) {
         return channel->volume;
     } else if (time > channel->attackTime) {
-        return ramp(MAX_VOLUME, channel->volume, channel->attackTime, channel->decayTime);
+        return ramp(channel->peakVolume, channel->volume, channel->attackTime, channel->decayTime);
     } else {
-        return ramp(0, MAX_VOLUME, channel->startTime, channel->attackTime);
+        return ramp(0, channel->peakVolume, channel->startTime, channel->attackTime);
     }
 }
 
@@ -96,6 +99,9 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     int decay = (duration >> 16) & 0xff;
     int attack = (duration >> 24) & 0xff;
 
+    int sustainVolume = volume & 0xff;
+    int peakVolume = (volume >> 8) & 0xff;
+
     int channelIdx = flags & 0x03;
     int mode = (flags >> 2) & 0x3;
 
@@ -108,7 +114,8 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     channel->decayTime = channel->attackTime + SAMPLE_RATE*decay/60;
     channel->sustainTime = channel->decayTime + SAMPLE_RATE*sustain/60;
     channel->releaseTime = channel->sustainTime + SAMPLE_RATE*release/60;
-    channel->volume = MAX_VOLUME * volume/100;
+    channel->volume = MAX_VOLUME * sustainVolume/100;
+    channel->peakVolume = peakVolume ? MAX_VOLUME * peakVolume/100 : MAX_VOLUME;
 
     if (channelIdx == 0 || channelIdx == 1) {
         switch (mode) {

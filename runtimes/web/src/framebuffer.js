@@ -182,8 +182,8 @@ export class Framebuffer {
                 if (dc0 !== 0) {
                     const start = x0 - x + 1;
                     const end = x0 + x;
-                    this.drawHLineFast(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
-                    this.drawHLineFast(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
+                    this.drawHLineUnclipped(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
+                    this.drawHLineUnclipped(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
                 }
 
                 y++;

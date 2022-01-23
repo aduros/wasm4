@@ -73,15 +73,15 @@ export class APU {
 
                         if (channelIdx == 3) {
                             // Noise channel
-                            channel.phase += freq * freq / 1000000;
+                            channel.phase += freq * freq / (1000000/44100 * SAMPLE_RATE);
                             while (channel.phase > 0) {
                                 channel.phase--;
-                                const bit0 = channel.noiseSeed & 1;
-                                channel.noiseSeed >>= 1;
-                                const bit1 = channel.noiseSeed & 1;
-                                const feedback = (bit0 ^ bit1);
-                                channel.noiseSeed |= feedback << 14;
-                                channel.noiseLastRandom = (feedback << 1) - 1;
+                                let noiseSeed = channel.noiseSeed;
+                                noiseSeed ^= noiseSeed >> 7;
+                                noiseSeed ^= noiseSeed << 9;
+                                noiseSeed ^= noiseSeed >> 13;
+                                channel.noiseSeed = noiseSeed;
+                                channel.noiseLastRandom = ((noiseSeed & 0x1) << 1) - 1;
                             }
                             sample = volume * channel.noiseLastRandom;
 

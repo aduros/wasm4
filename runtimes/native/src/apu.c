@@ -153,15 +153,13 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
 
                 if (channelIdx == 3) {
                     // Noise channel
-                    channel->phase += freq * freq / 1000000.f;
+                    channel->phase += freq * freq / (1000000.f/44100 * SAMPLE_RATE);
                     while (channel->phase > 0) {
                         channel->phase--;
-                        const int bit0 = channel->noise.seed & 1;
-                        channel->noise.seed >>= 1;
-                        const int bit1 = channel->noise.seed & 1;
-                        const int feedback = (bit0 ^ bit1);
-                        channel->noise.seed |= feedback << 14;
-                        channel->noise.lastRandom = 2 * feedback - 1;
+                        channel->noise.seed ^= channel->noise.seed >> 7;
+                        channel->noise.seed ^= channel->noise.seed << 9;
+                        channel->noise.seed ^= channel->noise.seed >> 13;
+                        channel->noise.lastRandom = 2 * (channel->noise.seed & 0x1) - 1;
                     }
                     sample = volume * channel->noise.lastRandom;
 

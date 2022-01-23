@@ -37,7 +37,7 @@ jobs:
               name: Install local dependencies
               run: |
                   sudo apt update
-                  sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libasound2-dev libpulse-dev
+                  sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libxkbcommon-dev libasound2-dev libpulse-dev
 
             - name: Build
               run: |

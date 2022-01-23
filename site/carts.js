@@ -1,5 +1,11 @@
 const CARTS = [
     {
+        slug: "smash-sugar-parallelepipeds",
+        title: "Smash Sugar Parallelepipeds",
+        author: "Lázaro Albuquerque",
+        github: "lzralbu",
+    },
+    {
         slug: "pocket-dust",
         title: "Pocket Dust",
         author: "Colby Hubscher",

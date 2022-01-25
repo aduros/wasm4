@@ -1,5 +1,11 @@
 const CARTS = [
     {
+        slug: "wasm-wars",
+        title: "Wasm Wars",
+        author: "Daniel Kiyoshi",
+        github: "Kiyoshi364",
+    },
+    {
         slug: "smash-sugar-parallelepipeds",
         title: "Smash Sugar Parallelepipeds",
         author: "Lázaro Albuquerque",

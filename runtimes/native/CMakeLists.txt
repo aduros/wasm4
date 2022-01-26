@@ -42,6 +42,13 @@ endif ()
 file(GLOB COMMON_SOURCES RELATIVE "${CMAKE_SOURCE_DIR}" "src/*.c")
 file(GLOB M3_SOURCES RELATIVE "${CMAKE_SOURCE_DIR}" "vendor/wasm3/source/*.c")
 
+# Include a strnlen polyfill for some platforms where it's missing (OSX PPC, maybe others)
+include(CheckSymbolExists)
+check_symbol_exists(strnlen "string.h" HAVE_STRNLEN)
+if (NOT HAVE_STRNLEN)
+    list(APPEND M3_SOURCES "src/backend/strnlen.c")
+endif ()
+
 if (NOT LIBRETRO)
 
 #

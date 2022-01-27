@@ -152,6 +152,7 @@ int main (int argc, const char* argv[]) {
 #endif
         strcat(diskPath, DISK_FILE_EXT);
         loadDiskFile(&disk, diskPath);
+
     } else {
         FILE* file = fopen(argv[1], "rb");
         if (file == NULL) {
@@ -170,6 +171,7 @@ int main (int argc, const char* argv[]) {
         // Look for disk file
         diskPath = malloc(strlen(argv[1]) + sizeof(DISK_FILE_EXT));
         strcpy(diskPath, argv[1]);
+        trimFileExtension(diskPath); // Trim .wasm
         strcat(diskPath, DISK_FILE_EXT);
         loadDiskFile(&disk, diskPath);
     }

@@ -99,28 +99,30 @@ export class APU {
 
                         } else {
                             const phaseInc = freq / SAMPLE_RATE;
-                            channel.phase += phaseInc;
+                            let phase = channel.phase + phaseInc;
 
-                            if (channel.phase >= 1) {
-                                channel.phase--;
+                            if (phase >= 1) {
+                                phase--;
                             }
+                            channel.phase = phase;
 
                             if (channelIdx == 2) {
                                 // Triangle channel
-                                sample = volume * Math.abs(2*channel.phase - 1);
+                                sample = volume * Math.abs(2*phase - 1);
 
                             } else {
                                 // Pulse channel
                                 let dutyPhase, dutyPhaseInc, multiplier;
 
                                 // Map duty to 0->1
-                                if (channel.phase < channel.pulseDutyCycle) {
-                                    dutyPhase = channel.phase / channel.pulseDutyCycle;
-                                    dutyPhaseInc = phaseInc / channel.pulseDutyCycle;
+                                const pulseDutyCycle = channel.pulseDutyCycle;
+                                if (phase < pulseDutyCycle) {
+                                    dutyPhase = phase / pulseDutyCycle;
+                                    dutyPhaseInc = phaseInc / pulseDutyCycle;
                                     multiplier = volume;
                                 } else {
-                                    dutyPhase = (channel.phase - channel.pulseDutyCycle) / (1 - channel.pulseDutyCycle);
-                                    dutyPhaseInc = phaseInc / (1 - channel.pulseDutyCycle);
+                                    dutyPhase = (phase - pulseDutyCycle) / (1 - pulseDutyCycle);
+                                    dutyPhaseInc = phaseInc / (1 - pulseDutyCycle);
                                     multiplier = -volume;
                                 }
                                 sample = multiplier * polyblep(dutyPhase, dutyPhaseInc);

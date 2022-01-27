@@ -1,6 +1,7 @@
 #include "apu.h"
 
 #include <stdlib.h>
+#include <math.h>
 
 #define SAMPLE_RATE 44100
 #define MAX_VOLUME 0x2000 // 25% of INT16_MAX
@@ -106,7 +107,7 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
 
     // Restart the phase if this channel wasn't already playing
     if (time > channel->releaseTime) {
-        channel->phase = 0;
+        channel->phase = (channelIdx == 2) ? 0.5 : 0;
     }
 
     channel->freq1 = freq1;
@@ -171,13 +172,7 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
 
                     if (channelIdx == 2) {
                         // Triangle channel
-                        if (channel->phase < 0.25) {
-                            sample = lerp(0, volume, 4*channel->phase);
-                        } else if (channel->phase < 0.75) {
-                            sample = lerp(volume, -volume, 2*channel->phase - 0.5);
-                        } else {
-                            sample = lerp(-volume, 0, 4*channel->phase - 3);
-                        }
+                        sample = volume * fabs(2*channel->phase - 1);
 
                     } else {
                         // Pulse channel

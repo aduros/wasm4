@@ -93,13 +93,7 @@ export class APU {
 
                             if (channelIdx == 2) {
                                 // Triangle channel
-                                if (channel.phase < 0.25) {
-                                    sample = lerp(0, volume, 4*channel.phase);
-                                } else if (channel.phase < 0.75) {
-                                    sample = lerp(volume, -volume, 2*channel.phase - 0.5);
-                                } else {
-                                    sample = lerp(-volume, 0, 4*channel.phase - 3);
-                                }
+                                sample = volume * Math.abs(2*channel.phase - 1);
 
                             } else {
                                 // Pulse channel
@@ -161,7 +155,7 @@ export class APU {
 
         // Restart the phase if this channel wasn't already playing
         if (this.time > channel.releaseTime) {
-            channel.phase = 0;
+            channel.phase = (channelIdx == 2) ? 0.5 : 0;
         }
 
         channel.freq1 = freq1;

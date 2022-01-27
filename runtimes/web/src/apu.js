@@ -44,6 +44,18 @@ function lerp (value1, value2, t) {
     return value1 + t * (value2 - value1);
 }
 
+function polyblep (phase, phaseInc) {
+    if (phase < phaseInc) {
+        const t = phase / phaseInc;
+        return t+t - t*t;
+    } else if (phase > 1 - phaseInc) {
+        const t = (phase - (1 - phaseInc)) / phaseInc;
+        return 1 - (t+t - t*t);
+    } else {
+        return 1;
+    }
+}
+
 export class APU {
     constructor () {
         this.time = 0;
@@ -86,8 +98,10 @@ export class APU {
                             sample = volume * channel.noiseLastRandom;
 
                         } else {
-                            channel.phase += freq / SAMPLE_RATE;
-                            if (channel.phase > 1) {
+                            const phaseInc = freq / SAMPLE_RATE;
+                            channel.phase += phaseInc;
+
+                            if (channel.phase >= 1) {
                                 channel.phase--;
                             }
 
@@ -97,7 +111,19 @@ export class APU {
 
                             } else {
                                 // Pulse channel
-                                sample = channel.phase < channel.pulseDutyCycle ? volume : -volume;
+                                let dutyPhase, dutyPhaseInc, multiplier;
+
+                                // Map duty to 0->1
+                                if (channel.phase < channel.pulseDutyCycle) {
+                                    dutyPhase = channel.phase / channel.pulseDutyCycle;
+                                    dutyPhaseInc = phaseInc / channel.pulseDutyCycle;
+                                    multiplier = volume;
+                                } else {
+                                    dutyPhase = (channel.phase - channel.pulseDutyCycle) / (1 - channel.pulseDutyCycle);
+                                    dutyPhaseInc = phaseInc / (1 - channel.pulseDutyCycle);
+                                    multiplier = -volume;
+                                }
+                                sample = multiplier * polyblep(dutyPhase, dutyPhaseInc);
                             }
                         }
 

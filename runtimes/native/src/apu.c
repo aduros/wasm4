@@ -86,6 +86,18 @@ static int16_t getCurrentVolume (const Channel* channel) {
     }
 }
 
+static float polyblep (float phase, float phaseInc) {
+    if (phase < phaseInc) {
+        float t = phase / phaseInc;
+        return t+t - t*t;
+    } else if (phase > 1.f - phaseInc) {
+        float t = (phase - (1.f - phaseInc)) / phaseInc;
+        return 1.f - (t+t - t*t);
+    } else {
+        return 1.f;
+    }
+}
+
 void w4_apuInit () {
     channels[3].noise.seed = 0x0001;
 }
@@ -165,8 +177,10 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
                     sample = volume * channel->noise.lastRandom;
 
                 } else {
-                    channel->phase += (float)freq / SAMPLE_RATE;
-                    if (channel->phase > 1) {
+                    float phaseInc = (float)freq / SAMPLE_RATE;
+                    channel->phase += phaseInc;
+
+                    if (channel->phase >= 1) {
                         channel->phase--;
                     }
 
@@ -176,7 +190,20 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
 
                     } else {
                         // Pulse channel
-                        sample = channel->phase < channel->pulse.dutyCycle ? volume : -volume;
+                        float dutyPhase, dutyPhaseInc;
+                        int16_t multiplier;
+
+                        // Map duty to 0->1
+                        if (channel->phase < channel->pulse.dutyCycle) {
+                            dutyPhase = channel->phase / channel->pulse.dutyCycle;
+                            dutyPhaseInc = phaseInc / channel->pulse.dutyCycle;
+                            multiplier = volume;
+                        } else {
+                            dutyPhase = (channel->phase - channel->pulse.dutyCycle) / (1.f - channel->pulse.dutyCycle);
+                            dutyPhaseInc = phaseInc / (1.f - channel->pulse.dutyCycle);
+                            multiplier = -volume;
+                        }
+                        sample = multiplier * polyblep(dutyPhase, dutyPhaseInc);
                     }
                 }
 

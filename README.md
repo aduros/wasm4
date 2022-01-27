@@ -34,7 +34,8 @@ language that compiles to WebAssembly.
   This makes them simple to learn, and easier to focus on finishing your game.
 
 * **Language Agnostic**: Use any programming language, as long as it can compile to WebAssembly. Out
-  of the box we currently support: AssemblyScript, C/C++, Rust, Go, D, Nim, Odin, Zig.
+  of the box we currently support: AssemblyScript, C/C++, D, Go, Nelua, Nim, Odin, Rust, WAT, and
+  Zig.
 
 * **Portable**: WASM-4 is designed to run on any device that can execute WebAssembly, even outside
   of the web! We're planning a lightweight implementation written in C that will run even on a

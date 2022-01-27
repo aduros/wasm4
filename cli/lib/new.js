@@ -1,6 +1,6 @@
 const copy = require("recursive-copy");
 const path = require("path");
-const fs = require("fs/promises");
+const fs = require("fs").promises;
 const Mustache = require('mustache');
 
 const HELP = {

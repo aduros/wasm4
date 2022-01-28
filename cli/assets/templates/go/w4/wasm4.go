@@ -29,6 +29,7 @@ var MOUSE_X = (*int16)(unsafe.Pointer(uintptr(0x1a)))
 var MOUSE_Y = (*int16)(unsafe.Pointer(uintptr(0x1c)))
 var MOUSE_BUTTONS = (*uint8)(unsafe.Pointer(uintptr(0x1e)))
 var SYSTEM_FLAGS = (*uint8)(unsafe.Pointer(uintptr(0x1f)));
+var START_TIME = (*uint64)(unsafe.Pointer(uintptr(0x20)));
 var FRAMEBUFFER = (*[6400]uint8)(unsafe.Pointer(uintptr(0xa0)))
 
 const BUTTON_1 byte = 1

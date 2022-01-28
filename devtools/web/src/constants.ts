@@ -17,6 +17,7 @@ export const ADDR_MOUSE_X = 0x1a;
 export const ADDR_MOUSE_Y = 0x1c;
 export const ADDR_MOUSE_BUTTONS = 0x1e;
 export const ADDR_SYSTEM_FLAGS = 0x1f;
+export const ADDR_START_TIME = 0x20;
 export const ADDR_FRAMEBUFFER = 0xa0;
 
 export const BUTTON_X = 1;
@@ -82,6 +83,10 @@ export const memoryMap: Readonly<Record<string, Range>> = {
   SYSTEM_FLAGS: {
     offset: ADDR_SYSTEM_FLAGS,
     len: 1,
+  },
+  START_TIME: {
+    offset: ADDR_START_TIME,
+    len: 8,
   },
   RESERVED: {
     offset: 0x0020,

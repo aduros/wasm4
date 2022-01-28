@@ -25,6 +25,7 @@ pub const MOUSE_X: *const i16 = @intToPtr(*const i16, 0x1a);
 pub const MOUSE_Y: *const i16 = @intToPtr(*const i16, 0x1c);
 pub const MOUSE_BUTTONS: *const u8 = @intToPtr(*const u8, 0x1e);
 pub const SYSTEM_FLAGS: *u8 = @intToPtr(*u8, 0x1f);
+pub const START_TIME: *u64 = @intToPtr(*u64, 0x20);
 pub const FRAMEBUFFER: *[6400]u8 = @intToPtr(*[6400]u8, 0xA0);
 
 pub const BUTTON_1: u8 = 1;

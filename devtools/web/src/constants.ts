@@ -90,7 +90,7 @@ export const memoryMap: Readonly<Record<string, Range>> = {
   },
   RESERVED: {
     offset: 0x0020,
-    len: 128,
+    len: 120,
   },
   FRAMEBUFFER: {
     offset: ADDR_FRAMEBUFFER,

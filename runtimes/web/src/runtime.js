@@ -31,6 +31,10 @@ export class Runtime {
         this.pauseState = 0;
     }
 
+    async init () {
+        await this.apu.init();
+    }
+
     setMouse (x, y, buttons) {
         this.data.setInt16(constants.ADDR_MOUSE_X, x, true);
         this.data.setInt16(constants.ADDR_MOUSE_Y, y, true);
@@ -73,17 +77,11 @@ export class Runtime {
     }
 
     unlockAudio () {
-        const ctx = this.apu.ctx;
-        if (ctx.state == "suspended") {
-            ctx.resume();
-        }
+        this.apu.unlockAudio();
     }
 
     pauseAudio() {
-        const ctx = this.apu.ctx;
-        if (ctx.state == "running") {
-            ctx.suspend();
-        }
+        this.apu.pauseAudio();
     }
 
     reset (zeroMemory) {

@@ -14,6 +14,10 @@ const commonWebpackConfig = {
         test: /\.css$/i,
         use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
+      {
+        resourceQuery: /raw/,
+        type: 'asset/source',
+      },
     ],
   },
   plugins: [
@@ -33,6 +37,10 @@ const commonWebpackConfig = {
  * @type {import('webpack').Configuration}
  */
 module.exports = [
+  merge(commonWebpackConfig, {
+    entry: './src/apu-worklet.js',
+    output: { filename: 'apu-worklet.js' },
+  }),
   merge(commonWebpackConfig, {
     output: { filename: 'wasm4-developer.js' },
     plugins: [new webpack.DefinePlugin({ DEVELOPER_BUILD: true })],

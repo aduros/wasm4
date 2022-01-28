@@ -1,0 +1,32 @@
+{
+  "entries": [
+    "./src/main.ts"
+  ],
+  "options": {
+    "binaryFile": "build/cart.wasm",
+    "runtime": "incremental",
+    "importMemory": true,
+    "initialMemory": 1,
+    "maximumMemory": 1,
+    "noExportMemory": true,
+    "zeroFilledMemory": true,
+    "memoryBase": 6560,
+    "use": [
+      "seed=src/wasm4/seedHandler",
+      "trace="
+    ]
+  },
+  "targets": {
+    "release": {
+      "optimizeLevel": 3,
+      "shrinkLevel": 0,
+      "noAssert": true,
+      "use": "abort="
+    },
+    "debug": {
+      "debug": true,
+      "sourceMap": "http://localhost:4444/cart.wasm.map",
+      "use": "abort=src/wasm4/abortHandler"
+    }
+  }
+}

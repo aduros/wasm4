@@ -13,7 +13,7 @@ WASM_OPT_FLAGS = -Oz --zero-filled-memory --strip-producers
 DEBUG = 0
 
 # Compilation flags
-CFLAGS = -W -Wall -Wextra -Werror -Wno-unused -MMD -MP -fno-exceptions
+CFLAGS = -W -Wall -Wextra -Werror -Wno-unused -Wconversion -Wsign-conversion -MMD -MP -fno-exceptions
 ifeq ($(DEBUG), 1)
 	CFLAGS += -DDEBUG -O0 -g
 else

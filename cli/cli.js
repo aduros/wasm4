@@ -10,6 +10,10 @@ const langOption = new Option("--lang <lang>", "Use the given language")
     .choices(LANGS);
 
 function requireLang (opts) {
+    if (opts.surpriseMe) {
+        return LANGS[(Math.random()*LANGS.length) >>> 0];
+    }
+
     if (opts.assemblyscript) {
         return "assemblyscript";
     } else if (opts.c) {
@@ -51,7 +55,8 @@ const blankProject = (cmd) =>
         .option("--rs, --rust", "Create Rust project (Shorthand for --lang rust)")
         .option("--wat", "Create WebAssembly Text project (Shorthand for --lang wat)")
         .option("--zig", "Create Zig project (Shorthand for --lang zig)")
-        .addOption(langOption);
+        .addOption(langOption)
+        .option("--surprise-me", "Create a project in a random language");
 
 
 blankProject(

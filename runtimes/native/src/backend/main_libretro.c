@@ -29,8 +29,10 @@ static int16_t audio_output[2*AUDIO_BUFFER_FRAMES_PER_VIDEO_FRAME];
 
 static w4_Disk disk = { 0 };
 
+#ifndef PSP
 static void audio_set_state (bool enable) {
 }
+#endif
 
 static void fallback_log(enum retro_log_level level,
 			 const char *fmt, ...) {
@@ -45,10 +47,12 @@ static void fallback_log(enum retro_log_level level,
 
 static retro_log_printf_t log_cb = fallback_log;
 
+#ifndef PSP
 static void audio_callback () {
     w4_apuWriteSamples(audio_output, AUDIO_BUFFER_FRAMES_CALLBACK);
     audio_batch_cb(audio_output, AUDIO_BUFFER_FRAMES_CALLBACK);
 }
+#endif
 
 unsigned retro_api_version () {
     return RETRO_API_VERSION;
@@ -60,10 +64,12 @@ static struct retro_variable variables[] =
 	"wasm4_pixel_type",
 	"Pixel type; xrgb8888|rgb565",
     },
+#ifndef PSP
     {
 	"wasm4_audio_type",
 	"Audio type; callback|normal",
     },
+#endif
     { NULL, NULL },
 };
 
@@ -272,6 +278,7 @@ bool retro_load_game (const struct retro_game_info* game) {
     w4_runtimeInit(memory, &disk);
     w4_wasmLoadModule(wasmData, wasmLength);
 
+#ifndef PSP
     var.key = "wasm4_audio_type";
     var.value = NULL;
 
@@ -281,7 +288,12 @@ bool retro_load_game (const struct retro_game_info* game) {
 	struct retro_audio_callback audio_cb = { audio_callback, audio_set_state };
 	log_cb(RETRO_LOG_INFO, "Using callback audio\n");
 	environ_cb(RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK, &audio_cb);
-    } else {
+    }
+#else
+    use_audio_callback = 0;
+#endif
+
+    if (!use_audio_callback) {
 	log_cb(RETRO_LOG_INFO, "Using normal audio\n");
     }
 

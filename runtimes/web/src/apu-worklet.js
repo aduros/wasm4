@@ -68,9 +68,11 @@ class APUProcessor extends AudioWorkletProcessor {
             this.channels[ii] = new Channel();
         }
 
-        this.port.onmessage = event => {
-            this.tone(...event.data);
-        };
+        if (this.port != null) {
+            this.port.onmessage = event => {
+                this.tone(...event.data);
+            };
+        }
     }
 
     ramp (value1, value2, time1, time2) {

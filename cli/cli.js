@@ -169,6 +169,7 @@ program.command("bundle <cart>")
     .option("--icon-file <file>", `Game icon image. Supported types: ${supportedIconExtensions().join(', ')}.\nTakes precedence over --icon-url`)
     .option("--icon-url <url>", 'Favicon icon url')
     .option("--timestamp", 'Adds build timestamp to output', false)
+    .option("--html-disk-prefix <prefix>", "Specify a prefix for the disk localStorage key. Defaults to game title")
     .action((cart, opts) => {
         const bundle = require("./lib/bundle");
         bundle.run(cart, opts);

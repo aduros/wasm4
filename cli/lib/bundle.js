@@ -60,6 +60,7 @@ async function bundleHtml (cartFile, htmlFile, opts) {
         html: {
             title: opts.title,
             description: opts.description,
+            diskPrefix: opts.htmlDiskPrefix ?? opts.title,
             wasmCartJson,
             wasm4Css,
             wasm4js,

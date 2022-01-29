@@ -15,6 +15,9 @@
     {{#html.iconUrl}}
     <link rel="shortcut icon" href="{{html.iconUrl}}" />
     {{/html.iconUrl}}
+    {{#html.diskPrefix}}
+    <script id="wasm4-disk-prefix" type="text/plain">{{{html.diskPrefix}}}</script>
+    {{/html.diskPrefix}}
     <title>{{html.title}}</title>
     <style type="text/css" id="wasm4-css">{{{html.wasm4Css}}}</style>
   </head>

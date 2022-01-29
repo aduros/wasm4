@@ -22,6 +22,7 @@ static size_t wasmLength;
 static bool wasmCopy = false;
 
 static uint8_t* memory;
+static enum retro_pixel_format pixel_format = RETRO_PIXEL_FORMAT_UNKNOWN;
 
 static w4_Disk disk = { 0 };
 
@@ -51,6 +52,15 @@ unsigned retro_api_version () {
     return RETRO_API_VERSION;
 }
 
+static struct retro_variable variables[] =
+{
+    {
+	"wasm4_pixel_type",
+	"Pixel type; xrgb8888|rgb565",
+    },
+    { NULL, NULL },
+};
+
 void retro_set_environment (retro_environment_t cb) {
     environ_cb = cb;
 
@@ -69,6 +79,8 @@ void retro_set_environment (retro_environment_t cb) {
 
     if (cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &logging))
         log_cb = logging.log;
+
+    cb(RETRO_ENVIRONMENT_SET_VARIABLES, variables);
 }
 
 void retro_set_audio_sample (retro_audio_sample_t cb) {
@@ -162,11 +174,44 @@ void retro_deinit () {
     // printf("WASM4 deinit\n");
 }
 
+static void try_pixel_format(enum retro_pixel_format format) {
+    if (environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &format)) {
+	log_cb(RETRO_LOG_INFO, "Using pixel format %d\n", format);
+	pixel_format = format;
+    }
+
+}
 bool retro_load_game (const struct retro_game_info* game) {
     // printf("WASM4 load_game\n");
 
     bool persistent_data = false;
     struct retro_game_info_ext* ext;
+    enum retro_pixel_format preferredformat = RETRO_PIXEL_FORMAT_XRGB8888;
+    static const enum retro_pixel_format supported_formats[] = {RETRO_PIXEL_FORMAT_XRGB8888, RETRO_PIXEL_FORMAT_RGB565 };
+    struct retro_variable var;
+    unsigned i;
+
+    var.key = "wasm4_pixel_type";
+    var.value = NULL;
+
+    if (!environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var))
+	var.value = NULL;
+    if (var.value && strcmp(var.value, "rgb565") == 0)
+	preferredformat = RETRO_PIXEL_FORMAT_RGB565;
+    else
+	preferredformat = RETRO_PIXEL_FORMAT_XRGB8888;
+
+    pixel_format = RETRO_PIXEL_FORMAT_UNKNOWN;
+    try_pixel_format(preferredformat);
+    for (i = 0; pixel_format == RETRO_PIXEL_FORMAT_UNKNOWN && i < sizeof(supported_formats) / sizeof(supported_formats[0]); i++)
+	if (supported_formats[i] != preferredformat) // No need to try again
+	    try_pixel_format(supported_formats[i]);
+    if (pixel_format == RETRO_PIXEL_FORMAT_UNKNOWN) {
+	log_cb(RETRO_LOG_ERROR, "No supported image format found\n");
+	pixel_format = RETRO_PIXEL_FORMAT_UNKNOWN;
+	return false;
+    }
+
     if (environ_cb(RETRO_ENVIRONMENT_GET_GAME_INFO_EXT, &ext)) {
         persistent_data = ext->persistent_data;
     }
@@ -244,9 +289,6 @@ void retro_reset () {
 }
 
 void retro_get_system_av_info (struct retro_system_av_info* info) {
-    enum retro_pixel_format format = RETRO_PIXEL_FORMAT_XRGB8888;
-    environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &format);
-
     info->timing = (struct retro_system_timing) {
         .fps = 60.0,
         .sample_rate = 44100,
@@ -309,6 +351,23 @@ void retro_run () {
     w4_runtimeUpdate();
 }
 
+#define do_composite(type, palette) {			\
+	type* out = (type *)dest;			\
+	for (int n = 0; n < 160*160/4; ++n) {		\
+	    uint8_t quartet = framebuffer[n];		\
+	    int color1 = (quartet & 0x03) >> 0;		\
+	    int color2 = (quartet & 0x0c) >> 2;		\
+	    int color3 = (quartet & 0x30) >> 4;		\
+	    int color4 = (quartet & 0xc0) >> 6;		\
+							\
+	    *out++ = palette[color1];			\
+	    *out++ = palette[color2];			\
+	    *out++ = palette[color3];			\
+	    *out++ = palette[color4];			\
+	}						\
+	video_cb(dest, 160, 160, 160*sizeof(type));	\
+  }
+
 void w4_windowComposite (const uint32_t* palette, const uint8_t* framebuffer) {
     // // Get the write destination
     // uint32_t* dest;
@@ -333,19 +392,15 @@ void w4_windowComposite (const uint32_t* palette, const uint8_t* framebuffer) {
     static uint32_t dest[160*160];
 
     // Convert indexed 2bpp framebuffer to XRGB output
-    uint32_t* out = dest;
-    for (int n = 0; n < 160*160/4; ++n) {
-        uint8_t quartet = framebuffer[n];
-        int color1 = (quartet & 0b00000011) >> 0;
-        int color2 = (quartet & 0b00001100) >> 2;
-        int color3 = (quartet & 0b00110000) >> 4;
-        int color4 = (quartet & 0b11000000) >> 6;
-
-        *out++ = palette[color1];
-        *out++ = palette[color2];
-        *out++ = palette[color3];
-        *out++ = palette[color4];
+    if (pixel_format == RETRO_PIXEL_FORMAT_RGB565) {
+	uint16_t transform_palette[4];
+	int i;
+	for (i = 0; i < 4; i++) {
+	    uint32_t c = palette[i];
+	    transform_palette[i] = ((c >> 3) & 0x001f) | ((c >> 5) & 0x07e0) | ((c >> 8) & 0xf800);
+	}
+	do_composite(uint16_t, transform_palette);
+    } else {
+	do_composite(uint32_t, palette);
     }
-
-    video_cb(dest, 160, 160, 160*4);
 }

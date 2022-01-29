@@ -262,33 +262,8 @@ function runAll(files, opts) {
         template = fs.readFileSync(opts.template, { encoding: 'utf8' });
 
     } else {
-        // TODO(2021-12-20): Refactor into a common file and remove duplication with new.js
-        let lang = opts.lang;
-        if (ALIASES[lang]) {
-            lang = ALIASES[lang];
-        }
-        if (opts.assemblyscript) {
-            lang = "assemblyscript";
-        } else if (opts.c || opts.cpp) {
-            lang = "c";
-        } else if (opts.d) {
-            lang = "d";
-        } else if (opts.go) {
-            lang = "go";
-        } else if (opts.nelua) {
-            lang = "nelua";
-        } else if (opts.nim) {
-            lang = "nim";
-        } else if (opts.odin) {
-            lang = "odin";
-        } else if (opts.rust) {
-            lang = "rust";
-        } else if (opts.wat) {
-            lang = "wat";
-        } else if (opts.zig) {
-            lang = "zig";
-        }
-        template = TEMPLATES[lang];
+        const lang = opts.lang;
+        template = TEMPLATES[lang == "cpp" ? "c" : lang];
     }
 
     let output = { "sprites": [] };

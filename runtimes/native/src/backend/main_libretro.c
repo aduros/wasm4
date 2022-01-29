@@ -2,14 +2,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdarg.h>
 #include <libretro.h>
 
 #include "../apu.h"
 #include "../runtime.h"
 #include "../wasm.h"
 
-#define AUDIO_BUFFER_FRAMES 256
+#define AUDIO_BUFFER_FRAMES_CALLBACK 256
+#define AUDIO_BUFFER_FRAMES_PER_VIDEO_FRAME 735
 
 static retro_environment_t environ_cb;
 static retro_video_refresh_t video_cb;
@@ -22,21 +23,55 @@ static size_t wasmLength;
 static bool wasmCopy = false;
 
 static uint8_t* memory;
+static enum retro_pixel_format pixel_format = RETRO_PIXEL_FORMAT_UNKNOWN;
+static int use_audio_callback = 0;
+static int16_t audio_output[2*AUDIO_BUFFER_FRAMES_PER_VIDEO_FRAME];
 
 static w4_Disk disk = { 0 };
 
+#ifndef PSP
 static void audio_set_state (bool enable) {
 }
+#endif
 
-static void audio_callback () {
-    static int16_t output[2*AUDIO_BUFFER_FRAMES];
-    w4_apuWriteSamples(output, AUDIO_BUFFER_FRAMES);
-    audio_batch_cb(output, AUDIO_BUFFER_FRAMES);
+static void fallback_log(enum retro_log_level level,
+			 const char *fmt, ...) {
+    va_list args;
+
+    (void) level;
+
+    va_start(args, fmt);
+    vfprintf(stderr, fmt, args);
+    va_end(args);
 }
+
+static retro_log_printf_t log_cb = fallback_log;
+
+#ifndef PSP
+static void audio_callback () {
+    w4_apuWriteSamples(audio_output, AUDIO_BUFFER_FRAMES_CALLBACK);
+    audio_batch_cb(audio_output, AUDIO_BUFFER_FRAMES_CALLBACK);
+}
+#endif
 
 unsigned retro_api_version () {
     return RETRO_API_VERSION;
 }
+
+static struct retro_variable variables[] =
+{
+    {
+	"wasm4_pixel_type",
+	"Pixel type; xrgb8888|rgb565",
+    },
+#ifndef PSP
+    {
+	"wasm4_audio_type",
+	"Audio type; callback|normal",
+    },
+#endif
+    { NULL, NULL },
+};
 
 void retro_set_environment (retro_environment_t cb) {
     environ_cb = cb;
@@ -46,16 +81,18 @@ void retro_set_environment (retro_environment_t cb) {
         { "wasm", false, true },
         { NULL, false, false },
     };
+    struct retro_log_callback logging;
+
     environ_cb(RETRO_ENVIRONMENT_SET_CONTENT_INFO_OVERRIDE, exts);
 
     // WASM-4 requires content to run
     bool no_game = false;
     environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &no_game);
 
-    // if (cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &logging))
-    //    log_cb = logging.log;
-    // else
-    //    log_cb = fallback_log;
+    if (cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &logging))
+        log_cb = logging.log;
+
+    cb(RETRO_ENVIRONMENT_SET_VARIABLES, variables);
 }
 
 void retro_set_audio_sample (retro_audio_sample_t cb) {
@@ -149,11 +186,44 @@ void retro_deinit () {
     // printf("WASM4 deinit\n");
 }
 
+static void try_pixel_format(enum retro_pixel_format format) {
+    if (environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &format)) {
+	log_cb(RETRO_LOG_INFO, "Using pixel format %d\n", format);
+	pixel_format = format;
+    }
+
+}
 bool retro_load_game (const struct retro_game_info* game) {
     // printf("WASM4 load_game\n");
 
     bool persistent_data = false;
     struct retro_game_info_ext* ext;
+    enum retro_pixel_format preferredformat = RETRO_PIXEL_FORMAT_XRGB8888;
+    static const enum retro_pixel_format supported_formats[] = {RETRO_PIXEL_FORMAT_XRGB8888, RETRO_PIXEL_FORMAT_RGB565 };
+    struct retro_variable var;
+    unsigned i;
+
+    var.key = "wasm4_pixel_type";
+    var.value = NULL;
+
+    if (!environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var))
+	var.value = NULL;
+    if (var.value && strcmp(var.value, "rgb565") == 0)
+	preferredformat = RETRO_PIXEL_FORMAT_RGB565;
+    else
+	preferredformat = RETRO_PIXEL_FORMAT_XRGB8888;
+
+    pixel_format = RETRO_PIXEL_FORMAT_UNKNOWN;
+    try_pixel_format(preferredformat);
+    for (i = 0; pixel_format == RETRO_PIXEL_FORMAT_UNKNOWN && i < sizeof(supported_formats) / sizeof(supported_formats[0]); i++)
+	if (supported_formats[i] != preferredformat) // No need to try again
+	    try_pixel_format(supported_formats[i]);
+    if (pixel_format == RETRO_PIXEL_FORMAT_UNKNOWN) {
+	log_cb(RETRO_LOG_ERROR, "No supported image format found\n");
+	pixel_format = RETRO_PIXEL_FORMAT_UNKNOWN;
+	return false;
+    }
+
     if (environ_cb(RETRO_ENVIRONMENT_GET_GAME_INFO_EXT, &ext)) {
         persistent_data = ext->persistent_data;
     }
@@ -204,12 +274,28 @@ bool retro_load_game (const struct retro_game_info* game) {
     };
     environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, descs);
 
-    struct retro_audio_callback audio_cb = { audio_callback, audio_set_state };
-    environ_cb(RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK, &audio_cb);
-
     memory = w4_wasmInit();
     w4_runtimeInit(memory, &disk);
     w4_wasmLoadModule(wasmData, wasmLength);
+
+#ifndef PSP
+    var.key = "wasm4_audio_type";
+    var.value = NULL;
+
+    use_audio_callback = !environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) || !var.value || strcmp(var.value, "callback") == 0;
+
+    if (use_audio_callback) {
+	struct retro_audio_callback audio_cb = { audio_callback, audio_set_state };
+	log_cb(RETRO_LOG_INFO, "Using callback audio\n");
+	environ_cb(RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK, &audio_cb);
+    }
+#else
+    use_audio_callback = 0;
+#endif
+
+    if (!use_audio_callback) {
+	log_cb(RETRO_LOG_INFO, "Using normal audio\n");
+    }
 
     return true;
 }
@@ -231,9 +317,6 @@ void retro_reset () {
 }
 
 void retro_get_system_av_info (struct retro_system_av_info* info) {
-    enum retro_pixel_format format = RETRO_PIXEL_FORMAT_XRGB8888;
-    environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &format);
-
     info->timing = (struct retro_system_timing) {
         .fps = 60.0,
         .sample_rate = 44100,
@@ -294,7 +377,29 @@ void retro_run () {
     w4_runtimeSetMouse(80+80*mouseX/0x7fff, 80+80*mouseY/0x7fff, mouseButtons);
 
     w4_runtimeUpdate();
+
+    if (!use_audio_callback) {
+	w4_apuWriteSamples(audio_output, AUDIO_BUFFER_FRAMES_PER_VIDEO_FRAME);
+	audio_batch_cb(audio_output, AUDIO_BUFFER_FRAMES_PER_VIDEO_FRAME);
+    }
 }
+
+#define do_composite(type, palette) {			\
+	type* out = (type *)dest;			\
+	for (int n = 0; n < 160*160/4; ++n) {		\
+	    uint8_t quartet = framebuffer[n];		\
+	    int color1 = (quartet & 0x03) >> 0;		\
+	    int color2 = (quartet & 0x0c) >> 2;		\
+	    int color3 = (quartet & 0x30) >> 4;		\
+	    int color4 = (quartet & 0xc0) >> 6;		\
+							\
+	    *out++ = palette[color1];			\
+	    *out++ = palette[color2];			\
+	    *out++ = palette[color3];			\
+	    *out++ = palette[color4];			\
+	}						\
+	video_cb(dest, 160, 160, 160*sizeof(type));	\
+  }
 
 void w4_windowComposite (const uint32_t* palette, const uint8_t* framebuffer) {
     // // Get the write destination
@@ -320,19 +425,15 @@ void w4_windowComposite (const uint32_t* palette, const uint8_t* framebuffer) {
     static uint32_t dest[160*160];
 
     // Convert indexed 2bpp framebuffer to XRGB output
-    uint32_t* out = dest;
-    for (int n = 0; n < 160*160/4; ++n) {
-        uint8_t quartet = framebuffer[n];
-        int color1 = (quartet & 0b00000011) >> 0;
-        int color2 = (quartet & 0b00001100) >> 2;
-        int color3 = (quartet & 0b00110000) >> 4;
-        int color4 = (quartet & 0b11000000) >> 6;
-
-        *out++ = palette[color1];
-        *out++ = palette[color2];
-        *out++ = palette[color3];
-        *out++ = palette[color4];
+    if (pixel_format == RETRO_PIXEL_FORMAT_RGB565) {
+	uint16_t transform_palette[4];
+	int i;
+	for (i = 0; i < 4; i++) {
+	    uint32_t c = palette[i];
+	    transform_palette[i] = ((c >> 3) & 0x001f) | ((c >> 5) & 0x07e0) | ((c >> 8) & 0xf800);
+	}
+	do_composite(uint16_t, transform_palette);
+    } else {
+	do_composite(uint32_t, palette);
     }
-
-    video_cb(dest, 160, 160, 160*4);
 }

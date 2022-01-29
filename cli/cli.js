@@ -4,9 +4,47 @@ const { program, Option } = require("commander");
 const pkg = require('./package.json');
 const { supportedIconExtensions } = require('./lib/utils/icon');
 
-let blankProject = (cmd) =>
+const LANGS = ["assemblyscript", "c", "cpp", "d", "go", "nelua", "nim", "odin", "rust", "wat", "zig"];
+const langOption = new Option("--lang <lang>", "Use the given language")
+    .env("W4_LANG")
+    .choices(LANGS);
+
+function requireLang (opts) {
+    if (opts.surpriseMe) {
+        return LANGS[(Math.random()*LANGS.length) >>> 0];
+    }
+
+    if (opts.assemblyscript) {
+        return "assemblyscript";
+    } else if (opts.c) {
+        return "c";
+    } else if (opts.cpp) {
+        return "cpp";
+    } else if (opts.d) {
+        return "d";
+    } else if (opts.go) {
+        return "go";
+    } else if (opts.nelua) {
+        return "nelua";
+    } else if (opts.nim) {
+        return "nim";
+    } else if (opts.odin) {
+        return "odin";
+    } else if (opts.rust) {
+        return "rust";
+    } else if (opts.wat) {
+        return "wat";
+    } else if (opts.zig) {
+        return "zig";
+    }
+
+    console.error("You must specify a programming language, for example by passing --c or --rust.");
+    process.exit(1);
+}
+
+const blankProject = (cmd) =>
     cmd
-        .option("--as, --assemblyscript", "Create AssemblyScript project (Shorthand for --lang as/--lang assemblyscript)")
+        .option("--as, --assemblyscript", "Create AssemblyScript project (Shorthand for --lang assemblyscript)")
         .option("--c", "Create C project (Shorthand for --lang c)")
         .option("--cpp", "Create C++ project (Shorthand for --lang cpp)")
         .option("--d", "Create D project (Shorthand for --lang d)")
@@ -14,15 +52,11 @@ let blankProject = (cmd) =>
         .option("--nelua", "Create Nelua project (Shorthand for --lang nelua)")
         .option("--nim", "Create Nim project (Shorthand for --lang nim)")
         .option("--odin", "Create Odin project (Shorthand for --lang odin)")
-        .option("--rs, --rust", "Create Rust project (Shorthand for --lang rs/--lang rust)")
+        .option("--rs, --rust", "Create Rust project (Shorthand for --lang rust)")
         .option("--wat", "Create WebAssembly Text project (Shorthand for --lang wat)")
         .option("--zig", "Create Zig project (Shorthand for --lang zig)")
-        .addOption(
-            new Option("--lang <lang>", "Use the given language")
-                .env("W4_LANG")
-                .choices(["as", "assemblyscript", "c", "cpp", "d", "go", "nelua", "nim", "odin", "rs", "rust", "wat", "zig"])
-                .default("as")
-        )
+        .addOption(langOption)
+        .option("--surprise-me", "Create a project in a random language");
 
 
 blankProject(
@@ -30,8 +64,9 @@ blankProject(
         .alias("create")
         .description("Create a new blank project")
 )
-    .action(async (dir, opts) => {
+    .action((dir, opts) => {
         const newCmd = require("./lib/new");
+        opts.lang = requireLang(opts);
         newCmd.run(dir, opts);
     });
 
@@ -39,8 +74,9 @@ blankProject(
     program.command("init")
         .description("Create a new blank project in current folder")
 )
-    .action(async (opts) => {
+    .action(opts => {
         const newCmd = require("./lib/new");
+        opts.lang = requireLang(opts);
         newCmd.run(".", opts);
     });
 
@@ -101,26 +137,24 @@ program.command("run-native <cart>")
 
 program.command("png2src <images...>")
     .description("Convert images to source code")
-    .option("--as, --assemblyscript", "Generate AssemblyScript source (Shorthand for --lang as/--lang assemblyscript)")
+    .option("--as, --assemblyscript", "Generate AssemblyScript source (Shorthand for --lang assemblyscript)")
     .option("--c, --cpp", "Generate C/C++ source (Shorthand for --lang c)")
     .option("--d", "Generate D source (Shorthand for --lang d)")
     .option("--go", "Generate Go source (Shorthand for --lang go)")
     .option("--nelua", "Generate Nelua source (Shorthand for --lang nelua)")
     .option("--nim", "Generate Nim source (Shorthand for --lang nim)")
     .option("--odin", "Generate Odin source (Shorthand for --lang odin)")
-    .option("--rs, --rust", "Generate Rust source (Shorthand for --lang rs/--lang rust)")
+    .option("--rs, --rust", "Generate Rust source (Shorthand for --lang rust)")
     .option("--wat", "Generate WebAssembly Text source (Shorthand for --lang wat)")
     .option("--zig", "Generate Zig source (Shorthand for --lang zig)")
     .option("-t, --template <file>", "Template file with a custom output format")
     .option("-o, --output <file>", "File to write the result to", "-")
-    .addOption(
-        new Option("--lang <lang>", "Use the given language")
-            .env("W4_LANG")
-            .choices(["as", "assemblyscript", "c", "cpp", "d", "go", "nelua", "nim", "odin", "rs", "rust", "wat"])
-            .default("as")
-    )
+    .addOption(langOption)
     .action((images, opts) => {
         const png2src = require("./lib/png2src");
+        if (!opts.template) {
+            opts.lang = requireLang(opts);
+        }
         png2src.runAll(images, opts);
     });
 
@@ -135,6 +169,7 @@ program.command("bundle <cart>")
     .option("--icon-file <file>", `Game icon image. Supported types: ${supportedIconExtensions().join(', ')}.\nTakes precedence over --icon-url`)
     .option("--icon-url <url>", 'Favicon icon url')
     .option("--timestamp", 'Adds build timestamp to output', false)
+    .option("--html-disk-prefix <prefix>", "Specify a prefix for the disk localStorage key. Defaults to game title")
     .action((cart, opts) => {
         const bundle = require("./lib/bundle");
         bundle.run(cart, opts);

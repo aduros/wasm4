@@ -41,7 +41,7 @@ static void drawHLine (uint8_t color, int startX, int y, int endX) {
 
         int from = (WIDTH * y + fillStart) >> 2;
         int to = (WIDTH * y + fillEnd) >> 2;
-        uint8_t fillColor = color * 0b01010101;
+        uint8_t fillColor = color * 0x55;
 
         memset(framebuffer+from, fillColor, to-from);
         startX = fillEnd;

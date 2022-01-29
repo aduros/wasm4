@@ -23,6 +23,8 @@ if (author != null) {
     document.getElementById("author").textContent = "by "+author;
 }
 
+const diskName = (document.getElementById("wasm4-disk-prefix")?.textContent ?? qs.get('disk-prefix') ?? title) + "-disk";
+
 function setClass (element, className, enabled) {
     if (enabled) {
         element.classList.add(className);
@@ -62,6 +64,8 @@ async function loadCartWasm () {
     if (DEVELOPER_BUILD) {
         devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager())
     }
+
+    runtime.diskName = diskName;
 
     if (screenshot != null) {
         // Wait until the initial focus before starting the runtime

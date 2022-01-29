@@ -9,7 +9,8 @@
 #include "../runtime.h"
 #include "../wasm.h"
 
-#define AUDIO_BUFFER_FRAMES 256
+#define AUDIO_BUFFER_FRAMES_CALLBACK 256
+#define AUDIO_BUFFER_FRAMES_PER_VIDEO_FRAME 735
 
 static retro_environment_t environ_cb;
 static retro_video_refresh_t video_cb;
@@ -23,6 +24,8 @@ static bool wasmCopy = false;
 
 static uint8_t* memory;
 static enum retro_pixel_format pixel_format = RETRO_PIXEL_FORMAT_UNKNOWN;
+static int use_audio_callback = 0;
+static int16_t audio_output[2*AUDIO_BUFFER_FRAMES_PER_VIDEO_FRAME];
 
 static w4_Disk disk = { 0 };
 
@@ -43,9 +46,8 @@ static void fallback_log(enum retro_log_level level,
 static retro_log_printf_t log_cb = fallback_log;
 
 static void audio_callback () {
-    static int16_t output[2*AUDIO_BUFFER_FRAMES];
-    w4_apuWriteSamples(output, AUDIO_BUFFER_FRAMES);
-    audio_batch_cb(output, AUDIO_BUFFER_FRAMES);
+    w4_apuWriteSamples(audio_output, AUDIO_BUFFER_FRAMES_CALLBACK);
+    audio_batch_cb(audio_output, AUDIO_BUFFER_FRAMES_CALLBACK);
 }
 
 unsigned retro_api_version () {
@@ -57,6 +59,10 @@ static struct retro_variable variables[] =
     {
 	"wasm4_pixel_type",
 	"Pixel type; xrgb8888|rgb565",
+    },
+    {
+	"wasm4_audio_type",
+	"Audio type; callback|normal",
     },
     { NULL, NULL },
 };
@@ -262,8 +268,18 @@ bool retro_load_game (const struct retro_game_info* game) {
     };
     environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, descs);
 
-    struct retro_audio_callback audio_cb = { audio_callback, audio_set_state };
-    environ_cb(RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK, &audio_cb);
+    var.key = "wasm4_audio_type";
+    var.value = NULL;
+
+    use_audio_callback = !environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) || !var.value || strcmp(var.value, "callback") == 0;
+
+    if (use_audio_callback) {
+	struct retro_audio_callback audio_cb = { audio_callback, audio_set_state };
+	log_cb(RETRO_LOG_INFO, "Using callback audio\n");
+	environ_cb(RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK, &audio_cb);
+    } else {
+	log_cb(RETRO_LOG_INFO, "Using normal audio\n");
+    }
 
     memory = w4_wasmInit();
     w4_runtimeInit(memory, &disk);
@@ -349,6 +365,11 @@ void retro_run () {
     w4_runtimeSetMouse(80+80*mouseX/0x7fff, 80+80*mouseY/0x7fff, mouseButtons);
 
     w4_runtimeUpdate();
+
+    if (!use_audio_callback) {
+	w4_apuWriteSamples(audio_output, AUDIO_BUFFER_FRAMES_PER_VIDEO_FRAME);
+	audio_batch_cb(audio_output, AUDIO_BUFFER_FRAMES_PER_VIDEO_FRAME);
+    }
 }
 
 #define do_composite(type, palette) {			\

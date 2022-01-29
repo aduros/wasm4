@@ -268,6 +268,10 @@ bool retro_load_game (const struct retro_game_info* game) {
     };
     environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, descs);
 
+    memory = w4_wasmInit();
+    w4_runtimeInit(memory, &disk);
+    w4_wasmLoadModule(wasmData, wasmLength);
+
     var.key = "wasm4_audio_type";
     var.value = NULL;
 
@@ -280,10 +284,6 @@ bool retro_load_game (const struct retro_game_info* game) {
     } else {
 	log_cb(RETRO_LOG_INFO, "Using normal audio\n");
     }
-
-    memory = w4_wasmInit();
-    w4_runtimeInit(memory, &disk);
-    w4_wasmLoadModule(wasmData, wasmLength);
 
     return true;
 }

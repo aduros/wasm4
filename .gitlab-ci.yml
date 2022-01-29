@@ -34,6 +34,10 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: 'osx-cmake-x86.yml'
 
+  # MacOS (PPC)
+  - project: 'libretro-infrastructure/ci-templates'
+    file: 'osx-cmake-ppc.yml'
+
   # Linux
   - project: 'libretro-infrastructure/ci-templates'
     file: '/linux-cmake.yml'
@@ -47,6 +51,10 @@ include:
   # CTR (3DS)
   - project: 'libretro-infrastructure/ci-templates'
     file: '/ctr-static-cmake.yml' 
+
+  # PSP
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/psp-static-cmake.yml'
 
   # VITA
   - project: 'libretro-infrastructure/ci-templates'
@@ -102,6 +110,12 @@ libretro-build-osx-x64:
     - .libretro-osx-cmake-x86
     - .core-defs-osx-x64
 
+# MacOS PPC
+libretro-build-osx-ppc:
+  extends:
+    - .libretro-osx-cmake-ppc
+    - .core-defs
+
 ################################### CELLULAR #################################
 # Android ARMv7a
 android-armeabi-v7a:
@@ -132,6 +146,12 @@ android-x86:
 libretro-build-ctr:
   extends:
     - .libretro-ctr-static-cmake-retroarch-master
+    - .core-defs
+
+# PSP
+libretro-build-psp:
+  extends:
+    - .libretro-psp-static-cmake-retroarch-master
     - .core-defs
 
 # VITA

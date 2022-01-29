@@ -88,11 +88,11 @@ class APUProcessor extends AudioWorkletProcessor {
 
     getCurrentVolume (channel) {
         const time = this.time;
-        if (time > channel.sustainTime) {
+        if (time >= channel.sustainTime) {
             return this.ramp(channel.volume, 0, channel.sustainTime, channel.releaseTime);
-        } else if (time > channel.decayTime) {
+        } else if (time >= channel.decayTime) {
             return channel.volume;
-        } else if (time > channel.attackTime) {
+        } else if (time >= channel.attackTime) {
             return this.ramp(MAX_VOLUME, channel.volume, channel.attackTime, channel.decayTime);
         } else if (channel.startTime != channel.attackTime) {
             return this.ramp(0, MAX_VOLUME, channel.startTime, channel.attackTime);

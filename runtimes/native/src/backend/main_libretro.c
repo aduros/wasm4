@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdarg.h>
 #include <libretro.h>
 
 #include "../apu.h"
@@ -28,6 +28,19 @@ static w4_Disk disk = { 0 };
 static void audio_set_state (bool enable) {
 }
 
+static void fallback_log(enum retro_log_level level,
+			 const char *fmt, ...) {
+    va_list args;
+
+    (void) level;
+
+    va_start(args, fmt);
+    vfprintf(stderr, fmt, args);
+    va_end(args);
+}
+
+static retro_log_printf_t log_cb = fallback_log;
+
 static void audio_callback () {
     static int16_t output[2*AUDIO_BUFFER_FRAMES];
     w4_apuWriteSamples(output, AUDIO_BUFFER_FRAMES);
@@ -46,16 +59,16 @@ void retro_set_environment (retro_environment_t cb) {
         { "wasm", false, true },
         { NULL, false, false },
     };
+    struct retro_log_callback logging;
+
     environ_cb(RETRO_ENVIRONMENT_SET_CONTENT_INFO_OVERRIDE, exts);
 
     // WASM-4 requires content to run
     bool no_game = false;
     environ_cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &no_game);
 
-    // if (cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &logging))
-    //    log_cb = logging.log;
-    // else
-    //    log_cb = fallback_log;
+    if (cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &logging))
+        log_cb = logging.log;
 }
 
 void retro_set_audio_sample (retro_audio_sample_t cb) {

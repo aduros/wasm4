@@ -117,7 +117,7 @@ class APUProcessor extends AudioWorkletProcessor {
 
         // Restart the phase if this channel wasn't already playing
         if (this.time > channel.releaseTime) {
-            channel.phase = (channelIdx == 2) ? 0.5 : 0;
+            channel.phase = (channelIdx == 2) ? 0.25 : 0;
         }
 
         channel.freq1 = freq1;
@@ -187,7 +187,7 @@ class APUProcessor extends AudioWorkletProcessor {
 
                         if (channelIdx == 2) {
                             // Triangle channel
-                            sample = volume * Math.abs(2*phase - 1);
+                            sample = volume * (2*Math.abs(2*channel.phase - 1) - 1);
 
                         } else {
                             // Pulse channel

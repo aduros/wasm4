@@ -119,7 +119,7 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
 
     // Restart the phase if this channel wasn't already playing
     if (time > channel->releaseTime) {
-        channel->phase = (channelIdx == 2) ? 0.5 : 0;
+        channel->phase = (channelIdx == 2) ? 0.25 : 0;
     }
 
     channel->freq1 = freq1;
@@ -186,7 +186,7 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
 
                     if (channelIdx == 2) {
                         // Triangle channel
-                        sample = volume * fabs(2*channel->phase - 1);
+                        sample = volume * (2*fabs(2*channel->phase - 1) - 1);
 
                     } else {
                         // Pulse channel

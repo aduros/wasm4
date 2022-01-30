@@ -107,9 +107,10 @@ export class Runtime {
         this.data.setInt16(constants.ADDR_MOUSE_X, 0x7fff, true);
         this.data.setInt16(constants.ADDR_MOUSE_Y, 0x7fff, true);
 
+        // Set the timestamp in seconds
         const currentDate = new Date();
-        console.log("WTF?")
-        this.data.setBigUint64(constants.ADDR_TIME, currentDate.getTime());
+        const timestamp = Math.floor(currentDate.getTime() / 1000);
+        this.data.setBigUint64(constants.ADDR_TIME, BigInt.asUintN(64, BigInt(timestamp)), true);
     }
 
     async load (wasmBuffer) {

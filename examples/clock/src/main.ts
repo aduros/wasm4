@@ -5,7 +5,7 @@ let time: f64;
 
 export function start(): void {
     // Get the time the runtime was started.
-    time = load<u64>(w4.START_TIME) as f64;
+    time = load<u64>(w4.TIME) as f64;
 }
 
 export function update(): void {

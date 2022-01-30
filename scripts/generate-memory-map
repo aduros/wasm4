@@ -20,7 +20,7 @@ const memory = {
 
     SYSTEM_FLAGS: 1,
 
-    START_TIME: 8,
+    TIME: 8,
 
     _RESERVED: 120,
 
@@ -34,7 +34,7 @@ const cTypes = {
     MOUSE_X: "const int16_t",
     MOUSE_Y: "const int16_t",
     SYSTEM_FLAGS: "uint8_t",
-    START_TIME: "uint64_t",
+    TIME: "uint64_t",
     FRAMEBUFFER: "uint8_t",
 };
 
@@ -56,7 +56,7 @@ const neluaTypes = {
     MOUSE_X: "int16",
     MOUSE_Y: "int16",
     SYSTEM_FLAGS: "uint8",
-    START_TIME: "uint64",
+    TIME: "uint64",
     FRAMEBUFFER: "uint8",
 };
 

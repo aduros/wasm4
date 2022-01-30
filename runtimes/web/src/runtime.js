@@ -51,7 +51,7 @@ export class Runtime {
     }
 
     getStartTime () {
-        return this.data.getUint32(constants.ADDR_START_TIME) & mask; // TODO: dataView doesn't support getUint64?
+        return this.data.getUint32(constants.ADDR_TIME) & mask; // TODO: dataView doesn't support getUint64?
     }
 
     maskGamepad (idx, mask, down) {
@@ -106,7 +106,8 @@ export class Runtime {
         this.data.setInt16(constants.ADDR_MOUSE_Y, 0x7fff, true);
 
         const currentDate = new Date();
-        this.data.setBigUint64(constants.ADDR_START_TIME, currentDate.getTime());
+        console.log("WTF?")
+        this.data.setBigUint64(constants.ADDR_TIME, currentDate.getTime());
     }
 
     async load (wasmBuffer) {

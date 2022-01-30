@@ -27,7 +27,7 @@ pub const MOUSE_X: *const i16 = 0x1a as *const i16;
 pub const MOUSE_Y: *const i16 = 0x1c as *const i16;
 pub const MOUSE_BUTTONS: *const u8 = 0x1e as *const u8;
 pub const SYSTEM_FLAGS: *mut u8 = 0x1f as *mut u8;
-pub const START_TIME: *mut u64 = 0x20 as *mut u64;
+pub const TIME: *mut u64 = 0x20 as *mut u64;
 pub const FRAMEBUFFER: *mut [u8; 6400] = 0xa0 as *mut [u8; 6400];
 
 pub const BUTTON_1: u8 = 1;

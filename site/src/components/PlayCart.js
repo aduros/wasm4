@@ -6,6 +6,7 @@ import { Giscus } from "@giscus/react";
 
 function Embed ({ slug, title, author }) {
     let params = "?url="+encodeURIComponent(`/carts/${slug}.wasm`);
+    params += "&disk-prefix="+encodeURIComponent(slug);
     params += "&screenshot="+encodeURIComponent(`/carts/${slug}.png`);
     if (title) {
         params += "&title="+encodeURIComponent(title);

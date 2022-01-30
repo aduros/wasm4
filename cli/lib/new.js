@@ -62,11 +62,6 @@ const HELP = {
     },
 };
 
-const ALIASES = {
-    rs: "rust",
-    as: "assemblyscript",
-};
-
 /**
  * @param {string} destDir
  * @param {string} lang
@@ -95,34 +90,7 @@ const ALIASES = {
 }
 
 async function run (destDir, opts) {
-    let lang = opts.lang;
-    if (ALIASES[lang]) {
-        lang = ALIASES[lang];
-    }
-    if (opts.assemblyscript) {
-        lang = "assemblyscript";
-    } else if (opts.c) {
-        lang = "c";
-    } else if (opts.cpp) {
-        lang = "cpp";
-    } else if (opts.d) {
-        lang = "d";
-    } else if (opts.go) {
-        lang = "go";
-    } else if (opts.nelua) {
-        lang = "nelua";
-    } else if (opts.nim) {
-        lang = "nim";
-    } else if (opts.odin) {
-        lang = "odin";
-    } else if (opts.rust) {
-        lang = "rust";
-    } else if (opts.wat) {
-        lang = "wat";
-    } else if (opts.zig) {
-        lang = "zig";
-    }
-
+    const lang = opts.lang;
     const srcDir = path.resolve(`${__dirname}/../assets/templates/${lang == "cpp" ? "c" : lang}`);
     await copy(srcDir, destDir, { dot: true });
     await init(destDir, lang);

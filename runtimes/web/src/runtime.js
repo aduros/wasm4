@@ -21,6 +21,8 @@ export class Runtime {
 
         this.apu = new APU();
 
+        this.diskName = 'disk';
+
         this.memory = new WebAssembly.Memory({initial: 1, maximum: 1});
         this.data = new DataView(this.memory.buffer);
 
@@ -216,7 +218,7 @@ export class Runtime {
     diskr (destPtr, size) {
         let str;
         try {
-            str = localStorage.getItem("disk");
+            str = localStorage.getItem(this.diskName);
         } catch (error) {
             if (constants.DEBUG) {
                 console.error(error);
@@ -236,7 +238,7 @@ export class Runtime {
         const src = new Uint8Array(this.memory.buffer, srcPtr, bytesWritten);
         const str = z85.encode(src);
         try {
-            localStorage.setItem("disk", str);
+            localStorage.setItem(this.diskName, str);
         } catch (error) {
             if (constants.DEBUG) {
                 console.error(error);
@@ -306,7 +308,7 @@ export class Runtime {
                 case 115: // s
                     let cstrPtr = this.data.getUint32(argPtr, true);
                     output += this.getCString(cstrPtr);
-					argPtr += 4;
+                    argPtr += 4;
                     break;
                 case 102: // f
                     output += this.data.getFloat64(argPtr, true);

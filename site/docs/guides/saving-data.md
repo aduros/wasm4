@@ -2,10 +2,25 @@ import MultiLanguageCode from '@site/src/components/MultiLanguageCode';
 
 # Saving Data
 
+WASM-4 supports saving up to 1024 raw bytes of data to persist between
+sessions.
+
+For the web runtime, the disk is saved into the browser's localStorage and tied
+to the domain. The localStorage key is chosen [when bundling](distribution) to
+be unique and not conflict with other games served from the same domain.
+
+For the native runtime, the disk is saved as a file in the same directory as
+the game.
+
+In the case that a game is updated and its disk layout was changed, it's up to
+the developer to handle it. A simple method would be to prefix the disk data
+with a version number and when it doesn't match, either reset the current disk
+or migrate it to the new format.
+
 ## Writing Data to Disk
 
-WASM-4 supports saving up to 1024 raw bytes of data using `diskw()`. It takes a
-source data pointer along with a byte length.
+To save, use `diskw()`.
+It takes a source data pointer along with a byte length.
 
 For example, to write a 32 bit integer with the value `1337` to disk:
 

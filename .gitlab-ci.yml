@@ -60,6 +60,10 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/vita-static-cmake.yml'
 
+  # Dingux
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/dingux-cmake.yml'
+
   # WiiU
   - project: 'libretro-infrastructure/ci-templates'
     file: '/wiiu-static-cmake.yml'
@@ -158,6 +162,32 @@ libretro-build-psp:
 libretro-build-vita:
   extends:
     - .libretro-vita-static-cmake-retroarch-master
+    - .core-defs
+
+# Dingux
+libretro-build-dingux-mips32:
+  extends:
+    - .libretro-dingux-cmake-mips32
+    - .core-defs
+
+libretro-build-dingux-mips32-odbeta:
+  extends:
+    - .libretro-dingux-odbeta-cmake-mips32
+    - .core-defs
+
+libretro-build-rs90-mips32-odbeta:
+  extends:
+    - .libretro-rs90-odbeta-cmake-mips32
+    - .core-defs
+
+libretro-build-retrofw-mips32-odbeta:
+  extends:
+    - .libretro-retrofw-odbeta-cmake-mips32
+    - .core-defs
+
+libretro-build-miyoo-arm32:
+  extends:
+    - .libretro-miyoo-cmake-arm32
     - .core-defs
 
 # WiiU

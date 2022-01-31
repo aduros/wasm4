@@ -52,7 +52,7 @@ export class Runtime {
         return this.data.getUint8(constants.ADDR_SYSTEM_FLAGS) & mask;
     }
 
-    getStartTime () {
+    getTime () {
         return this.data.getUint32(constants.ADDR_TIME) & mask; // TODO: dataView doesn't support getUint64?
     }
 

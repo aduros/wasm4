@@ -48,6 +48,10 @@ include:
     file: '/android-cmake.yml'
 
   ################################## CONSOLES ################################
+  # Libnx
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/libnx-static-cmake.yml' 
+
   # CTR (3DS)
   - project: 'libretro-infrastructure/ci-templates'
     file: '/ctr-static-cmake.yml' 
@@ -146,6 +150,12 @@ android-x86:
     - .core-defs
 
 ################################### CONSOLES #################################
+# Libnx
+libretro-build-libnx:
+  extends:
+    - .libretro-libnx-static-cmake-retroarch-master
+    - .core-defs
+
 # CTR (3ds)
 libretro-build-ctr:
   extends:

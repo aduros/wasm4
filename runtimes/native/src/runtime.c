@@ -24,7 +24,7 @@ typedef struct {
     int16_t mouseY;
     uint8_t mouseButtons;
     uint8_t systemFlags;
-    uint64_t startTime;
+    uint64_t time;
     uint8_t _reserved[120];
     uint8_t framebuffer[WIDTH*HEIGHT>>2];
     uint8_t _user[58975];

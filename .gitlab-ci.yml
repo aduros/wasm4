@@ -48,6 +48,10 @@ include:
     file: '/android-cmake.yml'
 
   ################################## CONSOLES ################################
+  # Libnx
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/libnx-static-cmake.yml' 
+
   # CTR (3DS)
   - project: 'libretro-infrastructure/ci-templates'
     file: '/ctr-static-cmake.yml' 
@@ -59,6 +63,10 @@ include:
   # VITA
   - project: 'libretro-infrastructure/ci-templates'
     file: '/vita-static-cmake.yml'
+
+  # Dingux
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/dingux-cmake.yml'
 
   # WiiU
   - project: 'libretro-infrastructure/ci-templates'
@@ -142,6 +150,12 @@ android-x86:
     - .core-defs
 
 ################################### CONSOLES #################################
+# Libnx
+libretro-build-libnx:
+  extends:
+    - .libretro-libnx-static-cmake-retroarch-master
+    - .core-defs
+
 # CTR (3ds)
 libretro-build-ctr:
   extends:
@@ -158,6 +172,32 @@ libretro-build-psp:
 libretro-build-vita:
   extends:
     - .libretro-vita-static-cmake-retroarch-master
+    - .core-defs
+
+# Dingux
+libretro-build-dingux-mips32:
+  extends:
+    - .libretro-dingux-cmake-mips32
+    - .core-defs
+
+libretro-build-dingux-mips32-odbeta:
+  extends:
+    - .libretro-dingux-odbeta-cmake-mips32
+    - .core-defs
+
+libretro-build-rs90-mips32-odbeta:
+  extends:
+    - .libretro-rs90-odbeta-cmake-mips32
+    - .core-defs
+
+libretro-build-retrofw-mips32-odbeta:
+  extends:
+    - .libretro-retrofw-odbeta-cmake-mips32
+    - .core-defs
+
+libretro-build-miyoo-arm32:
+  extends:
+    - .libretro-miyoo-cmake-arm32
     - .core-defs
 
 # WiiU

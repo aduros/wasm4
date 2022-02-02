@@ -8,16 +8,7 @@ const server = require("./server");
 function start (opts) {
     let buildCommand, buildParams, buildOutput;
 
-    if (fs.existsSync("Makefile")) {
-        buildCommand = "make";
-        buildParams = ["--silent", "DEBUG=1"];
-        if (fs.existsSync("dub.json")) {
-            buildOutput = "cart.wasm"; // Special case for D
-        } else {
-            buildOutput = "build/cart.wasm";
-        }
-
-    } else if (fs.existsSync("Cargo.toml")) {
+    if (fs.existsSync("Cargo.toml")) {
         buildCommand = "cargo";
         buildParams = ["build", "--quiet"];
         buildOutput = "target/wasm32-unknown-unknown/debug/cart.wasm";
@@ -36,6 +27,15 @@ function start (opts) {
         buildCommand = "nimble";
         buildParams = ["dbg"];
         buildOutput = "build/cart.wasm";
+
+    } else if (fs.existsSync("Makefile")) {
+        buildCommand = "make";
+        buildParams = ["--silent", "DEBUG=1"];
+        if (fs.existsSync("dub.json")) {
+            buildOutput = "cart.wasm"; // Special case for D
+        } else {
+            buildOutput = "build/cart.wasm";
+        }
 
     } else {
         console.error("This directory doesn't look like a WASM-4 project.");

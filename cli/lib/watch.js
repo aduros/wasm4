@@ -66,11 +66,12 @@ function start (opts) {
 
     let buildTimeoutId = 0;
     function watchFilter (file, skip) {
-        switch (file) {
-        case ".git": case "node_modules": case "build": case "target": case "zig-cache": case "zig-out":
-            // Don't bother descending into certain dirs
-            return skip;
-        default:
+        const directories = path.dirname(file).split(path.sep);
+
+        // Don't bother descending into certain dirs
+        if (['.git', 'node_modules', 'build', 'target', 'zig-cache', 'zig-out'].some(dir => directories.includes(dir))) {
+            return skip
+        } else {
             // Only trigger on source file changes
             return /\.(c|cpp|d|go|h|nelua|nim|odin|rs|ts|wat|zig)$/.test(file);
         }

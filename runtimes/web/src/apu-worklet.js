@@ -1,6 +1,3 @@
-// IMPORTANT: When developing this file, update apu.js to load this file directly and not the
-// minified dist version.
-
 const SAMPLE_RATE = 44100;
 const MAX_VOLUME = 0.25;
 

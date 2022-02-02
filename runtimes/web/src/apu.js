@@ -1,5 +1,5 @@
-import workletRawSource from "../dist/apu-worklet.js?raw"; // RELEASE
-// import workletRawSource from "./apu-worklet.js?raw"; // DEBUG
+// TODO(2022-02-02): This file gets bundled unminified!
+import workletRawSource from "./apu-worklet.js?raw";
 
 export class APU {
     async init () {

@@ -142,7 +142,7 @@ The first occurrence of another color is at (${x}, ${y}) and has the value of (R
                 palette.set(packed, {
                     r, g, b, a, x, y,
                     i: colorCount++,
-                    brightness: (r + g + b) * a,
+                    brightness: (0.2126*r + 0.7152*g + 0.0722*b) * a,
                 });
             }
         }

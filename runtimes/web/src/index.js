@@ -125,8 +125,11 @@ async function loadCartWasm () {
 
     let videoRecorder = null;
     function recordVideo () {
-        if (videoRecorder != null) {
-            return; // Still recording, ignore
+        if (videoRecorder != null) { // Stops recording after hitting the record key during recording
+            videoRecorder.requestData();
+            videoRecorder.stop();
+            videoRecorder = null;
+            return;
         }
 
         const mimeType = "video/webm";
@@ -152,11 +155,7 @@ async function loadCartWasm () {
         };
 
         videoRecorder.start();
-        setTimeout(() => {
-            videoRecorder.requestData();
-            videoRecorder.stop();
-            videoRecorder = null;
-        }, 4000);
+        
     }
 
     let savedState = null;

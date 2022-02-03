@@ -1,4 +1,4 @@
-node_modules
+**/node_modules
 
 # Misc
 .DS_Store
@@ -14,3 +14,14 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
+
+# Ignore non `npm` lock files
+**/yarn.lock
+**/pnpm-lock.yaml
+**/pnpm-lock.yml
+
+# Do not commit npm lockfiles accidentally defined inside workspaces
+devtools/web/package-lock.json
+site/package-lock.json
+runtimes/web/package-lock.json
+cli/package-lock.json

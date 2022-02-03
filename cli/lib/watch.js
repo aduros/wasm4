@@ -8,16 +8,7 @@ const server = require("./server");
 function start (opts) {
     let buildCommand, buildParams, buildOutput;
 
-    if (fs.existsSync("Makefile")) {
-        buildCommand = "make";
-        buildParams = ["--silent", "DEBUG=1"];
-        if (fs.existsSync("dub.json")) {
-            buildOutput = "cart.wasm"; // Special case for D
-        } else {
-            buildOutput = "build/cart.wasm";
-        }
-
-    } else if (fs.existsSync("Cargo.toml")) {
+    if (fs.existsSync("Cargo.toml")) {
         buildCommand = "cargo";
         buildParams = ["build", "--quiet"];
         buildOutput = "target/wasm32-unknown-unknown/debug/cart.wasm";
@@ -36,6 +27,15 @@ function start (opts) {
         buildCommand = "nimble";
         buildParams = ["dbg"];
         buildOutput = "build/cart.wasm";
+
+    } else if (fs.existsSync("Makefile")) {
+        buildCommand = "make";
+        buildParams = ["--silent", "DEBUG=1"];
+        if (fs.existsSync("dub.json")) {
+            buildOutput = "cart.wasm"; // Special case for D
+        } else {
+            buildOutput = "build/cart.wasm";
+        }
 
     } else {
         console.error("This directory doesn't look like a WASM-4 project.");
@@ -66,11 +66,12 @@ function start (opts) {
 
     let buildTimeoutId = 0;
     function watchFilter (file, skip) {
-        switch (file) {
-        case ".git": case "node_modules": case "build": case "target": case "zig-cache": case "zig-out":
-            // Don't bother descending into certain dirs
-            return skip;
-        default:
+        const directories = path.dirname(file).split(path.sep);
+
+        // Don't bother descending into certain dirs
+        if (['.git', 'node_modules', 'build', 'target', 'zig-cache', 'zig-out'].some(dir => directories.includes(dir))) {
+            return skip
+        } else {
             // Only trigger on source file changes
             return /\.(c|cpp|d|go|h|nelua|nim|odin|rs|ts|wat|zig)$/.test(file);
         }

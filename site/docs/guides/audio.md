@@ -79,7 +79,7 @@ The [duty cycle](https://en.wikipedia.org/wiki/Duty_cycle) of the pulse channels
 with additional flags:
 
 | Flag         | Duty Cycle      |
-| ------------ | --------------- |
+| ---          | ---             |
 | `TONE_MODE1` | 12.5% (default) |
 | `TONE_MODE2` | 25%             |
 | `TONE_MODE3` | 50%             |
@@ -198,26 +198,26 @@ w4.tone(262 | (523 << 16), 60, 100, w4.TONE_PULSE1);
 
 ## Volume 
 
-There are two volume levels that can be passed to the tone function
+There are two volume levels that can be passed to the tone function:
 
-| Volume  | Shift | Description                                            |
-| ------- | ----- | ------------------------------------------------------ |
-| Sustain | 0     | The volume sustained for the `sustain` phase duration. |
-| Peak    | 8     | The volume reached by the `attack` phase               |
+| Volume  | Shift | Description                                                 |
+| ---     | ---   | ---                                                         |
+| Sustain | 0     | The main volume used for the `sustain` duration.            |
+| Peak    | 8     | Optional, the peak volume reached by the `attack` duration. |
 
-If the peak volume is not set (or is set to 0), the peak defaults to maximum volume.
+If the peak volume is not set (or is set to 0), it defaults to 100.
 
 ## ADSR Envelope
  
 [ADSR](https://en.wikipedia.org/wiki/ADSR_envelope) describes how the volume changes over time, and
 has 4 time components:
 
-| Time        | Shift | Description                                                                    |
-| ----------- | ----- | ------------------------------------------------------------------------------ |
-| **A**ttack  | 24    | The time it takes to initially ramp up from 0 volume to `peak` volume.         |
-| **D**ecay   | 16    | The time taken to ramp down from `peak` volume to the tone `volume` parameter. |
-| **S**ustain | 0     | The time to hold the tone steady at `volume`.                                  |
-| **R**elease | 8     | The time to ramp back down to 0 volume.                                        |
+| Time        | Shift | Description                                                             |
+| ---         | ---   | ---                                                                     |
+| **A**ttack  | 24    | The time it takes to initially ramp up from 0 volume to `peak` volume.  |
+| **D**ecay   | 16    | The time taken to ramp down from `peak` volume to the `sustain` volume. |
+| **S**ustain | 0     | The time to hold the tone steady at the `sustain` volume.               |
+| **R**elease | 8     | The time to ramp back down to 0 volume.                                 |
 
 These times are all measured in frames (1/60th of a second), and can be packed
 into the `duration` parameter.

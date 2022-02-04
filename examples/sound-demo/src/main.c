@@ -85,7 +85,7 @@ void drawControl (const char* name, int x, int y, int valueIdx) {
 void update () {
 
     int x = 20;
-    int y = 40;
+    int y = 36;
     int spacing = 12;
     drawControl("FREQ1", x, y + 0*spacing, 0);
     drawControl("FREQ2", x, y + 1*spacing, 1);

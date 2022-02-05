@@ -4,7 +4,8 @@
 #include <math.h>
 
 #define SAMPLE_RATE 44100
-#define MAX_VOLUME 0x2000 // 25% of INT16_MAX
+#define MAX_VOLUME 0x1333 // ~15% of INT16_MAX
+#define MAX_VOLUME_TRIANGLE 0x2000 // ~25% of INT16_MAX
 
 typedef struct {
     /** Starting frequency. */
@@ -135,8 +136,10 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     channel->decayTime = channel->attackTime + SAMPLE_RATE*decay/60;
     channel->sustainTime = channel->decayTime + SAMPLE_RATE*sustain/60;
     channel->releaseTime = channel->sustainTime + SAMPLE_RATE*release/60;
-    channel->sustainVolume = MAX_VOLUME * sustainVolume/100;
-    channel->peakVolume = peakVolume ? MAX_VOLUME * peakVolume/100 : MAX_VOLUME;
+
+    int16_t maxVolume = (channelIdx == 2) ? MAX_VOLUME_TRIANGLE : MAX_VOLUME;
+    channel->sustainVolume = maxVolume * sustainVolume/100;
+    channel->peakVolume = peakVolume ? maxVolume * peakVolume/100 : maxVolume;
 
     if (channelIdx == 0 || channelIdx == 1) {
         switch (mode) {

@@ -1,5 +1,6 @@
 const SAMPLE_RATE = 44100;
-const MAX_VOLUME = 0.25;
+const MAX_VOLUME = 0.15;
+const MAX_VOLUME_TRIANGLE = 0.25;
 
 class Channel {
     /** Starting frequency. */
@@ -132,8 +133,10 @@ class APUProcessor extends AudioWorkletProcessor {
         channel.decayTime = channel.attackTime + ((SAMPLE_RATE*decay/60) >>> 0);
         channel.sustainTime = channel.decayTime + ((SAMPLE_RATE*sustain/60) >>> 0);
         channel.releaseTime = channel.sustainTime + ((SAMPLE_RATE*release/60) >>> 0);
-        channel.sustainVolume = MAX_VOLUME * sustainVolume/100;
-        channel.peakVolume = peakVolume ? MAX_VOLUME * peakVolume/100 : MAX_VOLUME;
+
+        const maxVolume = (channelIdx == 2) ? MAX_VOLUME_TRIANGLE : MAX_VOLUME;
+        channel.sustainVolume = maxVolume * sustainVolume/100;
+        channel.peakVolume = peakVolume ? maxVolume * peakVolume/100 : maxVolume;
 
         if (channelIdx == 0 || channelIdx == 1) {
             switch (mode) {

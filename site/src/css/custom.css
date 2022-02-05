@@ -69,9 +69,15 @@ html[data-theme='dark'] .header-github-link:before {
   width: 100%;
 }
 
-.game-container {
-  text-align: center;
+@media only screen and (max-width: 996px) {
+  .col-cart {
+    --ifm-col-width: 50% !important;
+  }
 }
+
+/* .game-container { */
+/*   text-align: center; */
+/* } */
 
 .game-embed-wrapper {
   width: calc(min(480px, 100%, 100vh - 200px));

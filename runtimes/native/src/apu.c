@@ -59,6 +59,10 @@ static Channel channels[4] = { 0 };
 /** The current time, in samples. */
 static unsigned long long time = 0;
 
+static int w4_min (int a, int b) {
+    return a < b ? a : b;
+}
+
 static int lerp (int value1, int value2, float t) {
     return value1 + t * (value2 - value1);
 }
@@ -115,8 +119,8 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     int decay = (duration >> 16) & 0xff;
     int attack = (duration >> 24) & 0xff;
 
-    int sustainVolume = volume & 0xff;
-    int peakVolume = (volume >> 8) & 0xff;
+    int sustainVolume = w4_min(volume & 0xff, 100);
+    int peakVolume = w4_min((volume >> 8) & 0xff, 100);
 
     int channelIdx = flags & 0x03;
     int mode = (flags >> 2) & 0x3;

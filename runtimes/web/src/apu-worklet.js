@@ -113,8 +113,8 @@ class APUProcessor extends AudioWorkletProcessor {
         const decay = ((duration >> 16) & 0xff);
         const attack = ((duration >> 24) & 0xff);
 
-        const sustainVolume = volume & 0xff;
-        const peakVolume = (volume >> 8) & 0xff;
+        const sustainVolume = Math.min(volume & 0xff, 100);
+        const peakVolume = Math.min((volume >> 8) & 0xff, 100);
 
         const channelIdx = flags & 0x3;
         const mode = (flags >> 2) & 0x3;

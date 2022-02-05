@@ -1,156 +1,67 @@
-const DUTY_CYCLE_LENGTH = 0x800;
-const NOISE_LENGTH = 0x8000;
-
-// const NOISE_TABLE = [
-//     447443.2 / 44100,
-//     223721.6 / 44100,
-//     111860.8 / 44100,
-//     55930.4 / 44100,
-//     27965.2 / 44100,
-//     18643.5 / 44100,
-//     13982.6 / 44100,
-//     11186.1 / 44100,
-//     8860.3 / 44100,
-//     7046.3 / 44100,
-//     4709.9 / 44100,
-//     3523.2 / 44100,
-//     2348.8 / 44100,
-//     1761.6 / 44100,
-//     879.9 / 44100,
-//     440.0 / 44100,
-// ].reverse();
+// TODO(2022-02-02): This file gets bundled unminified!
+import workletRawSource from "./apu-worklet.js?raw";
 
 export class APU {
-    constructor () {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        this.ctx = ctx;
+    async init () {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+            sampleRate: 44100, // must match SAMPLE_RATE in worklet
+        });
+        this.audioCtx = audioCtx;
 
-        this.nodes = new Array(4);
-        this.gains = new Array(4);
+        const blob = new Blob([workletRawSource], {type: "application/javascript"});
+        const url = URL.createObjectURL(blob);
 
-        function createDutyCycle (pulseWidth) {
-            const real = new Float32Array(DUTY_CYCLE_LENGTH);
-            for (let ii = 1; ii < DUTY_CYCLE_LENGTH; ii++) {
-                real[ii] = 4 / (ii * Math.PI) * Math.sin(Math.PI * ii * pulseWidth);
+        try {
+            await audioCtx.audioWorklet.addModule(url);
+
+            const workletNode = new AudioWorkletNode(audioCtx, "wasm4-apu");
+            this.processorPort = workletNode.port;
+            workletNode.connect(audioCtx.destination);
+
+        } catch (error) {
+            console.warn("AudioWorklet loading failed, falling back to slow audio", error);
+
+            // Scoop out the APUProcessor with a simple polyfill
+            let processor;
+            const registerProcessor = (name, p) => {
+                processor = new p();
             }
-            return ctx.createPeriodicWave(real, new Float32Array(DUTY_CYCLE_LENGTH));
-        }
-        const duty25 = createDutyCycle(0.25);
-        this.pulseDutyCycles = [
-            createDutyCycle(0.125),
-            duty25,
-            createDutyCycle(0.5),
-            duty25, // 75 is the same as 25
-        ];
+            const fn = new Function("registerProcessor", "AudioWorkletProcessor", workletRawSource);
+            fn(registerProcessor, class {});
+            this.processor = processor;
 
-        const noiseBuffer = ctx.createBuffer(1, NOISE_LENGTH, ctx.sampleRate);
-        const noiseData = noiseBuffer.getChannelData(0);
-        let seed = 0x0001;
-        for (let ii = 0; ii < NOISE_LENGTH; ++ii) {
-            const bit0 = seed & 1;
-            seed >>= 1;
-            const bit1 = seed & 1;
-            const feedback = (bit0 ^ bit1);
-            seed |= feedback << 14;
-            noiseData[ii] = 2*feedback - 1;
+            const scriptNode = audioCtx.createScriptProcessor(1024, 0, 1);
+            scriptNode.onaudioprocess = event => {
+                const output = event.outputBuffer.getChannelData(0);
+                processor.process(null, [[output]]);
+            };
+            scriptNode.connect(audioCtx.destination);
         }
-        this.noiseBuffer = noiseBuffer;
     }
 
     tone (frequency, duration, volume, flags) {
-        const freq1 = frequency & 0xffff;
-        const freq2 = (frequency >> 16) & 0xffff;
-
-        const sustain = (duration & 0xff) / 60;
-        const release = ((duration >> 8) & 0xff) / 60;
-        const decay = ((duration >> 16) & 0xff) / 60;
-        const attack = ((duration >> 24) & 0xff) / 60;
-
-        const sustainVolume = volume & 0xff;
-        const peakVolume = (volume >> 8) & 0xff;
-
-        const channel = flags & 0x3;
-        const mode = (flags >> 2) & 0x3;
-
-        const ctx = this.ctx;
-        const attackTime = ctx.currentTime + attack;
-        const decayTime = attackTime + decay;
-        const sustainTime = decayTime + sustain;
-        const releaseTime = sustainTime + release;
-
-        // Maximum level of any channel should be -12 dB, or a quarter of full volume
-        let maxLevel = 0.25;
-        // The level reached by the attack phase
-        let peakLevel = peakVolume ? peakVolume/100 * maxLevel : maxLevel;
-        // The level sustained for the duration of the sustain phase 
-        let sustainLevel = sustainVolume/100 * maxLevel;
-
-        let node;
-        const existingNode = this.nodes[channel];
-        if (existingNode != null) {
-            node = existingNode;
-        } else {
-            // create a new node
-            if (channel == 3) {
-                node = ctx.createBufferSource();
-                node.buffer = this.noiseBuffer;
-                node.loop = true;
-            } else {
-                node = ctx.createOscillator();
-                if (channel == 2) {
-                    node.type = "triangle";
-                }
-            }
-            this.nodes[channel] = node;
-            node.addEventListener('ended', () => {this.nodes[channel] = null;}); //note: might want accesses to be atomic
-            node.start(0);
-        }
-
-        // update a node, whether new or reused
-        if (channel == 3) {
-            const pbrValue = node.playbackRate;
-            pbrValue.cancelScheduledValues(0);
-            pbrValue.setValueAtTime(freq1*freq1/1000000, 0);
-            // pbrValue.value = NOISE_TABLE[16*(freq1/1024) | 0];
-            if (freq2) {
-                pbrValue.linearRampToValueAtTime(freq2*freq2/1000000, releaseTime);
-            }
+        const processorPort = this.processorPort;
+        if (processorPort != null) {
+            // Send params out to the worker
+            processorPort.postMessage([frequency, duration, volume, flags]);
 
         } else {
-            if (channel != 2) {
-                const wave = this.pulseDutyCycles[mode];
-                node.setPeriodicWave(wave);
-            }
-
-            const freqValue = node.frequency;
-            freqValue.cancelScheduledValues(0);
-            freqValue.setValueAtTime(freq1, 0);
-            if (freq2) {
-                freqValue.linearRampToValueAtTime(freq2, releaseTime);
-            }
+            // For the ScriptProcessorNode fallback, just call tone() directly
+            this.processor.tone(frequency, duration, volume, flags);
         }
-        node.stop(releaseTime); // replaces any previous stop delay
+    }
 
-        // Create gain node with ADSR ramp
-        let gain;
-        const existingGain = this.gains[channel];
-        if (existingGain != null) {
-            gain = existingGain;
-            existingGain.gain.cancelScheduledValues(0);
-        } else {
-            gain = ctx.createGain();
-            this.gains[channel] = gain;
-            gain.connect(ctx.destination);
+    unlockAudio () {
+        const audioCtx = this.audioCtx;
+        if (audioCtx.state == "suspended") {
+            audioCtx.resume();
         }
-        node.connect(gain);
+    }
 
-        const gainValue = gain.gain;
-        if(existingNode == null){
-            gainValue.setValueAtTime(0, 0);
+    pauseAudio () {
+        const audioCtx = this.audioCtx;
+        if (audioCtx.state == "running") {
+            audioCtx.suspend();
         }
-        gainValue.linearRampToValueAtTime(peakLevel, attackTime);
-        gainValue.linearRampToValueAtTime(sustainLevel, decayTime);
-        gainValue.linearRampToValueAtTime(sustainLevel, sustainTime);
-        gainValue.linearRampToValueAtTime(0, releaseTime);
     }
 }

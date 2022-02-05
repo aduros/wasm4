@@ -1,8 +1,4 @@
 /dist/cart.wasm
 /dist/wasm4.css
-/dist/wasm4.js
-/dist/wasm4.js.*
-/dist/wasm4-developer.js
-/dist/wasm4-developer.js.*
-
-
+/dist/*.js
+/dist/*.js.*

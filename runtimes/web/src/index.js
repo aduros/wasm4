@@ -55,6 +55,8 @@ async function loadCartWasm () {
 
 (async function () {
     const runtime = new Runtime();
+    await runtime.init();
+
     const canvas = runtime.canvas;
     document.getElementById("content").appendChild(canvas);
     let wasmBuffer = await loadCartWasm();

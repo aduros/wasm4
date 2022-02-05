@@ -14,6 +14,10 @@ const commonWebpackConfig = {
         test: /\.css$/i,
         use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
+      {
+        resourceQuery: /raw/,
+        type: 'asset/source',
+      },
     ],
   },
   plugins: [

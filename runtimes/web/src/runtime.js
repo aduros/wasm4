@@ -2,7 +2,7 @@ import * as constants from "./constants";
 import * as z85 from "./z85";
 import { APU } from "./apu";
 import { Framebuffer } from "./framebuffer";
-import { WebGLCompositor, Canvas2DCompositor } from "./compositor";
+import { WebGLCompositor } from "./compositor";
 import * as devkit from "./devkit";
 
 export class Runtime {
@@ -17,7 +17,7 @@ export class Runtime {
             depth: false,
             antialias: false,
         });
-        this.compositor = new WebGLCompositor(gl); // TODO(2021-08-01): Fallback to CanvasCompositor
+        this.compositor = new WebGLCompositor(gl); // TODO(2021-08-01): Fallback to Canvas2DCompositor
 
         this.apu = new APU();
 

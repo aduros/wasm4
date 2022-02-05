@@ -10,7 +10,6 @@ export class WebGLCompositor {
 
         this.colorBuffer = new Uint32Array(WIDTH*HEIGHT >> 2);
         this.paletteBuffer = new Float32Array(3 * PALETTE_SIZE);
-        this.lastPalette = Array(PALETTE_SIZE);
 
         // Create a lookup table for each byte mapping to 4 bytes:
         // 0bxxyyzzww --> 0bxx000000_yy000000_zz000000_ww000000
@@ -23,6 +22,30 @@ export class WebGLCompositor {
             table[ii] = (xx << 30) | (yy << 22) | (zz << 14) | (ww << 6);
         }
         this.table = table;
+
+        const canvas = gl.canvas;
+        canvas.addEventListener("webglcontextlost", event => {
+            event.preventDefault();
+        });
+        canvas.addEventListener("webglcontextrestored", () => { this.initGL() });
+
+        this.initGL();
+
+        // // Test WebGL context loss
+        // window.addEventListener("mousedown", () => {
+        //     console.log("Losing context");
+        //     const ext = gl.getExtension('WEBGL_lose_context');
+        //     ext.loseContext();
+        //     setTimeout(() => {
+        //         ext.restoreContext();
+        //     }, 0);
+        // })
+    }
+
+    initGL () {
+        const gl = this.gl;
+
+        this.lastPalette = Array(PALETTE_SIZE);
 
         function createShader (type, source) {
             const shader = gl.createShader(type);

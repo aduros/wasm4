@@ -7,7 +7,6 @@
     "build:developer-build": "vite build --mode 'developer-build'",
     "build:apu-worklet": "esbuild src/apu-worklet.js --minify --outfile=src/apu-worklet.min.generated.js --bundle",
     "build": "npm run build:apu-worklet && npm run build:slim && npm run build:developer-build",
-    "watch:vite": "npm run start:developer-build",
     "start": "concurrently --kill-others -n apu-worklet,vite 'npm:build:apu-worklet -- --watch' 'npm:start:developer-build'",
     "start:slim": "vite --mode 'slim'",
     "start:developer-build": "vite --mode 'developer-build'",

@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => {
       DEVELOPER_BUILD: mode === BuildModes.DeveloperBuild
     },
     build: {
+      sourcemap: mode === BuildModes.DeveloperBuild,
       outDir: `dist/${mode}`,
       lib: {
         entry: 'src/index.ts',

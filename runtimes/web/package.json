@@ -2,13 +2,13 @@
   "name": "wasm4-runtime",
   "private": true,
   "scripts": {
-    "clean": "rimraf dist",
+    "clean": "rimraf dist public/cart.wasm",
     "build:slim": "vite build --mode 'slim'",
     "build:developer-build": "vite build --mode 'developer-build'",
     "build": "npm run build:slim && npm run build:developer-build",
     "start": "npm run start:developer-build",
-    "start:slim": "vite --mode 'slim' 'dist/slim'",
-    "start:developer-build": "vite --mode 'developer-build' 'dist/developer-build'",
+    "start:slim": "vite --mode 'slim'",
+    "start:developer-build": "vite --mode 'developer-build'",
     "prepare": "npm --prefix '../../devtools/web' i"
   },
   "dependencies": {

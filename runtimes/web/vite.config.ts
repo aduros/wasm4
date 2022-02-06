@@ -20,6 +20,10 @@ export default defineConfig(({ mode }) => {
     define: {
       DEVELOPER_BUILD: mode === BuildModes.DeveloperBuild
     },
+    server: {
+      port: 3000,
+      open: '/?url=cart.wasm',
+    },
     build: {
       sourcemap: mode === BuildModes.DeveloperBuild,
       outDir: `dist/${mode}`,

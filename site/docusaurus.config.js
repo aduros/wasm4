@@ -1,6 +1,12 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
+const unified = require('unified');
+const remarkParse = require('remark-parse');
+const remarkRehype = import('remark-rehype');
+const rehypeStringify = import('rehype-stringify');
+const fs = require("fs");
+
 const CARTS = require('./carts');
 
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
@@ -149,8 +155,26 @@ module.exports = {
                       exact: true,
                   });
 
+                  const markdownRenderer = unified()
+                      .use(remarkParse, {commonmark: true})
+                      .use((await remarkRehype).default)
+                      .use((await rehypeStringify).default)
+
                   for (let cart of CARTS) {
-                      const cartJsonPath = await actions.createData(`cart-${cart.slug}.json`, JSON.stringify(cart));
+                      const cartDetail = {
+                          ...cart,
+                      };
+
+                      // Load cart readme
+                      try {
+                          const markdown = fs.readFileSync("static/carts/"+cart.slug+".md");
+                          const readme = await markdownRenderer.process(markdown);
+                          cartDetail.readme = readme.contents;
+                      } catch (error) {
+                      }
+
+                      const cartJsonPath = await actions.createData(`cart-${cart.slug}.json`, JSON.stringify(cartDetail));
+
                       actions.addRoute({
                           path: "/play/"+cart.slug,
                           component: "@site/src/components/PlayCart",

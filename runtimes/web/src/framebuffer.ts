@@ -6,35 +6,33 @@ import {
     ADDR_DRAW_COLORS
 } from "./constants";
 
-function getStrokeColor(drawColors) {
-    const dc0 = drawColors[0] & 0xf;
-    return dc0 ? (dc0 - 1) & 0x3 : 0;
-}
-
 export class Framebuffer {
-    constructor (memory) {
+    drawColors: Uint16Array;
+    bytes: Uint8Array;
+
+    constructor (memory: ArrayBuffer) {
         this.bytes = new Uint8Array(memory, ADDR_FRAMEBUFFER, WIDTH * HEIGHT >>> 2);
         this.drawColors = new Uint16Array(memory, ADDR_DRAW_COLORS, 1);
     }
 
-    clear () {
+    clear (): void {
         this.bytes.fill(0);
     }
 
-    drawPoint (color, x, y) {
+    drawPoint (color: number, x: number, y: number) {
         const idx = (WIDTH * y + x) >>> 2;
         const shift = (x & 0x3) << 1;
         const mask = 0x3 << shift;
         this.bytes[idx] = (color << shift) | (this.bytes[idx] & ~mask);
     }
 
-    drawPointUnclipped (color, x, y) {
+    drawPointUnclipped (color: number, x: number, y: number) {
         if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
             this.drawPoint(color, x, y);
         }
     }
 
-    drawHLineFast(color, startX, y, endX) {
+    drawHLineFast(color: number, startX: number, y: number, endX: number) {
         const fillEnd = endX - (endX & 3);
         const fillStart = Math.min((startX + 3) & ~3, fillEnd);
 
@@ -56,7 +54,7 @@ export class Framebuffer {
         }
     }
 
-    drawHLineUnclipped(color, startX, y, endX) {
+    drawHLineUnclipped(color: number, startX: number, y: number, endX: number) {
         if (y >= 0 && y < HEIGHT) {
             if (startX < 0) {
                 startX = 0;
@@ -70,7 +68,7 @@ export class Framebuffer {
         }
     }
 
-    drawHLine(x, y, len) {
+    drawHLine(x: number, y: number, len: number) {
         const dc0 = this.drawColors[0] & 0xf;
         if (dc0 == 0) {
             return;
@@ -80,7 +78,7 @@ export class Framebuffer {
         this.drawHLineUnclipped(strokeColor, x, y, x + len);
     }
 
-    drawVLine(x, y, len) {
+    drawVLine(x: number, y: number, len: number) {
         if (y + len <= 0 || x < 0 || x >= WIDTH) {
             return;
         }
@@ -98,7 +96,7 @@ export class Framebuffer {
         }
     }
 
-    drawRect(x, y, width, height) {
+    drawRect(x: number, y: number, width: number, height: number) {
         const startX = Math.max(0, x);
         const startY = Math.max(0, y);
         const endXUnclamped = x + width;
@@ -146,7 +144,7 @@ export class Framebuffer {
         }
     }
 
-    drawOval (x, y, width, height) {
+    drawOval (x: number, y: number, width: number, height: number) {
         const drawColors = this.drawColors[0];
         const dc0 = drawColors & 0xf;
         const dc1 = (drawColors >>> 4) & 0xf;
@@ -237,7 +235,7 @@ export class Framebuffer {
     }
 
     // From https://github.com/nesbox/TIC-80/blob/master/src/core/draw.c
-    drawLine (x1, y1, x2, y2) {
+    drawLine (x1: number, y1: number, x2: number, y2: number) {
         const drawColors = this.drawColors[0];
         const dc0 = drawColors & 0xf;
         if (dc0 === 0) {
@@ -276,7 +274,7 @@ export class Framebuffer {
         }
     }
 
-    drawText (charArray, x, y) {
+    drawText (charArray: number[] | Uint8Array | Uint8ClampedArray | Uint16Array, x: number, y: number) {
         let currentX = x;
         for (let ii = 0, len = charArray.length; ii < len; ++ii) {
             const charCode = charArray[ii];
@@ -296,15 +294,15 @@ export class Framebuffer {
     }
 
     blit (
-        sprite,
-        dstX, dstY,
-        width, height,
-        srcX, srcY,
-        srcStride,
-        bpp2 = false,
-        flipX = false,
-        flipY = false,
-        rotate = false
+        sprite: any,
+        dstX: number, dstY: number,
+        width: number, height: number,
+        srcX: number, srcY: number,
+        srcStride: number,
+        bpp2: number | boolean = false,
+        flipX: number | boolean = false,
+        flipY: number | boolean = false,
+        rotate: number | boolean = false
     ) {
         const drawColors = this.drawColors[0];
 

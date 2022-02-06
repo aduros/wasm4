@@ -28,6 +28,14 @@ function Embed ({ slug, title, author }) {
 
 export default function PlayCart ({ cart }) {
     const {siteConfig} = useDocusaurusContext();
+
+    const dateString = new Intl.DateTimeFormat(undefined, {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+    }).format(new Date(cart.date));
+
     return (
         <Layout
             title={cart.title}
@@ -35,6 +43,10 @@ export default function PlayCart ({ cart }) {
             <main>
             <div className="container game-container">
                 <Embed {... cart}/>
+
+                <div className="text--center">
+                    <small>P1 controls: Arrows, X, Z / P2 controls: ESDF, Tab, Q</small>
+                </div>
 
                 <h1>{cart.title} <a className="button button--primary button--outline" href={`/carts/${cart.slug}.wasm`}>Download</a></h1>
                 <div className="avatar">
@@ -47,19 +59,13 @@ export default function PlayCart ({ cart }) {
                   <div className="avatar__intro">
                     <div className="avatar__name"><a href={`https://github.com/${cart.github}`} target="_blank">{cart.author}</a></div>
                     <small className="avatar__subtitle">
-                      February 5, 2022
+                      {dateString}
                     </small>
                   </div>
                 </div>
 
                 <div className="margin-top--lg">
-                    { cart.readme
-                        ? <div dangerouslySetInnerHTML={{__html: cart.readme}} />
-                        : <div>
-                            <p>Player 1 controls: Arrows, X, Z/C</p>
-                            <p>Player 2 controls: ESDF, Tab/Shift, Q/A</p>
-                          </div>
-                    }
+                    <div dangerouslySetInnerHTML={{__html: cart.readme}} />
                 </div>
 
                 <Giscus

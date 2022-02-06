@@ -1,5 +1,7 @@
 /static/embed
 /static/download
+/static/carts/*.disk
+/static/carts/*.srm
 
 
 # Production

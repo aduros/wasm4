@@ -1,3 +1,4 @@
+// Audio worklet file: do not export anything directly.
 const SAMPLE_RATE = 44100;
 const MAX_VOLUME = 0.15;
 const MAX_VOLUME_TRIANGLE = 0.25;

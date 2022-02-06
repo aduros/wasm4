@@ -2,11 +2,13 @@
   "name": "wasm4-runtime",
   "private": true,
   "scripts": {
-    "clean": "rimraf dist public/cart.wasm",
+    "clean": "rimraf dist public/cart.wasm src/apu-worklet.min.js",
     "build:slim": "vite build --mode 'slim'",
     "build:developer-build": "vite build --mode 'developer-build'",
-    "build": "npm run build:slim && npm run build:developer-build",
-    "start": "npm run start:developer-build",
+    "build:apu-worklet": "esbuild src/apu-worklet.js --minify --outfile=src/apu-worklet.min.generated.js --bundle",
+    "build": "npm run build:apu-worklet && npm run build:slim && npm run build:developer-build",
+    "watch:vite": "npm run start:developer-build",
+    "start": "concurrently --kill-others -n apu-worklet,vite 'npm:build:apu-worklet -- --watch' 'npm:start:developer-build'",
     "start:slim": "vite --mode 'slim'",
     "start:developer-build": "vite --mode 'developer-build'",
     "prepare": "npm --prefix '../../devtools/web' i"
@@ -18,6 +20,7 @@
   "devDependencies": {
     "@types/node": "^16.11.10",
     "vite": "^2.6.4",
-    "rimraf": "3.0.2"
+    "rimraf": "3.0.2",
+    "concurrently": "7.0.0"
   }
 }

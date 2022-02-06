@@ -12,7 +12,7 @@ function isValidBuildMode(mode: unknown): mode is BuildModes {
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   if(!isValidBuildMode(mode)) {
-    throw new TypeError(`[web-runtime][build]: unknown config provided: ${mode}`);
+    throw new TypeError(`[web-runtime][build]: unknown mode provided: ${mode}`);
   }
 
   return {

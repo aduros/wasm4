@@ -25,6 +25,7 @@ export const MOUSE_X: usize = 0x1a;
 export const MOUSE_Y: usize = 0x1c;
 export const MOUSE_BUTTONS: usize = 0x1e;
 export const SYSTEM_FLAGS: usize = 0x1f;
+export const TIME: usize = 0x20;
 export const FRAMEBUFFER: usize = 0xa0;
 
 export const BUTTON_1: u8 = 1;

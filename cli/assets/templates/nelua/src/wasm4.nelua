@@ -50,6 +50,7 @@ global MOUSE_X <comptime> = (@*int16)(0x1a)
 global MOUSE_Y <comptime> = (@*int16)(0x1c)
 global MOUSE_BUTTONS <comptime> = (@*uint8)(0x1e)
 global SYSTEM_FLAGS <comptime> = (@*uint8)(0x1f)
+global TIME <comptime> = (@*uint64)(0x20)
 global FRAMEBUFFER <comptime> = (@*[6400]uint8)(0xa0)
 
 global BUTTON_1 <comptime> = 1

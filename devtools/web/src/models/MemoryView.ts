@@ -44,6 +44,7 @@ export class MemoryView implements MemoryViewComputedProperties {
   readonly pointerPos: Point;
   readonly mouseBtnByte: number;
   readonly systemFlags: number;
+  readonly time: number;
   readonly gamepads: number[];
   readonly palette: [number, number, number, number];
   readonly drawColors: number;
@@ -58,6 +59,7 @@ export class MemoryView implements MemoryViewComputedProperties {
     this.palette = extractPalette(dataView);
     this.gamepads = extractGamepads(dataView, bufferedData);
     this.systemFlags = dataView.getUint8(constants.ADDR_SYSTEM_FLAGS);
+    this.time = dataView.getUint32(constants.ADDR_TIME); // TODO: DataView doesn't support uint64?
     this.mouseBtnByte =
       dataView.getUint8(constants.ADDR_MOUSE_BUTTONS) |
       bufferedData.mouseButtons;

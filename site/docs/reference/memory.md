@@ -12,7 +12,8 @@ WASM-4 uses a fixed memory layout of 64 KB.
 | `$001c` | 2            | [MOUSE_Y](#mouse_y)             |
 | `$001e` | 1            | [MOUSE_BUTTONS](#mouse_buttons) |
 | `$001f` | 1            | [SYSTEM_FLAGS](#system_flags)   |
-| `$0020` | 128          | Reserved for future use         |
+| `$0020` | 8            | [TIME](#TIME)         |
+| `$0028` | 112          | Reserved for future use         |
 | `$00a0` | 6400         | [FRAMEBUFFER](#framebuffer)     |
 | `$19a0` | 58975        | Available program memory        |
 
@@ -90,6 +91,10 @@ Byte containing flags that modify WASM-4's operation. By default all flags are o
 | --- | ---                           | ---                                               |
 | 0   | `SYSTEM_PRESERVE_FRAMEBUFFER` | Prevent clearing the framebuffer between frames.  |
 | 1   | `SYSTEM_HIDE_GAMEPAD_OVERLAY` | Hide the gamepad UI overlay on mobile.            |
+
+### TIME
+
+Unsigned 64 bit integer representing the unix timestamp of when the runtime was started.
 
 ### FRAMEBUFFER
 

@@ -56,6 +56,10 @@ export class Runtime {
         return this.data.getUint8(constants.ADDR_SYSTEM_FLAGS) & mask;
     }
 
+    getTime () {
+        return this.data.getUint32(constants.ADDR_TIME) & mask; // TODO: dataView doesn't support getUint64?
+    }
+
     maskGamepad (idx, mask, down) {
         const addr = constants.ADDR_GAMEPAD1 + idx;
         let buttons = this.data.getUint8(addr);
@@ -100,6 +104,11 @@ export class Runtime {
         // Initialize the mouse off screen
         this.data.setInt16(constants.ADDR_MOUSE_X, 0x7fff, true);
         this.data.setInt16(constants.ADDR_MOUSE_Y, 0x7fff, true);
+
+        // Set the timestamp in seconds
+        const currentDate = new Date();
+        const timestamp = Math.floor(currentDate.getTime() / 1000);
+        this.data.setBigUint64(constants.ADDR_TIME, BigInt.asUintN(64, BigInt(timestamp)), true);
     }
 
     async load (wasmBuffer) {

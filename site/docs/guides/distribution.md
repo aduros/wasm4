@@ -32,12 +32,28 @@ Audio is not yet implemented in the native runtime.
 Send a PR on Github to feature your game on the site!
 
 1. Fork the [wasm4 repository](https://github.com/aduros/wasm4).
-2. In your fork, edit [`/site/carts.js`](https://github.com/aduros/wasm4/blob/main/site/carts.js) and insert an entry
-   for your game at the top of the list. It should have a unique slug for the URL.
-3. Copy your `<slug>.wasm` (cart) and `<slug>.png` (160x160 screenshot) to the
-   [`/site/static/carts`](https://github.com/aduros/wasm4/tree/main/site/static/carts) directory.
-4. Commit your changes and open a pull request!
+2. Choose an unused ID that will be used for your game URL. For example, `my-game` will be playable
+   at https://wasm4.org/play/my-game.
+3. In the `/site/static/carts` directory, add 3 new files:
+    - `my-game.wasm`: The cart file.
+    - `my-game.png`: A 160x160 screenshot. You can take a screenshot by pressing F9 in the emulator.
+    - `my-game.md`: Your game's manual, contains metadata and other info for your players.
 
-:::tip
-You can take a 160x160 screenshot of your game by pressing F9 in the emulator.
-:::
+The manual is a
+[Markdown](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
+document that should be in this format:
+
+```md
+---
+author: (Your name or username)
+github: (Your github username, used to show a profile pic)
+date: (When the cart was last updated, in YYYY-MM-DD format)
+---
+
+# (Your game's title)
+
+Additional info can go here. It will be displayed on your game's page.
+```
+
+Now just commit your changes and open a pull request! As soon as it's merged, your game will appear
+on the site.

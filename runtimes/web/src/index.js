@@ -247,10 +247,10 @@ async function loadCartWasm () {
         let playerIdx = 0;
         let mask = 0;
         switch (event.code) {
-        case "KeyX": case "KeyV": case "Space": case "ControlLeft": case "ControlRight": case "KeyM":
+        case "KeyX": case "KeyV": case "Space": case "KeyM":
             mask = constants.BUTTON_X;
             break;
-        case "KeyZ": case "KeyC": case "AltLeft": case "AltRight": case "KeyN":
+        case "KeyZ": case "KeyC": case "KeyN":
             mask = constants.BUTTON_Z;
             break;
         case "ArrowUp":

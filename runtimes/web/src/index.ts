@@ -47,11 +47,7 @@ async function loadCartWasm () {
 
     // Is cart inlined?
     if (cartJson) {
-        if(!cartJson.textContent) {
-            throw new Error('web-runtime: empty json');
-        }
-
-        const { WASM4_CART, WASM4_CART_SIZE } = JSON.parse(cartJson.textContent);
+        const { WASM4_CART, WASM4_CART_SIZE } = JSON.parse(cartJson.textContent ?? '');
 
         // The cart was bundled in the html, decode it
         const buffer = new Uint8Array(WASM4_CART_SIZE);
@@ -63,7 +59,7 @@ async function loadCartWasm () {
         const cartUrl = qs.has("url") ? qs.get("url") : "cart.wasm";
 
         if(!cartUrl) {
-            throw new Error('web-runtime: missing cart Url');
+            throw new Error('web-runtime: missing cart url');
         }
         const res = await fetch(cartUrl);
         return await res.arrayBuffer();
@@ -79,7 +75,7 @@ async function loadCartWasm () {
     let wasmBuffer = await loadCartWasm();
     await runtime.load(wasmBuffer);
 
-    let devtoolsManager = { toggleDevtools(){}, updateCompleted(...args: any[]) {} };
+    let devtoolsManager = { toggleDevtools(){}, updateCompleted(...args: unknown[]) {} };
     if (DEVELOPER_BUILD) {
         devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager())
     }

@@ -23,10 +23,6 @@ w4 bundle cart.wasm --title "My Game" \
 
 This creates tiny (~200 KB) executables that run natively, no web browser required!
 
-:::caution
-Audio is not yet implemented in the native runtime.
-:::
-
 ## Publish on wasm4.org
 
 Send a PR on Github to feature your game on the site!

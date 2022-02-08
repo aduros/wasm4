@@ -294,7 +294,7 @@ export class Framebuffer {
     }
 
     blit (
-        sprite: any,
+        sprite: Uint8Array,
         dstX: number, dstY: number,
         width: number, height: number,
         srcX: number, srcY: number,

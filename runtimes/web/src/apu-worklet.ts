@@ -167,7 +167,7 @@ class APUProcessor extends AudioWorkletProcessor {
         }
     }
 
-    process (inputs: any, [[ output ]]: number[][][], parameters: any) {
+    process (inputs: Float32Array[][], [[ output ]]: Float32Array[][], parameters: Record<string, Float32Array>) {
         for (let ii = 0, frames = output.length; ii < frames; ++ii, ++this.time) {
             let sum = 0;
 

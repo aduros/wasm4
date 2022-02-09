@@ -29,6 +29,8 @@ static int16_t audio_output[2*AUDIO_BUFFER_FRAMES_PER_VIDEO_FRAME];
 
 static w4_Disk disk = { 0 };
 
+static int hold_in_start_value = 10;
+
 #ifndef PSP
 static void audio_set_state (bool enable) {
 }
@@ -70,6 +72,10 @@ static struct retro_variable variables[] =
 	"Audio type; callback|normal",
     },
 #endif
+    {
+	"wasm4_touchscreen_hold_frames",
+	"Frames to hold touch value; 10|20|30|5"
+    },
     { NULL, NULL },
 };
 
@@ -194,8 +200,35 @@ static void try_pixel_format(enum retro_pixel_format format) {
 	log_cb(RETRO_LOG_INFO, "Using pixel format %d\n", format);
 	pixel_format = format;
     }
-
 }
+
+static void load_variables(bool startup) {
+    struct retro_variable var;
+
+    if (startup) {
+#ifndef PSP
+	var.key = "wasm4_audio_type";
+	var.value = NULL;
+
+	use_audio_callback = !environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) || !var.value || strcmp(var.value, "callback") == 0;
+#else
+	use_audio_callback = 0;
+#endif
+    }
+
+    var.key = "wasm4_touchscreen_hold_frames";
+    var.value = NULL;
+
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+	hold_in_start_value = strtoul(var.value, 0, 0);
+    } else {
+	hold_in_start_value = 10;
+    }
+
+    if (hold_in_start_value < 0 || hold_in_start_value > 120)
+	hold_in_start_value = 10;
+}
+
 bool retro_load_game (const struct retro_game_info* game) {
     // printf("WASM4 load_game\n");
 
@@ -281,19 +314,14 @@ bool retro_load_game (const struct retro_game_info* game) {
     w4_runtimeInit(memory, &disk);
     w4_wasmLoadModule(wasmData, wasmLength);
 
+    load_variables(true);
+
 #ifndef PSP
-    var.key = "wasm4_audio_type";
-    var.value = NULL;
-
-    use_audio_callback = !environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) || !var.value || strcmp(var.value, "callback") == 0;
-
     if (use_audio_callback) {
 	struct retro_audio_callback audio_cb = { audio_callback, audio_set_state };
 	log_cb(RETRO_LOG_INFO, "Using callback audio\n");
 	environ_cb(RETRO_ENVIRONMENT_SET_AUDIO_CALLBACK, &audio_cb);
     }
-#else
-    use_audio_callback = 0;
 #endif
 
     if (!use_audio_callback) {
@@ -335,6 +363,10 @@ void retro_get_system_av_info (struct retro_system_av_info* info) {
 }
 
 void retro_run () {
+    bool updated = false;
+    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated) {
+	load_variables(false);
+    }
     input_poll_cb();
 
     // Gamepad handling
@@ -364,19 +396,80 @@ void retro_run () {
     }
 
     // Mouse handling
-    int16_t mouseX = input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_X);
-    int16_t mouseY = input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_Y);
+    int16_t mouseX;
+    int16_t mouseY;
     uint8_t mouseButtons = 0;
-    if (input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_LEFT)
-            || input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_PRESSED)) {
-        mouseButtons |= W4_MOUSE_LEFT;
+    int touchcount = 0;
+    static int hold_position_countdown;
+    static int hold_touch_countdown;
+    static int old_touchcount = 0, held_touchcount = 0;
+    static int hold_position_touchcount = 0;
+    static int holdX = 0;
+    static int holdY = 0;
+    static bool is_mouse =
+#if defined(ANDROID) || defined(__SWITCH__) || defined(VITA)
+	false
+#else
+	true
+#endif
+	;
+
+    while (input_state_cb(0, RETRO_DEVICE_POINTER, touchcount, RETRO_DEVICE_ID_POINTER_PRESSED))
+	touchcount++;
+
+    if (hold_position_countdown > 0 && touchcount < hold_position_touchcount) {
+	hold_position_countdown--;
+	mouseX = holdX;
+	mouseY = holdY;
+    } else if (touchcount > 0)  {
+	int sX = 0, sY = 0, i = 0;
+	for (i = 0; i < touchcount; i++) {
+	    sX += input_state_cb(0, RETRO_DEVICE_POINTER, i, RETRO_DEVICE_ID_POINTER_X);
+	    sY += input_state_cb(0, RETRO_DEVICE_POINTER, i, RETRO_DEVICE_ID_POINTER_Y);
+	}
+	mouseX = sX / touchcount;
+	mouseY = sY / touchcount;
+    } else if (is_mouse)  {
+	mouseX = input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_X);
+	mouseY = input_state_cb(0, RETRO_DEVICE_POINTER, 0, RETRO_DEVICE_ID_POINTER_Y);
+    } else {
+	mouseX = 0x7fff;
+	mouseY = 0x7fff;
     }
-    if (input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_RIGHT)) {
-        mouseButtons |= W4_MOUSE_RIGHT;
+
+    if (hold_position_countdown <= 0)
+	hold_position_touchcount = 0;
+
+    if (touchcount > hold_position_touchcount) {
+	hold_position_countdown = hold_in_start_value;
+	hold_position_touchcount = touchcount;
+	holdX = mouseX;
+	holdY = mouseY;
     }
-    if (input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_MIDDLE)) {
-        mouseButtons |= W4_MOUSE_MIDDLE;
+
+    if (touchcount == held_touchcount && hold_touch_countdown > 0) {
+	hold_touch_countdown--;
+    } else if (touchcount == held_touchcount) {
+	old_touchcount = touchcount;
+    } else {
+	held_touchcount = touchcount;
+	hold_touch_countdown = hold_in_start_value;
     }
+
+    bool lbutton = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_LEFT);
+    bool rbutton = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_RIGHT);
+    bool mbutton = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_MIDDLE);
+
+    if (lbutton || old_touchcount == 1) {
+	mouseButtons |= W4_MOUSE_LEFT;
+    }
+    if (rbutton || old_touchcount == 2) {
+	mouseButtons |= W4_MOUSE_RIGHT;
+    }
+    if (mbutton || old_touchcount >= 3) {
+	mouseButtons |= W4_MOUSE_MIDDLE;
+    }
+
     w4_runtimeSetMouse(80+80*mouseX/0x7fff, 80+80*mouseY/0x7fff, mouseButtons);
 
     w4_runtimeUpdate();

@@ -1,5 +1,6 @@
-// TODO(2022-02-02): This file gets bundled unminified!
-import workletRawSource from "./apu-worklet.js?raw";
+// Created using `npm run build:apu-worklet` and
+// is automatically generated in build and start scripts.
+import workletRawSource from "./apu-worklet.min.generated.js?raw";
 
 export class APU {
     async init () {

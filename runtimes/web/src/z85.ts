@@ -20,7 +20,7 @@ const DECODER = [
     0x21, 0x22, 0x23, 0x4F, 0x00, 0x50, 0x00, 0x00
 ];
 
-export function encode (src) {
+export function encode (src: number[] | Uint8Array | Uint8ClampedArray): string {
     const size = src.length;
     const extra = (size % 4);
     const paddedSize = extra ? size + 4-extra : size;
@@ -46,7 +46,7 @@ export function encode (src) {
 	return str;
 }
 
-export function decode (string, dest) {
+export function decode (string: string, dest: number[] | Uint8Array | Uint8ClampedArray): number {
     let byte_nbr = 0,
         char_nbr = 0,
         string_len = string.length,

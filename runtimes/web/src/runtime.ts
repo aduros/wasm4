@@ -6,6 +6,18 @@ import { WebGLCompositor } from "./compositor";
 import * as devkit from "./devkit";
 
 export class Runtime {
+    canvas: HTMLCanvasElement;
+    diskName: string;
+    memory: WebAssembly.Memory;
+    apu: any;
+    compositor: WebGLCompositor;
+    data: DataView;
+    framebuffer: Framebuffer;
+    pauseState: number;
+    wasmBufferByteLen: number;
+    wasm?: WebAssembly.Instance;
+    warnedFileSize: boolean = false;
+
     constructor () {
         const canvas = document.createElement("canvas");
         canvas.width = constants.WIDTH;
@@ -17,8 +29,13 @@ export class Runtime {
             depth: false,
             antialias: false,
         });
-        this.compositor = new WebGLCompositor(gl); // TODO(2021-08-01): Fallback to Canvas2DCompositor
 
+        if(!gl) {
+            throw new Error('web-runtime: could not create wegl context')  // TODO(2021-08-01): Fallback to Canvas2DCompositor
+        }
+
+        this.compositor = new WebGLCompositor(gl);
+        
         this.apu = new APU();
 
         this.diskName = 'disk';
@@ -38,25 +55,25 @@ export class Runtime {
         await this.apu.init();
     }
 
-    setMouse (x, y, buttons) {
+    setMouse (x: number, y: number, buttons: number) {
         this.data.setInt16(constants.ADDR_MOUSE_X, x, true);
         this.data.setInt16(constants.ADDR_MOUSE_Y, y, true);
         this.data.setUint8(constants.ADDR_MOUSE_BUTTONS, buttons);
     }
 
-    setGamepad (idx, buttons) {
+    setGamepad (idx: number, buttons: number) {
         this.data.setUint8(constants.ADDR_GAMEPAD1 + idx, buttons);
     }
 
-    getGamepad (idx) {
+    getGamepad (idx: number) {
         return this.data.getUint8(constants.ADDR_GAMEPAD1 + idx);
     }
 
-    getSystemFlag (mask) {
+    getSystemFlag (mask: number) {
         return this.data.getUint8(constants.ADDR_SYSTEM_FLAGS) & mask;
     }
 
-    maskGamepad (idx, mask, down) {
+    maskGamepad (idx: number, mask: number, down: boolean) {
         const addr = constants.ADDR_GAMEPAD1 + idx;
         let buttons = this.data.getUint8(addr);
         if (down) {
@@ -87,7 +104,7 @@ export class Runtime {
         this.apu.pauseAudio();
     }
 
-    reset (zeroMemory) {
+    reset (zeroMemory?: boolean) {
         // Initialize default color table and palette
         const mem32 = new Uint32Array(this.memory.buffer);
         if (zeroMemory) {
@@ -102,7 +119,7 @@ export class Runtime {
         this.data.setInt16(constants.ADDR_MOUSE_Y, 0x7fff, true);
     }
 
-    async load (wasmBuffer) {
+    async load (wasmBuffer:  ArrayBuffer | Uint8Array) {
         const limit = 0xffff;
         this.wasmBufferByteLen = wasmBuffer.byteLength;
 
@@ -150,17 +167,17 @@ export class Runtime {
             this.wasm = module.instance;
 
             // Call the WASI _start/_initialize function (different from WASM-4's start callback!)
-            if (this.wasm.exports._start != null) {
+            if (typeof this.wasm.exports._start === 'function') {
                 this.wasm.exports._start();
             }
-            if (this.wasm.exports._initialize != null) {
+            if (typeof this.wasm.exports._initialize === 'function') {
                 this.wasm.exports._initialize();
             }
         });
     }
 
-    async safeCall (fn) {
-        if (fn != null) {
+    async safeCall (fn?: null | undefined | WebAssembly.ExportValue) {
+        if (typeof fn === 'function') {
             try {
                 await fn();
             } catch (err) {
@@ -176,26 +193,26 @@ export class Runtime {
         }
     }
 
-    text (textPtr, x, y) {
+    text (textPtr: number, x: number, y: number) {
         const text = new Uint8Array(this.memory.buffer, textPtr);
         this.framebuffer.drawText(text, x, y);
     }
 
-    textUtf8 (textPtr, byteLength, x, y) {
+    textUtf8 (textPtr: number, byteLength: number, x: number, y: number) {
         const text = new Uint8Array(this.memory.buffer, textPtr, byteLength);
         this.framebuffer.drawText(text, x, y);
     }
 
-    textUtf16 (textPtr, byteLength, x, y) {
+    textUtf16 (textPtr: number, byteLength: number, x: number, y: number) {
         const text = new Uint16Array(this.memory.buffer, textPtr, byteLength >> 1);
         this.framebuffer.drawText(text, x, y);
     }
 
-    blit (spritePtr, x, y, width, height, flags) {
+    blit (spritePtr: number, x: number, y: number, width: number, height: number, flags: number) {
         this.blitSub(spritePtr, x, y, width, height, 0, 0, width, flags);
     }
 
-    blitSub (spritePtr, x, y, width, height, srcX, srcY, stride, flags) {
+    blitSub (spritePtr: number, x: number, y: number, width: number, height: number, srcX: number, srcY: number, stride: number, flags: number) {
         const sprite = new Uint8Array(this.memory.buffer, spritePtr);
         const bpp2 = (flags & 1);
         const flipX = (flags & 2);
@@ -205,7 +222,7 @@ export class Runtime {
         this.framebuffer.blit(sprite, x, y, width, height, srcX, srcY, stride, bpp2, flipX, flipY, rotate);
     }
 
-    diskr (destPtr, size) {
+    diskr (destPtr: number, size: number) {
         let str;
         try {
             str = localStorage.getItem(this.diskName);
@@ -223,7 +240,7 @@ export class Runtime {
         return bytesRead;
     }
 
-    diskw (srcPtr, size) {
+    diskw (srcPtr: number, size: number) {
         const bytesWritten = Math.min(size, constants.STORAGE_SIZE);
         const src = new Uint8Array(this.memory.buffer, srcPtr, bytesWritten);
         const str = z85.encode(src);
@@ -238,7 +255,7 @@ export class Runtime {
         return bytesWritten;
     }
 
-    getCString (ptr) {
+    getCString (ptr: number) {
         let str = "";
         for (;;) {
             const c = this.data.getUint8(ptr++);
@@ -250,7 +267,7 @@ export class Runtime {
         return str;
     }
 
-    print (str, error = false) {
+    print (str: string , error = false) {
         if (error) {
             console.error(str);
         } else {
@@ -261,23 +278,23 @@ export class Runtime {
         }
     }
 
-    trace (cstrPtr) {
+    trace (cstrPtr: number) {
         this.print(this.getCString(cstrPtr));
     }
 
-    traceUtf8 (strUtf8Ptr, byteLength) {
+    traceUtf8 (strUtf8Ptr: number, byteLength: number) {
         const strUtf8 = new Uint8Array(this.memory.buffer, strUtf8Ptr, byteLength);
         const str = new TextDecoder().decode(strUtf8);
         this.print(str);
     }
 
-    traceUtf16 (strUtf16Ptr, byteLength) {
+    traceUtf16 (strUtf16Ptr: number, byteLength: number) {
         const strUtf16 = new Uint8Array(this.memory.buffer, strUtf16Ptr, byteLength);
         const str = new TextDecoder("utf-16").decode(strUtf16);
         this.print(str);
     }
 
-    tracef (fmtPtr, argPtr) {
+    tracef (fmtPtr: number, argPtr: number) {
         var output = "";
         let ch;
         while (ch = this.data.getUint8(fmtPtr++)) {
@@ -313,7 +330,7 @@ export class Runtime {
     }
 
     start () {
-        this.safeCall(this.wasm.exports.start);
+        this.safeCall(this.wasm!.exports.start);
     }
 
     update () {
@@ -325,12 +342,12 @@ export class Runtime {
             this.framebuffer.clear();
         }
 
-        this.safeCall(this.wasm.exports.update);
+        this.safeCall(this.wasm!.exports.update);
 
         this.composite();
     }
 
-    blueScreen(err) {
+    blueScreen(err: Error) {
         this.pauseState |= constants.PAUSE_CRASHED;
 
         const COLORS = [
@@ -340,7 +357,7 @@ export class Runtime {
             0xffffff, // white
         ];
 
-        const toCharArr = (s) => [...s].map(x => x.charCodeAt(0));
+        const toCharArr = (s: string) => [...s].map(x => x.charCodeAt(0));
 
         const title = ` ${constants.CRASH_TITLE} `;
         const headerTitle = title;
@@ -363,7 +380,7 @@ export class Runtime {
         this.composite();
 
         // to help with debugging
-        this.print(err.stack, true);
+        this.print(err.stack ?? '', true);
     }
 
     composite () {
@@ -385,7 +402,7 @@ export class Runtime {
     }
 }
 
-function errorToBlueScreenText(err) {
+function errorToBlueScreenText(err: Error) {
     let message = `${err.name}:\n${err.message}`;
 
     // hand written messages for specific errors

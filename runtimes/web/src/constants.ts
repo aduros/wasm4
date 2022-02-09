@@ -1,6 +1,4 @@
-"use strict";
-
-export const DEBUG = (process.env.NODE_ENV != "production");
+export const DEBUG = import.meta.env.DEV;
 
 export const WIDTH = 160;
 export const HEIGHT = 160;

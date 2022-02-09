@@ -109,7 +109,7 @@ jobs:
 
             - name: Quick w4 CLI tests
               run: |
-                  W4=../cli-build/w4-linux
+                  W4=../cli-build/wasm4-linux
                   $W4 --help
                   $W4 --version
                   $W4 new --c /tmp/test-w4

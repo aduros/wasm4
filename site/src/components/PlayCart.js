@@ -3,6 +3,10 @@ import Layout from '@theme/Layout';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import { AspectRatio } from './AspectRatio';
 import { Giscus } from "@giscus/react";
+import { RWebShare } from "react-web-share";
+
+// const ShareIcon = require("../../static/img/devices.svg").default;
+import ShareIcon from "../../static/img/share.svg";
 
 function Embed ({ slug, title, author }) {
     let params = "?url="+encodeURIComponent(`/carts/${slug}.wasm`);
@@ -44,11 +48,17 @@ export default function PlayCart ({ cart }) {
             <div className="container game-container">
                 <Embed {... cart}/>
 
-                <div className="text--center">
+                <div className="text--center margin-bottom--lg">
                     <small>P1 controls: Arrows, X, Z / P2 controls: ESDF, Tab, Q</small>
                 </div>
 
-                <h1>{cart.title} <a className="button button--primary button--outline" href={`/carts/${cart.slug}.wasm`}>Download</a></h1>
+                <h1>
+                    {cart.title}
+                    <a className="cart-download button button--primary button--outline" href={`/carts/${cart.slug}.wasm`}>Download</a>
+                    <RWebShare data={{text: cart.title, url: `https://wasm4.org/play/${cart.slug}`, title: `Share ${cart.title}`}}>
+                        <a href="#"><ShareIcon className="cart-share" alt="Share" /></a>
+                    </RWebShare>
+                </h1>
                 <div className="avatar">
                   <a
                     className="avatar__photo-link avatar__photo avatar__photo--lg"

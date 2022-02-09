@@ -89,3 +89,23 @@ html[data-theme='dark'] .header-github-link:before {
   height: 100%;
   padding: 0;
 }
+
+.web-share-fade-in-up {
+  background: var(--ifm-background-color) !important;
+}
+.web-share-fade-in-up > button {
+  background-color: transparent !important;
+  border-color: var(--ifm-color-primary) !important;
+  border-radius: var(--ifm-button-border-radius) !important;
+  border-style: solid !important;
+  border-width: var(--ifm-button-border-width) !important;
+  font-weight: var(--ifm-button-font-weight) !important;
+  color: var(--ifm-color-primary) !important;
+}
+.cart-download {
+  margin-left: 2.5em;
+}
+.cart-share {
+  margin-left: 0.25em;
+  vertical-align: middle;
+}

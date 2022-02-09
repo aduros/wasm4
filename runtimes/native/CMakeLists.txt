@@ -33,6 +33,17 @@ set(USE_OPENGL_API OFF)
 # Cubeb options
 set(USE_SANITIZERS OFF)
 
+if (LIBRETRO)
+  execute_process(COMMAND git rev-parse --short HEAD
+    OUTPUT_VARIABLE GIT_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET)
+  if ("${GIT_VERSION}" STREQUAL "")
+    set(GIT_VERSION "unknown")
+  endif ()
+  add_definitions(-DGIT_VERSION=" ${GIT_VERSION}")
+endif ()
+
 if (NOT LIBRETRO)
 # add_subdirectory(vendor/glfw)
 add_subdirectory(vendor/minifb)

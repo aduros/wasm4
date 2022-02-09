@@ -169,7 +169,10 @@ size_t retro_get_memory_size (unsigned id) {
 void retro_get_system_info (struct retro_system_info* info) {
     memset(info, 0, sizeof(*info));
     info->library_name = "WASM-4";
-    info->library_version = "v1";
+#ifndef GIT_VERSION
+#define GIT_VERSION ""
+#endif
+    info->library_version = "v1" GIT_VERSION;
     info->valid_extensions = "wasm";
     info->need_fullpath = false;
 }

@@ -4,28 +4,37 @@ import * as devkit from "./devkit";
 import * as z85 from "./z85";
 import "./styles.css";
 
-const qs = new URL(document.location).searchParams;
+const qs = new URL(document.location.href).searchParams;
 
 const screenshot = qs.get("screenshot");
 if (screenshot != null) {
     const img = document.createElement("img");
     img.src = screenshot;
-    document.getElementById("screenshot").appendChild(img);
+    document.getElementById("screenshot")?.appendChild(img);
 }
 
 const title = qs.get("title");
 if (title != null) {
-    document.getElementById("title").textContent = title;
+    const titleElem = document.getElementById("title");
+    if(titleElem) {
+        titleElem.textContent = title
+    }
 }
 
 const author = qs.get("author");
 if (author != null) {
-    document.getElementById("author").textContent = "by "+author;
+    const authorElem = document.getElementById("author");
+    if(authorElem) {
+        authorElem.textContent = "by "+author;
+    }
 }
 
 const diskName = (document.getElementById("wasm4-disk-prefix")?.textContent ?? qs.get('disk-prefix') ?? title) + "-disk";
 
-function setClass (element, className, enabled) {
+function setClass (element: Element | null, className: string, enabled: boolean | number) {
+    if(!element) {
+        return;
+    }
     if (enabled) {
         element.classList.add(className);
     } else {
@@ -38,7 +47,7 @@ async function loadCartWasm () {
 
     // Is cart inlined?
     if (cartJson) {
-        const { WASM4_CART, WASM4_CART_SIZE } = JSON.parse(cartJson.textContent);
+        const { WASM4_CART, WASM4_CART_SIZE } = JSON.parse(cartJson.textContent ?? '');
 
         // The cart was bundled in the html, decode it
         const buffer = new Uint8Array(WASM4_CART_SIZE);
@@ -48,6 +57,10 @@ async function loadCartWasm () {
     } else {
         // Load the cart from a url
         const cartUrl = qs.has("url") ? qs.get("url") : "cart.wasm";
+
+        if(!cartUrl) {
+            throw new Error('web-runtime: missing cart url');
+        }
         const res = await fetch(cartUrl);
         return await res.arrayBuffer();
     }
@@ -58,11 +71,11 @@ async function loadCartWasm () {
     await runtime.init();
 
     const canvas = runtime.canvas;
-    document.getElementById("content").appendChild(canvas);
+    document.getElementById("content")?.appendChild(canvas);
     let wasmBuffer = await loadCartWasm();
     await runtime.load(wasmBuffer);
 
-    let devtoolsManager = { toggleDevtools(){} };
+    let devtoolsManager = { toggleDevtools(){}, updateCompleted(...args: unknown[]) {} };
     if (DEVELOPER_BUILD) {
         devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager())
     }
@@ -71,7 +84,7 @@ async function loadCartWasm () {
 
     if (screenshot != null) {
         // Wait until the initial focus before starting the runtime
-        await new Promise(resolve => {
+        await new Promise<void>(resolve => {
             window.onpointerdown = function () {
                 window.onpointerdown = null;
                 runtime.unlockAudio();
@@ -93,7 +106,7 @@ async function loadCartWasm () {
     runtime.start();
 
     if (DEVELOPER_BUILD) {
-        devkit.websocket.addEventListener("message", async event => {
+        devkit.websocket?.addEventListener("message", async event => {
             switch (event.data) {
             case "reload":
                 wasmBuffer = await loadCartWasm();
@@ -116,6 +129,9 @@ async function loadCartWasm () {
         runtime.composite();
 
         canvas.toBlob(blob => {
+            if(!blob) {
+                throw new Error('web-runtime: missing blob in toBlob callback');
+            }
             const url = URL.createObjectURL(blob);
             const anchor = document.createElement("a");
             anchor.href = url;
@@ -125,7 +141,7 @@ async function loadCartWasm () {
         });
     }
 
-    let videoRecorder = null;
+    let videoRecorder: MediaRecorder | null = null;
     function recordVideo () {
         if (videoRecorder != null) {
             return; // Still recording, ignore
@@ -138,7 +154,7 @@ async function loadCartWasm () {
             videoBitsPerSecond: 25000000,
         });
 
-        const chunks = [];
+        const chunks: Blob[] = [];
         videoRecorder.ondataavailable = event => {
             chunks.push(event.data);
         };
@@ -155,15 +171,17 @@ async function loadCartWasm () {
 
         videoRecorder.start();
         setTimeout(() => {
-            videoRecorder.requestData();
-            videoRecorder.stop();
-            videoRecorder = null;
+            if(videoRecorder) {
+                videoRecorder.requestData();
+                videoRecorder.stop();
+                videoRecorder = null;
+            }
         }, 4000);
     }
 
-    let savedState = null;
+    let savedState: Uint32Array | null = null;
     function saveState () {
-        savedState = new Uint32Array(runtime.memory.buffer.slice());
+        savedState = new Uint32Array(runtime.memory.buffer.slice(0));
     }
 
     function loadState () {
@@ -185,7 +203,7 @@ async function loadCartWasm () {
         runtime.print(`Keyboard swapped to control gamepads ${swapKeyboardControls ? "3 and 4" : "1 and 2"}`);
     }
 
-    const onMouseEvent = event => {
+    const onMouseEvent = (event: PointerEvent) => {
         // Unhide the cursor if it was hidden by the keyboard handler
         document.body.style.cursor = "";
 
@@ -205,7 +223,7 @@ async function loadCartWasm () {
         event.preventDefault();
     });
 
-    const HOTKEYS = {
+    const HOTKEYS: Record<string, (...args:any[]) => any> = {
         "2": saveState,
         "4": loadState,
         "r": reboot,
@@ -219,7 +237,7 @@ async function loadCartWasm () {
 
     let isKeyboard = true;
 
-    const onKeyboardEvent = event => {
+    const onKeyboardEvent = (event: KeyboardEvent) => {
         const down = (event.type == "keydown");
 
         if (!isKeyboard) {
@@ -380,7 +398,7 @@ async function loadCartWasm () {
     const action2 = document.getElementById("gamepad-action2");
     const touchEvents = new Map();
 
-    function onPointerEvent (event) {
+    function onPointerEvent (event: PointerEvent) {
         // Do certain things that require a user gesture
         if (event.type == "pointerup") {
             if (event.pointerType == "touch") {
@@ -410,15 +428,15 @@ async function loadCartWasm () {
             const BUTTON_MAX_DISTANCE = 50;
             const DPAD_ACTIVE_ZONE = 3 / 5; // cos of active angle, greater that cos 60 (1/2)
 
-            const dpadBounds = dpad.getBoundingClientRect();
+            const dpadBounds = dpad!.getBoundingClientRect();
             const dpadX = dpadBounds.x + dpadBounds.width/2;
             const dpadY = dpadBounds.y + dpadBounds.height/2;
 
-            const action1Bounds = action1.getBoundingClientRect();
+            const action1Bounds = action1!.getBoundingClientRect();
             const action1X = action1Bounds.x + action1Bounds.width/2;
             const action1Y = action1Bounds.y + action1Bounds.height/2;
 
-            const action2Bounds = action2.getBoundingClientRect();
+            const action2Bounds = action2!.getBoundingClientRect();
             const action2X = action2Bounds.x + action2Bounds.width/2;
             const action2Y = action2Bounds.y + action2Bounds.height/2;
 
@@ -500,8 +518,11 @@ async function loadCartWasm () {
             lastFrameGapCorrected = now - (deltaFrameGapCorrected % INTERVAL);
             runtime.update();
 
-            gamepadOverlay.style.display = runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY)
+            if(gamepadOverlay) {
+                gamepadOverlay.style.display = runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY)
                 ? "none" : "";
+            }
+
 
             if (DEVELOPER_BUILD) {
                 devtoolsManager.updateCompleted(runtime, deltaTime);

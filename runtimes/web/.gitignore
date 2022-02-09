@@ -1,4 +1,3 @@
-/dist/cart.wasm
-/dist/wasm4.css
-/dist/*.js
-/dist/*.js.*
+/dist
+public/cart.wasm
+src/**/*.generated.js

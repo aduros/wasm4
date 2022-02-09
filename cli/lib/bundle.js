@@ -11,7 +11,7 @@ const Mustache = require('mustache');
 const pkg = require('../package.json');
 
 async function bundleHtml (cartFile, htmlFile, opts) {
-    const runtimeDir = path.resolve(__dirname, '../assets/runtime');
+    const runtimeDir = path.resolve(__dirname, '../assets/runtime/slim');
     const wasm4CssFilepath = path.resolve(runtimeDir, './wasm4.css');
     const wasm4JsFilepath = path.resolve(runtimeDir, './wasm4.js');
 

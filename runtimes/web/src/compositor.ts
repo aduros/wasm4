@@ -1,15 +1,22 @@
 import { WIDTH, HEIGHT } from "./constants";
 import * as constants from "./constants";
 import * as GL from "./webgl-constants";
+import type { Framebuffer } from "./framebuffer";
 
 const PALETTE_SIZE = 4;
 
 export class WebGLCompositor {
-    constructor (gl) {
-        this.gl = gl;
+    table: Uint32Array;
+    colorBuffer: Uint32Array;
+    paletteBuffer: Float32Array;
+    lastPalette: number[];
+    paletteLocation: WebGLUniformLocation | null;
 
-        this.colorBuffer = new Uint32Array(WIDTH*HEIGHT >> 2);
+    constructor (public gl: WebGLRenderingContext) {
+        this.colorBuffer = new Uint32Array(WIDTH * HEIGHT >> 2);
         this.paletteBuffer = new Float32Array(3 * PALETTE_SIZE);
+        this.lastPalette = Array(PALETTE_SIZE);
+        this.paletteLocation = null;
 
         // Create a lookup table for each byte mapping to 4 bytes:
         // 0bxxyyzzww --> 0bxx000000_yy000000_zz000000_ww000000
@@ -47,19 +54,20 @@ export class WebGLCompositor {
 
         this.lastPalette = Array(PALETTE_SIZE);
 
-        function createShader (type, source) {
-            const shader = gl.createShader(type);
+        function createShader (type: number, source: string) {
+            const shader = gl.createShader(type)!;
+
             gl.shaderSource(shader, source);
             gl.compileShader(shader);
             if (constants.DEBUG) {
                 if (gl.getShaderParameter(shader, GL.COMPILE_STATUS) == 0) {
-                    throw new Error(gl.getShaderInfoLog(shader));
+                    throw new Error(gl.getShaderInfoLog(shader) + '');
                 }
             }
             return shader;
         }
 
-        function createTexture (slot) {
+        function createTexture (slot: number) {
             const texture = gl.createTexture();
             gl.activeTexture(slot);
             gl.bindTexture(GL.TEXTURE_2D, texture);
@@ -102,13 +110,14 @@ export class WebGLCompositor {
         `);
 
         // Setup shaders
-        const program = gl.createProgram();
+        const program = gl.createProgram()!;
+
         gl.attachShader(program, vertexShader);
         gl.attachShader(program, fragmentShader);
         gl.linkProgram(program);
         if (constants.DEBUG) {
             if (gl.getProgramParameter(program, GL.LINK_STATUS) == 0) {
-                throw new Error(gl.getProgramInfoLog(program));
+                throw new Error(gl.getProgramInfoLog(program) + '');
             }
         }
         gl.useProgram(program);
@@ -140,7 +149,7 @@ export class WebGLCompositor {
         gl.vertexAttribPointer(positionAttrib, 2, GL.FLOAT, false, 0, 0);
     }
 
-    composite (palette, framebuffer) {
+    composite (palette: Uint32Array, framebuffer: Framebuffer) {
         const gl = this.gl;
         const
             bytes = framebuffer.bytes,

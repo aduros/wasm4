@@ -1,3 +1,6 @@
+"use strict";
+
+// Audio worklet file: do not export anything directly.
 const SAMPLE_RATE = 44100;
 const MAX_VOLUME = 0.15;
 const MAX_VOLUME_TRIANGLE = 0.25;
@@ -43,11 +46,11 @@ class Channel {
     noiseLastRandom = 0;
 }
 
-function lerp (value1, value2, t) {
+function lerp (value1: number, value2: number, t: number) {
     return value1 + t * (value2 - value1);
 }
 
-function polyblep (phase, phaseInc) {
+function polyblep (phase: number, phaseInc: number) {
     if (phase < phaseInc) {
         const t = phase / phaseInc;
         return t+t - t*t;
@@ -60,6 +63,9 @@ function polyblep (phase, phaseInc) {
 }
 
 class APUProcessor extends AudioWorkletProcessor {
+    time: number;
+    channels: Channel[];
+
     constructor () {
         super();
 
@@ -70,18 +76,18 @@ class APUProcessor extends AudioWorkletProcessor {
         }
 
         if (this.port != null) {
-            this.port.onmessage = event => {
+            this.port.onmessage = (event: MessageEvent<[number, number, number, number]>) => {
                 this.tone(...event.data);
             };
         }
     }
 
-    ramp (value1, value2, time1, time2) {
+    ramp (value1: number, value2: number, time1: number, time2: number) {
         const t = (this.time - time1) / (time2 - time1);
         return lerp(value1, value2, t);
     }
 
-    getCurrentFrequency (channel) {
+    getCurrentFrequency (channel: Channel) {
         if (channel.freq2 > 0) {
             return this.ramp(channel.freq1, channel.freq2, channel.startTime, channel.releaseTime);
         } else {
@@ -89,7 +95,7 @@ class APUProcessor extends AudioWorkletProcessor {
         }
     }
 
-    getCurrentVolume (channel) {
+    getCurrentVolume (channel: Channel) {
         const time = this.time;
         if (time >= channel.sustainTime) {
             // Release
@@ -106,7 +112,7 @@ class APUProcessor extends AudioWorkletProcessor {
         }
     }
 
-    tone (frequency, duration, volume, flags) {
+    tone (frequency: number, duration: number, volume: number, flags: number) {
         const freq1 = frequency & 0xffff;
         const freq2 = (frequency >> 16) & 0xffff;
 
@@ -161,7 +167,7 @@ class APUProcessor extends AudioWorkletProcessor {
         }
     }
 
-    process (inputs, [[ output ]], parameters) {
+    process (inputs: Float32Array[][], [[ output ]]: Float32Array[][], parameters: Record<string, Float32Array>) {
         for (let ii = 0, frames = output.length; ii < frames; ++ii, ++this.time) {
             let sum = 0;
 
@@ -230,4 +236,4 @@ class APUProcessor extends AudioWorkletProcessor {
     }
 }
 
-registerProcessor("wasm4-apu", APUProcessor);
+registerProcessor("wasm4-apu", APUProcessor as unknown as AudioWorkletProcessorConstructor);

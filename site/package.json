@@ -24,6 +24,7 @@
     "prism-react-renderer": "^1.2.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-icons": "^4.3.1",
     "react-web-share": "^1.1.1",
     "rehype-stringify": "^9.0.3",
     "remark-rehype": "^10.1.0",

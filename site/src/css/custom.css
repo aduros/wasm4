@@ -102,10 +102,7 @@ html[data-theme='dark'] .header-github-link:before {
   font-weight: var(--ifm-button-font-weight) !important;
   color: var(--ifm-color-primary) !important;
 }
-.cart-download {
-  margin-left: 2.5em;
-}
-.cart-share {
-  margin-left: 0.25em;
+.cart-icons {
+  margin-left: 0.5em;
   vertical-align: middle;
 }

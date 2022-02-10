@@ -53,3 +53,7 @@ Additional info can go here. It will be displayed on your game's page.
 
 Now just commit your changes and open a pull request! As soon as it's merged, your game will appear
 on the site.
+
+:::info Licensing
+Carts on wasm4.org are protected under [Creative Commons BY-NC-SA](https://creativecommons.org/licenses/by-nc-sa/4.0/). As the license holder, you can also release your cart elsewhere under a different license, such as open source on GitHub.
+:::

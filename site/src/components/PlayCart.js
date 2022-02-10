@@ -79,6 +79,10 @@ export default function PlayCart ({ cart }) {
                     <div dangerouslySetInnerHTML={{__html: cart.readme}} />
                 </div>
 
+                <div className="margin-top--lg">
+                    <small>License: <a target="_blank" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA</a></small>
+                </div>
+
                 <Giscus
                     repo="aduros/wasm4"
                     repoId="MDEwOlJlcG9zaXRvcnkzOTMxOTY4MjI="

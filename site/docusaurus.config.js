@@ -26,11 +26,11 @@ module.exports = {
     metadatas: [
         { name: 'description', property: 'og:description', content: 'Build retro games using WebAssembly for a fantasy console' },
     ],
-    announcementBar: {
-      id: 'gamejam1',
-      content: '📅 Join the first <a target="_blank" style="font-weight: bold" href="https://itch.io/jam/wasm4">WASM-4 Game Jam</a> on January 14 - 23!',
-      backgroundColor: '#9bc86a',
-    },
+    // announcementBar: {
+    //   id: 'gamejam1',
+    //   content: '📅 Join the first <a target="_blank" style="font-weight: bold" href="https://itch.io/jam/wasm4">WASM-4 Game Jam</a> on January 14 - 23!',
+    //   backgroundColor: '#9bc86a',
+    // },
     navbar: {
       title: 'WASM-4',
       logo: {
@@ -157,6 +157,10 @@ module.exports = {
                       // Load cart metadata
                       let cartData;
                       try {
+                          if (!slug.match(/^[a-z0-9-]+$/)) {
+                              throw new Error("Invalid slug: only lower-case characters, numbers, and hyphens allowed");
+                          }
+
                           if (!fs.existsSync(`static/carts/${slug}.png`)) {
                               throw new Error("Missing screenshot");
                           }

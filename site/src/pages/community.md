@@ -2,6 +2,8 @@
 title: Community
 ---
 
+import PlayButton from '@site/src/components/PlayButton';
+
 # Community
 
 WASM-4 is still very early in development, but everyone is welcome to contribute.
@@ -11,6 +13,17 @@ WASM-4 is still very early in development, but everyone is welcome to contribute
 - [Github](https://github.com/aduros/wasm4)
 - [Forums](https://github.com/aduros/wasm4/discussions)
 - [Discord](https://discord.gg/7teRdHdbYk)
+
+## Events
+
+The [first game jam](https://itch.io/jam/wasm4/entries) took place on January 14th to 23rd, 2022. The top 4 entries were:
+
+<div className="row margin-bottom--lg">
+    <PlayButton slug="antcopter" title="Antcopter" author="Eduardo Bart" colWidth="3"/>
+    <PlayButton slug="you-will-return" title="You Will Return" author="Sander in 't Veld" colWidth="3"/>
+    <PlayButton slug="wasm4nia" title="wasm4nia" author="Marcus Ramse" colWidth="3"/>
+    <PlayButton slug="zxz" title="ZxZ" author="Ścisław Dercz" colWidth="3"/>
+</div>
 
 ## How to Contribute
 

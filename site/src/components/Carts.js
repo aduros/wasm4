@@ -12,12 +12,12 @@ export default function Carts ({ carts }) {
         <Layout title="Play">
             <main>
                 <div className="container container--fluid margin-vert--lg">
-                    <div className="text--center">
+                    <div className="text--center margin-bottom--lg">
                         <h1>Newest Games</h1>
                         <p>Games and experiments built by users.</p>
                         <p><Link className="button button--primary button--outline" href="/docs/guides/distribution#publish-on-wasm4org">+ Add Your Game</Link></p>
                     </div>
-                    <div className="row">
+                    <div className="row margin-top--lg">
                         {cartButtons}
                     </div>
                 </div>

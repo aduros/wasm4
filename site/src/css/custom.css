@@ -21,6 +21,14 @@
   /* --ifm-background-color: #202020 !important; */
 }
 
+.navbar__inner {
+  margin: 0 auto;
+  max-width: var(--ifm-container-width);
+}
+.navbar__brand {
+  margin-right: 3rem;
+}
+
 .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.1);
   display: block;

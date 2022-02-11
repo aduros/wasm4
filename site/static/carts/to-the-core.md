@@ -1,7 +1,7 @@
 ---
 author: Garrett Hale
 github: Gertkeno
-date: 2022-01-23
+date: 2022-01-23 00:00:35 GMT
 ---
 
 # TO THE CORE

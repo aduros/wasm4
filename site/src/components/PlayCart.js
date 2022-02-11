@@ -54,7 +54,7 @@ export default function PlayCart ({ cart }) {
                     {cart.title}
 
                     <span className="cart-icons">
-                        <a href="#"><MdSaveAlt alt="Download" title="Download" href={`/carts/${cart.slug}.wasm`}/></a>
+                        <a href={`/carts/${cart.slug}.wasm`}><MdSaveAlt alt="Download" title="Download"/></a>
                         <RWebShare data={{text: cart.title, url: `https://wasm4.org/play/${cart.slug}`, title: `Share ${cart.title}`}}>
                             <a href="#"><MdShare alt="Share" title="Share" /></a>
                         </RWebShare>

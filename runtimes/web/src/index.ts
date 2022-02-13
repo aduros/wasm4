@@ -67,7 +67,7 @@ async function loadCartWasm () {
 }
 
 (async function () {
-    const runtime = new Runtime();
+    const runtime = new Runtime(diskName);
     await runtime.init();
 
     const canvas = runtime.canvas;
@@ -79,8 +79,6 @@ async function loadCartWasm () {
     if (DEVELOPER_BUILD) {
         devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager())
     }
-
-    runtime.diskName = diskName;
 
     if (screenshot != null) {
         // Wait until the initial focus before starting the runtime

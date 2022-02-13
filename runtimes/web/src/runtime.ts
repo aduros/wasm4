@@ -7,7 +7,6 @@ import * as devkit from "./devkit";
 
 export class Runtime {
     canvas: HTMLCanvasElement;
-    diskName: string;
     memory: WebAssembly.Memory;
     apu: any;
     compositor: WebGLCompositor;
@@ -18,7 +17,11 @@ export class Runtime {
     wasm?: WebAssembly.Instance;
     warnedFileSize: boolean = false;
 
-    constructor () {
+    diskName: string;
+    diskBuffer: ArrayBuffer;
+    diskSize: number;
+
+    constructor (diskName: string) {
         const canvas = document.createElement("canvas");
         canvas.width = constants.WIDTH;
         canvas.height = constants.HEIGHT;
@@ -38,7 +41,21 @@ export class Runtime {
         
         this.apu = new APU();
 
-        this.diskName = 'disk';
+        this.diskName = diskName;
+        this.diskBuffer = new ArrayBuffer(constants.STORAGE_SIZE);
+
+        // Try to load from localStorage
+        let str;
+        try {
+            str = localStorage.getItem(diskName);
+        } catch (error) {
+            if (constants.DEBUG) {
+                console.error("Error reading disk", error);
+            }
+        }
+        this.diskSize = (str != null)
+            ? z85.decode(str, new Uint8Array(this.diskBuffer))
+            : 0;
 
         this.memory = new WebAssembly.Memory({initial: 1, maximum: 1});
         this.data = new DataView(this.memory.buffer);
@@ -222,36 +239,33 @@ export class Runtime {
         this.framebuffer.blit(sprite, x, y, width, height, srcX, srcY, stride, bpp2, flipX, flipY, rotate);
     }
 
-    diskr (destPtr: number, size: number) {
-        let str;
-        try {
-            str = localStorage.getItem(this.diskName);
-        } catch (error) {
-            if (constants.DEBUG) {
-                console.error(error);
-            }
-        }
-        if (str == null) {
-            return 0;
-        }
+    diskr (destPtr: number, size: number): number {
+        const bytesRead = Math.min(size, this.diskSize);
+        const src = new Uint8Array(this.diskBuffer, 0, bytesRead);
+        const dest = new Uint8Array(this.memory.buffer, destPtr);
 
-        const dest = new Uint8Array(this.memory.buffer, destPtr, Math.min(size, constants.STORAGE_SIZE));
-        const bytesRead = z85.decode(str, dest);
+        dest.set(src);
         return bytesRead;
     }
 
-    diskw (srcPtr: number, size: number) {
+    diskw (srcPtr: number, size: number): number {
         const bytesWritten = Math.min(size, constants.STORAGE_SIZE);
         const src = new Uint8Array(this.memory.buffer, srcPtr, bytesWritten);
+        const dest = new Uint8Array(this.diskBuffer);
+
+        // Try to save to localStorage
         const str = z85.encode(src);
         try {
             localStorage.setItem(this.diskName, str);
         } catch (error) {
+            // TODO(2022-02-13): Show a warning to the user that storage is not persisted
             if (constants.DEBUG) {
-                console.error(error);
+                console.error("Error writing disk", error);
             }
-            return 0;
         }
+
+        dest.set(src);
+        this.diskSize = bytesWritten;
         return bytesWritten;
     }
 

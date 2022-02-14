@@ -10,6 +10,10 @@ w4 bundle cart.wasm --title "My Game" --html my-game.html
 
 The bundled HTML contains no external dependencies, works offline, and can be easily shared on sites like [itch.io](https://itch.io/).
 
+For saving disks, the localStorage key used will be based on the game title you supply.
+Alternatively, you can specifiy a localStorage key prefix manually with `--html-disk-prefix <prefix>`.
+This is useful to prevent disk conflicts between games.
+
 ## Bundle to Windows/Mac/Linux executable
 
 Native executables for multiple platforms can also be bundled:
@@ -21,7 +25,8 @@ w4 bundle cart.wasm --title "My Game" \
     --linux my-game-linux
 ```
 
-This creates tiny (~200 KB) executables that run natively, no web browser required!
+This creates tiny (~200 KB) executables that run natively, no web browser required! The disk
+file (in case your game uses them) will be saved as `<game>.disk` in the same directory as your game.
 
 ## Publish on wasm4.org
 

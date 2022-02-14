@@ -1,7 +1,14 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
-const CARTS = require('./carts');
+const unified = require('unified');
+const remarkParse = require('remark-parse');
+const remarkRehype = import('remark-rehype');
+const rehypeStringify = import('rehype-stringify');
+const utils = require("@docusaurus/utils");
+const glob = require("glob");
+const path = require("path");
+const fs = require("fs");
 
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
@@ -19,11 +26,11 @@ module.exports = {
     metadatas: [
         { name: 'description', property: 'og:description', content: 'Build retro games using WebAssembly for a fantasy console' },
     ],
-    announcementBar: {
-      id: 'gamejam1',
-      content: '📅 Join the first <a target="_blank" style="font-weight: bold" href="https://itch.io/jam/wasm4">WASM-4 Game Jam</a> on January 14 - 23!',
-      backgroundColor: '#9bc86a',
-    },
+    // announcementBar: {
+    //   id: 'gamejam1',
+    //   content: '📅 Join the first <a target="_blank" style="font-weight: bold" href="https://itch.io/jam/wasm4">WASM-4 Game Jam</a> on January 14 - 23!',
+    //   backgroundColor: '#9bc86a',
+    // },
     navbar: {
       title: 'WASM-4',
       logo: {
@@ -138,8 +145,78 @@ module.exports = {
           return {
               name: "carts-plugin",
               async contentLoaded ({ content, actions }) {
-                  const cartsJsonPath = await actions.createData("carts.json", JSON.stringify(CARTS));
+                  const markdownRenderer = unified()
+                      .use(remarkParse, {commonmark: true})
+                      .use((await remarkRehype).default)
+                      .use((await rehypeStringify).default)
 
+                  const allCarts = [];
+
+                  for (let wasmFile of glob.sync("static/carts/*.wasm")) {
+                      const slug = path.basename(wasmFile, ".wasm");
+                      // Load cart metadata
+                      let cartData;
+                      try {
+                          if (!slug.match(/^[a-z0-9-]+$/)) {
+                              throw new Error("Invalid slug: only lower-case characters, numbers, and hyphens allowed");
+                          }
+
+                          if (!fs.existsSync(`static/carts/${slug}.png`)) {
+                              throw new Error("Missing screenshot");
+                          }
+
+                          const markdown = await utils.parseMarkdownFile(`static/carts/${slug}.md`, {
+                              removeContentTitle: true,
+                          });
+                          const readme = await markdownRenderer.process(markdown.content);
+
+                          const title = markdown.contentTitle;
+                          if (!title) {
+                              throw new Error("Missing content title in markdown");
+                          }
+
+                          const author = markdown.frontMatter.author;
+                          if (!author) {
+                              throw new Error("Missing author");
+                          }
+
+                          const github = markdown.frontMatter.github;
+                          if (!github) {
+                              throw new Error("Missing github");
+                          }
+
+                          const date = new Date(markdown.frontMatter.date).getTime();
+                          if (!date) {
+                              throw new Error("Missing date");
+                          }
+
+                          cartData = {
+                              slug, title, author, github, date, readme: readme.contents,
+                          };
+                          allCarts.push(cartData);
+
+                      } catch (error) {
+                          console.error(error);
+                          throw new Error(`Error processing ${slug}`);
+                      }
+
+                      const cartJsonPath = await actions.createData(`cart-${slug}.json`, JSON.stringify(cartData));
+                      actions.addRoute({
+                          path: `/play/${slug}`,
+                          component: "@site/src/components/PlayCart",
+                          modules: {
+                              cart: cartJsonPath,
+                          },
+                          exact: true,
+                      });
+                  }
+
+                  const indexData = allCarts.sort((a, b) => b.date - a.date).map(cartData => ({
+                      slug: cartData.slug,
+                      title: cartData.title,
+                      author: cartData.author,
+                  }));
+                  const cartsJsonPath = await actions.createData("carts.json", JSON.stringify(indexData));
                   actions.addRoute({
                       path: "/play",
                       component: "@site/src/components/Carts",
@@ -148,18 +225,6 @@ module.exports = {
                       },
                       exact: true,
                   });
-
-                  for (let cart of CARTS) {
-                      const cartJsonPath = await actions.createData(`cart-${cart.slug}.json`, JSON.stringify(cart));
-                      actions.addRoute({
-                          path: "/play/"+cart.slug,
-                          component: "@site/src/components/PlayCart",
-                          modules: {
-                              cart: cartJsonPath,
-                          },
-                          exact: true,
-                      });
-                  }
               },
           }
       }

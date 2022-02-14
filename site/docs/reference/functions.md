@@ -100,7 +100,7 @@ Plays a sound tone.
 
 * `frequency`: Wave frequency in hertz.
 * `duration`: Duration of the tone in frames (1/60th of a second), up to 255 frames.
-* `volume`: Volume between 0 and 100.
+* `volume`: Volume of the sustain and attack durations, between 0 and 100.
 * `flags`: Flags that modify behavior:
 
 | Flag bits | Description                                                                                     |
@@ -129,6 +129,13 @@ The high bits of `duration` can optionally describe an ADSR volume envelope:
 The envelope starts at zero volume, then raises to the peak volume over the attack time, lowers to
 the sustain volume during the decay time, remains at the sustain volume during the sustain time, and
 finally fades to zero volume during the release time.
+
+The high bits of `volume` can optionally describe the peak volume used for the attack durations:
+
+| Volume bits | Description                                                           |
+| ---         | ---                                                                   |
+| 0 - 7       | Volume used for the sustain duration.                                 |
+| 8 - 15      | Peak volume reached by the attack duration. Defaults to 100 if zero.  |
 
 ## Storage
 

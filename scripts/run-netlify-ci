@@ -15,6 +15,6 @@ npm run build
 # Build and deploy site
 cd "$site"
 rm -rf static/embed
-cp -r "$runtime/dist" static/embed
+cp -r "$runtime/dist/slim" static/embed
 npm ci
 npm run build

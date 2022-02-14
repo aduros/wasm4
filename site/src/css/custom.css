@@ -21,6 +21,14 @@
   /* --ifm-background-color: #202020 !important; */
 }
 
+.navbar__inner {
+  margin: 0 auto;
+  max-width: var(--ifm-container-width);
+}
+.navbar__brand {
+  margin-right: 3rem;
+}
+
 .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.1);
   display: block;
@@ -69,9 +77,15 @@ html[data-theme='dark'] .header-github-link:before {
   width: 100%;
 }
 
-.game-container {
-  text-align: center;
+@media only screen and (max-width: 996px) {
+  .col-cart {
+    --ifm-col-width: 50% !important;
+  }
 }
+
+/* .game-container { */
+/*   text-align: center; */
+/* } */
 
 .game-embed-wrapper {
   width: calc(min(480px, 100%, 100vh - 200px));
@@ -82,4 +96,21 @@ html[data-theme='dark'] .header-github-link:before {
   width: 100%;
   height: 100%;
   padding: 0;
+}
+
+.web-share-fade-in-up {
+  background: var(--ifm-background-color) !important;
+}
+.web-share-fade-in-up > button {
+  background-color: transparent !important;
+  border-color: var(--ifm-color-primary) !important;
+  border-radius: var(--ifm-button-border-radius) !important;
+  border-style: solid !important;
+  border-width: var(--ifm-button-border-width) !important;
+  font-weight: var(--ifm-button-font-weight) !important;
+  color: var(--ifm-color-primary) !important;
+}
+.cart-icons {
+  margin-left: 0.5em;
+  vertical-align: middle;
 }

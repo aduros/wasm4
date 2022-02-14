@@ -1,9 +1,11 @@
 #include "apu.h"
 
 #include <stdlib.h>
+#include <math.h>
 
 #define SAMPLE_RATE 44100
-#define MAX_VOLUME 0x2000 // 25% of INT16_MAX
+#define MAX_VOLUME 0x1333 // ~15% of INT16_MAX
+#define MAX_VOLUME_TRIANGLE 0x2000 // ~25% of INT16_MAX
 
 typedef struct {
     /** Starting frequency. */
@@ -28,7 +30,10 @@ typedef struct {
     unsigned long long releaseTime;
 
     /** Sustain volume level. */
-    int16_t volume;
+    int16_t sustainVolume;
+
+     /** Peak volume level at the end of the attack phase. */
+    int16_t peakVolume;
 
     /** Used for time tracking. */
     float phase;
@@ -54,6 +59,10 @@ static Channel channels[4] = { 0 };
 /** The current time, in samples. */
 static unsigned long long time = 0;
 
+static int w4_min (int a, int b) {
+    return a < b ? a : b;
+}
+
 static int lerp (int value1, int value2, float t) {
     return value1 + t * (value2 - value1);
 }
@@ -72,14 +81,30 @@ static uint16_t getCurrentFrequency (const Channel* channel) {
 }
 
 static int16_t getCurrentVolume (const Channel* channel) {
-    if (time > channel->sustainTime) {
-        return ramp(channel->volume, 0, channel->sustainTime, channel->releaseTime);
-    } else if (time > channel->decayTime) {
-        return channel->volume;
-    } else if (time > channel->attackTime) {
-        return ramp(MAX_VOLUME, channel->volume, channel->attackTime, channel->decayTime);
+    if (time >= channel->sustainTime) {
+        // Release
+        return ramp(channel->sustainVolume, 0, channel->sustainTime, channel->releaseTime);
+    } else if (time >= channel->decayTime) {
+        // Sustain
+        return channel->sustainVolume;
+    } else if (time >= channel->attackTime) {
+        // Decay
+        return ramp(channel->peakVolume, channel->sustainVolume, channel->attackTime, channel->decayTime);
     } else {
-        return ramp(0, MAX_VOLUME, channel->startTime, channel->attackTime);
+        // Attack
+        return ramp(0, channel->peakVolume, channel->startTime, channel->attackTime);
+    }
+}
+
+static float polyblep (float phase, float phaseInc) {
+    if (phase < phaseInc) {
+        float t = phase / phaseInc;
+        return t+t - t*t;
+    } else if (phase > 1.f - phaseInc) {
+        float t = (phase - (1.f - phaseInc)) / phaseInc;
+        return 1.f - (t+t - t*t);
+    } else {
+        return 1.f;
     }
 }
 
@@ -96,11 +121,20 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     int decay = (duration >> 16) & 0xff;
     int attack = (duration >> 24) & 0xff;
 
+    int sustainVolume = w4_min(volume & 0xff, 100);
+    int peakVolume = w4_min((volume >> 8) & 0xff, 100);
+
     int channelIdx = flags & 0x03;
     int mode = (flags >> 2) & 0x3;
 
     // TODO(2022-01-08): Thread safety
     Channel* channel = &channels[channelIdx];
+
+    // Restart the phase if this channel wasn't already playing
+    if (time > channel->releaseTime) {
+        channel->phase = (channelIdx == 2) ? 0.25 : 0;
+    }
+
     channel->freq1 = freq1;
     channel->freq2 = freq2;
     channel->startTime = time;
@@ -108,7 +142,10 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     channel->decayTime = channel->attackTime + SAMPLE_RATE*decay/60;
     channel->sustainTime = channel->decayTime + SAMPLE_RATE*sustain/60;
     channel->releaseTime = channel->sustainTime + SAMPLE_RATE*release/60;
-    channel->volume = MAX_VOLUME * volume/100;
+
+    int16_t maxVolume = (channelIdx == 2) ? MAX_VOLUME_TRIANGLE : MAX_VOLUME;
+    channel->sustainVolume = maxVolume * sustainVolume/100;
+    channel->peakVolume = peakVolume ? maxVolume * peakVolume/100 : maxVolume;
 
     if (channelIdx == 0 || channelIdx == 1) {
         switch (mode) {
@@ -121,6 +158,12 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
         case 2:
             channel->pulse.dutyCycle = 0.5f;
             break;
+        }
+
+    } else if (channelIdx == 2) {
+        // For the triangle channel, prevent popping on hard stops by adding a 1 ms release
+        if (release == 0) {
+            channel->releaseTime += SAMPLE_RATE/1000;
         }
     }
 }
@@ -139,37 +182,44 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
 
                 if (channelIdx == 3) {
                     // Noise channel
-                    channel->phase += freq * freq / 1000000.f;
+                    channel->phase += freq * freq / (1000000.f/44100 * SAMPLE_RATE);
                     while (channel->phase > 0) {
                         channel->phase--;
-                        const int bit0 = channel->noise.seed & 1;
-                        channel->noise.seed >>= 1;
-                        const int bit1 = channel->noise.seed & 1;
-                        const int feedback = (bit0 ^ bit1);
-                        channel->noise.seed |= feedback << 14;
-                        channel->noise.lastRandom = 2 * feedback - 1;
+                        channel->noise.seed ^= channel->noise.seed >> 7;
+                        channel->noise.seed ^= channel->noise.seed << 9;
+                        channel->noise.seed ^= channel->noise.seed >> 13;
+                        channel->noise.lastRandom = 2 * (channel->noise.seed & 0x1) - 1;
                     }
                     sample = volume * channel->noise.lastRandom;
 
                 } else {
-                    channel->phase += (float)freq / SAMPLE_RATE;
-                    if (channel->phase > 1) {
+                    float phaseInc = (float)freq / SAMPLE_RATE;
+                    channel->phase += phaseInc;
+
+                    if (channel->phase >= 1) {
                         channel->phase--;
                     }
 
                     if (channelIdx == 2) {
                         // Triangle channel
-                        if (channel->phase < 0.25) {
-                            sample = lerp(0, volume, 4*channel->phase);
-                        } else if (channel->phase < 0.75) {
-                            sample = lerp(volume, -volume, 2*channel->phase - 0.5);
-                        } else {
-                            sample = lerp(-volume, 0, 4*channel->phase - 3);
-                        }
+                        sample = volume * (2*fabs(2*channel->phase - 1) - 1);
 
                     } else {
                         // Pulse channel
-                        sample = channel->phase < channel->pulse.dutyCycle ? volume : -volume;
+                        float dutyPhase, dutyPhaseInc;
+                        int16_t multiplier;
+
+                        // Map duty to 0->1
+                        if (channel->phase < channel->pulse.dutyCycle) {
+                            dutyPhase = channel->phase / channel->pulse.dutyCycle;
+                            dutyPhaseInc = phaseInc / channel->pulse.dutyCycle;
+                            multiplier = volume;
+                        } else {
+                            dutyPhase = (channel->phase - channel->pulse.dutyCycle) / (1.f - channel->pulse.dutyCycle);
+                            dutyPhaseInc = phaseInc / (1.f - channel->pulse.dutyCycle);
+                            multiplier = -volume;
+                        }
+                        sample = multiplier * polyblep(dutyPhase, dutyPhaseInc);
                     }
                 }
 

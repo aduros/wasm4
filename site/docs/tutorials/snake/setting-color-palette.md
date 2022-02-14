@@ -130,10 +130,10 @@ export function start(): void {
 
 ```c
 void start() {
-	PALETTE[0] = 0xfbf7f3
-	PALETTE[1] = 0xe5b083
-	PALETTE[2] = 0x426e5d
-	PALETTE[3] = 0x20283d
+	PALETTE[0] = 0xfbf7f3;
+	PALETTE[1] = 0xe5b083;
+	PALETTE[2] = 0x426e5d;
+	PALETTE[3] = 0x20283d;
 }
 ```
 </Page>

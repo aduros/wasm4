@@ -120,7 +120,7 @@ function run(sourceFile) {
         inputColorType: 1,
     });
 
-    const palette = {};
+    const palette = new Map();
     let colorCount = 0;
     for (let y = 0; y < png.height; ++y) {
         for (let x = 0; x < png.width; ++x) {
@@ -130,29 +130,48 @@ function run(sourceFile) {
             const b = png.data[idx + 2];
             const a = png.data[idx + 3];
             const packed = (r << 24) | (g << 16) | (b << 8) | a;
-            let s = palette[packed]
-            if (!s) {
+            if (!palette.has(packed)) {
                 if (colorCount >= 4) {
-                    let RGBs = [];
-                    for (let key in palette) {
-                        RGBs.push(`- (R: ${palette[key].r}, G: ${palette[key].g}, B: ${palette[key].b}, A: ${palette[key].a}); first seen at (${palette[key].x}, ${palette[key].y})`)
-                    }
+                    const rgbHistory = [...palette.values()].map(
+                        c => `- (R: ${c.r}, G: ${c.g}, B: ${c.b}, A: ${c.a}); first seen at (${c.x}, ${c.y})`);
                     throw new Error(`
 Too many colors: maximum is 4. The previous colors were:
-${RGBs.join("\n")}
+${rgbHistory.join("\n")}
 The first occurrence of another color is at (${x}, ${y}) and has the value of (R: ${r}, G: ${g}, B: ${b}, A: ${a})`);
                 }
-                palette[packed] = {
-                    r: r,
-                    g: g,
-                    b: b,
-                    a: a,
+                palette.set(packed, {
+                    r, g, b, a, x, y,
                     i: colorCount++,
-                    x: x,
-                    y: y,
-                };
+                    brightness: (0.2126*r + 0.7152*g + 0.0722*b) * a,
+                });
             }
         }
+    }
+
+    if (png.palette) {
+        // If the png has a palette, use that order.
+        // In the special case that the png palette contains 4 colors but we
+        // only use 3 of them, don't shift colors over.
+        const forceOrder = png.palette.length === 4 && colorCount === 3;
+        colorCount = 0;
+        for (let rgba of png.palette) {
+            const r = rgba[0];
+            const g = rgba[1];
+            const b = rgba[2];
+            const a = rgba[3];
+            const packed = (r << 24) | (g << 16) | (b << 8) | a;
+            if (palette.has(packed)) {
+                palette.set(packed, {i: colorCount++});
+            } else if (forceOrder) {
+                colorCount++;
+            }
+        }
+    } else {
+        // Sort palette by brightness value
+        const paletteKeys = [...palette.keys()];
+        paletteKeys.sort((packedA, packedB) =>
+            palette.get(packedB).brightness - palette.get(packedA).brightness);
+        paletteKeys.forEach((k, i) => palette.set(k, {i}));
     }
 
     let flags, flagsHumanReadable, odinFlags;
@@ -184,7 +203,7 @@ The first occurrence of another color is at (${x}, ${y}) and has the value of (R
         const b = png.data[idx + 2];
         const a = png.data[idx + 3];
         const packed = (r << 24) | (g << 16) | (b << 8) | a;
-        return palette[packed].i;
+        return palette.get(packed).i;
     }
 
     // Write a color (palette index) to the output buffer

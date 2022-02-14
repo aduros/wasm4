@@ -23,6 +23,7 @@ int values[] = {
     /* 255, */
     0,
     100,
+    100,
     0,
     0,
 };
@@ -34,6 +35,7 @@ const int MAX_VALUES[] = {
     255,
     255,
     255,
+    100,
     100,
     3,
     3,
@@ -83,7 +85,7 @@ void drawControl (const char* name, int x, int y, int valueIdx) {
 void update () {
 
     int x = 20;
-    int y = 40;
+    int y = 36;
     int spacing = 12;
     drawControl("FREQ1", x, y + 0*spacing, 0);
     drawControl("FREQ2", x, y + 1*spacing, 1);
@@ -91,9 +93,10 @@ void update () {
     drawControl("DECAY", x, y + 3*spacing, 3);
     drawControl("SUSTN", x, y + 4*spacing, 4);
     drawControl("RLEAS", x, y + 5*spacing, 5);
-    drawControl("VOLUM", x, y + 6*spacing, 6);
-    drawControl("CHNNL", x, y + 7*spacing, 7);
-    drawControl(" MODE", x, y + 8*spacing, 8);
+    drawControl(" PEAK", x, y + 6*spacing, 6);
+    drawControl("VOLUM", x, y + 7*spacing, 7);
+    drawControl("CHNNL", x, y + 8*spacing, 8);
+    drawControl(" MODE", x, y + 9*spacing, 9);
 
     *DRAW_COLORS = 4;
     text("Arrows: Adjust\nX: Play tone", x, 8);
@@ -105,7 +108,7 @@ void update () {
     char pressedThisFrame = gamepad & (gamepad ^ lastGamepadState);
     lastGamepadState = gamepad;
 
-    if ((pressedThisFrame & BUTTON_DOWN) && arrowIdx < 8) {
+    if ((pressedThisFrame & BUTTON_DOWN) && arrowIdx < 9) {
         ++arrowIdx;
     }
     if ((pressedThisFrame & BUTTON_UP) && arrowIdx > 0) {
@@ -132,14 +135,15 @@ void update () {
         int decay = values[3];
         int sustain = values[4];
         int release = values[5];
-        int volume = values[6];
-        int channel = values[7];
-        int mode = values[8];
-        tracef("freq1=%d freq2=%d attack=%d decay=%d sustain=%d release=%d volume=%d channel=%d mode=%d",
-            freq1, freq2, attack, decay, sustain, release, volume, channel, mode);
-        tracef("tone(%d | (%d << 16), (%d << 24) | (%d << 16) | %d | (%d << 8), %d, %d | (%d << 2))",
-            freq1, freq2, attack, decay, sustain, release, volume, channel, mode);
+        int peakVolume = values[6];
+        int sustainVolume = values[7];
+        int channel = values[8];
+        int mode = values[9];
+        tracef("freq1=%d freq2=%d attack=%d decay=%d sustain=%d release=%d peakVolume=%d sustainVolume=%d channel=%d mode=%d",
+            freq1, freq2, attack, decay, sustain, release, peakVolume, sustainVolume, channel, mode);
+        tracef("tone(%d | (%d << 16), (%d << 24) | (%d << 16) | %d | (%d << 8), (%d << 8) | %d, %d |(%d << 2))",
+            freq1, freq2, attack, decay, sustain, release, peakVolume, sustainVolume, channel, mode);
         trace("");
-        tone(freq1 | (freq2 << 16), (attack << 24) | (decay << 16) | sustain | (release << 8), volume, channel | (mode << 2));
+        tone(freq1 | (freq2 << 16), (attack << 24) | (decay << 16) | sustain | (release << 8), (peakVolume << 8) | sustainVolume, channel | (mode << 2));
     }
 }

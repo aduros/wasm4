@@ -105,7 +105,7 @@ jobs:
 
                   npm ci
                   npm install -g pkg
-                  pkg --compress Brotli --out-path ../cli-build --targets node16-win,node16-mac,node16-linux .
+                  pkg --compress Brotli --out-path ../cli-build --targets node12-win,node12-mac,node12-linux .
 
             - name: Quick w4 CLI tests
               run: |

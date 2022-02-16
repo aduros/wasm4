@@ -44,6 +44,9 @@
     "recursive-copy": "^2.0.13",
     "ws": "^7.5.3"
   },
+  "engines": {
+    "node": ">=12"
+  },
   "pkg": {
     "assets": "assets/**/*"
   }

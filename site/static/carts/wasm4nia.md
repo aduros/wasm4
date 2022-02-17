@@ -12,9 +12,9 @@ See [here](https://ramse.se/wasm4nia) for more details and updates.
 
 ## Input
 
-When playing on keyboard, WASM-4 uses **X to confirm** and **Z to back**.
+When playing on keyboard, wasm4nia uses **X to confirm** and **Z to back**.
 
-**To exit out of a song**, you can press all directions and 1 and 2 (meaning all 6 buttons). R also works to restart back to the main menu.
+**To exit out of a song**, you can press all directions and X and Z (meaning all 6 buttons). R also works to restart back to the main menu.
 
 For starting out, I strongly recommend these settings:
 

@@ -9,19 +9,18 @@ WASM_OPT = wasm-opt
 WASM_OPT_FLAGS = -Oz --zero-filled-memory --strip-producers
 
 ifeq ($(OS), Windows_NT)
-	MKDIR = md
+	MKDIR_BUILD = if not exist build md build
 	RMDIR = rd /s /q
 else
-	MKDIR = mkdir -p
+	MKDIR_BUILD = mkdir -p build
 	RMDIR = rm -rf
 endif
 
 all: build/cart.wasm
 
-
 # Build cart.wasm from main.wat and run wasm-opt
 build/cart.wasm: main.wat
-	@$(MKDIR) build
+	@$(MKDIR_BUILD)
 	$(WAT2WASM) $< -o $@
 ifneq ($(DEBUG), 1)
 ifeq (, $(shell command -v $(WASM_OPT)))

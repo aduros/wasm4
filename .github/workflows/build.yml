@@ -133,6 +133,10 @@ jobs:
         needs: build-cli
 
         steps:
+            - uses: actions/checkout@v2
+              with:
+                  submodules: true
+
             - name: Download artifacts
               uses: actions/download-artifact@v2
               with:
@@ -163,3 +167,15 @@ jobs:
                   npm publish ./artifacts/wasm4-npm.tar.gz
               env:
                   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish to the Internet Archive
+              run: |
+                  sudo apt update
+                  sudo apt install internetarchive
+
+                  version=`git describe --tags`
+                  git ls-files --recurse-submodules | tar caf "/tmp/wasm4-$version.tar.gz" --xform "s:^:wasm4-$version/:" --verbatim-files-from -T-
+                  ia configure --username="b@aduros.com" --password="$IA_PASSWORD"
+                  ia upload wasm4-source "/tmp/wasm4-$version.tar.gz"
+              env:
+                  IA_PASSWORD: ${{ secrets.IA_PASSWORD }}

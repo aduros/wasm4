@@ -14,21 +14,6 @@ if (screenshot != null) {
 }
 
 const title = qs.get("title");
-if (title != null) {
-    const titleElem = document.getElementById("title");
-    if(titleElem) {
-        titleElem.textContent = title
-    }
-}
-
-const author = qs.get("author");
-if (author != null) {
-    const authorElem = document.getElementById("author");
-    if(authorElem) {
-        authorElem.textContent = "by "+author;
-    }
-}
-
 const diskName = (document.getElementById("wasm4-disk-prefix")?.textContent ?? qs.get('disk-prefix') ?? title) + "-disk";
 
 function setClass (element: Element | null, className: string, enabled: boolean | number) {

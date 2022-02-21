@@ -47,9 +47,6 @@ export default defineConfig(({ mode }) => {
         },
       },
       minify: "terser",
-      // terserOptions: {
-          // compress: false,
-      // },
     },
     plugins: [
         minifyHTML(),

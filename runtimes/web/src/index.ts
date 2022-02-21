@@ -4,28 +4,15 @@ import * as devkit from "./devkit";
 import * as z85 from "./z85";
 import "./styles.css";
 
+import { virtualGamepadTagName } from "./ui/virtual-gamepad";
+import { focusOverlayTagName } from "./ui/focus-overlay";
+
 const qs = new URL(document.location.href).searchParams;
 
 const screenshot = qs.get("screenshot");
-if (screenshot != null) {
-    const img = document.createElement("img");
-    img.src = screenshot;
-    document.getElementById("screenshot")?.appendChild(img);
-}
 
 const title = qs.get("title");
 const diskName = (document.getElementById("wasm4-disk-prefix")?.textContent ?? qs.get('disk-prefix') ?? title) + "-disk";
-
-function setClass (element: Element | null, className: string, enabled: boolean | number) {
-    if(!element) {
-        return;
-    }
-    if (enabled) {
-        element.classList.add(className);
-    } else {
-        element.classList.remove(className);
-    }
-}
 
 async function loadCartWasm () {
     const cartJson = document.getElementById("wasm4-cart-json");
@@ -41,22 +28,26 @@ async function loadCartWasm () {
 
     } else {
         // Load the cart from a url
-        const cartUrl = qs.has("url") ? qs.get("url") : "cart.wasm";
-
-        if(!cartUrl) {
-            throw new Error('web-runtime: missing cart url');
-        }
+        const cartUrl = qs.has("url") ? qs.get("url")! : "cart.wasm";
         const res = await fetch(cartUrl);
         return await res.arrayBuffer();
     }
 }
 
 (async function () {
+    const content = document.getElementById("content")!;
+
+    if (screenshot != null) {
+        const focusOverlay = document.createElement(focusOverlayTagName);
+        focusOverlay.screenshot = screenshot;
+        content.appendChild(focusOverlay);
+    }
+
     const runtime = new Runtime(diskName);
     await runtime.init();
 
     const canvas = runtime.canvas;
-    document.getElementById("content")?.appendChild(canvas);
+    content.appendChild(canvas);
     let wasmBuffer = await loadCartWasm();
     await runtime.load(wasmBuffer);
 
@@ -112,10 +103,7 @@ async function loadCartWasm () {
         runtime.composite();
 
         canvas.toBlob(blob => {
-            if(!blob) {
-                throw new Error('web-runtime: missing blob in toBlob callback');
-            }
-            const url = URL.createObjectURL(blob);
+            const url = URL.createObjectURL(blob!);
             const anchor = document.createElement("a");
             anchor.href = url;
             anchor.download = "wasm4-screenshot.png";
@@ -376,112 +364,11 @@ async function loadCartWasm () {
         }
     });
 
-    const dpad = document.getElementById("gamepad-dpad");
-    const action1 = document.getElementById("gamepad-action1");
-    const action2 = document.getElementById("gamepad-action2");
-    const touchEvents = new Map();
+    const gamepadOverlay = document.createElement(virtualGamepadTagName);
+    gamepadOverlay.runtime = runtime;
+    document.body.appendChild(gamepadOverlay);
 
-    function onPointerEvent (event: PointerEvent) {
-        // Do certain things that require a user gesture
-        if (event.type == "pointerup") {
-            if (event.pointerType == "touch") {
-                requestFullscreen();
-            }
-            runtime.unlockAudio();
-        }
-
-        if (event.pointerType != "touch") {
-            return;
-        }
-        event.preventDefault();
-
-        switch (event.type) {
-        case "pointerdown": case "pointermove":
-            touchEvents.set(event.pointerId, event);
-            break;
-        default:
-            touchEvents.delete(event.pointerId);
-            break;
-        }
-
-        let buttons = 0;
-        if (touchEvents.size) {
-            const DPAD_MAX_DISTANCE = 100;
-            const DPAD_DEAD_ZONE = 10;
-            const BUTTON_MAX_DISTANCE = 50;
-            const DPAD_ACTIVE_ZONE = 3 / 5; // cos of active angle, greater that cos 60 (1/2)
-
-            const dpadBounds = dpad!.getBoundingClientRect();
-            const dpadX = dpadBounds.x + dpadBounds.width/2;
-            const dpadY = dpadBounds.y + dpadBounds.height/2;
-
-            const action1Bounds = action1!.getBoundingClientRect();
-            const action1X = action1Bounds.x + action1Bounds.width/2;
-            const action1Y = action1Bounds.y + action1Bounds.height/2;
-
-            const action2Bounds = action2!.getBoundingClientRect();
-            const action2X = action2Bounds.x + action2Bounds.width/2;
-            const action2Y = action2Bounds.y + action2Bounds.height/2;
-
-            let x, y, dist, cosX, cosY;
-            for (let touch of touchEvents.values()) {
-                x = touch.clientX - dpadX;
-                y = touch.clientY - dpadY;
-                dist = Math.sqrt( x*x + y * y );
-
-                if (dist < DPAD_MAX_DISTANCE && dist > DPAD_DEAD_ZONE) {
-                    cosX = x / dist;
-                    cosY = y / dist;
-
-                    if (-cosX > DPAD_ACTIVE_ZONE) {
-                        buttons |= constants.BUTTON_LEFT;
-                    } else if (cosX > DPAD_ACTIVE_ZONE) {
-                        buttons |= constants.BUTTON_RIGHT;
-                    }
-                    if (-cosY > DPAD_ACTIVE_ZONE) {
-                        buttons |= constants.BUTTON_UP;
-                    } else if (cosY > DPAD_ACTIVE_ZONE) {
-                        buttons |= constants.BUTTON_DOWN;
-                    }
-                }
-
-                x = touch.clientX - action1X;
-                y = touch.clientY - action1Y;
-                if (x*x + y*y < BUTTON_MAX_DISTANCE*BUTTON_MAX_DISTANCE) {
-                    buttons |= constants.BUTTON_X;
-                }
-
-                x = touch.clientX - action2X;
-                y = touch.clientY - action2Y;
-                if (x*x + y*y < BUTTON_MAX_DISTANCE*BUTTON_MAX_DISTANCE) {
-                    buttons |= constants.BUTTON_Z;
-                }
-            }
-        }
-
-        const nowXZDown = buttons & (constants.BUTTON_X | constants.BUTTON_Z);
-        const wasXZDown = runtime.getGamepad(0) & (constants.BUTTON_X | constants.BUTTON_Z);
-        if (nowXZDown && !wasXZDown) {
-            navigator.vibrate(1);
-        }
-
-        setClass(action1, "pressed", buttons & constants.BUTTON_X);
-        setClass(action2, "pressed", buttons & constants.BUTTON_Z);
-        setClass(dpad, "pressed-left", buttons & constants.BUTTON_LEFT);
-        setClass(dpad, "pressed-right", buttons & constants.BUTTON_RIGHT);
-        setClass(dpad, "pressed-up", buttons & constants.BUTTON_UP);
-        setClass(dpad, "pressed-down", buttons & constants.BUTTON_DOWN);
-
-        runtime.setGamepad(0, buttons);
-    }
-    window.addEventListener("pointercancel", onPointerEvent);
-    window.addEventListener("pointerdown", onPointerEvent);
-    window.addEventListener("pointermove", onPointerEvent);
-    window.addEventListener("pointerup", onPointerEvent);
-
-    const gamepadOverlay = document.getElementById("gamepad");
     // https://gist.github.com/addyosmani/5434533#file-limitloop-js-L60
-
     const INTERVAL = 1000 / 60;
 
     let lastFrame = performance.now();
@@ -501,11 +388,7 @@ async function loadCartWasm () {
             lastFrameGapCorrected = now - (deltaFrameGapCorrected % INTERVAL);
             runtime.update();
 
-            if(gamepadOverlay) {
-                gamepadOverlay.style.display = runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY)
-                ? "none" : "";
-            }
-
+            gamepadOverlay.style.display = runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY) ? "none" : "";
 
             if (DEVELOPER_BUILD) {
                 devtoolsManager.updateCompleted(runtime, deltaTime);

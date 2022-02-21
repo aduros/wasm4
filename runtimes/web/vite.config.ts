@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import minifyHTML from 'rollup-plugin-minify-html-literals';
 
 enum BuildModes {
   DeveloperBuild = 'developer-build',
@@ -45,6 +46,13 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
+      minify: "terser",
+      // terserOptions: {
+          // compress: false,
+      // },
     },
+    plugins: [
+        minifyHTML(),
+    ],
   };
 });

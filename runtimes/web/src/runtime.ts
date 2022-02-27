@@ -318,7 +318,7 @@ export class Runtime {
                     output += "%";
                     break;
                 case 99: // c
-                    output += String.fromCharCode(this.data.getInt32(argPtr, true));
+                    output += String.fromCodePoint(this.data.getInt32(argPtr, true));
                     argPtr += 4;
                     break;
                 case 100: // d

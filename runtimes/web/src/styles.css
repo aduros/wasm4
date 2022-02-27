@@ -1,7 +1,3 @@
-* {
-  box-sizing: border-box;
-}
-
 html, body {
   height: 100%;
   margin: 0;
@@ -10,32 +6,4 @@ html, body {
 body {
   background: #202020;
   touch-action: none;
-  font-family: system-ui;
-}
-
-.container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-#content {
-  width: 100vmin;
-  height: 100vmin;
-  overflow: hidden;
-}
-
-#content canvas {
-  width: 100%;
-  height: 100%;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-body {
-  overflow: hidden;
 }

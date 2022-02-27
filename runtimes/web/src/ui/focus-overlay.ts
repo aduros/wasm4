@@ -1,11 +1,9 @@
 import { LitElement, html, css } from "lit";
+import { customElement, property } from 'lit/decorators.js';
 
+@customElement("wasm4-focus-overlay")
 export class FocusOverlay extends LitElement {
     static styles = css`
-        :host-context(body.focus) {
-          display: none;
-        }
-
         .play-button {
             box-sizing: border-box;
             display: block;
@@ -39,7 +37,7 @@ export class FocusOverlay extends LitElement {
             width: 100vmin;
             height: 100%;
             color: #fff;
-            padding: 20px;
+            // padding: 20px;
             cursor: pointer;
         }
         .screenshot {
@@ -47,13 +45,10 @@ export class FocusOverlay extends LitElement {
             height: 100%;
             image-rendering: pixelated;
             image-rendering: crisp-edges;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
     `;
 
-    screenshot: string;
+    @property() screenshot: string;
 
     render () {
         return html`
@@ -65,10 +60,8 @@ export class FocusOverlay extends LitElement {
     }
 }
 
-export const focusOverlayTagName = "wasm4-focus-overlay";
 declare global {
     interface HTMLElementTagNameMap {
-        [focusOverlayTagName]: FocusOverlay;
+        "wasm4-focus-overlay": FocusOverlay;
     }
 }
-customElements.define(focusOverlayTagName, FocusOverlay);

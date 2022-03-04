@@ -76,6 +76,14 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/wiiu-static-cmake.yml'
 
+  # Wii
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/wii-static-cmake.yml'
+
+  # Gamecube
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/ngc-static-cmake.yml'
+
   # tvOS
   - project: 'libretro-infrastructure/ci-templates'
     file: '/tvos-cmake.yml'
@@ -202,6 +210,18 @@ libretro-build-ctr:
 libretro-build-psp:
   extends:
     - .libretro-psp-static-cmake-retroarch-master
+    - .core-defs
+
+# Wii
+libretro-build-wii:
+  extends:
+    - .libretro-wii-static-cmake-retroarch-master
+    - .core-defs
+
+# Gamecube
+libretro-build-ngc:
+  extends:
+    - .libretro-ngc-static-cmake-retroarch-master
     - .core-defs
 
 # VITA

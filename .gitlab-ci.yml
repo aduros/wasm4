@@ -30,6 +30,10 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/windows-cmake-mingw.yml'
 
+  # DJGPP
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/djgpp-static-cmake.yml'
+
   # MacOS
   - project: 'libretro-infrastructure/ci-templates'
     file: 'osx-cmake-x86.yml'
@@ -114,6 +118,12 @@ libretro-build-windows-x64:
 libretro-build-windows-i686:
   extends:
     - .libretro-windows-cmake-x86
+    - .core-defs
+
+# DJGPP
+libretro-build-djgpp:
+  extends:
+    - .libretro-djgpp-static-cmake-retroarch-master
     - .core-defs
 
 # Linux 64-bit

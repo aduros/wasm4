@@ -68,6 +68,10 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/psp-static-cmake.yml'
 
+  # PS2
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/ps2-static-cmake.yml'
+
   # VITA
   - project: 'libretro-infrastructure/ci-templates'
     file: '/vita-static-cmake.yml'
@@ -220,6 +224,12 @@ libretro-build-ctr:
 libretro-build-psp:
   extends:
     - .libretro-psp-static-cmake-retroarch-master
+    - .core-defs
+
+# PS2
+libretro-build-ps2:
+  extends:
+    - .libretro-ps2-static-cmake-retroarch-master
     - .core-defs
 
 # Wii

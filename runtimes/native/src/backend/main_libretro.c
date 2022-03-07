@@ -31,7 +31,7 @@ static w4_Disk disk = { 0 };
 
 static int hold_in_start_value = 10;
 
-#ifndef PSP
+#if !defined(PSP) && !defined(PS2)
 static void audio_set_state (bool enable) {
 }
 #endif
@@ -49,7 +49,7 @@ static void fallback_log(enum retro_log_level level,
 
 static retro_log_printf_t log_cb = fallback_log;
 
-#ifndef PSP
+#if !defined(PSP) && !defined(PS2)
 static void audio_callback () {
     w4_apuWriteSamples(audio_output, AUDIO_BUFFER_FRAMES_CALLBACK);
     audio_batch_cb(audio_output, AUDIO_BUFFER_FRAMES_CALLBACK);
@@ -66,7 +66,8 @@ static struct retro_variable variables[] =
 	"wasm4_pixel_type",
 	"Pixel type; xrgb8888|rgb565",
     },
-#ifndef PSP
+#if !defined(PSP) && !defined(PS2) // On PSP callback audio leads to hang
+    // On PS2 it leads to silent audio
     {
 	"wasm4_audio_type",
 	"Audio type; callback|normal",
@@ -206,7 +207,7 @@ static void load_variables(bool startup) {
     struct retro_variable var;
 
     if (startup) {
-#ifndef PSP
+#if !defined(PSP) && !defined(PS2)
 	var.key = "wasm4_audio_type";
 	var.value = NULL;
 
@@ -316,7 +317,7 @@ bool retro_load_game (const struct retro_game_info* game) {
 
     load_variables(true);
 
-#ifndef PSP
+#if !defined(PSP) && !defined(PS2)
     if (use_audio_callback) {
 	struct retro_audio_callback audio_cb = { audio_callback, audio_set_state };
 	log_cb(RETRO_LOG_INFO, "Using callback audio\n");

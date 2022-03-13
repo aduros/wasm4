@@ -1,11 +1,44 @@
 import { LitElement, html, css } from "lit";
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, state, query } from 'lit/decorators.js';
 
 import * as constants from "../constants";
 import * as devkit from "../devkit";
 import * as utils from "./utils";
 import * as z85 from "../z85";
 import { Runtime } from "../runtime";
+
+class InputState {
+    gamepad = [0, 0, 0, 0];
+    mouseX = 0;
+    mouseY = 0;
+    mouseButtons = 0;
+}
+
+class InputManager {
+    /** The input to be used for the next frame. */
+    nextState = new InputState();
+
+    /** The input used from the last frame. */
+    lastState = new InputState();
+
+    update () {
+        const next = this.nextState;
+        const last = this.lastState;
+
+        // Copy the next input state into the last input state
+        for (let ii = 0; ii < 4; ++ii) {
+            last.gamepad[ii] = next.gamepad[ii];
+        }
+        last.mouseX = next.mouseX;
+        last.mouseY = next.mouseY;
+        last.mouseButtons = next.mouseButtons;
+    }
+}
+
+class GameState {
+    constructor (public memory: Uint32Array) {
+    }
+}
 
 @customElement("wasm4-app")
 export class App extends LitElement {
@@ -41,6 +74,15 @@ export class App extends LitElement {
 
     @state() focused: boolean = true;
     @state() hideGamepadOverlay: boolean = false;
+
+    @state() pauseMenu: boolean = false;
+
+    @query("wasm4-menu-overlay") menuOverlay: MenuOverlay;
+
+    private wasmBuffer: ArrayBuffer;
+    private savedGameState: GameState | null;
+
+    readonly inputManager = new InputManager();
 
     constructor () {
         super();
@@ -80,8 +122,8 @@ export class App extends LitElement {
         await runtime.init();
 
         const canvas = runtime.canvas;
-        let wasmBuffer = await loadCartWasm();
-        await runtime.load(wasmBuffer);
+        this.wasmBuffer = await loadCartWasm();
+        await runtime.load(this.wasmBuffer);
 
         let devtoolsManager = { toggleDevtools(){}, updateCompleted(...args: unknown[]) {} };
         if (DEVELOPER_BUILD) {
@@ -120,19 +162,11 @@ export class App extends LitElement {
             devkit.websocket?.addEventListener("message", async event => {
                 switch (event.data) {
                 case "reload":
-                    wasmBuffer = await loadCartWasm();
-                    reboot();
+                    this.wasmBuffer = await loadCartWasm();
+                    this.resetCart();
                     break;
                 }
             });
-        }
-
-        async function reboot () {
-            runtime.reset(true);
-            runtime.pauseState |= constants.PAUSE_REBOOTING;
-            await runtime.load(wasmBuffer);
-            runtime.start();
-            runtime.pauseState &= ~constants.PAUSE_REBOOTING;
         }
 
         function takeScreenshot () {
@@ -187,17 +221,6 @@ export class App extends LitElement {
             }, 4000);
         }
 
-        let savedState: Uint32Array | null = null;
-        function saveState () {
-            savedState = new Uint32Array(runtime.memory.buffer.slice(0));
-        }
-
-        function loadState () {
-            if (savedState != null) {
-                new Uint32Array(runtime.memory.buffer).set(savedState);
-            }
-        }
-
         // Temporary hack to allow developers to build 3-4 player games until we have a better solution
         let swapKeyboardControls = false;
         function toggleSwapKeyboardControls () {
@@ -211,10 +234,10 @@ export class App extends LitElement {
 
             if (event.isPrimary) {
                 const bounds = canvas.getBoundingClientRect();
-                const x = Math.fround(constants.WIDTH * (event.clientX - bounds.left) / bounds.width);
-                const y = Math.fround(constants.HEIGHT * (event.clientY - bounds.top) / bounds.height);
-                const buttons = event.buttons & 0b111;
-                runtime.setMouse(x, y, buttons);
+                const input = this.inputManager.nextState;
+                input.mouseX = Math.fround(constants.WIDTH * (event.clientX - bounds.left) / bounds.width);
+                input.mouseY = Math.fround(constants.HEIGHT * (event.clientY - bounds.top) / bounds.height);
+                input.mouseButtons = event.buttons & 0b111;
             }
         };
         window.addEventListener("pointerdown", onMouseEvent);
@@ -226,28 +249,20 @@ export class App extends LitElement {
         });
 
         const HOTKEYS: Record<string, (...args:any[]) => any> = {
-            "2": saveState,
-            "4": loadState,
-            "r": reboot,
-            "R": reboot,
+            "2": this.saveGameState.bind(this),
+            "4": this.loadGameState.bind(this),
+            "r": this.resetCart.bind(this),
+            "R": this.resetCart.bind(this),
             "F7": toggleSwapKeyboardControls,
             "F8": devtoolsManager.toggleDevtools,
             "F9": takeScreenshot,
             "F10": recordVideo,
             "F11": utils.requestFullscreen,
+            "Enter": this.onMenuButtonPressed.bind(this),
         };
-
-        let isKeyboard = true;
 
         const onKeyboardEvent = (event: KeyboardEvent) => {
             const down = (event.type == "keydown");
-
-            if (!isKeyboard) {
-                // reset joy pad state
-                runtime.setGamepad(0, 0);
-            }
-
-            isKeyboard = true;
 
             // Poke WebAudio
             runtime.unlockAudio();
@@ -311,89 +326,63 @@ export class App extends LitElement {
                 mask = constants.BUTTON_RIGHT;
                 break;
             }
+
             if (mask != 0) {
                 event.preventDefault();
-                runtime.maskGamepad(playerIdx + (swapKeyboardControls ? 2 : 0), mask, down);
+
+                if (swapKeyboardControls) {
+                    playerIdx += 2;
+                }
+
+                // Set or clear the button bit from the next input state
+                const gamepad = this.inputManager.nextState.gamepad;
+                if (down) {
+                    gamepad[playerIdx] |= mask;
+                } else {
+                    gamepad[playerIdx] &= ~mask;
+                }
             }
         };
         window.addEventListener("keydown", onKeyboardEvent);
         window.addEventListener("keyup", onKeyboardEvent);
 
-        let usedGamepad = -1;
-
-        function processGamepad() {
-            if (usedGamepad === -1) {
-                return;
+        function pollPhysicalGamepads () {
+            if (!navigator.getGamepads) {
+                return; // Browser doesn't support gamepads
             }
 
-            const gamepad = navigator.getGamepads()[usedGamepad];
-            if (!gamepad) {
-                return;
-            }
+            for (const gamepad of navigator.getGamepads()) {
+                if (gamepad == null || gamepad.mapping != "standard") {
+                    continue; // Disconnected or non-standard gamepad
+                }
 
-            const buttons = gamepad.buttons;
-            const axes = gamepad.axes;
+                // https://www.w3.org/TR/gamepad/#remapping
+                const buttons = gamepad.buttons;
+                const axes = gamepad.axes;
 
-            // not all gamepads map DPAD to 12,13, 14, 15 buttos
-            const dpad = buttons.length > 12;
+                let mask = 0;
+                if (buttons[12].pressed || axes[1] < -0.5) {
+                    mask |= constants.BUTTON_UP;
+                }
+                if (buttons[13].pressed || axes[1] > 0.5) {
+                    mask |= constants.BUTTON_DOWN;
+                }
+                if (buttons[14].pressed || axes[0] < -0.5) {
+                    mask |= constants.BUTTON_LEFT;
+                }
+                if (buttons[15].pressed || axes[0] > 0.5) {
+                    mask |= constants.BUTTON_RIGHT;
+                }
+                if (buttons[0].pressed) {
+                    mask |= constants.BUTTON_X;
+                }
+                if (buttons[1].pressed) {
+                    mask |= constants.BUTTON_Z;
+                }
 
-            // https://www.w3.org/TR/gamepad/#remapping
-            // DPAD + AXIS
-            const up = dpad && buttons[12].pressed || axes[1] < -0.5;
-            const down = dpad && buttons[13].pressed || axes[1] > 0.5;
-            const left = dpad && buttons[14].pressed || axes[0] < -0.5;
-            const right = dpad && buttons[15].pressed || axes[0] > 0.5;
-
-            // X, O + Triggers
-            // NOTE: for XBox360 a triggers is 6 and 7
-            const x = buttons[0].pressed || buttons[6].pressed;
-            const z = buttons[1].pressed || buttons[7].pressed;
-
-            let buttonMask = 0;
-            buttonMask |= constants.BUTTON_UP & -up;
-            buttonMask |= constants.BUTTON_DOWN & -down;
-            buttonMask |= constants.BUTTON_LEFT & -left;
-            buttonMask |= constants.BUTTON_RIGHT & -right;
-
-            buttonMask |= constants.BUTTON_X & -x;
-            buttonMask |= constants.BUTTON_Z & -z;
-
-            // supress changing if keyboard used
-            // we should not reset state but should read it
-            if (buttonMask !== 0 || !isKeyboard) {
-                isKeyboard = false;
-
-                runtime.setGamepad(0, buttonMask);
+                this.inputManager.nextState.gamepad[gamepad.index % 4] = mask;
             }
         }
-
-        window.addEventListener("gamepadconnected", (e) => {
-            // find a first active gamepad
-            for(const g of navigator.getGamepads()) {
-                if (g) {
-                    usedGamepad = g.index;
-                    break;
-                }
-            }
-        });
-
-        window.addEventListener('gamepaddisconnected', (e) => {
-            // if gamepad is same - nothing doing
-            if (e.gamepad.index !== usedGamepad) {
-                return;
-            }
-
-            // reset
-            usedGamepad = -1;
-            runtime.setGamepad(0, 0);
-
-            for(const g of navigator.getGamepads()) {
-                if (g) {
-                    usedGamepad = g.index;
-                    break;
-                }
-            }
-        });
 
         // https://gist.github.com/addyosmani/5434533#file-limitloop-js-L60
         const INTERVAL = 1000 / 60;
@@ -404,12 +393,33 @@ export class App extends LitElement {
         let lastFrameGapCorrected = lastFrame;
 
         const loop = () => {
-            processGamepad();
+            pollPhysicalGamepads();
+
+            const lastInput = this.inputManager.lastState;
+            const input = this.inputManager.nextState;
+
+            // Send buttons that were pressed this frame to the menu overlay
+            if (this.menuOverlay != null) {
+                for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
+                    const pressed = input.gamepad[playerIdx] & (input.gamepad[playerIdx] ^ lastInput.gamepad[playerIdx]);
+                    if (pressed) {
+                        this.menuOverlay.onGamepadPressed(pressed);
+                    }
+                }
+            }
+
+            // Pass inputs into runtime memory
+            for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
+                runtime.setGamepad(playerIdx, input.gamepad[playerIdx]);
+            }
+            runtime.setMouse(input.mouseX, input.mouseY, input.mouseButtons);
+
+            this.inputManager.update();
 
             const now = performance.now();
             const deltaFrameGapCorrected = now - lastFrameGapCorrected;
 
-            if (deltaFrameGapCorrected >= INTERVAL) {
+            if (!this.pauseMenu && deltaFrameGapCorrected >= INTERVAL) {
                 const deltaTime = now - lastFrame;
                 lastFrame = now;
                 lastFrameGapCorrected = now - (deltaFrameGapCorrected % INTERVAL);
@@ -437,13 +447,53 @@ export class App extends LitElement {
         this.runtime.unlockAudio();
     }
 
+    onMenuButtonPressed () {
+        if (this.pauseMenu) {
+            // If the pause menu is already open, treat it as an X button
+            this.inputManager.nextState.gamepad[0] |= constants.BUTTON_X;
+        } else {
+            this.pauseMenu = true;
+        }
+    }
+
+    closeMenu () {
+        if (this.pauseMenu) {
+            this.pauseMenu = false;
+
+            // Kind of a hack to prevent the button press to close the menu from being passed
+            // through to the game
+            for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
+                this.inputManager.nextState.gamepad[playerIdx] = 0;
+            }
+        }
+    }
+
+    saveGameState () {
+        this.savedGameState = new GameState(new Uint32Array(this.runtime.memory.buffer.slice(0)));
+    }
+
+    loadGameState () {
+        if (this.savedGameState != null) {
+            new Uint32Array(this.runtime.memory.buffer).set(this.savedGameState.memory);
+        }
+    }
+
+    async resetCart () {
+        this.runtime.reset(true);
+        this.runtime.pauseState |= constants.PAUSE_REBOOTING;
+        await this.runtime.load(this.wasmBuffer);
+        this.runtime.start();
+        this.runtime.pauseState &= ~constants.PAUSE_REBOOTING;
+    }
+
     render () {
         return html`
             <div class="content" @pointerup="${this.onPointerUp}">
+                ${this.pauseMenu ? html`<wasm4-menu-overlay .app=${this} />`: ""}
                 ${!this.focused ? html`<wasm4-focus-overlay screenshot=${this.screenshot} />` : ""}
                 ${this.runtime ? this.runtime.canvas : ""}
             </div>
-            ${this.runtime && this.focused && !this.hideGamepadOverlay ? html`<wasm4-virtual-gamepad .runtime=${this.runtime} />` : ""}
+            ${this.focused && !this.hideGamepadOverlay ? html`<wasm4-virtual-gamepad .app=${this} />` : ""}
         `;
     }
 }

@@ -82,10 +82,6 @@ export class Runtime {
         this.data.setUint8(constants.ADDR_GAMEPAD1 + idx, buttons);
     }
 
-    getGamepad (idx: number) {
-        return this.data.getUint8(constants.ADDR_GAMEPAD1 + idx);
-    }
-
     getSystemFlag (mask: number) {
         return this.data.getUint8(constants.ADDR_SYSTEM_FLAGS) & mask;
     }

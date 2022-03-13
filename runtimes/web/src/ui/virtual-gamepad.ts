@@ -3,7 +3,7 @@ import { customElement, property, query } from 'lit/decorators.js';
 
 import * as constants from "../constants";
 import * as utils from "./utils";
-import { Runtime } from "../runtime";
+import { App } from "./app";
 
 function setClass (element: Element | null, className: string, enabled: boolean | number) {
     if(!element) {
@@ -30,11 +30,9 @@ export class VirtualGamepad extends LitElement {
                 display: none;
             }
         }
-        :host {
-          pointer-events: none;
-        }
 
         .dpad {
+            pointer-events: none;
             position: absolute;
             width: 39px;
             height: 120px;
@@ -87,6 +85,7 @@ export class VirtualGamepad extends LitElement {
             bottom: 90px;
         }
         .action1, .action2 {
+            pointer-events: none;
             position: absolute;
             width: 60px;
             height: 60px;
@@ -96,17 +95,27 @@ export class VirtualGamepad extends LitElement {
         .action1.pressed, .action2.pressed {
             background: #A93671;
         }
+
+        .menu {
+            position: absolute;
+            background: #444;
+            width: 60px;
+            height: 20px;
+            bottom: 200px;
+            right: 35px;
+            border-radius: 9px;
+        }
     `;
 
-    @property() runtime: Runtime;
+    @property() app: App;
 
-    @query(".dpad") dpad: HtmlElement;
-    @query(".action1") action1: HtmlElement;
-    @query(".action2") action2: HtmlElement;
+    @query(".dpad") dpad: HTMLElement;
+    @query(".action1") action1: HTMLElement;
+    @query(".action2") action2: HTMLElement;
 
     readonly touchEvents = new Map();
 
-    readonly onPointerEvent = () => {
+    readonly onPointerEvent = (event: PointerEvent) => {
         if (event.pointerType != "touch") {
             return;
         }
@@ -176,12 +185,6 @@ export class VirtualGamepad extends LitElement {
             }
         }
 
-        const nowXZDown = buttons & (constants.BUTTON_X | constants.BUTTON_Z);
-        const wasXZDown = this.runtime.getGamepad(0) & (constants.BUTTON_X | constants.BUTTON_Z);
-        if (nowXZDown && !wasXZDown) {
-            navigator.vibrate(1);
-        }
-
         setClass(this.action1, "pressed", buttons & constants.BUTTON_X);
         setClass(this.action2, "pressed", buttons & constants.BUTTON_Z);
         setClass(this.dpad, "pressed-left", buttons & constants.BUTTON_LEFT);
@@ -189,7 +192,7 @@ export class VirtualGamepad extends LitElement {
         setClass(this.dpad, "pressed-up", buttons & constants.BUTTON_UP);
         setClass(this.dpad, "pressed-down", buttons & constants.BUTTON_DOWN);
 
-        this.runtime.setGamepad(0, buttons);
+        this.app.inputManager.nextState.gamepad[0] = buttons;
     }
 
     connectedCallback () {
@@ -212,6 +215,7 @@ export class VirtualGamepad extends LitElement {
 
     render () {
         return html`
+            <div class="menu" @pointerdown="${() => { this.app.onMenuButtonPressed() }}"></div>
             <div class="dpad"></div>
             <div class="action1"></div>
             <div class="action2"></div>

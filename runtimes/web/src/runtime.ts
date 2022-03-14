@@ -86,29 +86,6 @@ export class Runtime {
         return this.data.getUint8(constants.ADDR_SYSTEM_FLAGS) & mask;
     }
 
-    maskGamepad (idx: number, mask: number, down: boolean) {
-        const addr = constants.ADDR_GAMEPAD1 + idx;
-        let buttons = this.data.getUint8(addr);
-        if (down) {
-            // if (mask & constants.BUTTON_LEFT) {
-            //     buttons &= ~constants.BUTTON_RIGHT;
-            // }
-            // if (mask & constants.BUTTON_RIGHT) {
-            //     buttons &= ~constants.BUTTON_LEFT;
-            // }
-            // if (mask & constants.BUTTON_DOWN) {
-            //     buttons &= ~constants.BUTTON_UP;
-            // }
-            // if (mask & constants.BUTTON_UP) {
-            //     buttons &= ~constants.BUTTON_DOWN;
-            // }
-            buttons |= mask;
-        } else {
-            buttons &= ~mask;
-        }
-        this.data.setUint8(addr, buttons);
-    }
-
     unlockAudio () {
         this.apu.unlockAudio();
     }
@@ -399,7 +376,7 @@ export class Runtime {
         this.compositor.composite(palette, this.framebuffer);
     }
 
-    updateIdleState = () => {
+    updateIdleState () {
         const lostFocus = !document.body.classList.contains('focus');
 
         if (lostFocus) {

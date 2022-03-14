@@ -3,11 +3,6 @@ html, body {
   margin: 0;
 }
 
-body {
-  background: #202020;
-  touch-action: none;
-}
-
 /* https://github.com/codeman38/PressStart2P, with most glyphs stripped */
 @font-face {
     font-family: wasm4-font;

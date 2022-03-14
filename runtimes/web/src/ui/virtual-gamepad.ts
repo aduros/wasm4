@@ -25,9 +25,12 @@ function requestFullscreen () {
 @customElement("wasm4-virtual-gamepad")
 export class VirtualGamepad extends LitElement {
     static styles = css`
-        @media (pointer: fine) {
+        :host {
+            display: none;
+        }
+        @media (pointer: coarse) {
             :host {
-                display: none;
+                display: inherit;
             }
         }
 
@@ -91,6 +94,12 @@ export class VirtualGamepad extends LitElement {
             height: 60px;
             border: 4px solid #A93671;
             border-radius: 50px;
+
+            /** TODO(2022-03-14): Button text should be centered but is off slightly. */
+            color: #A93671;
+            font: 24px wasm4-font;
+            text-align: center;
+            line-height: 60px;
         }
         .action1.pressed, .action2.pressed {
             background: #A93671;
@@ -103,7 +112,7 @@ export class VirtualGamepad extends LitElement {
             height: 20px;
             bottom: 200px;
             right: 35px;
-            border-radius: 9px;
+            border-radius: 10px;
         }
     `;
 
@@ -213,12 +222,19 @@ export class VirtualGamepad extends LitElement {
         super.disconnectedCallback();
     }
 
+    onMenuButtonPressed (event) {
+        this.app.onMenuButtonPressed();
+
+        // Prevent the window handler from clearing our menu close button press
+        event.stopImmediatePropagation();
+    }
+
     render () {
         return html`
-            <div class="menu" @pointerdown="${() => { this.app.onMenuButtonPressed() }}"></div>
+            <div class="menu" @pointerdown="${this.onMenuButtonPressed}"></div>
             <div class="dpad"></div>
-            <div class="action1"></div>
-            <div class="action2"></div>
+            <div class="action1">X</div>
+            <div class="action2">Z</div>
         `;
     }
 }

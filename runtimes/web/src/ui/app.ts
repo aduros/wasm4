@@ -50,15 +50,26 @@ export class App extends LitElement {
             align-items: center;
             justify-content: center;
 
+            touch-action: none;
             user-select: none;
             -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;
+
+            background: #202020;
         }
 
         .content {
             width: 100vmin;
             height: 100vmin;
             overflow: hidden;
+        }
+
+        /** Nudge the game upwards a bit in portrait to make space for the virtual gamepad. */
+        @media (pointer: coarse) and (max-aspect-ratio: 2/3) {
+            .content {
+                position: absolute;
+                top: calc((100% - 220px - 100vmin)/2)
+            }
         }
 
         .content canvas {

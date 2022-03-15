@@ -64,7 +64,11 @@ static struct retro_variable variables[] =
 {
     {
 	"wasm4_pixel_type",
+#if defined(PS2)
+	"Pixel type; bgr555|xrgb8888",
+#else
 	"Pixel type; xrgb8888|rgb565",
+#endif
     },
 #if !defined(PSP) && !defined(PS2) // On PSP callback audio leads to hang
     // On PS2 it leads to silent audio
@@ -245,7 +249,7 @@ bool retro_load_game (const struct retro_game_info* game) {
 
     if (!environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var))
 	var.value = NULL;
-    if (var.value && strcmp(var.value, "rgb565") == 0)
+    if (var.value && (strcmp(var.value, "rgb565") == 0 || strcmp(var.value, "bgr555") == 0))
 	preferredformat = RETRO_PIXEL_FORMAT_RGB565;
     else
 	preferredformat = RETRO_PIXEL_FORMAT_XRGB8888;
@@ -527,7 +531,11 @@ void w4_windowComposite (const uint32_t* palette, const uint8_t* framebuffer) {
 	int i;
 	for (i = 0; i < 4; i++) {
 	    uint32_t c = palette[i];
+#if defined(PS2)
+	    transform_palette[i] = ((((c) & 0xf8) << 7) | ((c>>6) & 0x3e0) | (((c >> 19) & 0x1f)));
+#else
 	    transform_palette[i] = ((c >> 3) & 0x001f) | ((c >> 5) & 0x07e0) | ((c >> 8) & 0xf800);
+#endif
 	}
 	do_composite(uint16_t, transform_palette);
     } else {

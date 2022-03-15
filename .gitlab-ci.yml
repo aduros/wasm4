@@ -125,7 +125,7 @@ libretro-build-windows-i686:
     - .core-defs
 
 # DJGPP
-libretro-build-djgpp:
+libretro-build-djgpp-i586:
   extends:
     - .libretro-djgpp-static-cmake-retroarch-master
     - .core-defs
@@ -155,7 +155,7 @@ libretro-build-osx-x64:
     - .core-defs-osx
 
 # MacOS ARM64
-libretro-build-osx-aarch64:
+libretro-build-osx-arm64:
   extends:
     - .libretro-osx-cmake
     - .core-defs-osx
@@ -209,7 +209,7 @@ libretro-build-ios9:
 
 ################################### CONSOLES #################################
 # Libnx
-libretro-build-libnx:
+libretro-build-libnx-aarch64:
   extends:
     - .libretro-libnx-static-cmake-retroarch-master
     - .core-defs
@@ -261,12 +261,12 @@ libretro-build-dingux-mips32-odbeta:
     - .libretro-dingux-odbeta-cmake-mips32
     - .core-defs
 
-libretro-build-rs90-mips32-odbeta:
+libretro-build-rs90-odbeta-mips32:
   extends:
     - .libretro-rs90-odbeta-cmake-mips32
     - .core-defs
 
-libretro-build-retrofw-mips32-odbeta:
+libretro-build-retrofw-mips32:
   extends:
     - .libretro-retrofw-odbeta-cmake-mips32
     - .core-defs

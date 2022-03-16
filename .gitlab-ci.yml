@@ -256,7 +256,7 @@ libretro-build-dingux-mips32:
     - .libretro-dingux-cmake-mips32
     - .core-defs
 
-libretro-build-dingux-mips32-odbeta:
+libretro-build-dingux-odbeta-mips32:
   extends:
     - .libretro-dingux-odbeta-cmake-mips32
     - .core-defs

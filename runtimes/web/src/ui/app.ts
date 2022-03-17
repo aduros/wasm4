@@ -273,6 +273,10 @@ export class App extends LitElement {
         };
 
         const onKeyboardEvent = (event: KeyboardEvent) => {
+            if (event.repeat) {
+                return; // Ignore key repeat events
+            }
+
             const down = (event.type == "keydown");
 
             // Poke WebAudio
@@ -409,39 +413,40 @@ export class App extends LitElement {
             const lastInput = this.inputManager.lastState;
             const input = this.inputManager.nextState;
 
-            // Send buttons that were pressed this frame to the menu overlay
             if (this.menuOverlay != null) {
+                // Send buttons that were pressed this frame to the menu overlay
                 for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
                     const pressed = input.gamepad[playerIdx] & (input.gamepad[playerIdx] ^ lastInput.gamepad[playerIdx]);
                     if (pressed) {
                         this.menuOverlay.onGamepadPressed(pressed);
                     }
                 }
-            }
 
-            // Pass inputs into runtime memory
-            for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
-                runtime.setGamepad(playerIdx, input.gamepad[playerIdx]);
-            }
-            runtime.setMouse(input.mouseX, input.mouseY, input.mouseButtons);
+            } else {
+                // Pass inputs into runtime memory
+                for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
+                    runtime.setGamepad(playerIdx, input.gamepad[playerIdx]);
+                }
+                runtime.setMouse(input.mouseX, input.mouseY, input.mouseButtons);
 
-            this.inputManager.update();
+                const now = performance.now();
+                const deltaFrameGapCorrected = now - lastFrameGapCorrected;
 
-            const now = performance.now();
-            const deltaFrameGapCorrected = now - lastFrameGapCorrected;
+                if (!this.pauseMenu && deltaFrameGapCorrected >= INTERVAL) {
+                    const deltaTime = now - lastFrame;
+                    lastFrame = now;
+                    lastFrameGapCorrected = now - (deltaFrameGapCorrected % INTERVAL);
+                    runtime.update();
 
-            if (!this.pauseMenu && deltaFrameGapCorrected >= INTERVAL) {
-                const deltaTime = now - lastFrame;
-                lastFrame = now;
-                lastFrameGapCorrected = now - (deltaFrameGapCorrected % INTERVAL);
-                runtime.update();
+                    this.hideGamepadOverlay = !!runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY);
 
-                this.hideGamepadOverlay = !!runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY);
-
-                if (DEVELOPER_BUILD) {
-                    devtoolsManager.updateCompleted(runtime, deltaTime);
+                    if (DEVELOPER_BUILD) {
+                        devtoolsManager.updateCompleted(runtime, deltaTime);
+                    }
                 }
             }
+
+            this.inputManager.update();
 
             requestAnimationFrame(loop);
         };

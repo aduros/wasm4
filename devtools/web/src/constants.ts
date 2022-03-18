@@ -35,7 +35,7 @@ export const MOUSE_MIDDLE = 4;
 export const SYSTEM_PRESERVE_FRAMEBUFFER = 1;
 export const SYSTEM_HIDE_GAMEPAD_OVERLAY = 2;
 
-export const MAX_CART_SIZE = 0xffff;
+export const MAX_CART_SIZE = 1 << 16;
 
 interface Range {
   offset: number;

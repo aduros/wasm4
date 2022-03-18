@@ -44,7 +44,7 @@ void w4_runtimeInit (uint8_t* memoryBytes, w4_Disk* diskBytes) {
     firstFrame = true;
 
     // Set memory to initial state
-    memset(memory, 0, 0xffff);
+    memset(memory, 0, 1 << 16);
     m3ApiWriteMem32(&memory->palette[0], 0xe0f8cf);
     m3ApiWriteMem32(&memory->palette[1], 0x86c06c);
     m3ApiWriteMem32(&memory->palette[2], 0x306850);
@@ -197,14 +197,14 @@ int w4_runtimeSerializeSize () {
 
 void w4_runtimeSerialize (void* dest) {
     SerializedState* state = dest;
-    memcpy(&state->memory, memory, 0xffff);
+    memcpy(&state->memory, memory, 1 << 16);
     memcpy(&state->disk, disk, sizeof(w4_Disk));
     state->firstFrame = firstFrame;
 }
 
 void w4_runtimeUnserialize (const void* src) {
     const SerializedState* state = src;
-    memcpy(memory, &state->memory, 0xffff);
+    memcpy(memory, &state->memory, 1 << 16);
     memcpy(disk, &state->disk, sizeof(w4_Disk));
     firstFrame = state->firstFrame;
 }

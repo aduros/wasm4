@@ -101,7 +101,7 @@ async function bundle(cartFile, opts) {
         throw new Error('You must specify one or more bundle outputs.');
     }
 
-    const limit = 0xffff;
+    const limit = 1 << 16;
     const stat = await fs.stat(cartFile);
     if (stat.size > limit) {
         throw new Error(`Cart is above the size limit of ${limit} bytes.`);

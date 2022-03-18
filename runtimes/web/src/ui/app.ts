@@ -36,7 +36,27 @@ class InputManager {
 }
 
 class GameState {
-    constructor (public memory: Uint32Array) {
+    memory: ArrayBuffer;
+    diskBuffer: ArrayBuffer;
+    diskSize: number;
+    // TODO(2022-03-17): APU state
+
+    constructor () {
+        this.memory = new ArrayBuffer(1 << 16);
+        this.diskBuffer = new ArrayBuffer(constants.STORAGE_SIZE);
+        this.diskSize = 0;
+    }
+
+    read (runtime: Runtime) {
+        new Uint8Array(this.memory).set(new Uint8Array(runtime.memory.buffer));
+        new Uint8Array(this.diskBuffer).set(new Uint8Array(runtime.diskBuffer));
+        this.diskSize = runtime.diskSize;
+    }
+
+    write (runtime: Runtime) {
+        new Uint8Array(runtime.memory.buffer).set(new Uint8Array(this.memory));
+        new Uint8Array(runtime.diskBuffer).set(new Uint8Array(this.diskBuffer));
+        runtime.diskSize = this.diskSize;
     }
 }
 
@@ -485,12 +505,17 @@ export class App extends LitElement {
     }
 
     saveGameState () {
-        this.savedGameState = new GameState(new Uint32Array(this.runtime.memory.buffer.slice(0)));
+        let state = this.savedGameState;
+        if (state == null) {
+            state = this.savedGameState = new GameState();
+        }
+        state.read(this.runtime);
     }
 
     loadGameState () {
-        if (this.savedGameState != null) {
-            new Uint32Array(this.runtime.memory.buffer).set(this.savedGameState.memory);
+        const state = this.savedGameState;
+        if (state != null) {
+            state.write(this.runtime);
         }
     }
 

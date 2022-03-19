@@ -8,6 +8,10 @@ import * as z85 from "../z85";
 import { Runtime } from "../runtime";
 import { State } from "../state";
 
+import { Netplay } from "../netplay";
+
+const DEV_NETPLAY = false;
+
 class InputState {
     gamepad = [0, 0, 0, 0];
     mouseX = 0;
@@ -15,6 +19,7 @@ class InputState {
     mouseButtons = 0;
 }
 
+// TODO(2022-03-19): Remove
 class InputManager {
     /** The input to be used for the next frame. */
     nextState = new InputState();
@@ -403,6 +408,8 @@ export class App extends LitElement {
         // used for keeping a consistent framerate. not a real time.
         let lastFrameGapCorrected = lastFrame;
 
+        const netplay = DEV_NETPLAY ? new Netplay(runtime) : null;
+
         const loop = () => {
             pollPhysicalGamepads();
 
@@ -419,12 +426,6 @@ export class App extends LitElement {
                 }
 
             } else {
-                // Pass inputs into runtime memory
-                for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
-                    runtime.setGamepad(playerIdx, input.gamepad[playerIdx]);
-                }
-                runtime.setMouse(input.mouseX, input.mouseY, input.mouseButtons);
-
                 const now = performance.now();
                 const deltaFrameGapCorrected = now - lastFrameGapCorrected;
 
@@ -432,7 +433,21 @@ export class App extends LitElement {
                     const deltaTime = now - lastFrame;
                     lastFrame = now;
                     lastFrameGapCorrected = now - (deltaFrameGapCorrected % INTERVAL);
-                    runtime.update();
+
+                    if (netplay) {
+                        netplay.update(input.gamepad[0]);
+
+                    } else {
+                        // Pass inputs into runtime memory
+                        for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
+                            runtime.setGamepad(playerIdx, input.gamepad[playerIdx]);
+                        }
+                        runtime.setMouse(input.mouseX, input.mouseY, input.mouseButtons);
+
+                        runtime.update();
+                    }
+
+                    runtime.composite();
 
                     this.hideGamepadOverlay = !!runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY);
 

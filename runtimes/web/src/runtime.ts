@@ -330,8 +330,6 @@ export class Runtime {
         }
 
         this.safeCall(this.wasm!.exports.update);
-
-        this.composite();
     }
 
     blueScreen(err: Error) {

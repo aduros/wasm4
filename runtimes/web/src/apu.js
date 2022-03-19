@@ -3,12 +3,14 @@
 import workletRawSource from "./apu-worklet.min.generated.js?raw";
 
 export class APU {
-    async init () {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+    constructor () {
+        this.audioCtx = new (window.AudioContext || window.webkitAudioContext)({
             sampleRate: 44100, // must match SAMPLE_RATE in worklet
         });
-        this.audioCtx = audioCtx;
+    }
 
+    async init () {
+        const audioCtx = this.audioCtx;
         const blob = new Blob([workletRawSource], {type: "application/javascript"});
         const url = URL.createObjectURL(blob);
 

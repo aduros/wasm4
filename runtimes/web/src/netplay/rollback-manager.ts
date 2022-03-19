@@ -7,9 +7,15 @@ const HISTORY_LENGTH = 10;
 // A gamepad input byte
 type InputData = number;
 
-class HistoryFrame {
+// A single frame of input history
+class History {
     frame: number = -1;
+
+    // Inputs for each player
     readonly inputs: InputData[];
+
+    // For each input, whether it was a prediction
+    readonly predicted: boolean[];
 
     // The state at the beginning of this frame
     readonly state: State;
@@ -18,8 +24,10 @@ class HistoryFrame {
         this.state = new State();
 
         this.inputs = new Array(PLAYER_COUNT);
+        this.predicted = new Array(PLAYER_COUNT);
         for (let ii = 0; ii < PLAYER_COUNT; ++ii) {
             this.inputs[ii] = 0;
+            this.predicted[ii] = true;
         }
     }
 }
@@ -34,30 +42,21 @@ class Player {
 export class RollbackManager {
     currentFrame: number = 0;
 
-    private history: HistoryFrame[];
+    private history: History[];
     private players: Player[];
 
-    private rollbackFromFrame: number;
+    private rollbackIdx: number = HISTORY_LENGTH;
 
     constructor (private runtime: Runtime) {
         this.history = new Array(HISTORY_LENGTH);
         for (let ii = 0; ii < HISTORY_LENGTH; ++ii) {
-            this.history[ii] = new HistoryFrame();
+            this.history[ii] = new History();
         }
 
         this.players = new Array(PLAYER_COUNT);
         for (let ii = 0; ii < PLAYER_COUNT; ++ii) {
             this.players[ii] = new Player();
         }
-    }
-
-    private getHistoryFrame (frame: number): HistoryFrame {
-        for (const nextHistoryFrame of this.history) {
-            if (nextHistoryFrame.frame == frame) {
-                return nextHistoryFrame;
-            }
-        }
-        throw new Error("Missing history frame");
     }
 
     addInputs (playerIdx: number, frame: number, inputs: InputData[]) {
@@ -70,11 +69,24 @@ export class RollbackManager {
 
             } else {
                 // Search our history for this frame
-                const nextHistoryFrame = this.getHistoryFrame(frame);
-                if (nextHistoryFrame.inputs[playerIdx] != input) {
-                    // If the input changed, schedule a rollback
-                    nextHistoryFrame.inputs[playerIdx] = input;
-                    this.rollbackFromFrame = Math.min(this.rollbackFromFrame, frame);
+                let found = false;
+                for (let ii = 0, ll = HISTORY_LENGTH; ii < ll; ++ii) {
+                    const history = this.history[ii];
+                    if (history.frame == frame) {
+                        if (history.inputs[playerIdx] != input) {
+                            if (!history.predicted[playerIdx]) {
+                                throw new Error("Tried to rewrite an unpredicted input!");
+                            }
+                            history.predicted[playerIdx] = false;
+                            history.inputs[playerIdx] = input;
+                            this.rollbackIdx = Math.min(ii, this.rollbackIdx);
+                        }
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    throw new Error("History entry not found!");
                 }
             }
 
@@ -84,30 +96,70 @@ export class RollbackManager {
 
     update () {
         // TODO(2022-03-19):
-        // - perform scheduled rollbacks if necessary
         // - stall if we haven't received input from one of the players in a while
 
-        const lastHistoryFrame = this.history[HISTORY_LENGTH-1];
+        // Apply any rollbacks
+        if (this.rollbackIdx < HISTORY_LENGTH) {
+            console.log(`Rolling back ${HISTORY_LENGTH - this.rollbackIdx} frames`);
 
-        const nextHistoryFrame = this.history.shift();
-        this.history.push(nextHistoryFrame);
+            // Update predicted inputs, propagating them forward
+            for (let ii = this.rollbackIdx+1; ii < HISTORY_LENGTH; ++ii) {
+                const history = this.history[ii];
+                for (let playerIdx = 0; playerIdx < PLAYER_COUNT; ++playerIdx) {
+                    if (history.predicted[playerIdx]) {
+                        const prevHistory = this.history[ii-1];
+                        history.inputs[playerIdx] = prevHistory.inputs[playerIdx];
+                    }
+                }
+            }
 
-        nextHistoryFrame.frame = this.currentFrame;
+            let first = true;
+
+            while (this.rollbackIdx < HISTORY_LENGTH) {
+                const history = this.history[this.rollbackIdx++];
+
+                if (first) {
+                    first = false;
+
+                    // Restore runtime state to the beginning of the rollback
+                    history.state.write(this.runtime);
+
+                } else {
+                    // Update the saved state for this frame
+                    history.state.read(this.runtime);
+                }
+
+                for (let playerIdx = 0; playerIdx < PLAYER_COUNT; ++playerIdx) {
+                    this.runtime.setGamepad(playerIdx, history.inputs[playerIdx]);
+                }
+                this.runtime.update();
+            }
+        }
+
+        const prevHistory = this.history[HISTORY_LENGTH-1];
+
+        const nextHistory = this.history.shift();
+        this.history.push(nextHistory);
+
+        nextHistory.frame = this.currentFrame;
 
         // Save state before executing the frame
-        nextHistoryFrame.state.read(this.runtime);
+        nextHistory.state.read(this.runtime);
 
         // Copy inputs into the next frame
         for (let playerIdx = 0; playerIdx < PLAYER_COUNT; ++playerIdx) {
             const player = this.players[playerIdx];
+
             let input = player.futureInputs.get(this.currentFrame);
             if (input != null) {
                 player.futureInputs.delete(this.currentFrame);
             } else {
                 // No known input for this player, repeat the input from the last frame
-                input = lastHistoryFrame.inputs[playerIdx];
+                nextHistory.predicted[playerIdx] = true;
+                input = prevHistory.inputs[playerIdx];
             }
-            nextHistoryFrame.inputs[playerIdx] = input;
+
+            nextHistory.inputs[playerIdx] = input;
 
             // Also poke runtime memory
             this.runtime.setGamepad(playerIdx, input);

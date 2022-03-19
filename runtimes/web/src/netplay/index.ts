@@ -13,7 +13,11 @@ export class Netplay {
     }
 
     update (localInput: number) {
-        this.rollbackMgr.addInputs(this.localPlayerIdx, this.rollbackMgr.currentFrame, [ localInput ]);
+        // this.rollbackMgr.addInputs(this.localPlayerIdx, this.rollbackMgr.currentFrame, [ localInput ]);
+
+        // Test with input lag
+        this.rollbackMgr.addInputs(this.localPlayerIdx, Math.max(0, this.rollbackMgr.currentFrame-8), [ localInput ]);
+
         this.rollbackMgr.update();
 
         // TODO(2022-03-19):

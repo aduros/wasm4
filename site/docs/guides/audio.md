@@ -23,7 +23,7 @@ The `tone()` function is used to play a tone with a given frequency on a given c
 - Frequency is the "pitch", measured in hertz.
 - Durations are measured in frames, 1/60ths of a second.
 - Volume ranges from 0 (silent) to 100 (full volume).
-- Flags sets the channel (0-3) and duty cycle. (0-3)
+- Flags sets the channel (0-3), duty cycle (0-3) and panning (0-2).
 
 For example, to play a one second (60 frames) tone of 262 Hz ([middle C](https://pages.mtu.edu/~suits/notefreqs.html)) on the first pulse wave channel:
 
@@ -268,6 +268,61 @@ tone(262, 60 | (30 << 8), 100, TONE_PULSE1);
 
 ```zig
 w4.tone(262, 60 | (30 << 8), 100, w4.TONE_PULSE1);
+```
+
+</MultiLanguageCode>
+
+## Panning
+
+Tones can be panned either center (default), far left (`TONE_PAN_LEFT`),
+or far right (`TONE_PAN_RIGHT`), similar to on a gameboy.
+
+<MultiLanguageCode>
+
+```typescript
+w4.tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_PAN_LEFT);
+```
+
+```c
+tone(262, 60, 100, TONE_PULSE1 | TONE_PAN_LEFT);
+```
+
+```d
+w4.tone(262, 60, 100, w4.tonePulse1 | w4.tonePanLeft);
+```
+
+```go
+w4.Tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_PAN_LEFT)
+```
+
+```lua
+tone(262, 60, 100, TONE_PULSE1 | TONE_PAN_LEFT)
+```
+
+```nim
+tone(262, 60, 100, TONE_PULSE1 or TONE_PAN_LEFT)
+```
+
+```odin
+w4.tone(262, 60, 100, .Pulse1, .Half, .Left)
+```
+
+```rust
+tone(262, 60, 100, TONE_PULSE1 | TONE_PAN_LEFT);
+```
+
+```wasm
+(call $tone
+  (i32.const 262)
+  (i32.const 60)
+  (i32.const 100)
+  (i32.or
+    (global.get $TONE_PULSE1)
+    (global.get $TONE_PAN_LEFT)))
+```
+
+```zig
+w4.tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_PAN_LEFT);
 ```
 
 </MultiLanguageCode>

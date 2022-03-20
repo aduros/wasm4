@@ -26,6 +26,7 @@ int values[] = {
     100,
     0,
     0,
+    0,
 };
 
 const int MAX_VALUES[] = {
@@ -39,6 +40,7 @@ const int MAX_VALUES[] = {
     100,
     3,
     3,
+    2,
 };
 
 static char *itoa_simple_helper(char *dest, int i) {
@@ -85,8 +87,8 @@ void drawControl (const char* name, int x, int y, int valueIdx) {
 void update () {
 
     int x = 20;
-    int y = 36;
-    int spacing = 12;
+    int y = 30;
+    int spacing = 10;
     drawControl("FREQ1", x, y + 0*spacing, 0);
     drawControl("FREQ2", x, y + 1*spacing, 1);
     drawControl("ATTCK", x, y + 2*spacing, 2);
@@ -97,6 +99,7 @@ void update () {
     drawControl("VOLUM", x, y + 7*spacing, 7);
     drawControl("CHNNL", x, y + 8*spacing, 8);
     drawControl(" MODE", x, y + 9*spacing, 9);
+    drawControl("  PAN", x, y + 10*spacing, 10);
 
     *DRAW_COLORS = 4;
     text("Arrows: Adjust\nX: Play tone", x, 8);
@@ -108,7 +111,7 @@ void update () {
     char pressedThisFrame = gamepad & (gamepad ^ lastGamepadState);
     lastGamepadState = gamepad;
 
-    if ((pressedThisFrame & BUTTON_DOWN) && arrowIdx < 9) {
+    if ((pressedThisFrame & BUTTON_DOWN) && arrowIdx < 10) {
         ++arrowIdx;
     }
     if ((pressedThisFrame & BUTTON_UP) && arrowIdx > 0) {
@@ -139,11 +142,12 @@ void update () {
         int sustainVolume = values[7];
         int channel = values[8];
         int mode = values[9];
-        tracef("freq1=%d freq2=%d attack=%d decay=%d sustain=%d release=%d peakVolume=%d sustainVolume=%d channel=%d mode=%d",
-            freq1, freq2, attack, decay, sustain, release, peakVolume, sustainVolume, channel, mode);
-        tracef("tone(%d | (%d << 16), (%d << 24) | (%d << 16) | %d | (%d << 8), (%d << 8) | %d, %d |(%d << 2))",
-            freq1, freq2, attack, decay, sustain, release, peakVolume, sustainVolume, channel, mode);
+        int pan = values[10];
+        tracef("freq1=%d freq2=%d attack=%d decay=%d sustain=%d release=%d peakVolume=%d sustainVolume=%d channel=%d mode=%d pan=%d",
+            freq1, freq2, attack, decay, sustain, release, peakVolume, sustainVolume, channel, mode, pan);
+        tracef("tone(%d | (%d << 16), (%d << 24) | (%d << 16) | %d | (%d << 8), (%d << 8) | %d, %d | (%d << 2) | (%d << 4))",
+            freq1, freq2, attack, decay, sustain, release, peakVolume, sustainVolume, channel, mode, pan);
         trace("");
-        tone(freq1 | (freq2 << 16), (attack << 24) | (decay << 16) | sustain | (release << 8), (peakVolume << 8) | sustainVolume, channel | (mode << 2));
+        tone(freq1 | (freq2 << 16), (attack << 24) | (decay << 16) | sustain | (release << 8), (peakVolume << 8) | sustainVolume, channel | (mode << 2) | (pan << 4));
     }
 }

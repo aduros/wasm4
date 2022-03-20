@@ -46,11 +46,15 @@ export class Netplay {
             switch (message.type) {
             case "join":
                 // from client to host
+                const saveState = new State();
+                saveState.read(runtime);
+
                 peer.send({
                     type: "start",
                     playerIdx: peer.playerIdx,
                     // TODO(2022-03-19): Send state and cart wasm
                     frame: this.rollbackMgr.currentFrame,
+                    state: saveState.toBytes(),
                 });
                 console.log("[host] Client connected as player", peer.playerIdx);
                 break;
@@ -59,6 +63,11 @@ export class Netplay {
                 // from host to client
                 this.localPlayerIdx = message.playerIdx;
                 this.rollbackMgr = new RollbackManager(message.frame, runtime);
+
+                const loadState = new State();
+                loadState.fromBytes(message.state);
+                loadState.write(runtime);
+
                 console.log(`[client] Connected as player ${message.playerIdx} on frame ${message.frame}`);
                 break;
 

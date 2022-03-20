@@ -17,7 +17,9 @@ export class APU {
         try {
             await audioCtx.audioWorklet.addModule(url);
 
-            const workletNode = new AudioWorkletNode(audioCtx, "wasm4-apu");
+            const workletNode = new AudioWorkletNode(audioCtx, "wasm4-apu", {
+                outputChannelCount: [2],
+            });
             this.processorPort = workletNode.port;
             workletNode.connect(audioCtx.destination);
 
@@ -33,10 +35,11 @@ export class APU {
             fn(registerProcessor, class {});
             this.processor = processor;
 
-            const scriptNode = audioCtx.createScriptProcessor(1024, 0, 1);
+            const scriptNode = audioCtx.createScriptProcessor(1024, 0, 2);
             scriptNode.onaudioprocess = event => {
-                const output = event.outputBuffer.getChannelData(0);
-                processor.process(null, [[output]]);
+                const outputLeft = event.outputBuffer.getChannelData(0);
+                const outputRight = event.outputBuffer.getChannelData(1);
+                processor.process(null, [[outputLeft, outputRight]]);
             };
             scriptNode.connect(audioCtx.destination);
         }

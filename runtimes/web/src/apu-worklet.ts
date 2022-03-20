@@ -36,6 +36,9 @@ class Channel {
     /** Used for time tracking. */
     phase = 0;
 
+    /** Tone panning. 0 = center, 1 = only left, 2 = only right. */
+    pan = 0;
+
     /** Duty cycle for pulse channels. */
     pulseDutyCycle = 0;
 
@@ -126,6 +129,7 @@ class APUProcessor extends AudioWorkletProcessor {
 
         const channelIdx = flags & 0x3;
         const mode = (flags >> 2) & 0x3;
+        const pan = ((flags >> 4) & 0x3) % 3;
 
         const channel = this.channels[channelIdx];
 
@@ -141,6 +145,7 @@ class APUProcessor extends AudioWorkletProcessor {
         channel.decayTime = channel.attackTime + ((SAMPLE_RATE*decay/60) >>> 0);
         channel.sustainTime = channel.decayTime + ((SAMPLE_RATE*sustain/60) >>> 0);
         channel.releaseTime = channel.sustainTime + ((SAMPLE_RATE*release/60) >>> 0);
+        channel.pan = pan;
 
         const maxVolume = (channelIdx == 2) ? MAX_VOLUME_TRIANGLE : MAX_VOLUME;
         channel.sustainVolume = maxVolume * sustainVolume/100;
@@ -167,9 +172,9 @@ class APUProcessor extends AudioWorkletProcessor {
         }
     }
 
-    process (inputs: Float32Array[][], [[ output ]]: Float32Array[][], parameters: Record<string, Float32Array>) {
-        for (let ii = 0, frames = output.length; ii < frames; ++ii, ++this.time) {
-            let sum = 0;
+    process (_inputs: Float32Array[][], [[ outputLeft, outputRight ]]: Float32Array[][], _parameters: Record<string, Float32Array>) {
+        for (let ii = 0, frames = outputLeft.length; ii < frames; ++ii, ++this.time) {
+            let mixLeft = 0, mixRight = 0;
 
             for (let channelIdx = 0; channelIdx < 4; ++channelIdx) {
                 const channel = this.channels[channelIdx];
@@ -225,11 +230,17 @@ class APUProcessor extends AudioWorkletProcessor {
                         }
                     }
 
-                    sum += sample;
+                    if (channel.pan != 1) {
+                        mixRight += sample;
+                    }
+                    if (channel.pan != 2) {
+                        mixLeft += sample;
+                    }
                 }
             }
 
-            output[ii] = sum;
+            outputLeft[ii] = mixLeft;
+            outputRight[ii] = mixRight;
         }
 
         return true;

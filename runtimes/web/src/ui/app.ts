@@ -10,7 +10,7 @@ import { State } from "../state";
 
 import { Netplay } from "../netplay";
 
-const DEV_NETPLAY = false;
+const DEV_NETPLAY = true;
 
 class InputState {
     gamepad = [0, 0, 0, 0];

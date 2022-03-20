@@ -1,8 +1,9 @@
 import { State } from "../state";
 import { Runtime } from "./runtime";
 
+export const HISTORY_LENGTH = 10;
+
 const PLAYER_COUNT = 4;
-const HISTORY_LENGTH = 10;
 
 // A gamepad input byte
 type InputData = number;
@@ -33,6 +34,7 @@ class History {
 }
 
 class Player {
+    /** Inputs queued for frames that we haven't simulated locally yet. */
     readonly futureInputs = new Map<number,InputData>();
 }
 
@@ -40,14 +42,12 @@ class Player {
  * Collects gamepad inputs from all players and handles rollbacks.
  */
 export class RollbackManager {
-    currentFrame: number = 0;
-
     private history: History[];
     private players: Player[];
 
     private rollbackIdx: number = HISTORY_LENGTH;
 
-    constructor (private runtime: Runtime) {
+    constructor (public currentFrame: number, private runtime: Runtime) {
         this.history = new Array(HISTORY_LENGTH);
         for (let ii = 0; ii < HISTORY_LENGTH; ++ii) {
             this.history[ii] = new History();
@@ -77,10 +77,10 @@ export class RollbackManager {
                             if (!history.predicted[playerIdx]) {
                                 throw new Error("Tried to rewrite an unpredicted input!");
                             }
-                            history.predicted[playerIdx] = false;
                             history.inputs[playerIdx] = input;
                             this.rollbackIdx = Math.min(ii, this.rollbackIdx);
                         }
+                        history.predicted[playerIdx] = false;
                         found = true;
                         break;
                     }
@@ -95,9 +95,6 @@ export class RollbackManager {
     }
 
     update () {
-        // TODO(2022-03-19):
-        // - stall if we haven't received input from one of the players in a while
-
         // Apply any rollbacks
         if (this.rollbackIdx < HISTORY_LENGTH) {
             console.log(`Rolling back ${HISTORY_LENGTH - this.rollbackIdx} frames`);

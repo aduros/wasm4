@@ -118,6 +118,8 @@ export const TONE_MODE1: u32 = 0;
 export const TONE_MODE2: u32 = 4;
 export const TONE_MODE3: u32 = 8;
 export const TONE_MODE4: u32 = 12;
+export const TONE_PAN_LEFT: u32 = 16;
+export const TONE_PAN_RIGHT: u32 = 32;
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │

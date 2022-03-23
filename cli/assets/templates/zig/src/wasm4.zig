@@ -97,6 +97,8 @@ pub const TONE_MODE1: u32 = 0;
 pub const TONE_MODE2: u32 = 4;
 pub const TONE_MODE3: u32 = 8;
 pub const TONE_MODE4: u32 = 12;
+pub const TONE_PAN_LEFT: u32 = 16;
+pub const TONE_PAN_RIGHT: u32 = 32;
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │

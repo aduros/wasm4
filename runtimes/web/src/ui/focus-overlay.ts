@@ -48,7 +48,7 @@ export class FocusOverlay extends LitElement {
         }
     `;
 
-    @property() screenshot: string;
+    @property() screenshot!: string;
 
     render () {
         return html`

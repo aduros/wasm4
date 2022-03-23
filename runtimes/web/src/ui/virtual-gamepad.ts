@@ -116,11 +116,11 @@ export class VirtualGamepad extends LitElement {
         }
     `;
 
-    @property() app: App;
+    app!: App;
 
-    @query(".dpad") dpad: HTMLElement;
-    @query(".action1") action1: HTMLElement;
-    @query(".action2") action2: HTMLElement;
+    @query(".dpad") dpad!: HTMLElement;
+    @query(".action1") action1!: HTMLElement;
+    @query(".action2") action2!: HTMLElement;
 
     readonly touchEvents = new Map();
 
@@ -222,7 +222,7 @@ export class VirtualGamepad extends LitElement {
         super.disconnectedCallback();
     }
 
-    onMenuButtonPressed (event) {
+    onMenuButtonPressed (event: Event) {
         this.app.onMenuButtonPressed();
 
         // Prevent the window handler from clearing our menu close button press

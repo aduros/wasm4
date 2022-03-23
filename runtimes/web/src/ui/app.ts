@@ -8,6 +8,8 @@ import * as z85 from "../z85";
 import { Runtime } from "../runtime";
 import { State } from "../state";
 
+import { MenuOverlay } from "./menu-overlay";
+
 import { Netplay } from "../netplay";
 
 const DEV_NETPLAY = false;
@@ -81,18 +83,18 @@ export class App extends LitElement {
         }
     `;
 
-    @state() runtime: Runtime;
-    screenshot: string;
+    @state() runtime?: Runtime;
+    screenshot?: string;
 
-    @state() focused: boolean = true;
-    @state() hideGamepadOverlay: boolean = false;
+    @state() focused = true;
+    @state() hideGamepadOverlay = false;
 
     @state() pauseMenu: boolean = false;
 
-    @query("wasm4-menu-overlay") menuOverlay: MenuOverlay;
+    @query("wasm4-menu-overlay") menuOverlay?: MenuOverlay;
 
-    private wasmBuffer: ArrayBuffer;
-    private savedGameState: State | null;
+    private wasmBuffer?: ArrayBuffer;
+    private savedGameState?: State;
 
     readonly inputManager = new InputManager();
 
@@ -125,7 +127,9 @@ export class App extends LitElement {
         }
 
         const screenshot = qs.get("screenshot");
-        this.screenshot = screenshot;
+        if (screenshot) {
+            this.screenshot = screenshot;
+        }
 
         const title = qs.get("title");
         const diskName = (document.getElementById("wasm4-disk-prefix")?.textContent ?? qs.get('disk-prefix') ?? title) + "-disk";
@@ -362,7 +366,7 @@ export class App extends LitElement {
         window.addEventListener("keydown", onKeyboardEvent);
         window.addEventListener("keyup", onKeyboardEvent);
 
-        function pollPhysicalGamepads () {
+        const pollPhysicalGamepads = () => {
             if (!navigator.getGamepads) {
                 return; // Browser doesn't support gamepads
             }
@@ -470,8 +474,10 @@ export class App extends LitElement {
             utils.requestFullscreen();
         }
 
-        // Try to begin playing audio
-        this.runtime.unlockAudio();
+        if (this.runtime) {
+            // Try to begin playing audio
+            this.runtime.unlockAudio();
+        }
     }
 
     onMenuButtonPressed () {
@@ -496,26 +502,32 @@ export class App extends LitElement {
     }
 
     saveGameState () {
-        let state = this.savedGameState;
-        if (state == null) {
-            state = this.savedGameState = new State();
+        if (this.runtime) {
+            let state = this.savedGameState;
+            if (state == null) {
+                state = this.savedGameState = new State();
+            }
+            state.read(this.runtime);
         }
-        state.read(this.runtime);
     }
 
     loadGameState () {
-        const state = this.savedGameState;
-        if (state != null) {
-            state.write(this.runtime);
+        if (this.runtime) {
+            const state = this.savedGameState;
+            if (state != null) {
+                state.write(this.runtime);
+            }
         }
     }
 
     async resetCart () {
-        this.runtime.reset(true);
-        this.runtime.pauseState |= constants.PAUSE_REBOOTING;
-        await this.runtime.load(this.wasmBuffer);
-        this.runtime.start();
-        this.runtime.pauseState &= ~constants.PAUSE_REBOOTING;
+        if (this.runtime) {
+            this.runtime.reset(true);
+            this.runtime.pauseState |= constants.PAUSE_REBOOTING;
+            await this.runtime.load(this.wasmBuffer!);
+            this.runtime.start();
+            this.runtime.pauseState &= ~constants.PAUSE_REBOOTING;
+        }
     }
 
     render () {

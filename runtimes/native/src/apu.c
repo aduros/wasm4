@@ -129,7 +129,7 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
 
     int channelIdx = flags & 0x03;
     int mode = (flags >> 2) & 0x3;
-    const int pan = ((flags >> 4) & 0x3) % 3;
+    int pan = (flags >> 4) & 0x3;
 
     // TODO(2022-01-08): Thread safety
     Channel* channel = &channels[channelIdx];

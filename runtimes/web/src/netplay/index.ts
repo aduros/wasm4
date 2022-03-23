@@ -1,32 +1,72 @@
 import { State } from "../state";
-import { Runtime } from "./runtime";
+import { Runtime } from "../runtime";
 import { RollbackManager, HISTORY_LENGTH } from "./rollback-manager";
+import { Peer, PeerManager } from "./peer-manager";
 
-class Peer {
-    public playerIdx: number = -1;
+type Message = JoinRequestMessage | JoinReplyMessage | TickMessage;
 
-    private channel: BroadcastChannel;
+type JoinRequestMessage = {
+    type: "JOIN_REQUEST";
+}
+
+type JoinReplyMessage = {
+    type: "JOIN_REPLY";
+    myPlayerIdx: number;
+    yourPlayerIdx: number;
+    frame: number;
+    state: Uint8Array;
+}
+
+// TODO(2022-03-22): Binary encode this in preparation for RTC
+type TickMessage = {
+    type: "TICK";
+
+    frame: number;
+    syncFrame: number;
+
+    inputs: number[];
+
+    ping: number;
+    pong: number;
+}
+
+class RemotePlayer {
+    playerIdx: number = -1;
 
     /** The most recent frame that we've received input for. */
-    public mostRecentInputFrame: number;
+    mostRecentFrame: number = -1;
 
-    // TODO(2022-03-20):
-    // - Calculate ping
-    // - Calculate frame advantage and a strategy to get back in sync
+    /** Estimated round-trip time for this peer. */
+    ping: number = 0;
 
-    constructor (name: string, onMessage: (peer: Peer, message: any) => void) {
-        this.channel = new BroadcastChannel(name);
-        this.channel.addEventListener("message", event => {
-            onMessage(this, event.data);
-        });
+    /** The ping reply to send in the next message to this peer, for ping time calculation. */
+    nextPong: number = 0;
+
+    /** The most recent frame where both we and this peer were in perfect sync. */
+    syncFrame: number = -1;
+
+    outboundFrame: number = -1;
+    readonly outboundInputs: number[] = [];
+
+    constructor (public readonly peer: Peer) {
     }
 
-    send (message: any) {
-        this.channel.postMessage(message);
+    addPingSample (sample: number) {
+        const factor = 0.125;
+        this.ping = (this.ping > 0)
+            ? (1 - factor) * this.ping + factor * sample
+            : sample;
     }
 
-    close () {
-        this.channel.close();
+    init (playerIdx: number, currentFrame: number) {
+        this.playerIdx = playerIdx;
+        this.mostRecentFrame = currentFrame;
+        // this.syncFrame = -1;
+        this.outboundFrame = currentFrame;
+    }
+
+    sendMessage (message: Message) {
+        this.peer.send(message);
     }
 }
 
@@ -34,109 +74,182 @@ class Peer {
  * Handles connections and messaging between other players.
  */
 export class Netplay {
-    private rollbackMgr: RollbackManager = null;
+    private rollbackMgr?: RollbackManager;
 
-    private peers = new Map<number,Peer>();
+    private remotePlayers = new Map<string,RemotePlayer>();
     private localPlayerIdx = -1;
 
-    constructor (runtime: Runtime) {
+    constructor (private runtime: Runtime) {
+        this.init();
+    }
+
+    private async init () {
         const host = location.hash == "#host";
+        const peerId = host ? "host" : "client_"+Math.random();
 
-        const onMessage = (peer, message) => {
-            switch (message.type) {
-            case "join":
-                // from client to host
-                const saveState = new State();
-                saveState.read(runtime);
-
-                peer.send({
-                    type: "start",
-                    playerIdx: peer.playerIdx,
-                    // TODO(2022-03-19): Send state and cart wasm
-                    frame: this.rollbackMgr.currentFrame,
-                    state: saveState.toBytes(),
-                });
-                console.log("[host] Client connected as player", peer.playerIdx);
-                break;
-
-            case "start":
-                // from host to client
-                this.localPlayerIdx = message.playerIdx;
-                this.rollbackMgr = new RollbackManager(message.frame, runtime);
-
-                const loadState = new State();
-                loadState.fromBytes(message.state);
-                loadState.write(runtime);
-
-                console.log(`[client] Connected as player ${message.playerIdx} on frame ${message.frame}`);
-                break;
-
-            case "input":
-                peer.mostRecentInputFrame = message.frame + message.inputs.length - 1;
-                this.rollbackMgr.addInputs(peer.playerIdx, message.frame, message.inputs);
-                break;
-            }
-        }
-
-        // Temporary scaffolding for testing
-        const brokerClientId = Math.random();
-        const broker = new Peer("broker", (_, message) => {
-            if (host) {
-                // Create a new connection to be used to connect to us and only us
-                const newChannelName = "channel_"+Math.random();
-                broker.send({
-                    reply: message,
-                    newChannelName: newChannelName,
-                });
-
-                const peer = new Peer(newChannelName, onMessage);
-                peer.playerIdx = this.peers.size + 1;
-                this.peers.set(peer.playerIdx, peer);
-
-            } else if (message.reply == brokerClientId) {
-                broker.close();
-
-                const peer = new Peer(message.newChannelName, onMessage);
-                peer.playerIdx = 0;
-                this.peers.set(peer.playerIdx, peer);
-                peer.send({type: "join"});
-            }
+        const peerMgr = new PeerManager(peerId, peer => {
+            console.log("Client connected to me: "+peer.peerId);
+            this.addRemotePlayer(peer);
         });
 
         if (host) {
-            this.rollbackMgr = new RollbackManager(0, runtime);
+            this.rollbackMgr = new RollbackManager(0, this.runtime);
             this.localPlayerIdx = 0;
+
         } else {
-            broker.send(brokerClientId);
+            const peer = await peerMgr.connect("host");
+            const remotePlayer = this.addRemotePlayer(peer);
+            remotePlayer.sendMessage({ type: "JOIN_REQUEST" });
         }
+    }
+
+    private nextPlayerIdx () {
+        // TODO(2022-03-22): Return the next available player index
+        // return this.remotePlayers.length + 1;
+        return 1;
+    }
+
+    private addRemotePlayer (peer: Peer): RemotePlayer {
+        const remotePlayer = new RemotePlayer(peer);
+        this.remotePlayers.set(peer.peerId, remotePlayer);
+
+        peer.onMessage = (message: Message) => {
+            switch (message.type) {
+            case "JOIN_REQUEST":
+                remotePlayer.init(this.nextPlayerIdx(), this.rollbackMgr!.currentFrame);
+
+                const saveState = new State();
+                saveState.read(this.runtime);
+
+                peer.send({
+                    type: "JOIN_REPLY",
+                    myPlayerIdx: this.localPlayerIdx,
+                    yourPlayerIdx: remotePlayer.playerIdx,
+                    frame: this.rollbackMgr!.currentFrame,
+                    state: saveState.toBytes(),
+                });
+
+                console.log("Client connected as player", remotePlayer.playerIdx);
+                break;
+
+            case "JOIN_REPLY":
+                this.rollbackMgr = new RollbackManager(message.frame, this.runtime);
+                this.localPlayerIdx = message.yourPlayerIdx;
+
+                remotePlayer.init(message.myPlayerIdx, message.frame);
+
+                const loadState = new State();
+                loadState.fromBytes(message.state);
+                loadState.write(this.runtime);
+
+                console.log(`Connected as player ${message.myPlayerIdx} on frame ${message.frame}`);
+                break;
+
+            case "TICK":
+                remotePlayer.nextPong = Math.max(remotePlayer.nextPong, message.ping);
+                if (message.pong != 0) {
+                    remotePlayer.addPingSample(Date.now() - message.pong);
+                }
+
+                if (this.rollbackMgr != null) {
+                    const mostRecentFrame = message.frame + message.inputs.length - 1;
+                    if (mostRecentFrame > remotePlayer.mostRecentFrame) {
+                        // console.log("Updating most recent frame from peer: ", mostRecentFrame);
+                        remotePlayer.mostRecentFrame = mostRecentFrame;
+                        remotePlayer.syncFrame = message.syncFrame;
+                        this.rollbackMgr.addInputs(remotePlayer.playerIdx, message.frame, message.inputs);
+                    } else {
+                        // console.log("Stale tick received");
+                    }
+                }
+                break;
+            }
+        };
+
+        return remotePlayer;
     }
 
     update (localInput: number) {
         if (this.rollbackMgr == null) {
+            return; // Not connected yet
+        }
+
+        const currentFrame = this.rollbackMgr.currentFrame;
+        const stallThreshold = currentFrame - HISTORY_LENGTH;
+        let minFrameDelta = 0;
+        for (const [peerId, remotePlayer] of this.remotePlayers) {
+            if (remotePlayer.mostRecentFrame < stallThreshold) {
+                // Hard pause if we haven't heard from a peer in a while
+                console.log("STALL "+remotePlayer.mostRecentFrame+" < "+stallThreshold);
+                return;
+            }
+
+            // TODO(2022-03-22): If we have too many inputs, keep networking them, but skip this
+            // frame locally
+            // if (remotePlayer.outboundInputs.length > 10) {
+            //     return;
+            // }
+
+            // The estimated difference that this peer's simulation is running compared to our local
+            const frameDelta = 0.5 * remotePlayer.ping * 60/1000 + remotePlayer.mostRecentFrame - currentFrame;
+            minFrameDelta = Math.min(minFrameDelta, frameDelta);
+        }
+
+        // If we're running ahead of all other peers, gradually slow down by stalling every 8th frame
+        if ((currentFrame & 7) == 0 && minFrameDelta < -1) {
+            console.log("Frame delta stall");
             return;
         }
 
-        const frame = this.rollbackMgr.currentFrame;
+        // TODO(2022-03-20): Prevent flooding a peer if we haven't heard from them in a while?
 
-        const stallThreshold = frame - HISTORY_LENGTH;
-        for (const [playerIdx, peer] of this.peers) {
-            if (peer.mostRecentInputFrame < stallThreshold) {
-                console.log("STALL");
-                return;
+        for (const [peerId, remotePlayer] of this.remotePlayers) {
+            if (remotePlayer.syncFrame >= remotePlayer.outboundFrame) {
+                const delta = remotePlayer.syncFrame + 1 - remotePlayer.outboundFrame;
+                remotePlayer.outboundFrame = remotePlayer.syncFrame + 1;
+                remotePlayer.outboundInputs.splice(0, delta);
+            }
+            remotePlayer.outboundInputs.push(localInput);
+
+            const ping = Date.now();
+            const pong = remotePlayer.nextPong;
+            const frame = remotePlayer.outboundFrame;
+            const inputs = remotePlayer.outboundInputs.slice();
+            const syncFrame = remotePlayer.mostRecentFrame;
+            const message: TickMessage = { type: "TICK", frame, inputs, ping, pong, syncFrame };
+
+            // console.log(`Sending ${inputs.length} inputs from frame ${frame}`);
+
+            const simulateUDP = true;
+            if (simulateUDP) {
+                // Simulate a UDP-like connection with packet loss and unordered delivery
+                if (Math.random() > 0.05) {
+                    const simulatedTransmissionDelay = Math.random()*30 + 50;
+                    setTimeout(() => {
+                        remotePlayer.sendMessage(message);
+                    }, simulatedTransmissionDelay);
+                }
+            } else {
+                const simulatedTransmissionDelay = 50;
+                setTimeout(() => {
+                    remotePlayer.sendMessage(message);
+                }, simulatedTransmissionDelay);
             }
         }
 
-        // TODO(2022-03-20): Prevent flooding a peer if we haven't heard from them in a while?
-        const inputs = [ localInput ];
-        for (const [playerIdx, peer] of this.peers) {
-            peer.send({type: "input", frame, inputs });
-        }
-
-        this.rollbackMgr.addInputs(this.localPlayerIdx, this.rollbackMgr.currentFrame, [ localInput ]);
-
-        // Test with input lag
-        // this.rollbackMgr.addInputs(this.localPlayerIdx, Math.max(0, this.rollbackMgr.currentFrame-8), [ localInput ]);
+        // TODO(2022-03-21): The input lag frame needs to be calculated correctly for outgoing input
+        const inputLag = 0;
+        this.rollbackMgr.addInputs(this.localPlayerIdx, currentFrame + inputLag, [ localInput ]);
 
         this.rollbackMgr.update();
+
+        // Temporary debug info to show in devtools live expressions
+        const debug = [];
+        debug.push(`frame=${currentFrame} inputLag=${inputLag}`);
+        for (const [peerId, remotePlayer] of this.remotePlayers) {
+            const frameDelta = 0.5 * remotePlayer.ping * 60/1000 + remotePlayer.mostRecentFrame - currentFrame;
+            debug.push(`Player #${remotePlayer.playerIdx}: ping=${Math.round(remotePlayer.ping)} frameDelta=${frameDelta.toFixed(2)} outboundInputs=${remotePlayer.outboundInputs.length} mostRecentFrame=${remotePlayer.mostRecentFrame} syncFrame=${remotePlayer.syncFrame}`);
+        }
+        (window as any).NETPLAY_DEBUG = debug.join(" / ");
     }
 }

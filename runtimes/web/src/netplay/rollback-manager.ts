@@ -1,5 +1,5 @@
 import { State } from "../state";
-import { Runtime } from "./runtime";
+import { Runtime } from "../runtime";
 
 export const HISTORY_LENGTH = 10;
 
@@ -62,6 +62,8 @@ export class RollbackManager {
     addInputs (playerIdx: number, frame: number, inputs: InputData[]) {
         const player = this.players[playerIdx];
 
+        // console.log(`${playerIdx} frame ${frame} -> ${inputs.join(", ")}`);
+
         for (const input of inputs) {
             if (frame >= this.currentFrame) {
                 // We haven't simulated this frame locally yet, schedule the input for later
@@ -75,7 +77,7 @@ export class RollbackManager {
                     if (history.frame == frame) {
                         if (history.inputs[playerIdx] != input) {
                             if (!history.predicted[playerIdx]) {
-                                throw new Error("Tried to rewrite an unpredicted input!");
+                                console.warn("Tried to rewrite an unpredicted input!");
                             }
                             history.inputs[playerIdx] = input;
                             this.rollbackIdx = Math.min(ii, this.rollbackIdx);
@@ -86,7 +88,7 @@ export class RollbackManager {
                     }
                 }
                 if (!found) {
-                    throw new Error("History entry not found!");
+                    console.warn("History entry not found! "+frame);
                 }
             }
 
@@ -135,7 +137,7 @@ export class RollbackManager {
 
         const prevHistory = this.history[HISTORY_LENGTH-1];
 
-        const nextHistory = this.history.shift();
+        const nextHistory = this.history.shift()!;
         this.history.push(nextHistory);
 
         nextHistory.frame = this.currentFrame;

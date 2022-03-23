@@ -31,7 +31,8 @@ export class State {
 
     toBytes (dest?: Uint8Array): Uint8Array {
         if (!dest) {
-            dest = new Uint8Array(1<<16 + 4 + this.diskSize);
+            dest = new Uint8Array((1<<16) + 4 + this.diskSize);
+            console.log(dest.byteLength);
         }
 
         dest.set(new Uint8Array(this.memory), 0);
@@ -39,7 +40,7 @@ export class State {
         const dataView = new DataView(dest.buffer, dest.byteOffset, dest.byteLength);
         dataView.setUint32(1<<16, this.diskSize);
 
-        dest.set(new Uint8Array(this.diskBuffer), 1<<16 + 4);
+        dest.set(new Uint8Array(this.diskBuffer, 0, this.diskSize), (1<<16) + 4);
 
         return dest;
     }
@@ -50,7 +51,7 @@ export class State {
         const dataView = new DataView(src.buffer, src.byteOffset, src.byteLength);
         this.diskSize = dataView.getUint32(1<<16);
 
-        const offset = 1<<16 + 4;
+        const offset = (1<<16) + 4;
         new Uint8Array(this.diskBuffer).set(src.subarray(offset, offset + this.diskSize));
     }
 }

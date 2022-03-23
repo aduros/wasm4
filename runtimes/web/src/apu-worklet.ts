@@ -129,7 +129,7 @@ class APUProcessor extends AudioWorkletProcessor {
 
         const channelIdx = flags & 0x3;
         const mode = (flags >> 2) & 0x3;
-        const pan = ((flags >> 4) & 0x3) % 3;
+        const pan = (flags >> 4) & 0x3;
 
         const channel = this.channels[channelIdx];
 

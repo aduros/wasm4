@@ -3,4 +3,4 @@
 /** 
  * `DEVELOPER_BUILD` is a compile-time flag, see `vite.config.ts` 
  */
-declare var DEVELOPER_BUILD: boolean;
+declare let DEVELOPER_BUILD: boolean;

@@ -31,21 +31,21 @@ type TickMessage = {
 }
 
 class RemotePlayer {
-    playerIdx: number = -1;
+    playerIdx = -1;
 
     /** The most recent frame that we've received input for. */
-    mostRecentFrame: number = -1;
+    mostRecentFrame = -1;
 
     /** Estimated round-trip time for this peer. */
-    ping: number = 0;
+    ping = 0;
 
     /** The ping reply to send in the next message to this peer, for ping time calculation. */
-    nextPong: number = 0;
+    nextPong = 0;
 
     /** The most recent frame where both we and this peer were in perfect sync. */
-    syncFrame: number = -1;
+    syncFrame = -1;
 
-    outboundFrame: number = -1;
+    outboundFrame = -1;
     readonly outboundInputs: number[] = [];
 
     constructor (public readonly peer: Peer) {
@@ -115,7 +115,7 @@ export class Netplay {
 
         peer.onMessage = (message: Message) => {
             switch (message.type) {
-            case "JOIN_REQUEST":
+            case "JOIN_REQUEST": {
                 remotePlayer.init(this.nextPlayerIdx(), this.rollbackMgr!.currentFrame);
 
                 const saveState = new State();
@@ -130,9 +130,9 @@ export class Netplay {
                 });
 
                 console.log("Client connected as player", remotePlayer.playerIdx);
-                break;
+            } break;
 
-            case "JOIN_REPLY":
+            case "JOIN_REPLY": {
                 this.rollbackMgr = new RollbackManager(message.frame, this.runtime);
                 this.localPlayerIdx = message.yourPlayerIdx;
 
@@ -143,9 +143,9 @@ export class Netplay {
                 loadState.write(this.runtime);
 
                 console.log(`Connected as player ${message.myPlayerIdx} on frame ${message.frame}`);
-                break;
+            } break;
 
-            case "TICK":
+            case "TICK": {
                 remotePlayer.nextPong = Math.max(remotePlayer.nextPong, message.ping);
                 if (message.pong != 0) {
                     remotePlayer.addPingSample(Date.now() - message.pong);
@@ -162,7 +162,7 @@ export class Netplay {
                         // console.log("Stale tick received");
                     }
                 }
-                break;
+            } break;
             }
         };
 

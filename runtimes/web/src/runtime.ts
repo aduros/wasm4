@@ -15,7 +15,7 @@ export class Runtime {
     pauseState: number;
     wasmBufferByteLen: number;
     wasm?: WebAssembly.Instance;
-    warnedFileSize: boolean = false;
+    warnedFileSize = false;
 
     diskName: string;
     diskBuffer: ArrayBuffer;
@@ -282,9 +282,9 @@ export class Runtime {
     }
 
     tracef (fmtPtr: number, argPtr: number) {
-        var output = "";
+        let output = "";
         let ch;
-        while (ch = this.data.getUint8(fmtPtr++)) {
+        while ((ch = this.data.getUint8(fmtPtr++))) {
             if (ch == 37) {
                 switch (ch = this.data.getUint8(fmtPtr++)) {
                 case 37: // %
@@ -300,8 +300,7 @@ export class Runtime {
                     argPtr += 4;
                     break;
                 case 115: // s
-                    let cstrPtr = this.data.getUint32(argPtr, true);
-                    output += this.getCString(cstrPtr);
+                    output += this.getCString(this.data.getUint32(argPtr, true));
                     argPtr += 4;
                     break;
                 case 102: // f

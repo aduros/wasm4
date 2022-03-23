@@ -10,7 +10,7 @@ type InputData = number;
 
 // A single frame of input history
 class History {
-    frame: number = -1;
+    frame = -1;
 
     // Inputs for each player
     readonly inputs: InputData[];

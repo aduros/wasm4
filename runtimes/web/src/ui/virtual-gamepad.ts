@@ -159,7 +159,7 @@ export class VirtualGamepad extends LitElement {
             const action2Y = action2Bounds.y + action2Bounds.height/2;
 
             let x, y, dist, cosX, cosY;
-            for (let touch of this.touchEvents.values()) {
+            for (const touch of this.touchEvents.values()) {
                 x = touch.clientX - dpadX;
                 y = touch.clientY - dpadY;
                 dist = Math.sqrt( x*x + y * y );

@@ -89,7 +89,7 @@ export class App extends LitElement {
     @state() focused = true;
     @state() hideGamepadOverlay = false;
 
-    @state() pauseMenu: boolean = false;
+    @state() pauseMenu = false;
 
     @query("wasm4-menu-overlay") menuOverlay?: MenuOverlay;
 
@@ -141,7 +141,14 @@ export class App extends LitElement {
         this.wasmBuffer = await loadCartWasm();
         await runtime.load(this.wasmBuffer);
 
-        let devtoolsManager = { toggleDevtools(){}, updateCompleted(...args: unknown[]) {} };
+        let devtoolsManager = {
+            toggleDevtools () {
+                // Nothing
+            },
+            updateCompleted (...args: unknown[]) {
+                // Nothing
+            },
+        };
         if (DEVELOPER_BUILD) {
             devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager())
         }

@@ -10,7 +10,9 @@
     "start": "concurrently --kill-others -n apu-worklet,vite 'npm:build:apu-worklet -- --watch' 'npm:start:developer-build'",
     "start:slim": "vite --mode 'slim'",
     "start:developer-build": "vite --mode 'developer-build' --host",
-    "prepare": "npm --prefix '../../devtools/web' i"
+    "prepare": "npm --prefix '../../devtools/web' i",
+    "test": "tsc && eslint src",
+    "lint": "eslint src --fix"
   },
   "dependencies": {
     "@types/audioworklet": "0.0.23",
@@ -19,7 +21,10 @@
   },
   "devDependencies": {
     "@types/node": "^16.11.10",
+    "@typescript-eslint/eslint-plugin": "^5.16.0",
+    "@typescript-eslint/parser": "^5.16.0",
     "concurrently": "7.0.0",
+    "eslint": "^8.11.0",
     "rimraf": "3.0.2",
     "rollup-plugin-minify-html-literals": "^1.2.6",
     "vite": "^2.6.4"

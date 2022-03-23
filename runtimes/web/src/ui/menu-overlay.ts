@@ -55,7 +55,7 @@ export class MenuOverlay extends LitElement {
         }
     `;
 
-    @state() private selectedIdx: number = 0;
+    @state() private selectedIdx = 0;
     app!: App;
 
     constructor () {

@@ -49,13 +49,13 @@ export function encode (src: number[] | Uint8Array | Uint8ClampedArray): string 
 export function decode (string: string, dest: number[] | Uint8Array | Uint8ClampedArray): number {
     let byte_nbr = 0,
         char_nbr = 0,
-        string_len = string.length,
-        dest_len = dest.length,
         value = 0;
+    const string_len = string.length,
+        dest_len = dest.length;
 
     if ((string.length % 5) == 0) {
         while (char_nbr < string_len) {
-            let idx = string.charCodeAt(char_nbr++) - 32;
+            const idx = string.charCodeAt(char_nbr++) - 32;
             if ((idx < 0) || (idx >= DECODER.length)) {
                 return byte_nbr;
             }

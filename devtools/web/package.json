@@ -40,5 +40,8 @@
     "sass": "^1.43.5",
     "typescript": "^4.3.2",
     "vite": "^2.6.4"
+  },
+  "scripts": {
+    "rimraf": "node_modules/rimraf/bin.js"
   }
 }

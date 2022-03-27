@@ -2,9 +2,13 @@ This directory contains the web runtime.
 
 ## Development
 
-First run `npm install` to install dependencies.
+First run `npm run prepare` to build `@wasm4/web-devtool`.
+Then run `npm install` to install dependencies.
 
-For quick development run `npm start` and navigate to http://localhost:8080. You will also need to
-place a test cart in public/cart.wasm.
+For quick development run `npm start` and navigate to http://localhost:3000.
+You will also need to place a test cartridge in public/cart.wasm.
+
+You can create a cartridge with the `w4` tool. You can build that in `cli`
+directory with `npm i`, then just run the `cli.js` file.
 
 Run `npm run build` to build a release build, which is used by the website and the `w4` CLI.

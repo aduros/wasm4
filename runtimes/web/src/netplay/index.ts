@@ -1,7 +1,7 @@
 import { State } from "../state";
 import { Runtime } from "../runtime";
 import { RollbackManager, HISTORY_LENGTH } from "./rollback-manager";
-import { Peer, PeerManager } from "./peer-manager";
+import { PeerManager } from "./peer-manager";
 
 type Message = JoinRequestMessage | JoinReplyMessage | TickMessage;
 
@@ -14,7 +14,9 @@ type JoinReplyMessage = {
     myPlayerIdx: number;
     yourPlayerIdx: number;
     frame: number;
-    state: Uint8Array;
+
+    // TODO(2022-03-28): Need to split this into multiple binary chunks
+    // state: Uint8Array;
 }
 
 // TODO(2022-03-22): Binary encode this in preparation for RTC
@@ -48,7 +50,8 @@ class RemotePlayer {
     outboundFrame = -1;
     readonly outboundInputs: number[] = [];
 
-    constructor (public readonly peer: Peer) {
+    constructor (public readonly peerId: string, private connection: RTCPeerConnection,
+            private reliableChannel: RTCDataChannel, private unreliableChannel: RTCDataChannel) {
     }
 
     addPingSample (sample: number) {
@@ -66,7 +69,8 @@ class RemotePlayer {
     }
 
     sendMessage (message: Message) {
-        this.peer.send(message);
+        console.log("Sending message: "+message.type);
+        this.reliableChannel.send(JSON.stringify(message));
     }
 }
 
@@ -87,9 +91,9 @@ export class Netplay {
         const host = location.hash == "#host";
         const peerId = host ? "host" : "client_"+Math.random();
 
-        const peerMgr = new PeerManager(peerId, peer => {
-            console.log("Client connected to me: "+peer.peerId);
-            this.addRemotePlayer(peer);
+        const peerMgr = new PeerManager(peerId, (connection, peerId) => {
+            this.createRemotePlayer(connection, peerId);
+            console.log("Client connected to me: "+peerId);
         });
 
         if (host) {
@@ -97,39 +101,54 @@ export class Netplay {
             this.localPlayerIdx = 0;
 
         } else {
-            const peer = await peerMgr.connect("host");
-            const remotePlayer = this.addRemotePlayer(peer);
+            const connection = peerMgr.connect("host");
+            const remotePlayer = await this.createRemotePlayer(connection, "host");
             remotePlayer.sendMessage({ type: "JOIN_REQUEST" });
         }
     }
 
-    private nextPlayerIdx () {
-        // TODO(2022-03-22): Return the next available player index
-        // return this.remotePlayers.length + 1;
-        return 1;
-    }
+    private async createRemotePlayer (connection: RTCPeerConnection, peerId: string): Promise<RemotePlayer> {
+        function createDataChannel (config: RTCDataChannelInit): Promise<RTCDataChannel> {
+            return new Promise((resolve, reject) => {
+                const channel = connection.createDataChannel("WASM-4", config);
+                channel.binaryType = "arraybuffer";
 
-    private addRemotePlayer (peer: Peer): RemotePlayer {
-        const remotePlayer = new RemotePlayer(peer);
-        this.remotePlayers.set(peer.peerId, remotePlayer);
+                channel.onopen = () => { resolve(channel) };
+                channel.onerror = reject;
+            });
+        }
 
-        peer.onMessage = (message: Message) => {
+        const [ reliableChannel, unreliableChannel ] = await Promise.all([
+            createDataChannel({ negotiated: true, id: 0 }),
+            createDataChannel({ negotiated: true, id: 1 }),
+            // TODO(2022-03-24): Add connection timeout
+        ]);
+
+        console.log("Connected to "+peerId+" :)");
+
+        const remotePlayer = new RemotePlayer(peerId, connection, reliableChannel, unreliableChannel);
+        this.remotePlayers.set(peerId, remotePlayer);
+
+        reliableChannel.addEventListener("message", event => {
+            const message: Message = JSON.parse(event.data);
+            console.log("Received game message: "+message.type);
+
             switch (message.type) {
             case "JOIN_REQUEST": {
                 remotePlayer.init(this.nextPlayerIdx(), this.rollbackMgr!.currentFrame);
 
-                const saveState = new State();
-                saveState.read(this.runtime);
+                const state = new State();
+                state.read(this.runtime);
 
-                peer.send({
+                remotePlayer.sendMessage({
                     type: "JOIN_REPLY",
                     myPlayerIdx: this.localPlayerIdx,
                     yourPlayerIdx: remotePlayer.playerIdx,
                     frame: this.rollbackMgr!.currentFrame,
-                    state: saveState.toBytes(),
+                    // state: state.toBytes(),
                 });
 
-                console.log("Client connected as player", remotePlayer.playerIdx);
+                console.log("Client joined as player", remotePlayer.playerIdx);
             } break;
 
             case "JOIN_REPLY": {
@@ -138,11 +157,11 @@ export class Netplay {
 
                 remotePlayer.init(message.myPlayerIdx, message.frame);
 
-                const loadState = new State();
-                loadState.fromBytes(message.state);
-                loadState.write(this.runtime);
+                // const state = new State();
+                // state.fromBytes(message.state);
+                // state.write(this.runtime);
 
-                console.log(`Connected as player ${message.myPlayerIdx} on frame ${message.frame}`);
+                console.log(`Joined as player ${message.myPlayerIdx} on frame ${message.frame}`);
             } break;
 
             case "TICK": {
@@ -164,9 +183,15 @@ export class Netplay {
                 }
             } break;
             }
-        };
+        });
 
         return remotePlayer;
+    }
+
+    private nextPlayerIdx () {
+        // TODO(2022-03-22): Return the next available player index
+        // return this.remotePlayers.length + 1;
+        return 1;
     }
 
     update (localInput: number) {

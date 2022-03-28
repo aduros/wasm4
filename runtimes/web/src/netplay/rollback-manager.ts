@@ -151,6 +151,7 @@ export class RollbackManager {
 
             let input = player.futureInputs.get(this.currentFrame);
             if (input != null) {
+                nextHistory.predicted[playerIdx] = false;
                 player.futureInputs.delete(this.currentFrame);
             } else {
                 // No known input for this player, repeat the input from the last frame

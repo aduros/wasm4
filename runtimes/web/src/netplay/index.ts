@@ -3,7 +3,12 @@ import { Runtime } from "../runtime";
 import { RollbackManager, HISTORY_LENGTH } from "./rollback-manager";
 import { PeerManager } from "./peer-manager";
 
-type Message = JoinRequestMessage | JoinReplyMessage | TickMessage;
+type Message = WelcomeMessage | PlayerInfoMessage | JoinRequestMessage | JoinReplyMessage | TickMessage;
+
+type WelcomeMessage = {
+    type: "WELCOME";
+    otherPeers: string[];
+}
 
 type JoinRequestMessage = {
     type: "JOIN_REQUEST";
@@ -11,12 +16,17 @@ type JoinRequestMessage = {
 
 type JoinReplyMessage = {
     type: "JOIN_REPLY";
-    myPlayerIdx: number;
     yourPlayerIdx: number;
     frame: number;
 
     // TODO(2022-03-28): Need to split this into multiple binary chunks
     // state: Uint8Array;
+}
+
+type PlayerInfoMessage = {
+    type: "PLAYER_INFO";
+    playerIdx: number;
+    frame: number;
 }
 
 // TODO(2022-03-22): Binary encode this in preparation for RTC
@@ -68,9 +78,28 @@ class RemotePlayer {
         this.outboundFrame = currentFrame;
     }
 
-    sendMessage (message: Message) {
+    sendMessage (message: Message, simulateUDP = false) {
         console.log("Sending message: "+message.type);
-        this.reliableChannel.send(JSON.stringify(message));
+        const json = JSON.stringify(message);
+
+        if (simulateUDP) {
+            // Simulate a UDP-like connection with packet loss and unordered delivery
+            if (Math.random() > 0.05) {
+                const simulatedTransmissionDelay = Math.random()*30 + 50;
+                setTimeout(() => {
+                    if (this.reliableChannel.readyState == "open") {
+                        this.reliableChannel.send(json);
+                    }
+                }, simulatedTransmissionDelay);
+            }
+        } else {
+            const simulatedTransmissionDelay = 50;
+            setTimeout(() => {
+                if (this.reliableChannel.readyState == "open") {
+                    this.reliableChannel.send(json);
+                }
+            }, simulatedTransmissionDelay);
+        }
     }
 }
 
@@ -79,21 +108,33 @@ class RemotePlayer {
  */
 export class Netplay {
     private rollbackMgr?: RollbackManager;
+    private peerMgr: PeerManager;
 
     private remotePlayers = new Map<string,RemotePlayer>();
     private localPlayerIdx = -1;
 
-    constructor (private runtime: Runtime) {
-        this.init();
-    }
+    private updateCount = 0;
 
-    private async init () {
+    constructor (private runtime: Runtime) {
         const host = location.hash == "#host";
         const peerId = host ? "host" : "client_"+Math.random();
 
-        const peerMgr = new PeerManager(peerId, (connection, peerId) => {
-            this.createRemotePlayer(connection, peerId);
-            console.log("Client connected to me: "+peerId);
+        this.peerMgr = new PeerManager(peerId, async (connection, peerId) => {
+            const remotePlayer = await this.createRemotePlayer(connection, peerId);
+
+            // When a peer connects to us, send them a welcome message containing all other peer IDs
+            // so they can connect to the entire mesh
+            remotePlayer.sendMessage({
+                type: "WELCOME",
+                otherPeers: Array.from(this.remotePlayers.keys()).filter(id => id != peerId),
+            });
+
+            // Also inform them of our own player state
+            remotePlayer.sendMessage({
+                type: "PLAYER_INFO",
+                playerIdx: this.localPlayerIdx,
+                frame: this.rollbackMgr!.currentFrame,
+            });
         });
 
         if (host) {
@@ -101,9 +142,10 @@ export class Netplay {
             this.localPlayerIdx = 0;
 
         } else {
-            const connection = peerMgr.connect("host");
-            const remotePlayer = await this.createRemotePlayer(connection, "host");
-            remotePlayer.sendMessage({ type: "JOIN_REQUEST" });
+            const connection = this.peerMgr.connect("host");
+            this.createRemotePlayer(connection, "host").then(remotePlayer => {
+                remotePlayer.sendMessage({ type: "JOIN_REQUEST" });
+            });
         }
     }
 
@@ -120,7 +162,7 @@ export class Netplay {
 
         const [ reliableChannel, unreliableChannel ] = await Promise.all([
             createDataChannel({ negotiated: true, id: 0 }),
-            createDataChannel({ negotiated: true, id: 1 }),
+            createDataChannel({ negotiated: true, id: 1, ordered: false, maxRetransmits: 0 }),
             // TODO(2022-03-24): Add connection timeout
         ]);
 
@@ -129,11 +171,29 @@ export class Netplay {
         const remotePlayer = new RemotePlayer(peerId, connection, reliableChannel, unreliableChannel);
         this.remotePlayers.set(peerId, remotePlayer);
 
-        reliableChannel.addEventListener("message", event => {
+        reliableChannel.addEventListener("close", () => {
+            this.remotePlayers.delete(peerId);
+        });
+
+        reliableChannel.addEventListener("message", async event => {
             const message: Message = JSON.parse(event.data);
             console.log("Received game message: "+message.type);
 
             switch (message.type) {
+            case "WELCOME": {
+                for (const peerId of message.otherPeers) {
+                    if (!this.remotePlayers.has(peerId)) {
+                        const connection = this.peerMgr.connect(peerId);
+                        const remotePlayer = await this.createRemotePlayer(connection, peerId);
+                        remotePlayer.sendMessage({
+                            type: "PLAYER_INFO",
+                            playerIdx: this.localPlayerIdx,
+                            frame: this.rollbackMgr!.currentFrame,
+                        });
+                    }
+                }
+            } break;
+
             case "JOIN_REQUEST": {
                 remotePlayer.init(this.nextPlayerIdx(), this.rollbackMgr!.currentFrame);
 
@@ -142,7 +202,6 @@ export class Netplay {
 
                 remotePlayer.sendMessage({
                     type: "JOIN_REPLY",
-                    myPlayerIdx: this.localPlayerIdx,
                     yourPlayerIdx: remotePlayer.playerIdx,
                     frame: this.rollbackMgr!.currentFrame,
                     // state: state.toBytes(),
@@ -155,13 +214,28 @@ export class Netplay {
                 this.rollbackMgr = new RollbackManager(message.frame, this.runtime);
                 this.localPlayerIdx = message.yourPlayerIdx;
 
-                remotePlayer.init(message.myPlayerIdx, message.frame);
+                remotePlayer.init(remotePlayer.playerIdx, message.frame);
+
+                // Tell all other peers about our new player info
+                for (const [peerId, otherPlayer] of this.remotePlayers) {
+                    if (otherPlayer != remotePlayer) {
+                        otherPlayer.sendMessage({
+                            type: "PLAYER_INFO",
+                            playerIdx: this.localPlayerIdx,
+                            frame: message.frame,
+                        });
+                    }
+                }
 
                 // const state = new State();
                 // state.fromBytes(message.state);
                 // state.write(this.runtime);
 
-                console.log(`Joined as player ${message.myPlayerIdx} on frame ${message.frame}`);
+                console.log(`Joined as player ${this.localPlayerIdx} on frame ${message.frame}`);
+            } break;
+
+            case "PLAYER_INFO": {
+                remotePlayer.init(message.playerIdx, message.frame);
             } break;
 
             case "TICK": {
@@ -170,16 +244,17 @@ export class Netplay {
                     remotePlayer.addPingSample(Date.now() - message.pong);
                 }
 
-                if (this.rollbackMgr != null) {
+                if (this.rollbackMgr != null && remotePlayer.playerIdx >= 0) {
                     const mostRecentFrame = message.frame + message.inputs.length - 1;
                     if (mostRecentFrame > remotePlayer.mostRecentFrame) {
-                        // console.log("Updating most recent frame from peer: ", mostRecentFrame);
                         remotePlayer.mostRecentFrame = mostRecentFrame;
                         remotePlayer.syncFrame = message.syncFrame;
                         this.rollbackMgr.addInputs(remotePlayer.playerIdx, message.frame, message.inputs);
                     } else {
                         // console.log("Stale tick received");
                     }
+                } else {
+                    throw new Error("Received inputs before we could process them?");
                 }
             } break;
             }
@@ -188,10 +263,20 @@ export class Netplay {
         return remotePlayer;
     }
 
+    /** Returns the next available player index, or -1. */
     private nextPlayerIdx () {
-        // TODO(2022-03-22): Return the next available player index
-        // return this.remotePlayers.length + 1;
-        return 1;
+        outer: for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
+            if (this.localPlayerIdx == playerIdx) {
+                continue;
+            }
+            for (const [peerId, remotePlayer] of this.remotePlayers) {
+                if (remotePlayer.playerIdx == playerIdx) {
+                    continue outer;
+                }
+            }
+            return playerIdx;
+        }
+        return -1;
     }
 
     update (localInput: number) {
@@ -199,14 +284,18 @@ export class Netplay {
             return; // Not connected yet
         }
 
+        let skipFrame = false;
+        ++this.updateCount;
+
         const currentFrame = this.rollbackMgr.currentFrame;
         const stallThreshold = currentFrame - HISTORY_LENGTH;
         let minFrameDelta = 0;
         for (const [peerId, remotePlayer] of this.remotePlayers) {
             if (remotePlayer.mostRecentFrame < stallThreshold) {
                 // Hard pause if we haven't heard from a peer in a while
-                console.log("STALL "+remotePlayer.mostRecentFrame+" < "+stallThreshold);
-                return;
+                console.log("STALL", remotePlayer.playerIdx, remotePlayer.mostRecentFrame+" < "+stallThreshold);
+                skipFrame = true;
+                break;
             }
 
             // TODO(2022-03-22): If we have too many inputs, keep networking them, but skip this
@@ -221,12 +310,9 @@ export class Netplay {
         }
 
         // If we're running ahead of all other peers, gradually slow down by stalling every 8th frame
-        if ((currentFrame & 7) == 0 && minFrameDelta < -1) {
-            console.log("Frame delta stall");
-            return;
+        if ((this.updateCount & 7) == 0 && minFrameDelta < -1) {
+            skipFrame = true;
         }
-
-        // TODO(2022-03-20): Prevent flooding a peer if we haven't heard from them in a while?
 
         for (const [peerId, remotePlayer] of this.remotePlayers) {
             if (remotePlayer.syncFrame >= remotePlayer.outboundFrame) {
@@ -234,43 +320,33 @@ export class Netplay {
                 remotePlayer.outboundFrame = remotePlayer.syncFrame + 1;
                 remotePlayer.outboundInputs.splice(0, delta);
             }
-            remotePlayer.outboundInputs.push(localInput);
-
-            const ping = Date.now();
-            const pong = remotePlayer.nextPong;
-            const frame = remotePlayer.outboundFrame;
-            const inputs = remotePlayer.outboundInputs.slice();
-            const syncFrame = remotePlayer.mostRecentFrame;
-            const message: TickMessage = { type: "TICK", frame, inputs, ping, pong, syncFrame };
-
-            // console.log(`Sending ${inputs.length} inputs from frame ${frame}`);
-
-            const simulateUDP = true;
-            if (simulateUDP) {
-                // Simulate a UDP-like connection with packet loss and unordered delivery
-                if (Math.random() > 0.05) {
-                    const simulatedTransmissionDelay = Math.random()*30 + 50;
-                    setTimeout(() => {
-                        remotePlayer.sendMessage(message);
-                    }, simulatedTransmissionDelay);
-                }
-            } else {
-                const simulatedTransmissionDelay = 50;
-                setTimeout(() => {
-                    remotePlayer.sendMessage(message);
-                }, simulatedTransmissionDelay);
+            if (!skipFrame) {
+                remotePlayer.outboundInputs.push(localInput);
             }
+
+            // TODO(2022-03-20): Prevent flooding a peer if we haven't heard from them in a while?
+            const message: TickMessage = {
+                type: "TICK",
+                frame: remotePlayer.outboundFrame,
+                inputs: remotePlayer.outboundInputs,
+                ping: Date.now(),
+                pong: remotePlayer.nextPong,
+                syncFrame: remotePlayer.mostRecentFrame,
+            };
+            remotePlayer.sendMessage(message, true);
         }
 
-        // TODO(2022-03-21): The input lag frame needs to be calculated correctly for outgoing input
-        const inputLag = 0;
-        this.rollbackMgr.addInputs(this.localPlayerIdx, currentFrame + inputLag, [ localInput ]);
+        if (!skipFrame) {
+            // TODO(2022-03-21): The input lag frame needs to be calculated correctly for outgoing input
+            const inputLag = 0;
+            this.rollbackMgr.addInputs(this.localPlayerIdx, currentFrame + inputLag, [ localInput ]);
 
-        this.rollbackMgr.update();
+            this.rollbackMgr.update();
+        }
 
         // Temporary debug info to show in devtools live expressions
         const debug = [];
-        debug.push(`frame=${currentFrame} inputLag=${inputLag}`);
+        debug.push(`frame=${currentFrame}`);
         for (const [peerId, remotePlayer] of this.remotePlayers) {
             const frameDelta = 0.5 * remotePlayer.ping * 60/1000 + remotePlayer.mostRecentFrame - currentFrame;
             debug.push(`Player #${remotePlayer.playerIdx}: ping=${Math.round(remotePlayer.ping)} frameDelta=${frameDelta.toFixed(2)} outboundInputs=${remotePlayer.outboundInputs.length} mostRecentFrame=${remotePlayer.mostRecentFrame} syncFrame=${remotePlayer.syncFrame}`);

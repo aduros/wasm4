@@ -333,7 +333,7 @@ export class Runtime {
         this.safeCall(this.wasm!.exports.update);
     }
 
-    blueScreen(err: Error) {
+    blueScreen (err: Error) {
         this.pauseState |= constants.PAUSE_CRASHED;
 
         const COLORS = [
@@ -377,7 +377,7 @@ export class Runtime {
 }
 
 function errorToBlueScreenText(err: Error) {
-    let message = `${err.name}:\n${err.message}`;
+    let message = err.message;
 
     // hand written messages for specific errors
     if (err instanceof WebAssembly.RuntimeError) {

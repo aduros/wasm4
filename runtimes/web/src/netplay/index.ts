@@ -248,7 +248,7 @@ export class Netplay {
             case "TICK": {
                 remotePlayer.nextPong = Math.max(remotePlayer.nextPong, message.ping);
                 if (message.pong != 0) {
-                    remotePlayer.addPingSample(Date.now() - message.pong);
+                    remotePlayer.addPingSample(Math.floor(performance.now()) - message.pong);
                 }
 
                 if (this.rollbackMgr != null && remotePlayer.playerIdx >= 0) {
@@ -336,7 +336,7 @@ export class Netplay {
                 type: "TICK",
                 frame: remotePlayer.outboundFrame,
                 inputs: remotePlayer.outboundInputs,
-                ping: Date.now(),
+                ping: Math.floor(performance.now()),
                 pong: remotePlayer.nextPong,
                 syncFrame: remotePlayer.mostRecentFrame,
             };

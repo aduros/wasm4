@@ -2,6 +2,7 @@ import { State } from "../state";
 import { Runtime } from "../runtime";
 import { RollbackManager, HISTORY_LENGTH } from "./rollback-manager";
 import { PeerManager } from "./peer-manager";
+import { ChunkReader, ChunkWriter } from "./chunks";
 
 type Message = WelcomeMessage | PlayerInfoMessage | JoinRequestMessage | JoinReplyMessage | TickMessage;
 
@@ -19,8 +20,8 @@ type JoinReplyMessage = {
     yourPlayerIdx: number;
     frame: number;
 
-    // TODO(2022-03-28): Need to split this into multiple binary chunks
-    // state: Uint8Array;
+    // The offset to the state data in the binary payload
+    stateOffset: number;
 }
 
 type PlayerInfoMessage = {
@@ -60,8 +61,13 @@ class RemotePlayer {
     outboundFrame = -1;
     readonly outboundInputs: number[] = [];
 
+    readonly chunkReader: ChunkReader;
+    readonly chunkWriter: ChunkWriter;
+
     constructor (public readonly peerId: string, private connection: RTCPeerConnection,
             private reliableChannel: RTCDataChannel, private unreliableChannel: RTCDataChannel) {
+        this.chunkReader = new ChunkReader(reliableChannel);
+        this.chunkWriter = new ChunkWriter(reliableChannel);
     }
 
     addPingSample (sample: number) {
@@ -183,7 +189,11 @@ export class Netplay {
         });
 
         reliableChannel.addEventListener("message", async event => {
-            const message: Message = JSON.parse(event.data);
+            if (typeof event.data != "string") {
+                return; // Ignore binary data
+            }
+
+            const message = JSON.parse(event.data) as Message;
             console.log("Received game message: "+message.type);
 
             switch (message.type) {
@@ -204,14 +214,20 @@ export class Netplay {
             case "JOIN_REQUEST": {
                 remotePlayer.init(this.nextPlayerIdx(), this.rollbackMgr!.currentFrame);
 
+                // FIXME(2022-03-31)
+                // remotePlayer.chunkWriter.write(cartBytes);
+
                 const state = new State();
                 state.read(this.runtime);
+                remotePlayer.chunkWriter.write(state.toBytes());
+
+                remotePlayer.chunkWriter.flush();
 
                 remotePlayer.sendMessage({
                     type: "JOIN_REPLY",
                     yourPlayerIdx: remotePlayer.playerIdx,
                     frame: this.rollbackMgr!.currentFrame,
-                    // state: state.toBytes(),
+                    stateOffset: 0,
                 });
 
                 console.log("Client joined as player", remotePlayer.playerIdx);
@@ -234,9 +250,16 @@ export class Netplay {
                     }
                 }
 
-                // const state = new State();
-                // state.fromBytes(message.state);
-                // state.write(this.runtime);
+                const bytes = remotePlayer.chunkReader.read();
+                const cartBytes = bytes.subarray(0, message.stateOffset);
+                const stateBytes = bytes.subarray(message.stateOffset);
+
+                // FIXME(2022-03-31)
+                // await this.runtime.load(cartBytes);
+
+                const state = new State();
+                state.fromBytes(stateBytes);
+                state.write(this.runtime);
 
                 console.log(`Joined as player ${this.localPlayerIdx} on frame ${message.frame}`);
             } break;
@@ -318,6 +341,7 @@ export class Netplay {
 
         // If we're running ahead of all other peers, gradually slow down by stalling every 8th frame
         if ((this.updateCount & 7) == 0 && minFrameDelta < -1) {
+            console.log("Stall frame for catch-up");
             skipFrame = true;
         }
 

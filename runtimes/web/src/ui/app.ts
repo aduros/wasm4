@@ -270,8 +270,12 @@ export class App extends LitElement {
         };
 
         const onKeyboardEvent = (event: KeyboardEvent) => {
-            if (event.repeat) {
-                return; // Ignore key repeat events
+            if (event.ctrlKey || event.altKey) {
+                return; // Ignore ctrl/alt modified key presses because they may be the user trying to navigate
+            }
+
+            if (event.srcElement instanceof HTMLElement && event.srcElement.tagName == "INPUT") {
+                return; // Ignore if we have an input element focused
             }
 
             const down = (event.type == "keydown");
@@ -357,6 +361,12 @@ export class App extends LitElement {
         };
         window.addEventListener("keydown", onKeyboardEvent);
         window.addEventListener("keyup", onKeyboardEvent);
+
+        // Also listen to the top frame when we're embedded in an iframe
+        if (top && top != window) {
+            top.addEventListener("keydown", onKeyboardEvent);
+            top.addEventListener("keyup", onKeyboardEvent);
+        }
 
         const pollPhysicalGamepads = () => {
             if (!navigator.getGamepads) {

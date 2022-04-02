@@ -9,7 +9,7 @@ import { MdSaveAlt, MdShare } from "react-icons/md";
 function Embed ({ slug, title, author }) {
     let params = "?url="+encodeURIComponent(`/carts/${slug}.wasm`);
     params += "&disk-prefix="+encodeURIComponent(slug);
-    params += "&screenshot="+encodeURIComponent(`/carts/${slug}.png`);
+    // params += "&screenshot="+encodeURIComponent(`/carts/${slug}.png`);
     // if (title) {
     //     params += "&title="+encodeURIComponent(title);
     // }
@@ -18,12 +18,12 @@ function Embed ({ slug, title, author }) {
     // }
     return (
         <AspectRatio width={1} height={1} className="game-embed-wrapper">
-        <iframe
-            src={`/embed/${params}`}
-            allow="fullscreen"
-            frameBorder="0"
-            className="game-embed">
-        </iframe>
+            <iframe
+                src={`/embed/${params}`}
+                allow="fullscreen gamepad autoplay"
+                frameBorder="0"
+                className="game-embed">
+            </iframe>
         </AspectRatio>
     );
 }

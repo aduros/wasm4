@@ -86,7 +86,6 @@ export class App extends LitElement {
     readonly runtime: Runtime;
     screenshot?: string;
 
-    @state() focused = true;
     @state() hideGamepadOverlay = false;
 
     @state() pauseMenu = false;
@@ -146,7 +145,7 @@ export class App extends LitElement {
         if (DEV_NETPLAY && location.hash) {
             const hostPeerId = location.hash.substring(1);
             this.netplay = new Netplay(runtime);
-            await this.netplay.join(hostPeerId);
+            this.netplay.join(hostPeerId);
 
         } else {
             await runtime.load(await loadCartWasm());
@@ -164,31 +163,9 @@ export class App extends LitElement {
             devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager())
         }
 
-        if (screenshot != null) {
-            // Wait until the initial focus before starting the runtime
-            this.focused = false;
-            await new Promise<void>(resolve => {
-                window.onpointerdown = function () {
-                    window.onpointerdown = null;
-                    runtime.unlockAudio();
-                    resolve();
-                };
-            });
-            this.focused = true;
-
-            window.onblur = () => {
-                document.body.classList.remove("focus");
-                runtime.updateIdleState();
-                this.focused = false;
-            };
-            window.onfocus = () => {
-                document.body.classList.add("focus");
-                runtime.updateIdleState();
-                this.focused = true;
-            };
+        if (!this.netplay) {
+            runtime.start();
         }
-
-        runtime.start();
 
         if (DEVELOPER_BUILD) {
             devkit.websocket?.addEventListener("message", async event => {
@@ -564,10 +541,9 @@ export class App extends LitElement {
         return html`
             <div class="content" @pointerup="${this.onPointerUp}">
                 ${this.pauseMenu ? html`<wasm4-menu-overlay .app=${this} />`: ""}
-                ${!this.focused ? html`<wasm4-focus-overlay screenshot=${this.screenshot} />` : ""}
                 ${this.runtime.canvas}
             </div>
-            ${this.focused && !this.hideGamepadOverlay ? html`<wasm4-virtual-gamepad .app=${this} />` : ""}
+            ${!this.hideGamepadOverlay ? html`<wasm4-virtual-gamepad .app=${this} />` : ""}
         `;
     }
 }

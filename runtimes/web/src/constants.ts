@@ -45,9 +45,8 @@ export const SYSTEM_PRESERVE_FRAMEBUFFER = 1;
 export const SYSTEM_HIDE_GAMEPAD_OVERLAY = 2;
 
 // Flags for Runtime.pauseState
-export const PAUSE_UNFOCUSED = 1;
-export const PAUSE_CRASHED = 2;
-export const PAUSE_REBOOTING = 4;
+export const PAUSE_CRASHED = 1;
+export const PAUSE_REBOOTING = 2;
 
 export const FONT = Uint8Array.of(
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,

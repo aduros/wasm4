@@ -374,18 +374,6 @@ export class Runtime {
 
         this.compositor.composite(palette, this.framebuffer);
     }
-
-    updateIdleState () {
-        const lostFocus = !document.body.classList.contains('focus');
-
-        if (lostFocus) {
-            this.pauseAudio();
-            this.pauseState |= constants.PAUSE_UNFOCUSED;
-        } else {
-            this.unlockAudio();
-            this.pauseState &= ~constants.PAUSE_UNFOCUSED;
-        }
-    }
 }
 
 function errorToBlueScreenText(err: Error) {

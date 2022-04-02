@@ -116,17 +116,15 @@ export class Netplay {
     private updateCount = 0;
 
     constructor (private runtime: Runtime) {
-        const host = location.hash == "#host";
-        const peerId = host ? "host" : "client_"+Math.random();
-
-        this.peerMgr = new PeerManager(peerId, async (connection, peerId) => {
-            const remotePlayer = await this.createRemotePlayer(connection, peerId);
+        this.peerMgr = new PeerManager(async (connection, peerId) => {
+            const otherPeers = Array.from(this.remotePlayers.keys());
 
             // When a peer connects to us, send them a welcome message containing all other peer IDs
             // so they can connect to the entire mesh
+            const remotePlayer = await this.createRemotePlayer(connection, peerId);
             remotePlayer.sendMessage({
                 type: "WELCOME",
-                otherPeers: Array.from(this.remotePlayers.keys()).filter(id => id != peerId),
+                otherPeers,
             });
 
             // Also inform them of our own player state
@@ -136,17 +134,26 @@ export class Netplay {
                 frame: this.rollbackMgr!.currentFrame,
             });
         });
+    }
 
-        if (host) {
-            this.rollbackMgr = new RollbackManager(0, this.runtime);
-            this.localPlayerIdx = 0;
+    host () {
+        this.rollbackMgr = new RollbackManager(0, this.runtime);
+        this.localPlayerIdx = 0;
+    }
 
-        } else {
-            const connection = this.peerMgr.connect("host");
-            this.createRemotePlayer(connection, "host").then(remotePlayer => {
-                remotePlayer.sendMessage({ type: "JOIN_REQUEST" });
-            });
-        }
+    async join (peerId: string) {
+        const connection = this.peerMgr.connect(peerId);
+        const remotePlayer = await this.createRemotePlayer(connection, peerId);
+
+        remotePlayer.sendMessage({ type: "JOIN_REQUEST" });
+    }
+
+    getInviteLink (): string {
+        return `http://localhost:3000/#${this.peerMgr.localPeerId}`;
+    }
+
+    close () {
+        this.peerMgr.close();
     }
 
     private async createRemotePlayer (connection: RTCPeerConnection, peerId: string): Promise<RemotePlayer> {

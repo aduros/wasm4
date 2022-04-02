@@ -1,0 +1,7 @@
+{
+  "name": "webrtc-signal-server",
+  "private": true,
+  "dependencies": {
+    "ws": "^8.5.0"
+  }
+}

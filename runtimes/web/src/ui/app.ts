@@ -98,6 +98,8 @@ export class App extends LitElement {
 
     readonly inputManager = new InputManager();
 
+    private netplay?: Netplay;
+
     constructor () {
         super();
         this.init();
@@ -419,7 +421,16 @@ export class App extends LitElement {
         // used for keeping a consistent framerate. not a real time.
         let lastFrameGapCorrected = lastFrame;
 
-        const netplay = DEV_NETPLAY ? new Netplay(runtime) : null;
+        if (DEV_NETPLAY) {
+            const isHost = !location.hash; // Temporary
+            if (isHost) {
+                this.copyNetplayLink();
+            } else {
+                const hostPeerId = location.hash.substring(1);
+                this.netplay = new Netplay(runtime);
+                await this.netplay.join(hostPeerId);
+            }
+        }
 
         const loop = () => {
             pollPhysicalGamepads();
@@ -445,8 +456,8 @@ export class App extends LitElement {
                     lastFrame = now;
                     lastFrameGapCorrected = now - (deltaFrameGapCorrected % INTERVAL);
 
-                    if (netplay) {
-                        netplay.update(input.gamepad[0]);
+                    if (this.netplay) {
+                        this.netplay.update(input.gamepad[0]);
 
                     } else {
                         // Pass inputs into runtime memory
@@ -525,6 +536,23 @@ export class App extends LitElement {
                 state.write(this.runtime);
             }
         }
+    }
+
+    copyNetplayLink () {
+        if (!this.netplay) {
+            this.netplay = new Netplay(this.runtime);
+            this.netplay.host();
+        }
+
+        const url = this.netplay.getInviteLink();
+        if (navigator.share) {
+            navigator.share({ url });
+        } else {
+            utils.copyToClipboard(url);
+            // TODO(2022-03-31): Show a notification about the URL being copied to the clipboard
+        }
+
+        console.log("Copy invite URL: "+url);
     }
 
     async resetCart () {

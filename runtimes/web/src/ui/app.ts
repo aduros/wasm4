@@ -83,7 +83,7 @@ export class App extends LitElement {
         }
     `;
 
-    @state() runtime?: Runtime;
+    readonly runtime: Runtime;
     screenshot?: string;
 
     @state() focused = true;
@@ -93,7 +93,6 @@ export class App extends LitElement {
 
     @query("wasm4-menu-overlay") menuOverlay?: MenuOverlay;
 
-    private wasmBuffer?: ArrayBuffer;
     private savedGameState?: State;
 
     readonly inputManager = new InputManager();
@@ -102,13 +101,19 @@ export class App extends LitElement {
 
     constructor () {
         super();
+
+        const qs = new URL(document.location.href).searchParams;
+        const title = qs.get("title");
+        const diskName = (document.getElementById("wasm4-disk-prefix")?.textContent ?? qs.get('disk-prefix') ?? title) + "-disk";
+        this.runtime = new Runtime(diskName);
+
         this.init();
     }
 
     async init () {
         const qs = new URL(document.location.href).searchParams;
 
-        async function loadCartWasm () {
+        async function loadCartWasm (): Promise<Uint8Array> {
             const cartJson = document.getElementById("wasm4-cart-json");
 
             // Is cart inlined?
@@ -124,7 +129,7 @@ export class App extends LitElement {
                 // Load the cart from a url
                 const cartUrl = qs.has("url") ? qs.get("url")! : "cart.wasm";
                 const res = await fetch(cartUrl);
-                return await res.arrayBuffer();
+                return new Uint8Array(await res.arrayBuffer());
             }
         }
 
@@ -133,15 +138,19 @@ export class App extends LitElement {
             this.screenshot = screenshot;
         }
 
-        const title = qs.get("title");
-        const diskName = (document.getElementById("wasm4-disk-prefix")?.textContent ?? qs.get('disk-prefix') ?? title) + "-disk";
-
-        const runtime = new Runtime(diskName);
+        const runtime = this.runtime;
         await runtime.init();
 
         const canvas = runtime.canvas;
-        this.wasmBuffer = await loadCartWasm();
-        await runtime.load(this.wasmBuffer);
+
+        if (DEV_NETPLAY && location.hash) {
+            const hostPeerId = location.hash.substring(1);
+            this.netplay = new Netplay(runtime);
+            await this.netplay.join(hostPeerId);
+
+        } else {
+            await runtime.load(await loadCartWasm());
+        }
 
         let devtoolsManager = {
             toggleDevtools () {
@@ -181,14 +190,11 @@ export class App extends LitElement {
 
         runtime.start();
 
-        this.runtime = runtime; // Trigger a rerender
-
         if (DEVELOPER_BUILD) {
             devkit.websocket?.addEventListener("message", async event => {
                 switch (event.data) {
                 case "reload":
-                    this.wasmBuffer = await loadCartWasm();
-                    this.resetCart();
+                    this.resetCart(await loadCartWasm());
                     break;
                 }
             });
@@ -421,15 +427,8 @@ export class App extends LitElement {
         // used for keeping a consistent framerate. not a real time.
         let lastFrameGapCorrected = lastFrame;
 
-        if (DEV_NETPLAY) {
-            const isHost = !location.hash; // Temporary
-            if (isHost) {
-                this.copyNetplayLink();
-            } else {
-                const hostPeerId = location.hash.substring(1);
-                this.netplay = new Netplay(runtime);
-                await this.netplay.join(hostPeerId);
-            }
+        if (DEV_NETPLAY && !location.hash) {
+            this.copyNetplayLink(); // temporary during development
         }
 
         const loop = () => {
@@ -492,10 +491,8 @@ export class App extends LitElement {
             utils.requestFullscreen();
         }
 
-        if (this.runtime) {
-            // Try to begin playing audio
-            this.runtime.unlockAudio();
-        }
+        // Try to begin playing audio
+        this.runtime.unlockAudio();
     }
 
     onMenuButtonPressed () {
@@ -520,21 +517,17 @@ export class App extends LitElement {
     }
 
     saveGameState () {
-        if (this.runtime) {
-            let state = this.savedGameState;
-            if (state == null) {
-                state = this.savedGameState = new State();
-            }
-            state.read(this.runtime);
+        let state = this.savedGameState;
+        if (state == null) {
+            state = this.savedGameState = new State();
         }
+        state.read(this.runtime);
     }
 
     loadGameState () {
-        if (this.runtime) {
-            const state = this.savedGameState;
-            if (state != null) {
-                state.write(this.runtime);
-            }
+        const state = this.savedGameState;
+        if (state != null) {
+            state.write(this.runtime);
         }
     }
 
@@ -555,14 +548,16 @@ export class App extends LitElement {
         console.log("Copy invite URL: "+url);
     }
 
-    async resetCart () {
-        if (this.runtime) {
-            this.runtime.reset(true);
-            this.runtime.pauseState |= constants.PAUSE_REBOOTING;
-            await this.runtime.load(this.wasmBuffer!);
-            this.runtime.start();
-            this.runtime.pauseState &= ~constants.PAUSE_REBOOTING;
+    async resetCart (wasmBuffer?: Uint8Array) {
+        if (!wasmBuffer) {
+            wasmBuffer = this.runtime.wasmBuffer!;
         }
+
+        this.runtime.reset(true);
+        this.runtime.pauseState |= constants.PAUSE_REBOOTING;
+        await this.runtime.load(wasmBuffer);
+        this.runtime.start();
+        this.runtime.pauseState &= ~constants.PAUSE_REBOOTING;
     }
 
     render () {
@@ -570,7 +565,7 @@ export class App extends LitElement {
             <div class="content" @pointerup="${this.onPointerUp}">
                 ${this.pauseMenu ? html`<wasm4-menu-overlay .app=${this} />`: ""}
                 ${!this.focused ? html`<wasm4-focus-overlay screenshot=${this.screenshot} />` : ""}
-                ${this.runtime ? this.runtime.canvas : ""}
+                ${this.runtime.canvas}
             </div>
             ${this.focused && !this.hideGamepadOverlay ? html`<wasm4-virtual-gamepad .app=${this} />` : ""}
         `;

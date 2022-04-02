@@ -214,9 +214,10 @@ export class Netplay {
             case "JOIN_REQUEST": {
                 remotePlayer.init(this.nextPlayerIdx(), this.rollbackMgr!.currentFrame);
 
-                // FIXME(2022-03-31)
-                // remotePlayer.chunkWriter.write(cartBytes);
+                // Send the cart data
+                remotePlayer.chunkWriter.write(this.runtime.wasmBuffer!);
 
+                // And the game state
                 const state = new State();
                 state.read(this.runtime);
                 remotePlayer.chunkWriter.write(state.toBytes());
@@ -227,7 +228,7 @@ export class Netplay {
                     type: "JOIN_REPLY",
                     yourPlayerIdx: remotePlayer.playerIdx,
                     frame: this.rollbackMgr!.currentFrame,
-                    stateOffset: 0,
+                    stateOffset: this.runtime.wasmBuffer!.byteLength,
                 });
 
                 console.log("Client joined as player", remotePlayer.playerIdx);
@@ -254,8 +255,8 @@ export class Netplay {
                 const cartBytes = bytes.subarray(0, message.stateOffset);
                 const stateBytes = bytes.subarray(message.stateOffset);
 
-                // FIXME(2022-03-31)
-                // await this.runtime.load(cartBytes);
+                // Load the cart, ignoring file size limits so netplay works even during development
+                await this.runtime.load(cartBytes, false);
 
                 const state = new State();
                 state.fromBytes(stateBytes);

@@ -13,6 +13,7 @@ export class Runtime {
     data: DataView;
     framebuffer: Framebuffer;
     pauseState: number;
+    wasmBuffer?: Uint8Array;
     wasmBufferByteLen: number;
     wasm?: WebAssembly.Instance;
     warnedFileSize = false;
@@ -109,8 +110,9 @@ export class Runtime {
         this.data.setInt16(constants.ADDR_MOUSE_Y, 0x7fff, true);
     }
 
-    async load (wasmBuffer:  ArrayBuffer | Uint8Array) {
+    async load (wasmBuffer: Uint8Array, enforceSizeLimit = true) {
         const limit = 1 << 16;
+        this.wasmBuffer = wasmBuffer;
         this.wasmBufferByteLen = wasmBuffer.byteLength;
 
         if (wasmBuffer.byteLength > limit) {
@@ -119,7 +121,7 @@ export class Runtime {
                     this.warnedFileSize = true;
                     this.print(`Warning: Cart is larger than ${limit} bytes. Ensure the release build of your cart is small enough to be bundled.`);
                 }
-            } else {
+            } else if (enforceSizeLimit) {
                 throw new Error("Cart too big!");
             }
         }

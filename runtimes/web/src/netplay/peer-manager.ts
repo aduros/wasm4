@@ -172,7 +172,7 @@ export class PeerManager {
 
         connection.addEventListener("connectionstatechange", () => {
             const state = connection.connectionState;
-            if (state == "failed" || state == "closed") {
+            if (state != "connecting" && state != "connected") {
                 this.connections.delete(peerId);
             }
         });

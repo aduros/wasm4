@@ -131,7 +131,9 @@ class RemotePlayer {
                 }, simulatedTransmissionDelay);
             }
         } else {
-            this.unreliableChannel.send(json);
+            if (this.unreliableChannel.readyState == "open") {
+                this.unreliableChannel.send(json);
+            }
         }
     }
 }
@@ -147,6 +149,11 @@ export class Netplay {
     private localPlayerIdx = -1;
 
     private updateCount = 0;
+
+    // Callbacks for showing UI notifications
+    onstart?: (playerIdx: number) => void;
+    onjoin?: (playerIdx: number) => void;
+    onleave?: (playerIdx: number) => void;
 
     constructor (private runtime: Runtime) {
         this.peerMgr = new PeerManager(async (connection, peerId) => {
@@ -209,13 +216,19 @@ export class Netplay {
             // TODO(2022-03-24): Add connection timeout
         ]);
 
-        console.log("Connected to "+peerId+" :)");
-
         const remotePlayer = new RemotePlayer(peerId, connection, reliableChannel, unreliableChannel);
         this.remotePlayers.set(peerId, remotePlayer);
 
-        reliableChannel.addEventListener("close", () => {
-            this.remotePlayers.delete(peerId);
+        connection.addEventListener("connectionstatechange", () => {
+            console.log(`Peer ${peerId} connection state changed to ${connection.connectionState}`);
+            if (connection.connectionState != "connected" && this.remotePlayers.has(peerId)) {
+                console.log(`Peer ${peerId} left`);
+                this.remotePlayers.delete(peerId);
+
+                if (this.onleave && remotePlayer.playerIdx >= 0) {
+                    this.onleave(remotePlayer.playerIdx);
+                }
+            }
         });
 
         reliableChannel.addEventListener("message", async event => {
@@ -263,6 +276,10 @@ export class Netplay {
                     frame: this.rollbackMgr!.currentFrame,
                     stateOffset: this.runtime.wasmBuffer!.byteLength,
                 });
+
+                if (this.onjoin) {
+                    this.onjoin(remotePlayer.playerIdx);
+                }
             } break;
 
             case "JOIN_REPLY": {
@@ -289,10 +306,21 @@ export class Netplay {
 
                 this.rollbackMgr = new RollbackManager(message.frame, this.runtime);
                 this.localPlayerIdx = message.yourPlayerIdx;
+
+                if (this.onstart) {
+                    this.onstart(this.localPlayerIdx);
+                }
             } break;
 
             case "PLAYER_INFO": {
-                remotePlayer.playerIdx = message.playerIdx;
+                if (remotePlayer.playerIdx == -1) {
+                    remotePlayer.playerIdx = message.playerIdx;
+
+                    // TODO(2022-04-03): Don't send this for initially joining clients
+                    if (this.onjoin) {
+                        this.onjoin(remotePlayer.playerIdx);
+                    }
+                }
             } break;
             }
         });

@@ -10,6 +10,7 @@ import { Runtime } from "../runtime";
 import { State } from "../state";
 
 import { MenuOverlay } from "./menu-overlay";
+import { Notifications } from "./notifications";
 
 class InputState {
     gamepad = [0, 0, 0, 0];
@@ -87,6 +88,7 @@ export class App extends LitElement {
     @state() pauseMenu = false;
 
     @query("wasm4-menu-overlay") menuOverlay?: MenuOverlay;
+    @query("wasm4-notifications") notifications!: Notifications;
 
     private savedGameState?: State;
 
@@ -132,7 +134,7 @@ export class App extends LitElement {
 
         const hostPeerId = utils.getUrlParam("netplay");
         if (hostPeerId) {
-            this.netplay = new Netplay(runtime);
+            this.netplay = this.createNetplay();
             this.netplay.join(hostPeerId);
         } else {
             await runtime.load(await loadCartWasm());
@@ -507,19 +509,12 @@ export class App extends LitElement {
 
     copyNetplayLink () {
         if (!this.netplay) {
-            this.netplay = new Netplay(this.runtime);
+            this.netplay = this.createNetplay();
             this.netplay.host();
         }
 
-        const url = this.netplay.getInviteLink();
-        if (navigator.share) {
-            navigator.share({ url });
-        } else {
-            utils.copyToClipboard(url);
-            // TODO(2022-03-31): Show a notification about the URL being copied to the clipboard
-        }
-
-        console.log("Copy invite URL: "+url);
+        utils.copyToClipboard(this.netplay.getInviteLink());
+        this.notifications.show("Netplay link copied to clipboard");
     }
 
     async resetCart (wasmBuffer?: Uint8Array) {
@@ -534,12 +529,21 @@ export class App extends LitElement {
         this.runtime.pauseState &= ~constants.PAUSE_REBOOTING;
     }
 
+    private createNetplay (): Netplay {
+        const netplay = new Netplay(this.runtime);
+        netplay.onstart = playerIdx => this.notifications.show(`Joined as player ${playerIdx+1}`);
+        netplay.onjoin = playerIdx => this.notifications.show(`Player ${playerIdx+1} joined`);
+        netplay.onleave = playerIdx => this.notifications.show(`Player ${playerIdx+1} left`);
+        return netplay;
+    }
+
     render () {
         return html`
             <div class="content" @pointerup="${this.onPointerUp}">
                 ${this.pauseMenu ? html`<wasm4-menu-overlay .app=${this} />`: ""}
                 ${this.runtime.canvas}
             </div>
+            <wasm4-notifications></wasm4-notifications>
             ${!this.hideGamepadOverlay ? html`<wasm4-virtual-gamepad .app=${this} />` : ""}
         `;
     }

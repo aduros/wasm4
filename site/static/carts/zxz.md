@@ -1,7 +1,7 @@
 ---
 author: Ścisław Dercz
 github: drcz
-date: 2022-01-23 00:00:41 GMT
+date: 2022-04-02 22:22:22 GMT
 ---
 
 # ZxZ
@@ -9,3 +9,4 @@ date: 2022-01-23 00:00:41 GMT
 A submission to the WASM-4 game jam.
 
 Original page on [itch.io](https://drcz.itch.io/zxz).
+Source on [github](https://github.com/drcz/ZxZ).

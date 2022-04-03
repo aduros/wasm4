@@ -13,7 +13,7 @@ function Embed () {
         <AspectRatio width={1} height={1} className="game-embed-wrapper">
             <iframe
                 src={`/embed/#?netplay=${peerId}`}
-                allow="fullscreen gamepad autoplay"
+                allow="fullscreen"
                 frameBorder="0"
                 className="game-embed">
             </iframe>

@@ -20,7 +20,7 @@ function Embed ({ slug, title, author }) {
         <AspectRatio width={1} height={1} className="game-embed-wrapper">
             <iframe
                 src={`/embed/#${params}`}
-                allow="fullscreen gamepad autoplay"
+                allow="fullscreen"
                 frameBorder="0"
                 className="game-embed">
             </iframe>

@@ -1,6 +1,7 @@
 import React from 'react';
 import Layout from '@theme/Layout';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import BrowserOnly from '@docusaurus/BrowserOnly';
 import { AspectRatio } from './AspectRatio';
 import { Giscus } from "@giscus/react";
 import { RWebShare } from "react-web-share";
@@ -25,7 +26,7 @@ export default function NetplayCart () {
         <Layout title="Netplay">
             <main>
             <div className="container game-container">
-                <Embed/>
+                <BrowserOnly>{() => Embed()}</BrowserOnly>
 
                 <div className="text--center margin-bottom--lg">
                     <small>Controls: Arrows, X, Z</small>

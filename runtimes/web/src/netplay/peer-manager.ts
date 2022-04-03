@@ -42,7 +42,7 @@ class SignalClient {
         this.socket = new WebSocket(`wss://aduros.com/webrtc-signal-server/?peerId=${encodeURIComponent(localPeerId)}`);
         this.socket.addEventListener("message", event => {
             const { source, message } = JSON.parse(event.data);
-            console.log(`Received ${message.type} message from ${source}`);
+            // console.log(`Received ${message.type} message from ${source}`);
             onMessage(source, message);
         });
 
@@ -56,7 +56,7 @@ class SignalClient {
     }
 
     send (target: string, message: Message) {
-        console.log(`Sent ${message.type} message to ${target}`);
+        // console.log(`Sent ${message.type} message to ${target}`);
         const output = JSON.stringify({ target, message });
         if (this.socket.readyState == 1) {
             this.socket.send(output);
@@ -155,7 +155,6 @@ export class PeerManager {
         this.connections.set(peerId, connection);
 
         connection.addEventListener("negotiationneeded", async () => {
-            console.log("[client] onnegotiationneeded");
             await connection.setLocalDescription(await connection.createOffer());
             this.signalClient.send(peerId, { type: "OFFER", description: connection.localDescription!.toJSON() });
         });
@@ -168,9 +167,7 @@ export class PeerManager {
 
         connection.addEventListener("connectionstatechange", () => {
             const state = connection.connectionState;
-            console.log("state changed", state);
             if (state == "failed" || state == "closed") {
-                console.log("Removing connection", peerId);
                 this.connections.delete(peerId);
             }
         });

@@ -4,6 +4,8 @@ import { RollbackManager, HISTORY_LENGTH } from "./rollback-manager";
 import { PeerManager } from "./peer-manager";
 import { ChunkReader, ChunkWriter } from "./chunks";
 
+const DEV_SIMULATE_LAG = true;
+
 /**
  * Control messages sent over the reliable data channel.
  *
@@ -14,8 +16,7 @@ import { ChunkReader, ChunkWriter } from "./chunks";
  * 3. B → (binary payload containing the cart and game state) → A
  * 4. B → JOIN_REPLY → A
  *
- * At any point, a peer can send a PLAYER_INFO to other peers to inform them of their player index
- * and frame.
+ * At any point, a peer can send a PLAYER_INFO to another to inform them of their player index.
  */
 type Message =
     WelcomeMessage |
@@ -44,7 +45,6 @@ type JoinReplyMessage = {
 type PlayerInfoMessage = {
     type: "PLAYER_INFO";
     playerIdx: number;
-    frame: number;
 }
 
 // TODO(2022-03-22): Binary encode this
@@ -92,24 +92,21 @@ class RemotePlayer {
             : sample;
     }
 
-    init (playerIdx: number, currentFrame: number) {
-        this.playerIdx = playerIdx;
-        this.mostRecentFrame = currentFrame;
-        // this.syncFrame = -1;
-        this.outboundFrame = currentFrame;
-    }
-
     sendMessage (message: Message) {
-        console.log("Sending message: "+message.type);
+        console.log(`Sending ${message.type} message to ${this.peerId}`, message);
         const json = JSON.stringify(message);
 
         // Simulate connection lag
-        const simulatedTransmissionDelay = 50;
-        setTimeout(() => {
-            if (this.reliableChannel.readyState == "open") {
-                this.reliableChannel.send(json);
-            }
-        }, simulatedTransmissionDelay);
+        if (DEV_SIMULATE_LAG) {
+            const simulatedTransmissionDelay = 50;
+            setTimeout(() => {
+                if (this.reliableChannel.readyState == "open") {
+                    this.reliableChannel.send(json);
+                }
+            }, simulatedTransmissionDelay);
+        } else {
+            this.reliableChannel.send(json);
+        }
     }
 
     sendTick () {
@@ -123,13 +120,17 @@ class RemotePlayer {
         const json = JSON.stringify(payload);
 
         // Simulate a bad connection with packet loss and unordered delivery
-        if (Math.random() > 0.05) {
-            const simulatedTransmissionDelay = Math.random()*30 + 50;
-            setTimeout(() => {
-                if (this.unreliableChannel.readyState == "open") {
-                    this.unreliableChannel.send(json);
-                }
-            }, simulatedTransmissionDelay);
+        if (DEV_SIMULATE_LAG) {
+            if (Math.random() > 0.05) {
+                const simulatedTransmissionDelay = Math.random()*30 + 50;
+                setTimeout(() => {
+                    if (this.unreliableChannel.readyState == "open") {
+                        this.unreliableChannel.send(json);
+                    }
+                }, simulatedTransmissionDelay);
+            }
+        } else {
+            this.unreliableChannel.send(json);
         }
     }
 }
@@ -159,11 +160,12 @@ export class Netplay {
             });
 
             // Also inform them of our own player state
-            remotePlayer.sendMessage({
-                type: "PLAYER_INFO",
-                playerIdx: this.localPlayerIdx,
-                frame: this.rollbackMgr!.currentFrame,
-            });
+            if (this.localPlayerIdx >= 0) {
+                remotePlayer.sendMessage({
+                    type: "PLAYER_INFO",
+                    playerIdx: this.localPlayerIdx,
+                });
+            }
         });
     }
 
@@ -172,12 +174,12 @@ export class Netplay {
         this.localPlayerIdx = 0;
     }
 
-    async join (peerId: string) {
+    join (peerId: string) {
         const connection = this.peerMgr.connect(peerId);
         this.createRemotePlayer(connection, peerId).then(remotePlayer => {
             remotePlayer.sendMessage({ type: "JOIN_REQUEST" });
         }, error => {
-            this.runtime.blueScreen(new Error("Failed to connect\nto host. They may\nbe offline?"));
+            this.runtime.blueScreen(new Error("Failed to connect\nto peer. They may\nbe offline?"));
         });
     }
 
@@ -221,7 +223,7 @@ export class Netplay {
             }
 
             const message = JSON.parse(event.data) as Message;
-            console.log("Received game message: "+message.type);
+            console.log(`Received ${message.type} message from ${peerId}`, message);
 
             switch (message.type) {
             case "WELCOME": {
@@ -229,17 +231,20 @@ export class Netplay {
                     if (!this.remotePlayers.has(peerId)) {
                         const connection = this.peerMgr.connect(peerId);
                         const remotePlayer = await this.createRemotePlayer(connection, peerId);
-                        remotePlayer.sendMessage({
-                            type: "PLAYER_INFO",
-                            playerIdx: this.localPlayerIdx,
-                            frame: this.rollbackMgr!.currentFrame,
-                        });
+
+                        if (this.localPlayerIdx >= 0) {
+                            remotePlayer.sendMessage({
+                                type: "PLAYER_INFO",
+                                playerIdx: this.localPlayerIdx,
+                            });
+                        }
                     }
                 }
             } break;
 
             case "JOIN_REQUEST": {
-                remotePlayer.init(this.nextPlayerIdx(), this.rollbackMgr!.currentFrame);
+                // Assign them a player index
+                remotePlayer.playerIdx = this.nextPlayerIdx();
 
                 // Send the cart data
                 remotePlayer.chunkWriter.write(this.runtime.wasmBuffer!);
@@ -257,8 +262,6 @@ export class Netplay {
                     frame: this.rollbackMgr!.currentFrame,
                     stateOffset: this.runtime.wasmBuffer!.byteLength,
                 });
-
-                console.log("Client joined as player", remotePlayer.playerIdx);
             } break;
 
             case "JOIN_REPLY": {
@@ -268,7 +271,6 @@ export class Netplay {
                         otherPlayer.sendMessage({
                             type: "PLAYER_INFO",
                             playerIdx: this.localPlayerIdx,
-                            frame: message.frame,
                         });
                     }
                 }
@@ -285,14 +287,11 @@ export class Netplay {
                 state.write(this.runtime);
 
                 this.rollbackMgr = new RollbackManager(message.frame, this.runtime);
-                remotePlayer.init(remotePlayer.playerIdx, message.frame);
                 this.localPlayerIdx = message.yourPlayerIdx;
-
-                console.log(`Joined as player ${this.localPlayerIdx} on frame ${message.frame}`);
             } break;
 
             case "PLAYER_INFO": {
-                remotePlayer.init(message.playerIdx, message.frame);
+                remotePlayer.playerIdx = message.playerIdx;
             } break;
             }
         });
@@ -305,17 +304,15 @@ export class Netplay {
                 remotePlayer.addPingSample(Math.floor(performance.now()) - payload.pong);
             }
 
-            if (this.rollbackMgr != null && remotePlayer.playerIdx >= 0) {
+            // Ignore if we haven't started our local simulation, or we haven't yet received a
+            // player index from this peer
+            if (this.rollbackMgr && remotePlayer.playerIdx >= 0) {
                 const mostRecentFrame = payload.frame + payload.inputs.length - 1;
                 if (mostRecentFrame > remotePlayer.mostRecentFrame) {
                     remotePlayer.mostRecentFrame = mostRecentFrame;
                     remotePlayer.syncFrame = payload.syncFrame;
                     this.rollbackMgr.addInputs(remotePlayer.playerIdx, payload.frame, payload.inputs);
-                } else {
-                    // console.log("Stale tick received");
                 }
-            } else {
-                console.warn("Received inputs before we could process them?");
             }
         });
 
@@ -375,6 +372,10 @@ export class Netplay {
         }
 
         for (const [peerId, remotePlayer] of this.remotePlayers) {
+            if (remotePlayer.outboundFrame < 0) {
+                remotePlayer.outboundFrame = currentFrame;
+            }
+
             if (remotePlayer.syncFrame >= remotePlayer.outboundFrame) {
                 const delta = remotePlayer.syncFrame + 1 - remotePlayer.outboundFrame;
                 remotePlayer.outboundFrame = remotePlayer.syncFrame + 1;
@@ -384,7 +385,6 @@ export class Netplay {
                 remotePlayer.outboundInputs.push(localInput);
             }
 
-            // TODO(2022-03-20): Prevent flooding a peer if we haven't heard from them in a while?
             remotePlayer.sendTick();
         }
 

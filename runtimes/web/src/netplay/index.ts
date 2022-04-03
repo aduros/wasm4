@@ -4,7 +4,8 @@ import { RollbackManager, HISTORY_LENGTH } from "./rollback-manager";
 import { PeerManager } from "./peer-manager";
 import { ChunkReader, ChunkWriter } from "./chunks";
 
-const DEV_SIMULATE_LAG = true;
+export const DEV_NETPLAY = false;
+const SIMULATE_LAG = false;
 
 /**
  * Control messages sent over the reliable data channel.
@@ -97,7 +98,7 @@ class RemotePlayer {
         const json = JSON.stringify(message);
 
         // Simulate connection lag
-        if (DEV_SIMULATE_LAG) {
+        if (SIMULATE_LAG) {
             const simulatedTransmissionDelay = 50;
             setTimeout(() => {
                 if (this.reliableChannel.readyState == "open") {
@@ -120,7 +121,7 @@ class RemotePlayer {
         const json = JSON.stringify(payload);
 
         // Simulate a bad connection with packet loss and unordered delivery
-        if (DEV_SIMULATE_LAG) {
+        if (SIMULATE_LAG) {
             if (Math.random() > 0.05) {
                 const simulatedTransmissionDelay = Math.random()*30 + 50;
                 setTimeout(() => {
@@ -184,7 +185,7 @@ export class Netplay {
     }
 
     getInviteLink (): string {
-        return `http://localhost:3000/#${this.peerMgr.localPeerId}`;
+        return `https://wasm4.org/netplay/#${this.peerMgr.localPeerId}`;
     }
 
     close () {

@@ -1,3 +1,5 @@
+import { DEV_NETPLAY } from "./index";
+
 /** WebRTC signaling messages. */
 type Message = OfferMessage | AnswerMessage | CandidateMessage | AbortMessage;
 
@@ -80,9 +82,12 @@ export class PeerManager {
     private readonly signalClient: SignalClient;
 
     constructor (onConnection: (connection: RTCPeerConnection, remotePeerId: string) => void) {
-        const host = !location.hash; // Temporary
-        this.localPeerId = host ? "host" : createRandomPeerId();
-        // this.localPeerId = createRandomPeerId();
+        if (DEV_NETPLAY) {
+            const host = !location.hash; // Temporary
+            this.localPeerId = host ? "host" : createRandomPeerId();
+        } else {
+            this.localPeerId = createRandomPeerId();
+        }
 
         this.signalClient = new SignalClient(this.localPeerId, async (source, message) => {
             switch (message.type) {

@@ -225,6 +225,11 @@ module.exports = {
                       },
                       exact: true,
                   });
+
+                  actions.addRoute({
+                      path: "/netplay",
+                      component: "@site/src/components/NetplayCart",
+                  });
               },
           }
       }

@@ -10,7 +10,7 @@ const options = [
     "SAVE STATE",
     "LOAD STATE",
     // "OPTIONS",
-    // "HOST NETPLAY",
+    "COPY NETPLAY URL",
     "RESET CART",
 ];
 
@@ -74,6 +74,9 @@ export class MenuOverlay extends LitElement {
                 this.app.loadGameState();
                 break;
             case 3:
+                this.app.copyNetplayLink();
+                break;
+            case 4:
                 this.app.resetCart();
                 break;
             }

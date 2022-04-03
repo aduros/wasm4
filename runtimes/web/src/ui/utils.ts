@@ -1,3 +1,17 @@
+export function getUrlParam (name: string): string | null {
+    const url = new URL(location.href);
+
+    // First try the URL query string
+    const value = url.searchParams.get(name);
+    if (value != null) {
+        return value;
+    }
+
+    // Fallback to using the value in the hash
+    const hash = new URL(url.hash.substring(1), url.origin);
+    return hash.searchParams.get(name);
+}
+
 export function requestFullscreen () {
     if (document.fullscreenElement == null) {
         document.body.requestFullscreen({navigationUI: "hide"});

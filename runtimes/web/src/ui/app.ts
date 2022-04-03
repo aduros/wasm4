@@ -5,14 +5,11 @@ import * as constants from "../constants";
 import * as devkit from "../devkit";
 import * as utils from "./utils";
 import * as z85 from "../z85";
+import { Netplay, DEV_NETPLAY } from "../netplay";
 import { Runtime } from "../runtime";
 import { State } from "../state";
 
 import { MenuOverlay } from "./menu-overlay";
-
-import { Netplay } from "../netplay";
-
-const DEV_NETPLAY = false;
 
 class InputState {
     gamepad = [0, 0, 0, 0];
@@ -84,7 +81,6 @@ export class App extends LitElement {
     `;
 
     readonly runtime: Runtime;
-    screenshot?: string;
 
     @state() hideGamepadOverlay = false;
 
@@ -101,17 +97,14 @@ export class App extends LitElement {
     constructor () {
         super();
 
-        const qs = new URL(document.location.href).searchParams;
-        const title = qs.get("title");
-        const diskName = (document.getElementById("wasm4-disk-prefix")?.textContent ?? qs.get('disk-prefix') ?? title) + "-disk";
-        this.runtime = new Runtime(diskName);
+        const diskPrefix = document.getElementById("wasm4-disk-prefix")?.textContent
+            ?? utils.getUrlParam("disk-prefix");
+        this.runtime = new Runtime(diskPrefix + "-disk");
 
         this.init();
     }
 
     async init () {
-        const qs = new URL(document.location.href).searchParams;
-
         async function loadCartWasm (): Promise<Uint8Array> {
             const cartJson = document.getElementById("wasm4-cart-json");
 
@@ -126,15 +119,10 @@ export class App extends LitElement {
 
             } else {
                 // Load the cart from a url
-                const cartUrl = qs.has("url") ? qs.get("url")! : "cart.wasm";
+                const cartUrl = utils.getUrlParam("url") ?? "cart.wasm";
                 const res = await fetch(cartUrl);
                 return new Uint8Array(await res.arrayBuffer());
             }
-        }
-
-        const screenshot = qs.get("screenshot");
-        if (screenshot) {
-            this.screenshot = screenshot;
         }
 
         const runtime = this.runtime;
@@ -142,13 +130,16 @@ export class App extends LitElement {
 
         const canvas = runtime.canvas;
 
-        if (DEV_NETPLAY && location.hash) {
-            const hostPeerId = location.hash.substring(1);
+        const hostPeerId = utils.getUrlParam("netplay");
+        if (hostPeerId) {
             this.netplay = new Netplay(runtime);
             this.netplay.join(hostPeerId);
-
         } else {
             await runtime.load(await loadCartWasm());
+
+            if (DEV_NETPLAY) {
+                this.copyNetplayLink();
+            }
         }
 
         let devtoolsManager = {
@@ -413,10 +404,6 @@ export class App extends LitElement {
 
         // used for keeping a consistent framerate. not a real time.
         let lastFrameGapCorrected = lastFrame;
-
-        if (DEV_NETPLAY && !location.hash) {
-            this.copyNetplayLink(); // temporary during development
-        }
 
         const loop = () => {
             pollPhysicalGamepads();

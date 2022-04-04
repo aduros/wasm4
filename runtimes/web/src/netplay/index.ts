@@ -4,7 +4,12 @@ import { RollbackManager, HISTORY_LENGTH } from "./rollback-manager";
 import { PeerManager } from "./peer-manager";
 import { ChunkReader, ChunkWriter } from "./chunks";
 
+/**
+ * Flag for easier netplay testing. When this is on, open http://localhost:3000 to immediately start
+ * hosting netplay, and http://localhost:3000/#?netplay=host in a second window to connect to it.
+ */
 export const DEV_NETPLAY = false;
+
 const SIMULATE_LAG = false;
 
 /**
@@ -91,6 +96,24 @@ class RemotePlayer {
         this.ping = (this.ping > 0)
             ? (1 - factor) * this.ping + factor * sample
             : sample;
+    }
+
+    addOutboundInput (frame: number, input: number) {
+        if (this.outboundFrame <= frame) {
+            // Pad out any intermediate frames we don't have by repeating the last input
+            const frameIdx = frame - this.outboundFrame;
+            for (let ii = this.outboundInputs.length; ii < frameIdx; ++ii) {
+                this.outboundInputs[ii] = (ii > 0) ? this.outboundInputs[ii-1] : 0;
+            }
+            this.outboundInputs[frameIdx] = input;
+
+        } else {
+            // Prepend inputs so that our outbound inputs are based on the new frame
+            for (let count = this.outboundFrame - frame; count > 0; --count) {
+                this.outboundInputs.unshift(input);
+            }
+            this.outboundFrame = frame;
+        }
     }
 
     sendMessage (message: Message) {
@@ -400,34 +423,34 @@ export class Netplay {
             skipFrame = true;
         }
 
+        const inputDelay = 2;
+        const inputFrame = currentFrame + inputDelay;
+
         for (const [peerId, remotePlayer] of this.remotePlayers) {
             if (remotePlayer.outboundFrame < 0) {
-                remotePlayer.outboundFrame = currentFrame;
+                remotePlayer.outboundFrame = inputFrame;
             }
-
             if (remotePlayer.syncFrame >= remotePlayer.outboundFrame) {
                 const delta = remotePlayer.syncFrame + 1 - remotePlayer.outboundFrame;
                 remotePlayer.outboundFrame = remotePlayer.syncFrame + 1;
                 remotePlayer.outboundInputs.splice(0, delta);
             }
             if (!skipFrame) {
-                remotePlayer.outboundInputs.push(localInput);
+                remotePlayer.addOutboundInput(inputFrame, localInput);
             }
 
             remotePlayer.sendTick();
         }
 
         if (!skipFrame) {
-            // TODO(2022-03-21): The input lag frame needs to be calculated correctly for outgoing input
-            const inputLag = 0;
-            this.rollbackMgr.addInputs(this.localPlayerIdx, currentFrame + inputLag, [ localInput ]);
+            this.rollbackMgr.addInputs(this.localPlayerIdx, inputFrame, [ localInput ]);
 
             this.rollbackMgr.update();
         }
 
         // Temporary debug info to show in devtools live expressions
         const debug = [];
-        debug.push(`frame=${currentFrame}`);
+        debug.push(`frame=${currentFrame} inputDelay=${inputDelay}`);
         for (const [peerId, remotePlayer] of this.remotePlayers) {
             const frameDelta = 0.5 * remotePlayer.ping * 60/1000 + remotePlayer.mostRecentFrame - currentFrame;
             debug.push(`Player #${remotePlayer.playerIdx}: ping=${Math.round(remotePlayer.ping)} frameDelta=${frameDelta.toFixed(2)} outboundInputs=${remotePlayer.outboundInputs.length} mostRecentFrame=${remotePlayer.mostRecentFrame} syncFrame=${remotePlayer.syncFrame}`);

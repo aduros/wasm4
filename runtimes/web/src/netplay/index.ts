@@ -99,20 +99,24 @@ class RemotePlayer {
     }
 
     addOutboundInput (frame: number, input: number) {
-        if (this.outboundFrame <= frame) {
-            // Pad out any intermediate frames we don't have by repeating the last input
-            const frameIdx = frame - this.outboundFrame;
-            for (let ii = this.outboundInputs.length; ii < frameIdx; ++ii) {
-                this.outboundInputs[ii] = (ii > 0) ? this.outboundInputs[ii-1] : 0;
-            }
-            this.outboundInputs[frameIdx] = input;
-
-        } else {
+        if (frame < this.outboundFrame) {
             // Prepend inputs so that our outbound inputs are based on the new frame
             for (let count = this.outboundFrame - frame; count > 0; --count) {
                 this.outboundInputs.unshift(input);
             }
             this.outboundFrame = frame;
+
+        } else {
+            const frameIdx = frame - this.outboundFrame;
+
+            // Ensure we never overwrite a frame we already queued input for
+            if (frameIdx >= this.outboundInputs.length) {
+                // Pad out any intermediate frames we don't have by repeating the last input
+                for (let ii = this.outboundInputs.length; ii < frameIdx; ++ii) {
+                    this.outboundInputs[ii] = (ii > 0) ? this.outboundInputs[ii-1] : 0;
+                }
+                this.outboundInputs[frameIdx] = input;
+            }
         }
     }
 

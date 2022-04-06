@@ -461,4 +461,14 @@ export class Netplay {
         }
         (window as any).NETPLAY_DEBUG = debug.join(" / ");
     }
+
+    /** Get a player summary for UI display. */
+    getSummary (): { playerIdx: number, ping: number }[] {
+        const summary = [{ playerIdx: this.localPlayerIdx, ping: -1 }];
+        for (const [peerId, remotePlayer] of this.remotePlayers) {
+            summary.push({ playerIdx: remotePlayer.playerIdx, ping: remotePlayer.ping });
+        }
+        summary.sort((a, b) => a.playerIdx - b.playerIdx);
+        return summary;
+    }
 }

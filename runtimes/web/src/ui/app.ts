@@ -19,28 +19,6 @@ class InputState {
     mouseButtons = 0;
 }
 
-// TODO(2022-03-19): Remove
-class InputManager {
-    /** The input to be used for the next frame. */
-    nextState = new InputState();
-
-    /** The input used from the last frame. */
-    lastState = new InputState();
-
-    update () {
-        const next = this.nextState;
-        const last = this.lastState;
-
-        // Copy the next input state into the last input state
-        for (let ii = 0; ii < 4; ++ii) {
-            last.gamepad[ii] = next.gamepad[ii];
-        }
-        last.mouseX = next.mouseX;
-        last.mouseY = next.mouseY;
-        last.mouseButtons = next.mouseButtons;
-    }
-}
-
 @customElement("wasm4-app")
 export class App extends LitElement {
     static styles = css`
@@ -81,18 +59,17 @@ export class App extends LitElement {
         }
     `;
 
-    readonly runtime: Runtime;
+    private readonly runtime: Runtime;
 
-    @state() hideGamepadOverlay = false;
+    @state() private hideGamepadOverlay = false;
+    @state() private showMenu = false;
 
-    @state() pauseMenu = false;
-
-    @query("wasm4-menu-overlay") menuOverlay?: MenuOverlay;
-    @query("wasm4-notifications") notifications!: Notifications;
+    @query("wasm4-menu-overlay") private menuOverlay?: MenuOverlay;
+    @query("wasm4-notifications") private notifications!: Notifications;
 
     private savedGameState?: State;
 
-    readonly inputManager = new InputManager();
+    readonly inputState = new InputState();
 
     private netplay?: Netplay;
 
@@ -235,7 +212,7 @@ export class App extends LitElement {
 
             if (event.isPrimary) {
                 const bounds = canvas.getBoundingClientRect();
-                const input = this.inputManager.nextState;
+                const input = this.inputState;
                 input.mouseX = Math.fround(constants.WIDTH * (event.clientX - bounds.left) / bounds.width);
                 input.mouseY = Math.fround(constants.HEIGHT * (event.clientY - bounds.top) / bounds.height);
                 input.mouseButtons = event.buttons & 0b111;
@@ -344,7 +321,7 @@ export class App extends LitElement {
                 }
 
                 // Set or clear the button bit from the next input state
-                const gamepad = this.inputManager.nextState.gamepad;
+                const gamepad = this.inputState.gamepad;
                 if (down) {
                     gamepad[playerIdx] |= mask;
                 } else {
@@ -395,7 +372,7 @@ export class App extends LitElement {
                     mask |= constants.BUTTON_Z;
                 }
 
-                this.inputManager.nextState.gamepad[gamepad.index % 4] = mask;
+                this.inputState.gamepad[gamepad.index % 4] = mask;
             }
         }
 
@@ -410,23 +387,26 @@ export class App extends LitElement {
         const loop = () => {
             pollPhysicalGamepads();
 
-            const lastInput = this.inputManager.lastState;
-            const input = this.inputManager.nextState;
+            let input = this.inputState;
+            let runUpdate = true;
 
             if (this.menuOverlay != null) {
-                // Send buttons that were pressed this frame to the menu overlay
-                for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
-                    const pressed = input.gamepad[playerIdx] & (input.gamepad[playerIdx] ^ lastInput.gamepad[playerIdx]);
-                    if (pressed) {
-                        this.menuOverlay.onGamepadPressed(pressed);
-                    }
-                }
+                this.menuOverlay.applyInput();
 
-            } else {
+                // Pause while the menu is open, unless netplay is active
+                if (this.netplay) {
+                    // Prevent inputs on the menu from being passed through to the game
+                    input = new InputState();
+                } else {
+                    runUpdate = false;
+                }
+            }
+
+            if (runUpdate) {
                 const now = performance.now();
                 const deltaFrameGapCorrected = now - lastFrameGapCorrected;
 
-                if (!this.pauseMenu && deltaFrameGapCorrected >= INTERVAL) {
+                if (deltaFrameGapCorrected >= INTERVAL) {
                     const deltaTime = now - lastFrame;
                     lastFrame = now;
                     lastFrameGapCorrected = now - (deltaFrameGapCorrected % INTERVAL);
@@ -454,8 +434,6 @@ export class App extends LitElement {
                 }
             }
 
-            this.inputManager.update();
-
             requestAnimationFrame(loop);
         };
         loop();
@@ -472,22 +450,22 @@ export class App extends LitElement {
     }
 
     onMenuButtonPressed () {
-        if (this.pauseMenu) {
+        if (this.showMenu) {
             // If the pause menu is already open, treat it as an X button
-            this.inputManager.nextState.gamepad[0] |= constants.BUTTON_X;
+            this.inputState.gamepad[0] |= constants.BUTTON_X;
         } else {
-            this.pauseMenu = true;
+            this.showMenu = true;
         }
     }
 
     closeMenu () {
-        if (this.pauseMenu) {
-            this.pauseMenu = false;
+        if (this.showMenu) {
+            this.showMenu = false;
 
             // Kind of a hack to prevent the button press to close the menu from being passed
             // through to the game
             for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
-                this.inputManager.nextState.gamepad[playerIdx] = 0;
+                this.inputState.gamepad[playerIdx] = 0;
             }
         }
     }
@@ -537,13 +515,17 @@ export class App extends LitElement {
         return netplay;
     }
 
+    getNetplaySummary () {
+        return this.netplay ? this.netplay.getSummary() : [];
+    }
+
     render () {
         return html`
             <div class="content" @pointerup="${this.onPointerUp}">
-                ${this.pauseMenu ? html`<wasm4-menu-overlay .app=${this} />`: ""}
+                ${this.showMenu ? html`<wasm4-menu-overlay .app=${this} />`: ""}
+                <wasm4-notifications></wasm4-notifications>
                 ${this.runtime.canvas}
             </div>
-            <wasm4-notifications></wasm4-notifications>
             ${!this.hideGamepadOverlay ? html`<wasm4-virtual-gamepad .app=${this} />` : ""}
         `;
     }

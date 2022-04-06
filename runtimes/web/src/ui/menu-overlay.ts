@@ -24,11 +24,11 @@ export class MenuOverlay extends LitElement {
 
             color: #a0a0a0;
             font: 16px wasm4-font;
-            line-height: 2em;
 
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-direction: column;
 
             background: rgba(0, 0, 0, 0.85);
         }
@@ -36,6 +36,28 @@ export class MenuOverlay extends LitElement {
         .menu {
             border: 2px solid #f0f0f0;
             padding: 0 1em 0 1em;
+            line-height: 2em;
+        }
+
+        .netplay-summary {
+            margin-top: 2em;
+            line-height: 1.5em;
+        }
+
+        .ping-you {
+            color: #f0f0f0;
+        }
+
+        .ping-good {
+            color: green;
+        }
+
+        .ping-ok {
+            color: yellow;
+        }
+
+        .ping-bad {
+            color: red;
         }
 
         ul {
@@ -55,15 +77,30 @@ export class MenuOverlay extends LitElement {
         }
     `;
 
-    @state() private selectedIdx = 0;
     app!: App;
+
+    private lastGamepad = 0;
+
+    @state() private selectedIdx = 0;
+    @state() private netplaySummary: { playerIdx: number, ping: number }[] = [];
+
+    private netplayPollInterval?: number;
 
     constructor () {
         super();
     }
 
-    onGamepadPressed (gamepad: number) {
-        if (gamepad & (constants.BUTTON_X | constants.BUTTON_Z)) {
+    applyInput () {
+        // Mix all player's gamepads together for the purposes of menu input
+        let gamepad = 0;
+        for (const player of this.app.inputState.gamepad) {
+            gamepad |= player;
+        }
+
+        const pressedThisFrame = gamepad & (gamepad ^ this.lastGamepad);
+        this.lastGamepad = gamepad;
+
+        if (pressedThisFrame & (constants.BUTTON_X | constants.BUTTON_Z)) {
             switch (this.selectedIdx) {
             case 0:
                 break;
@@ -83,13 +120,29 @@ export class MenuOverlay extends LitElement {
             this.app.closeMenu();
         }
 
-        if (gamepad & constants.BUTTON_DOWN) {
+        if (pressedThisFrame & constants.BUTTON_DOWN) {
             this.selectedIdx++;
         }
-        if (gamepad & constants.BUTTON_UP) {
+        if (pressedThisFrame & constants.BUTTON_UP) {
             this.selectedIdx--;
         }
         this.selectedIdx = (this.selectedIdx + options.length) % options.length;
+    }
+
+    connectedCallback () {
+        super.connectedCallback();
+
+        const updateNetplaySummary = () => {
+            this.netplaySummary = this.app.getNetplaySummary();
+        };
+        updateNetplaySummary();
+        this.netplayPollInterval = window.setInterval(updateNetplaySummary, 1000);
+    }
+
+    disconnectedCallback () {
+        window.clearInterval(this.netplayPollInterval);
+
+        super.disconnectedCallback();
     }
 
     render () {
@@ -99,6 +152,15 @@ export class MenuOverlay extends LitElement {
                     ${map(options, (option, idx) =>
                         html`<li class="${this.selectedIdx == idx ? "selected" : ""}"}>${option}</li>`)}
                 </ul>
+            </div>
+            <div class="netplay-summary">
+                ${map(this.netplaySummary, player => {
+                    const pingClass = player.ping < 100 ? "good" : player.ping < 200 ? "ok" : "bad";
+                    const ping = (player.ping < 0)
+                        ? html`<span class="ping-you">YOU</span>`
+                        : html`<span class="ping-${pingClass}">${Math.ceil(player.ping)}ms</span>`;
+                    return html`<div>PLAYER ${player.playerIdx >= 0 ? player.playerIdx+1 : "?"} ${ping}</div>`;
+                })}
             </div>
         `;
     }

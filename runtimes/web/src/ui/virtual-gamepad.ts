@@ -201,7 +201,7 @@ export class VirtualGamepad extends LitElement {
         setClass(this.dpad, "pressed-up", buttons & constants.BUTTON_UP);
         setClass(this.dpad, "pressed-down", buttons & constants.BUTTON_DOWN);
 
-        this.app.inputManager.nextState.gamepad[0] = buttons;
+        this.app.inputState.gamepad[0] = buttons;
     }
 
     connectedCallback () {

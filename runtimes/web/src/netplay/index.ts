@@ -3,6 +3,7 @@ import { Runtime } from "../runtime";
 import { RollbackManager, HISTORY_LENGTH } from "./rollback-manager";
 import { PeerManager } from "./peer-manager";
 import { ChunkReader, ChunkWriter } from "./chunks";
+import { MovingAverage } from "./moving-average";
 
 /**
  * Flag for easier netplay testing. When this is on, open http://localhost:3000 to immediately start
@@ -11,6 +12,8 @@ import { ChunkReader, ChunkWriter } from "./chunks";
 export const DEV_NETPLAY = false;
 
 const SIMULATE_LAG = false;
+
+const MAX_OUTBOUND_INPUTS = 20;
 
 /**
  * Control messages sent over the reliable data channel.
@@ -58,8 +61,15 @@ type UnreliableMessage = TickMessage | PingRequestMessage | PingReplyMessage;
 
 type TickMessage = {
     type: "TICK";
+
+    // The frame our local simulation is currently on
     frame: number;
-    syncFrame: number;
+
+    // The next input frame we need from the other peer
+    requestedFrame: number;
+
+    // The frame that the inputs are relative to
+    inputFrame: number;
     inputs: number[];
 }
 
@@ -76,17 +86,18 @@ type PingReplyMessage = {
 class RemotePlayer {
     playerIdx = -1;
 
-    /** The most recent frame that we've received input for. */
-    mostRecentFrame = -1;
+    frame = -1;
 
-    /** Estimated round-trip time for this peer. */
-    ping = 0;
-
-    /** The most recent frame where both we and this peer were in perfect sync. */
-    syncFrame = -1;
+    nextNeededFrame = -1;
 
     outboundFrame = -1;
     readonly outboundInputs: number[] = [];
+
+    /** Estimated round-trip time for this player. */
+    ping = new MovingAverage();
+
+    /** Estimated number of frames we are ahead of this player. */
+    readonly drift = new MovingAverage();
 
     readonly chunkReader: ChunkReader;
     readonly chunkWriter: ChunkWriter;
@@ -97,14 +108,11 @@ class RemotePlayer {
         this.chunkWriter = new ChunkWriter(reliableChannel);
     }
 
-    addPingSample (sample: number) {
-        const factor = 0.125;
-        this.ping = (this.ping > 0)
-            ? (1 - factor) * this.ping + factor * sample
-            : sample;
-    }
-
     addOutboundInput (frame: number, input: number) {
+        if (this.outboundFrame < 0) {
+            this.outboundFrame = frame;
+        }
+
         if (frame < this.outboundFrame) {
             // Prepend inputs so that our outbound inputs are based on the new frame
             for (let count = this.outboundFrame - frame; count > 0; --count) {
@@ -177,11 +185,12 @@ class RemotePlayer {
         });
     }
 
-    sendTick () {
+    sendTick (currentFrame: number) {
         this.sendUnreliableMessage({
             type: "TICK",
-            frame: this.outboundFrame,
-            syncFrame: this.mostRecentFrame,
+            frame: currentFrame,
+            requestedFrame: this.nextNeededFrame,
+            inputFrame: this.outboundFrame,
             inputs: this.outboundInputs,
         });
     }
@@ -382,11 +391,29 @@ export class Netplay {
                 // Ignore if we haven't started our local simulation, or we haven't yet received a
                 // player index from this peer
                 if (this.rollbackMgr && remotePlayer.playerIdx >= 0) {
-                    const mostRecentFrame = message.frame + message.inputs.length - 1;
-                    if (mostRecentFrame > remotePlayer.mostRecentFrame) {
-                        remotePlayer.mostRecentFrame = mostRecentFrame;
-                        remotePlayer.syncFrame = message.syncFrame;
-                        this.rollbackMgr.addInputs(remotePlayer.playerIdx, message.frame, message.inputs);
+                    const { frame, requestedFrame, inputFrame, inputs } = message;
+                    if (frame > remotePlayer.frame) {
+                        remotePlayer.frame = frame;
+                        remotePlayer.nextNeededFrame = inputFrame + inputs.length;
+
+                        // Update outboundFrame
+                        if (remotePlayer.outboundFrame < 0) {
+                            remotePlayer.outboundFrame = requestedFrame;
+                        } else if (requestedFrame > remotePlayer.outboundFrame) {
+                            // Trim no longer needed inputs
+                            const delta = requestedFrame - remotePlayer.outboundFrame;
+                            remotePlayer.outboundFrame = requestedFrame;
+                            remotePlayer.outboundInputs.splice(0, delta);
+                        }
+
+                        // We can estimate the remote frame by offsetting half the ping (RTT)
+                        const estimatedRemoteFrame = frame + 0.5*remotePlayer.ping.average*60/1000;
+                        // Calculate the difference and update our drift
+                        const drift = this.rollbackMgr.currentFrame - estimatedRemoteFrame;
+                        remotePlayer.drift.update(drift);
+
+                        // Apply the remote inputs to the local simulation
+                        this.rollbackMgr.addInputs(remotePlayer.playerIdx, inputFrame, inputs);
                     }
                 }
                 break;
@@ -396,7 +423,8 @@ export class Netplay {
                 break;
 
             case "PING_REPLY":
-                remotePlayer.addPingSample(Math.floor(performance.now()) - message.timestamp);
+                const ping = Math.floor(performance.now()) - message.timestamp;
+                remotePlayer.ping.update(ping);
                 break;
             }
         });
@@ -420,9 +448,9 @@ export class Netplay {
         return -1;
     }
 
-    update (localInput: number) {
+    update (localInput: number): boolean {
         if (!this.rollbackMgr) {
-            return; // Not joined yet
+            return false; // Not joined yet
         }
 
         // Perform certain actions only once every few ticks
@@ -430,85 +458,65 @@ export class Netplay {
         const every32Ticks = (this.updateCount & 31) == 0;
         ++this.updateCount;
 
-        let skipFrame = false;
-
         const currentFrame = this.rollbackMgr.currentFrame;
-        const stallThreshold = currentFrame - HISTORY_LENGTH;
-        for (const remotePlayer of this.remotePlayers.values()) {
-            if (remotePlayer.mostRecentFrame < stallThreshold) {
-                // Hard pause if we haven't heard from a peer in a while
-                console.log("STALL", remotePlayer.playerIdx, remotePlayer.mostRecentFrame+" < "+stallThreshold);
-                skipFrame = true;
-                break;
-            }
-
-            // TODO(2022-03-22): If we have too many inputs, keep networking them, but skip this
-            // frame locally
-            // if (remotePlayer.outboundInputs.length > 10) {
-            //     return;
-            // }
-        }
-
-        if (every8Ticks) {
-            let minFrameDelta = 0;
-            for (const remotePlayer of this.remotePlayers.values()) {
-                // The estimated difference that this peer's simulation is running compared to our local
-                const frameDelta = 0.5 * remotePlayer.ping * 60/1000 + remotePlayer.mostRecentFrame - currentFrame;
-                minFrameDelta = Math.min(minFrameDelta, frameDelta);
-            }
-
-            // If we're running ahead of all other peers, gradually slow down by stalling every 8th frame
-            if (minFrameDelta < -1) {
-                console.log("Stall frame for catch-up");
-                skipFrame = true;
-            }
-        }
-
-
         const inputDelay = 2;
         const inputFrame = currentFrame + inputDelay;
 
-        for (const remotePlayer of this.remotePlayers.values()) {
-            if (remotePlayer.outboundFrame < 0) {
-                remotePlayer.outboundFrame = inputFrame;
-            }
-            if (remotePlayer.syncFrame >= remotePlayer.outboundFrame) {
-                const delta = remotePlayer.syncFrame + 1 - remotePlayer.outboundFrame;
-                remotePlayer.outboundFrame = remotePlayer.syncFrame + 1;
-                remotePlayer.outboundInputs.splice(0, delta);
-            }
-            if (!skipFrame) {
-                remotePlayer.addOutboundInput(inputFrame, localInput);
-            }
+        // Add our input to the local simulation
+        this.rollbackMgr.addInputs(this.localPlayerIdx, inputFrame, [ localInput ]);
 
-            remotePlayer.sendTick();
+        let stall = false;
+
+        for (const remotePlayer of this.remotePlayers.values()) {
+            // Enqueue our input to send to the remote player
+            remotePlayer.addOutboundInput(inputFrame, localInput);
+
+            remotePlayer.sendTick(currentFrame);
+
+            // Stall if we're starved for input from this player, or the outbound buffer is full
+            if (remotePlayer.nextNeededFrame < currentFrame - HISTORY_LENGTH || remotePlayer.outboundInputs.length >= MAX_OUTBOUND_INPUTS) {
+                stall = true;
+            }
 
             if (every32Ticks) {
                 remotePlayer.sendPingRequest();
             }
         }
 
-        if (!skipFrame) {
-            this.rollbackMgr.addInputs(this.localPlayerIdx, inputFrame, [ localInput ]);
+        if (every8Ticks) {
+            // If we're more than one frame ahead of everybody else, stall this frame and eventually
+            // they'll catch up to us
+            let maxDrift = 0;
+            for (const remotePlayer of this.remotePlayers.values()) {
+                maxDrift = Math.max(remotePlayer.drift.average, maxDrift);
+            }
+            if (maxDrift >= 1) {
+                stall = true;
+            }
+        }
 
+        if (!stall) {
             this.rollbackMgr.update();
+        } else {
+            console.log("STALL");
         }
 
         // Temporary debug info to show in devtools live expressions
         const debug = [];
         debug.push(`frame=${currentFrame} inputDelay=${inputDelay}`);
         for (const remotePlayer of this.remotePlayers.values()) {
-            const frameDelta = 0.5 * remotePlayer.ping * 60/1000 + remotePlayer.mostRecentFrame - currentFrame;
-            debug.push(`Player #${remotePlayer.playerIdx}: ping=${Math.round(remotePlayer.ping)} frameDelta=${frameDelta.toFixed(2)} outboundInputs=${remotePlayer.outboundInputs.length} mostRecentFrame=${remotePlayer.mostRecentFrame} syncFrame=${remotePlayer.syncFrame}`);
+            debug.push(`Player #${remotePlayer.playerIdx}: ping=${Math.round(remotePlayer.ping.average)} drift=${remotePlayer.drift.average.toFixed(2)} outboundInputs=${remotePlayer.outboundInputs.length}`);
         }
         (window as any).NETPLAY_DEBUG = debug.join(" / ");
+
+        return !stall;
     }
 
     /** Get a player summary for UI display. */
     getSummary (): { playerIdx: number, ping: number }[] {
         const summary = [{ playerIdx: this.localPlayerIdx, ping: -1 }];
         for (const remotePlayer of this.remotePlayers.values()) {
-            summary.push({ playerIdx: remotePlayer.playerIdx, ping: remotePlayer.ping });
+            summary.push({ playerIdx: remotePlayer.playerIdx, ping: remotePlayer.ping.average });
         }
         summary.sort((a, b) => a.playerIdx - b.playerIdx);
         return summary;

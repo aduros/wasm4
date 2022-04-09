@@ -411,8 +411,10 @@ export class App extends LitElement {
                     lastFrame = now;
                     lastFrameGapCorrected = now - (deltaFrameGapCorrected % INTERVAL);
 
+                    let callComposite = true;
+
                     if (this.netplay) {
-                        this.netplay.update(input.gamepad[0]);
+                        callComposite = this.netplay.update(input.gamepad[0]);
 
                     } else {
                         // Pass inputs into runtime memory
@@ -424,7 +426,9 @@ export class App extends LitElement {
                         runtime.update();
                     }
 
-                    runtime.composite();
+                    if (callComposite) {
+                        runtime.composite();
+                    }
 
                     this.hideGamepadOverlay = !!runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY);
 

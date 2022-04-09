@@ -1,7 +1,7 @@
 import { State } from "../state";
 import { Runtime } from "../runtime";
 
-export const HISTORY_LENGTH = 10;
+export const HISTORY_LENGTH = 20;
 
 const PLAYER_COUNT = 4;
 
@@ -64,31 +64,33 @@ export class RollbackManager {
 
         // console.log(`${playerIdx} frame ${frame} -> ${inputs.join(", ")}`);
 
+        // TODO(2022-04-09): Optimize
+
         for (const input of inputs) {
             if (frame >= this.currentFrame) {
-                // We haven't simulated this frame locally yet, schedule the input for later
-                player.futureInputs.set(frame, input);
+                // Never overwrite a previously added input
+                if (!player.futureInputs.has(frame)) {
+                    // We haven't simulated this frame locally yet, schedule the input for later
+                    player.futureInputs.set(frame, input);
+                }
 
             } else {
                 // Search our history for this frame
-                let found = false;
                 for (let ii = 0, ll = HISTORY_LENGTH; ii < ll; ++ii) {
                     const history = this.history[ii];
                     if (history.frame == frame) {
-                        if (history.inputs[playerIdx] != input) {
-                            if (!history.predicted[playerIdx]) {
-                                console.warn("Tried to rewrite an unpredicted input!");
+                        // We only consider frames that have been predicted
+                        if (history.predicted[playerIdx]) {
+                            history.predicted[playerIdx] = false;
+
+                            // If the input is different than we predicted, schedule a rollback
+                            if (history.inputs[playerIdx] != input) {
+                                history.inputs[playerIdx] = input;
+                                this.rollbackIdx = Math.min(ii, this.rollbackIdx);
                             }
-                            history.inputs[playerIdx] = input;
-                            this.rollbackIdx = Math.min(ii, this.rollbackIdx);
                         }
-                        history.predicted[playerIdx] = false;
-                        found = true;
                         break;
                     }
-                }
-                if (!found) {
-                    // console.warn("History entry not found! "+frame);
                 }
             }
 

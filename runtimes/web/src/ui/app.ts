@@ -199,13 +199,6 @@ export class App extends LitElement {
             }, 4000);
         }
 
-        // Temporary hack to allow developers to build 3-4 player games until we have a better solution
-        let swapKeyboardControls = false;
-        function toggleSwapKeyboardControls () {
-            swapKeyboardControls = !swapKeyboardControls;
-            runtime.print(`Keyboard swapped to control gamepads ${swapKeyboardControls ? "3 and 4" : "1 and 2"}`);
-        }
-
         const onMouseEvent = (event: PointerEvent) => {
             // Unhide the cursor if it was hidden by the keyboard handler
             document.body.style.cursor = "";
@@ -231,7 +224,6 @@ export class App extends LitElement {
             "4": this.loadGameState.bind(this),
             "r": this.resetCart.bind(this),
             "R": this.resetCart.bind(this),
-            "F7": toggleSwapKeyboardControls,
             "F8": devtoolsManager.toggleDevtools,
             "F9": takeScreenshot,
             "F10": recordVideo,
@@ -343,10 +335,6 @@ export class App extends LitElement {
 
             if (mask != 0) {
                 event.preventDefault();
-
-                if (swapKeyboardControls) {
-                    playerIdx += 2;
-                }
 
                 // Set or clear the button bit from the next input state
                 const gamepad = this.inputState.gamepad;

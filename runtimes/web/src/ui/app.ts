@@ -268,10 +268,11 @@ export class App extends LitElement {
             let playerIdx = 0;
             let mask = 0;
             switch (event.code) {
-            case "KeyX": case "KeyV": case "Space": case "KeyM":
+            // Player 1
+            case "KeyX": case "KeyV": case "Space": case "Period":
                 mask = constants.BUTTON_X;
                 break;
-            case "KeyZ": case "KeyC": case "KeyN":
+            case "KeyZ": case "KeyC": case "Comma":
                 mask = constants.BUTTON_Z;
                 break;
             case "ArrowUp":

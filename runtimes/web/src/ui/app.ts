@@ -488,6 +488,11 @@ export class App extends LitElement {
     }
 
     loadGameState () {
+        if (this.netplay) {
+            this.notifications.show("State loading disabled during netplay");
+            return;
+        }
+
         const state = this.savedGameState;
         if (state != null) {
             state.write(this.runtime);
@@ -505,6 +510,11 @@ export class App extends LitElement {
     }
 
     async resetCart (wasmBuffer?: Uint8Array) {
+        if (this.netplay) {
+            this.notifications.show("Reset disabled during netplay");
+            return;
+        }
+
         if (!wasmBuffer) {
             wasmBuffer = this.runtime.wasmBuffer!;
         }

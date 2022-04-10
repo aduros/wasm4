@@ -31,6 +31,7 @@ type Message =
     WelcomeMessage |
     JoinRequestMessage |
     JoinReplyMessage |
+    JoinRejectMessage |
     PlayerInfoMessage;
 
 type WelcomeMessage = {
@@ -49,6 +50,11 @@ type JoinReplyMessage = {
 
     // The offset to the state data in the binary payload
     stateOffset: number;
+}
+
+/** Sent instead of JoinReply if the request failed for some reason, such as the game being full. */
+type JoinRejectMessage = {
+    type: "JOIN_REJECT";
 }
 
 type PlayerInfoMessage = {
@@ -136,19 +142,7 @@ class RemotePlayer {
 
     sendMessage (message: Message) {
         console.log(`Sending ${message.type} message to ${this.peerId}`, message);
-        const json = JSON.stringify(message);
-
-        // Simulate connection lag
-        if (SIMULATE_LAG) {
-            const simulatedTransmissionDelay = 50;
-            setTimeout(() => {
-                if (this.reliableChannel.readyState == "open") {
-                    this.reliableChannel.send(json);
-                }
-            }, simulatedTransmissionDelay);
-        } else {
-            this.reliableChannel.send(json);
-        }
+        this.reliableChannel.send(JSON.stringify(message));
     }
 
     sendUnreliableMessage (message: UnreliableMessage) {
@@ -193,6 +187,12 @@ class RemotePlayer {
             inputFrame: this.outboundFrame,
             inputs: this.outboundInputs,
         });
+    }
+
+    close () {
+        this.reliableChannel.close();
+        this.unreliableChannel.close();
+        this.connection.close();
     }
 }
 
@@ -254,6 +254,9 @@ export class Netplay {
     }
 
     close () {
+        for (const remotePlayer of this.remotePlayers.values()) {
+            remotePlayer.close();
+        }
         this.peerMgr.close();
     }
 
@@ -277,9 +280,8 @@ export class Netplay {
         const remotePlayer = new RemotePlayer(peerId, connection, reliableChannel, unreliableChannel);
         this.remotePlayers.set(peerId, remotePlayer);
 
-        connection.addEventListener("connectionstatechange", () => {
-            console.log(`Peer ${peerId} connection state changed to ${connection.connectionState}`);
-            if (connection.connectionState != "connected" && this.remotePlayers.has(peerId)) {
+        const onClose = () => {
+            if (this.remotePlayers.has(peerId)) {
                 console.log(`Peer ${peerId} left`);
                 this.remotePlayers.delete(peerId);
 
@@ -287,7 +289,14 @@ export class Netplay {
                     this.onleave(remotePlayer.playerIdx);
                 }
             }
+        };
+        connection.addEventListener("connectionstatechange", () => {
+            if (connection.connectionState == "disconnected") {
+                onClose();
+            }
         });
+        reliableChannel.addEventListener("close", onClose);
+        unreliableChannel.addEventListener("close", onClose);
 
         reliableChannel.addEventListener("message", async event => {
             if (typeof event.data != "string") {
@@ -316,27 +325,36 @@ export class Netplay {
 
             case "JOIN_REQUEST": {
                 // Assign them a player index
-                remotePlayer.playerIdx = this.nextPlayerIdx();
+                const playerIdx = this.nextPlayerIdx();
 
-                // Send the cart data
-                remotePlayer.chunkWriter.write(this.runtime.wasmBuffer!);
+                if (playerIdx >= 4) {
+                    // Game is already full
+                    remotePlayer.sendMessage({ type: "JOIN_REJECT" });
+                    remotePlayer.close();
 
-                // And the game state
-                const state = new State();
-                state.read(this.runtime);
-                remotePlayer.chunkWriter.write(state.toBytes());
+                } else {
+                    remotePlayer.playerIdx = playerIdx;
 
-                remotePlayer.chunkWriter.flush();
+                    // Send the cart data
+                    remotePlayer.chunkWriter.write(this.runtime.wasmBuffer!);
 
-                remotePlayer.sendMessage({
-                    type: "JOIN_REPLY",
-                    yourPlayerIdx: remotePlayer.playerIdx,
-                    frame: this.rollbackMgr!.currentFrame,
-                    stateOffset: this.runtime.wasmBuffer!.byteLength,
-                });
+                    // And the game state
+                    const state = new State();
+                    state.read(this.runtime);
+                    remotePlayer.chunkWriter.write(state.toBytes());
 
-                if (this.onjoin) {
-                    this.onjoin(remotePlayer.playerIdx);
+                    remotePlayer.chunkWriter.flush();
+
+                    remotePlayer.sendMessage({
+                        type: "JOIN_REPLY",
+                        yourPlayerIdx: remotePlayer.playerIdx,
+                        frame: this.rollbackMgr!.currentFrame,
+                        stateOffset: this.runtime.wasmBuffer!.byteLength,
+                    });
+
+                    if (this.onjoin) {
+                        this.onjoin(remotePlayer.playerIdx);
+                    }
                 }
             } break;
 
@@ -368,6 +386,11 @@ export class Netplay {
                 if (this.onstart) {
                     this.onstart(this.localPlayerIdx);
                 }
+            } break;
+
+            case "JOIN_REJECT": {
+                this.runtime.blueScreen(new Error("Connected, but the\ngame is already\nfull!"));
+                this.close();
             } break;
 
             case "PLAYER_INFO": {

@@ -78,7 +78,10 @@ class SignalClient {
 export class PeerManager {
     readonly localPeerId: string;
 
+    /** Pending P2P connections that haven't been fully established yet. */
     private readonly connections = new Map<string,RTCPeerConnection>();
+
+    /** Our connection to the signaling server. */
     private readonly signalClient: SignalClient;
 
     constructor (onConnection: (connection: RTCPeerConnection, remotePeerId: string) => void) {
@@ -172,7 +175,9 @@ export class PeerManager {
 
         connection.addEventListener("connectionstatechange", () => {
             const state = connection.connectionState;
-            if (state != "connecting" && state != "connected") {
+            if (state == "connected" || state == "failed") {
+                // After they connected (or failed to connect), we don't need to manage this
+                // connection anymore
                 this.connections.delete(peerId);
             }
         });

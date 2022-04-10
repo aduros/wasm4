@@ -35,6 +35,7 @@ module.exports = {
             "guides/sprites",
             "guides/audio",
             "guides/saving-data",
+            "guides/multiplayer",
             "guides/distribution",
         ],
     },

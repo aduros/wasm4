@@ -381,11 +381,15 @@ export class App extends LitElement {
                 if (buttons[15].pressed || axes[0] > 0.5) {
                     mask |= constants.BUTTON_RIGHT;
                 }
-                if (buttons[0].pressed) {
+                if (buttons[0].pressed || buttons[3].pressed || buttons[5].pressed || buttons[7].pressed) {
                     mask |= constants.BUTTON_X;
                 }
-                if (buttons[1].pressed) {
+                if (buttons[1].pressed || buttons[2].pressed || buttons[4].pressed || buttons[6].pressed) {
                     mask |= constants.BUTTON_Z;
+                }
+
+                if (buttons[9].pressed) {
+                    this.showMenu = true;
                 }
 
                 this.inputState.gamepad[gamepad.index % 4] = mask;

@@ -288,11 +288,12 @@ export class App extends LitElement {
                 mask = constants.BUTTON_RIGHT;
                 break;
 
-            case "ShiftLeft": case "Tab":
+            // Player 2
+            case "KeyA": case "KeyQ":
                 playerIdx = 1;
                 mask = constants.BUTTON_X;
                 break;
-            case "KeyA": case "KeyQ":
+            case "ShiftLeft": case "Tab":
                 playerIdx = 1;
                 mask = constants.BUTTON_Z;
                 break;

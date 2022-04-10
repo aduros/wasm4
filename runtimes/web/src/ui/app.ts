@@ -376,19 +376,17 @@ export class App extends LitElement {
             }
         }
 
-        // https://gist.github.com/addyosmani/5434533#file-limitloop-js-L60
-        const INTERVAL = 1000 / 60;
+        let requestedAnimationFrame = false;
 
-        let lastFrame = performance.now();
+        const update = () => {
+            // Pause updates and rendering while backgrounded, unless netplay is active
+            if (document.visibilityState == "hidden" && !this.netplay) {
+                return;
+            }
 
-        // used for keeping a consistent framerate. not a real time.
-        let lastFrameGapCorrected = lastFrame;
-
-        const loop = () => {
             pollPhysicalGamepads();
 
             let input = this.inputState;
-            let runUpdate = true;
 
             if (this.menuOverlay != null) {
                 this.menuOverlay.applyInput();
@@ -398,47 +396,54 @@ export class App extends LitElement {
                     // Prevent inputs on the menu from being passed through to the game
                     input = new InputState();
                 } else {
-                    runUpdate = false;
+                    return; // Pause updates and rendering
                 }
             }
 
-            if (runUpdate) {
-                const now = performance.now();
-                const deltaFrameGapCorrected = now - lastFrameGapCorrected;
+            let needRender;
 
-                if (deltaFrameGapCorrected >= INTERVAL) {
-                    const deltaTime = now - lastFrame;
-                    lastFrame = now;
-                    lastFrameGapCorrected = now - (deltaFrameGapCorrected % INTERVAL);
+            if (this.netplay) {
+                needRender = this.netplay.update(input.gamepad[0]);
 
-                    let callComposite = true;
-
-                    if (this.netplay) {
-                        callComposite = this.netplay.update(input.gamepad[0]);
-
-                    } else {
-                        // Pass inputs into runtime memory
-                        for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
-                            runtime.setGamepad(playerIdx, input.gamepad[playerIdx]);
-                        }
-                        runtime.setMouse(input.mouseX, input.mouseY, input.mouseButtons);
-
-                        runtime.update();
-                    }
-
-                    if (callComposite) {
-                        runtime.composite();
-                    }
-
-                    this.hideGamepadOverlay = !!runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY);
-
-                    if (DEVELOPER_BUILD) {
-                        devtoolsManager.updateCompleted(runtime, deltaTime);
-                    }
+            } else {
+                // Pass inputs into runtime memory
+                for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
+                    runtime.setGamepad(playerIdx, input.gamepad[playerIdx]);
                 }
+                runtime.setMouse(input.mouseX, input.mouseY, input.mouseButtons);
+                runtime.update();
+                needRender = true;
             }
 
-            requestAnimationFrame(loop);
+            // If we need a render, schedule a composite if we haven't already
+            if (needRender && !requestedAnimationFrame) {
+                requestedAnimationFrame = true;
+                requestAnimationFrame(() => {
+                    requestedAnimationFrame = false;
+                    runtime.composite();
+                });
+            }
+
+            this.hideGamepadOverlay = !!runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY);
+        }
+
+        let timeLastUpdate = performance.now();
+
+        const loop = () => {
+            const timeFrameStart = performance.now();
+            const elapsedSinceLastUpdate = timeFrameStart - timeLastUpdate;
+            timeLastUpdate = timeFrameStart;
+
+            update();
+            if (DEVELOPER_BUILD) {
+                devtoolsManager.updateCompleted(runtime, elapsedSinceLastUpdate);
+            }
+
+            // Take our base 16.66ms, and subtract the amount of time we took in this update step.
+            // We round because setTimeout/setInterval doesn't support sub-millisecond precision
+            const elapsedSinceFrameStart = performance.now() - timeFrameStart;
+            const sleepTime = Math.round(1000/60 - elapsedSinceFrameStart);
+            setTimeout(loop, sleepTime);
         };
         loop();
     }

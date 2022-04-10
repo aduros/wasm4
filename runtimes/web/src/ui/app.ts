@@ -313,6 +313,32 @@ export class App extends LitElement {
                 playerIdx = 1;
                 mask = constants.BUTTON_RIGHT;
                 break;
+
+            // Player 3
+            case "NumpadMultiply": case "NumpadDecimal":
+                playerIdx = 2;
+                mask = constants.BUTTON_X;
+                break;
+            case "NumpadSubtract": case "NumpadEnter":
+                playerIdx = 2;
+                mask = constants.BUTTON_Z;
+                break;
+            case "Numpad8":
+                playerIdx = 2;
+                mask = constants.BUTTON_UP;
+                break;
+            case "Numpad5":
+                playerIdx = 2;
+                mask = constants.BUTTON_DOWN;
+                break;
+            case "Numpad4":
+                playerIdx = 2;
+                mask = constants.BUTTON_LEFT;
+                break;
+            case "Numpad6":
+                playerIdx = 2;
+                mask = constants.BUTTON_RIGHT;
+                break;
             }
 
             if (mask != 0) {

@@ -3,6 +3,7 @@ import { Runtime } from "../runtime";
 import { RollbackManager, HISTORY_LENGTH } from "./rollback-manager";
 import { PeerManager } from "./peer-manager";
 import { ChunkReader, ChunkWriter } from "./chunks";
+import { BitReader, BitWriter } from "./bits";
 import { MovingAverage } from "./moving-average";
 
 /**
@@ -14,6 +15,10 @@ export const DEV_NETPLAY = false;
 const SIMULATE_LAG = false;
 
 const MAX_OUTBOUND_INPUTS = 20;
+
+// Calculate our worst case tick size and use it to size a reusable buffer
+const MAX_TICK_SIZE = 8 + Math.ceil((MAX_OUTBOUND_INPUTS * (1 + 8*4))/8);
+const SEND_BUFFER = new ArrayBuffer(MAX_TICK_SIZE);
 
 /**
  * Control messages sent over the reliable data channel.
@@ -62,41 +67,14 @@ type PlayerInfoMessage = {
     playerIdx: number;
 }
 
-// TODO(2022-04-07): Binary encode these messages instead of JSON
-type UnreliableMessage = TickMessage | PingRequestMessage | PingReplyMessage;
-
-type TickMessage = {
-    type: "TICK";
-
-    // The frame our local simulation is currently on
-    frame: number;
-
-    // The next input frame we need from the other peer
-    requestedFrame: number;
-
-    // The frame that the inputs are relative to
-    inputFrame: number;
-    inputs: number[];
-}
-
-type PingRequestMessage = {
-    type: "PING_REQUEST";
-    timestamp: number;
-}
-
-type PingReplyMessage = {
-    type: "PING_REPLY";
-    timestamp: number;
-}
-
 class RemotePlayer {
     playerIdx = -1;
 
-    frame = -1;
+    frame = 0;
 
-    nextNeededFrame = -1;
+    nextNeededFrame = 0;
 
-    outboundFrame = -1;
+    outboundFrame = 0;
     readonly outboundInputs: number[] = [];
 
     /** Estimated round-trip time for this player. */
@@ -115,7 +93,7 @@ class RemotePlayer {
     }
 
     addOutboundInput (frame: number, input: number) {
-        if (this.outboundFrame < 0) {
+        if (this.outboundFrame == 0) {
             this.outboundFrame = frame;
         }
 
@@ -145,48 +123,66 @@ class RemotePlayer {
         this.reliableChannel.send(JSON.stringify(message));
     }
 
-    sendUnreliableMessage (message: UnreliableMessage) {
-        const json = JSON.stringify(message);
-
+    sendUnreliableBuffer (buffer: Uint8Array) {
         // Simulate a bad connection with packet loss and unordered delivery
         if (SIMULATE_LAG) {
             if (Math.random() > 0.05) {
                 const simulatedTransmissionDelay = Math.random()*30 + 50;
+                buffer = buffer.slice();
                 setTimeout(() => {
                     if (this.unreliableChannel.readyState == "open") {
-                        this.unreliableChannel.send(json);
+                        this.unreliableChannel.send(buffer);
                     }
                 }, simulatedTransmissionDelay);
             }
         } else {
-            if (this.unreliableChannel.readyState == "open") {
-                this.unreliableChannel.send(json);
-            }
+            this.unreliableChannel.send(buffer);
         }
     }
 
     sendPingRequest () {
-        this.sendUnreliableMessage({
-            type: "PING_REQUEST",
-            timestamp: Math.floor(performance.now()),
-        });
+        const data = new DataView(SEND_BUFFER);
+        data.setUint8(0, 2); // type = PING_REQUEST
+        data.setUint32(1, performance.now() >>> 0);
+        this.sendUnreliableBuffer(new Uint8Array(SEND_BUFFER, 0, 5));
     }
 
     sendPingReply (timestamp: number) {
-        this.sendUnreliableMessage({
-            type: "PING_REPLY",
-            timestamp,
-        });
+        const data = new DataView(SEND_BUFFER);
+        data.setUint8(0, 3); // type = PING_REPLY
+        data.setUint32(1, timestamp);
+        this.sendUnreliableBuffer(new Uint8Array(SEND_BUFFER, 0, 5));
     }
 
     sendTick (currentFrame: number) {
-        this.sendUnreliableMessage({
-            type: "TICK",
-            frame: currentFrame,
-            requestedFrame: this.nextNeededFrame,
-            inputFrame: this.outboundFrame,
-            inputs: this.outboundInputs,
-        });
+        const data = new DataView(SEND_BUFFER);
+        data.setUint8(0, 1); // type = TICK
+
+        // We delta encode frame numbers relative to the first base frame to save space
+        data.setUint32(1, currentFrame); // frame
+        data.setInt8(5, (this.nextNeededFrame == 0) ? -127 : this.nextNeededFrame - currentFrame); // requestedFrame
+        data.setInt8(6, this.outboundFrame - currentFrame); // inputFrame
+        data.setUint8(7, this.outboundInputs.length); // inputCount
+
+        // Pack inputs into a stream of bits:
+        // 1NNN: Toggle button N
+        // 0: Advance to next frame's inputs
+        const inputWriter = new BitWriter(new Uint8Array(SEND_BUFFER, 8));
+        let prevInput = 0;
+        for (const input of this.outboundInputs) {
+            const changed = prevInput ^ input;
+            prevInput = input;
+            for (let button = 0; button < 8; ++button) {
+                if (changed & (1 << button)) {
+                    inputWriter.write1();
+                    inputWriter.writeBits(button, 3);
+                }
+            }
+            inputWriter.write0();
+        }
+
+        const byteLength = 8 + Math.ceil(inputWriter.position / 8);
+        this.sendUnreliableBuffer(new Uint8Array(SEND_BUFFER, 0, byteLength));
     }
 
     close () {
@@ -236,7 +232,8 @@ export class Netplay {
     }
 
     host () {
-        this.rollbackMgr = new RollbackManager(0, this.runtime);
+        // Start at frame 1 because we treat frame 0 as a "null" state
+        this.rollbackMgr = new RollbackManager(1, this.runtime);
         this.localPlayerIdx = 0;
     }
 
@@ -407,20 +404,39 @@ export class Netplay {
         });
 
         unreliableChannel.addEventListener("message", async event => {
-            const message = JSON.parse(event.data) as UnreliableMessage;
+            const buffer = event.data as ArrayBuffer;
+            const data = new DataView(buffer);
 
-            switch (message.type) {
-            case "TICK":
+            const type = data.getUint8(0);
+            switch (type) {
+            case 1: { // TICK
                 // Ignore if we haven't started our local simulation, or we haven't yet received a
                 // player index from this peer
                 if (this.rollbackMgr && remotePlayer.playerIdx >= 0) {
-                    const { frame, requestedFrame, inputFrame, inputs } = message;
+                    const frame = data.getUint32(1);
+
                     if (frame > remotePlayer.frame) {
+                        const requestedFrame = data.getInt8(5) + frame;
+                        const inputFrame = data.getInt8(6) + frame;
+                        const inputCount = data.getUint8(7);
+
+                        // Unpack inputs
+                        const inputReader = new BitReader(new Uint8Array(buffer, 8));
+                        const inputs = new Array(inputCount);
+                        let prevInput = 0;
+                        for (let ii = 0; ii < inputCount; ++ii) {
+                            while (inputReader.readBit()) {
+                                const button = inputReader.readBits(3);
+                                prevInput ^= (1 << button);
+                            }
+                            inputs[ii] = prevInput;
+                        }
+
                         remotePlayer.frame = frame;
                         remotePlayer.nextNeededFrame = inputFrame + inputs.length;
 
                         // Update outboundFrame
-                        if (remotePlayer.outboundFrame < 0) {
+                        if (remotePlayer.outboundFrame == 0) {
                             remotePlayer.outboundFrame = requestedFrame;
                         } else if (requestedFrame > remotePlayer.outboundFrame) {
                             // Trim no longer needed inputs
@@ -439,16 +455,18 @@ export class Netplay {
                         this.rollbackMgr.addInputs(remotePlayer.playerIdx, inputFrame, inputs);
                     }
                 }
-                break;
+            } break;
 
-            case "PING_REQUEST":
-                remotePlayer.sendPingReply(message.timestamp);
-                break;
+            case 2: { // PING_REQUEST
+                const timestamp = data.getUint32(1);
+                remotePlayer.sendPingReply(timestamp);
+            } break;
 
-            case "PING_REPLY":
-                const ping = Math.floor(performance.now()) - message.timestamp;
+            case 3: { // PING_REPLY
+                const timestamp = data.getUint32(1);
+                const ping = (performance.now() >>> 0) - timestamp;
                 remotePlayer.ping.update(ping);
-                break;
+            } break;
             }
         });
 

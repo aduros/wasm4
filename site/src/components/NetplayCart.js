@@ -1,5 +1,6 @@
 import React from 'react';
 import Layout from '@theme/Layout';
+import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import { AspectRatio } from './AspectRatio';
@@ -32,12 +33,17 @@ export default function NetplayCart () {
                     <small>Controls: Arrows, X, Z</small>
                 </div>
 
-                <h1>
-                    🚧 Netplay beta
-                </h1>
+                <h1>Netplay</h1>
 
-                <p>Netplay connects 2 or more players together over WebRTC. It's still in development, and may have bugs and performance issues.</p>
-                <p>Having problems? Please join us on Discord, or open an issue on GitHub!</p>
+                <p>You've been invited to play a WASM-4 multiplayer game.</p>
+
+                <h2>FAQ</h2>
+
+                <b><i>The game seems to be paused or incredibly slow?</i></b>
+                <p>Make sure you're not playing in a background tab! Most browsers heavily throttle pages in a background tab. To test netplay, open the game in two separate, visible windows.</p>
+
+                <b><i>How does this work?</i></b>
+                <p>Check out the <Link href="/docs/guides/multiplayer">documentation</Link> for more details about building multiplayer games with WASM-4.</p>
             </div>
             </main>
         </Layout>

@@ -129,7 +129,7 @@ export class App extends LitElement {
                 // Nothing
             },
         };
-        if (DEVELOPER_BUILD) {
+        if (import.meta.env.DEV) {
             devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager())
         }
 
@@ -137,7 +137,7 @@ export class App extends LitElement {
             runtime.start();
         }
 
-        if (DEVELOPER_BUILD) {
+        if (import.meta.env.DEV) {
             devkit.websocket?.addEventListener("message", async event => {
                 switch (event.data) {
                 case "reload":
@@ -455,7 +455,7 @@ export class App extends LitElement {
             timeLastUpdate = timeFrameStart;
 
             update();
-            if (DEVELOPER_BUILD) {
+            if (import.meta.env.DEV) {
                 devtoolsManager.updateCompleted(runtime, elapsedSinceLastUpdate);
             }
 

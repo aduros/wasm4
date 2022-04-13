@@ -1,1 +1,1 @@
-export const websocket = DEVELOPER_BUILD ? new WebSocket("ws://"+location.host) : null;
+export const websocket = import.meta.env.DEV ? new WebSocket("ws://"+location.host) : null;

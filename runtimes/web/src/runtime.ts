@@ -116,7 +116,7 @@ export class Runtime {
         this.wasmBufferByteLen = wasmBuffer.byteLength;
 
         if (wasmBuffer.byteLength > limit) {
-            if (DEVELOPER_BUILD) {
+            if (import.meta.env.DEV) {
                 if (!this.warnedFileSize) {
                     this.warnedFileSize = true;
                     this.print(`Warning: Cart is larger than ${limit} bytes. Ensure the release build of your cart is small enough to be bundled.`);

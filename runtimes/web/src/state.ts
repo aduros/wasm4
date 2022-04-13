@@ -32,7 +32,6 @@ export class State {
     toBytes (dest?: Uint8Array): Uint8Array {
         if (!dest) {
             dest = new Uint8Array((1<<16) + 4 + this.diskSize);
-            console.log(dest.byteLength);
         }
 
         dest.set(new Uint8Array(this.memory), 0);

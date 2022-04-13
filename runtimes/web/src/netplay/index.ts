@@ -119,7 +119,7 @@ class RemotePlayer {
     }
 
     sendMessage (message: Message) {
-        console.log(`Sending ${message.type} message to ${this.peerId}`, message);
+        // console.log(`Sending ${message.type} message to ${this.peerId}`, message);
         this.reliableChannel.send(JSON.stringify(message));
     }
 
@@ -279,7 +279,7 @@ export class Netplay {
 
         const onClose = () => {
             if (this.remotePlayers.has(peerId)) {
-                console.log(`Peer ${peerId} left`);
+                // console.log(`Peer ${peerId} left`);
                 this.remotePlayers.delete(peerId);
 
                 if (this.onleave && remotePlayer.playerIdx >= 0) {
@@ -301,7 +301,7 @@ export class Netplay {
             }
 
             const message = JSON.parse(event.data) as Message;
-            console.log(`Received ${message.type} message from ${peerId}`, message);
+            // console.log(`Received ${message.type} message from ${peerId}`, message);
 
             switch (message.type) {
             case "WELCOME": {
@@ -539,16 +539,16 @@ export class Netplay {
         if (!stall) {
             this.rollbackMgr.update();
         } else {
-            console.log("STALL");
+            // console.log("STALL");
         }
 
-        // Temporary debug info to show in devtools live expressions
-        const debug = [];
-        debug.push(`frame=${currentFrame} inputDelay=${inputDelay}`);
-        for (const remotePlayer of this.remotePlayers.values()) {
-            debug.push(`Player #${remotePlayer.playerIdx}: ping=${Math.round(remotePlayer.ping.average)} drift=${remotePlayer.drift.average.toFixed(2)} outboundInputs=${remotePlayer.outboundInputs.length}`);
-        }
-        (window as any).NETPLAY_DEBUG = debug.join(" / ");
+        // // Temporary debug info to show in devtools live expressions
+        // const debug = [];
+        // debug.push(`frame=${currentFrame} inputDelay=${inputDelay}`);
+        // for (const remotePlayer of this.remotePlayers.values()) {
+        //     debug.push(`Player #${remotePlayer.playerIdx}: ping=${Math.round(remotePlayer.ping.average)} drift=${remotePlayer.drift.average.toFixed(2)} outboundInputs=${remotePlayer.outboundInputs.length}`);
+        // }
+        // (window as any).NETPLAY_DEBUG = debug.join(" / ");
 
         return !stall;
     }

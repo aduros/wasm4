@@ -12,7 +12,7 @@ export class ChunkReader {
                 const chunk = new Uint8Array(event.data);
                 this.size += chunk.byteLength;
                 this.chunks.push(chunk);
-                console.log("CHUNK received", chunk.byteLength);
+                // console.log("CHUNK received", chunk.byteLength);
             }
         });
     }
@@ -59,7 +59,7 @@ export class ChunkWriter {
             if (destPos >= CAPACITY) {
                 destPos -= CAPACITY;
 
-                console.log("CHUNK sending", this.buffer.length);
+                // console.log("CHUNK sending", this.buffer.length);
                 this.channel.send(this.buffer);
             }
         }
@@ -69,7 +69,7 @@ export class ChunkWriter {
 
     flush () {
         if (this.buffer && this.size > 0) {
-            console.log("CHUNK flushing", this.size);
+            // console.log("CHUNK flushing", this.size);
             this.channel.send(this.buffer.subarray(0, this.size));
         }
 

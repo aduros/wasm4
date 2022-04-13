@@ -101,7 +101,7 @@ export class RollbackManager {
     update () {
         // Apply any rollbacks
         if (this.rollbackIdx < HISTORY_LENGTH) {
-            console.log(`Rolling back ${HISTORY_LENGTH - this.rollbackIdx} frames`);
+            // console.log(`Rolling back ${HISTORY_LENGTH - this.rollbackIdx} frames`);
 
             // Update predicted inputs, propagating them forward
             for (let ii = this.rollbackIdx+1; ii < HISTORY_LENGTH; ++ii) {

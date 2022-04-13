@@ -42,6 +42,9 @@ export default function NetplayCart () {
                 <b><i>The game seems to be paused or incredibly slow?</i></b>
                 <p>Make sure you're not playing in a background tab! Most browsers heavily throttle pages in a background tab. To test netplay, open the game in two separate, visible windows.</p>
 
+                <b><i>How do I check our connection quality?</i></b>
+                <p>You can see your ping to each of the other players on the pause menu by pressing Enter. For fast-paced action games, ping below 200 ms is recommended for best results.</p>
+
                 <b><i>How does this work?</i></b>
                 <p>Check out the <Link href="/docs/guides/multiplayer">documentation</Link> for more details about building multiplayer games with WASM-4.</p>
             </div>

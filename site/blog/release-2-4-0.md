@@ -7,7 +7,7 @@ date: Apr 13, 2022
 
 import PlayButton from '@site/src/components/PlayButton';
 
-# Release 2.4.0: Netplay
+# Release 2.4: Netplay
 
 The latest version of WASM-4 now supports online multiplayer!
 
@@ -22,9 +22,10 @@ Hosting a netplay game is as easy as copy and pasting a link.
 Try it out yourself with these multiplayer games:
 
 <div className="row margin-bottom--lg">
-    <PlayButton slug="lime-volleyball" title="Lime Volleyball" author="Bruno Garcia" colWidth="4"/>
-    <PlayButton slug="wloku" title="WLOKU" author="12Boti" colWidth="4"/>
-    <PlayButton slug="racer" title="Racer" author="Claudio Mattera" colWidth="4"/>
+    <PlayButton slug="shieldshooter" title="Shieldshooter" author="Marcus Ramse" colWidth="3"/>
+    <PlayButton slug="lime-volleyball" title="Lime Volleyball" author="Bruno Garcia" colWidth="3"/>
+    <PlayButton slug="wloku" title="WLOKU" author="12Boti" colWidth="3"/>
+    <PlayButton slug="racer" title="Racer" author="Claudio Mattera" colWidth="3"/>
 </div>
 
 Some details about how netplay works in WASM-4:

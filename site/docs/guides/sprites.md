@@ -12,7 +12,7 @@ Sprites come in two formats: 1BPP and 2BPP.
 ## 1BPP Format
 
 1BPP sprites require **1** **B**it **P**er **P**ixel. That means each pixel can be one of two
-colors, either 0 or 1.
+colors. Bit value 0 uses `DRAW_COLORS` color 1, and bit value 1 is `DRAW_COLORS` color 2.
 
 First let's define an 8x8 1BPP sprite called `smiley` at the top of our program. We do this by using
 the binary literal syntax for each row of 8 pixels. If you look closely you can see it's a picture

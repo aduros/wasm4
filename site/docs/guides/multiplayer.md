@@ -2,7 +2,7 @@
 
 WASM-4 supports realtime multiplayer of up to 4 players, either locally or online.
 
-Detecting [gamepad input](./user-input#gamepad) for Player 2 is the same as usual, but instead of
+Detecting [gamepad input](/docs/guides/user-input#gamepad) for Player 2 is the same as usual, but instead of
 `GAMEPAD1`, you read from `GAMEPAD2`. For Players 3 and 4, `GAMEPAD3` and `GAMEPAD4`.
 
 ## Local Multiplayer

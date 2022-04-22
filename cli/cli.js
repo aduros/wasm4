@@ -4,7 +4,7 @@ const { program, Option } = require("commander");
 const pkg = require('./package.json');
 const { supportedIconExtensions } = require('./lib/utils/icon');
 
-const LANGS = ["assemblyscript", "c", "cpp", "d", "go", "nelua", "nim", "odin", "rust", "wat", "zig"];
+const LANGS = ["assemblyscript", "c", "cpp", "d", "go", "nelua", "nim", "odin", "rust", "wat", "zig", "porth"];
 const langOption = new Option("--lang <lang>", "Use the given language")
     .env("W4_LANG")
     .choices(LANGS);
@@ -36,6 +36,8 @@ function requireLang (opts) {
         return "wat";
     } else if (opts.zig) {
         return "zig";
+    } else if (opts.porth) {
+        return "porth";
     }
 
     console.error("You must specify a programming language, for example by passing --c or --rust.");
@@ -55,6 +57,7 @@ const blankProject = (cmd) =>
         .option("--rs, --rust", "Create Rust project (Shorthand for --lang rust)")
         .option("--wat", "Create WebAssembly Text project (Shorthand for --lang wat)")
         .option("--zig", "Create Zig project (Shorthand for --lang zig)")
+        .option("--porth", "Create Porth project (Shorthand for --lang porth)")
         .addOption(langOption)
         .option("--surprise-me", "Create a project in a random language");
 
@@ -147,6 +150,7 @@ program.command("png2src <images...>")
     .option("--rs, --rust", "Generate Rust source (Shorthand for --lang rust)")
     .option("--wat", "Generate WebAssembly Text source (Shorthand for --lang wat)")
     .option("--zig", "Generate Zig source (Shorthand for --lang zig)")
+    .option("--porth", "Generate Porth source (Shorthand for --lang porth)")
     .option("-t, --template <file>", "Template file with a custom output format")
     .option("-o, --output <file>", "File to write the result to", "-")
     .addOption(langOption)

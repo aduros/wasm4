@@ -60,6 +60,11 @@ const HELP = {
       build: 'zig build -Drelease-small=true',
       cart: 'zig-out/lib/cart.wasm',
     },
+    porth: {
+      name: 'Porth',
+      build: 'make',
+      cart: 'build/cart.wasm',
+    }
 };
 
 /**

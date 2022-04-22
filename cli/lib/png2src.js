@@ -106,6 +106,16 @@ const {{name}}_flags = {{flags}}; // {{flagsHumanReadable}}
 const {{name}} = [{{length}}]u8{ {{bytes}} };
 
 {{/sprites}}`,
+
+    porth:
+        `{{#sprites}}
+// {{name}} sprite
+const {{name}}-sprite \"{{porthBytes}}\"c end
+const {{name}}-flags  {{flags}} end // {{flagsHumanReadable}}
+const {{name}}-height {{height}} end
+const {{name}}-width  {{width}} end
+
+{{/sprites}}`,
 };
 
 const ALIASES = {
@@ -253,6 +263,9 @@ The first occurrence of another color is at (${x}, ${y}) and has the value of (R
     const wasmBytes = [...bytes]
         .map((b) => "\\" + b.toString(16).padStart(2, "0"))
 
+    const porthBytes = [...bytes]
+        .map((b) => "\\\\" + b.toString(16).padStart(2, "0"))
+
     const odinVarName = (varName.substr(0, 1) + varName.substr(1)
         .replace(/[A-Z]/g, l => '_' + l))
         .toLocaleLowerCase()
@@ -268,6 +281,7 @@ The first occurrence of another color is at (${x}, ${y}) and has the value of (R
         "firstByte": dataBytes[0],
         "restBytes": dataBytes.slice(1).join(','),
         "wasmBytes": wasmBytes.join(''),
+        "porthBytes": porthBytes.join(''),
         "rustName": rustVarName,
         "odinName": odinVarName,
         "odinFlags": odinFlags,

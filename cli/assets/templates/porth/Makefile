@@ -48,12 +48,7 @@ all: build/cart.wasm
 .PHONY: build/cart.wasm
 build/cart.wasm: main.porth
 	@$(MKDIR_BUILD)
-	$(4ORTH) $(4ORTH_ARGS) $< 
-	mv main.wat  build/cart.wat
-	mv main.wasm build/cart.wasm
-ifeq ($(b), 1)
-	mv main build/cart
-endif
+	$(4ORTH) $(4ORTH_ARGS) -o $@ $<
 
 .PHONY: clean
 clean:

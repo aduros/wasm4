@@ -71,6 +71,12 @@ tone(262, 60, 100, TONE_PULSE1);
 w4.tone(262, 60, 100, w4.TONE_PULSE1);
 ```
 
+```porth
+import proc tone int int int int in end
+
+$TONE_PULSE1 60 60 262 tone
+```
+
 </MultiLanguageCode>
 
 ## Duty Cycle
@@ -135,6 +141,10 @@ tone(262, 60, 100, TONE_PULSE1 | TONE_MODE3);
 w4.tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_MODE3);
 ```
 
+```porth
+$TONE_PULSE1 $TONE_MODE3 or 100 60 262 tone
+```
+
 </MultiLanguageCode>
 
 ## Frequency Slide
@@ -191,6 +201,12 @@ tone(262 | (523 << 16), 60, 100, TONE_PULSE1);
 
 ```zig
 w4.tone(262 | (523 << 16), 60, 100, w4.TONE_PULSE1);
+```
+
+```porth
+$TONE_PULSE1 100 60 
+523 16 shl 262 or 
+tone
 ```
 
 </MultiLanguageCode>
@@ -270,6 +286,12 @@ tone(262, 60 | (30 << 8), 100, TONE_PULSE1);
 w4.tone(262, 60 | (30 << 8), 100, w4.TONE_PULSE1);
 ```
 
+```porth
+$TONE_PULSE1 100
+30 8 shl 60 or 
+262 tone
+```
+
 </MultiLanguageCode>
 
 ## Panning
@@ -323,6 +345,10 @@ tone(262, 60, 100, TONE_PULSE1 | TONE_PAN_LEFT);
 
 ```zig
 w4.tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_PAN_LEFT);
+```
+
+```porth
+$TONE_PAN_LEFT $TONE_PULSE1 or 100 60 262 tone
 ```
 
 </MultiLanguageCode>

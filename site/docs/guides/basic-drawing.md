@@ -86,6 +86,13 @@ w4.PALETTE.* = .{
 };
 ```
 
+```porth
+  0xfff6d3 $PALETTE0 !int
+  0xf9a875 $PALETTE1 !int
+  0xeb6b6f $PALETTE2 !int
+  0x7c3f58 $PALETTE3 !int
+```
+
 </MultiLanguageCode>
 
 The default Gameboy-ish palette looks like this:
@@ -162,6 +169,11 @@ w4.DRAW_COLORS.* = 0x42;
 w4.rect(10, 10, 32, 32);
 ```
 
+```porth
+0x42 $DRAW_COLORS !16
+32 32 10 10 rect
+```
+
 </MultiLanguageCode>
 
 A value of `0` in a draw color means it will be transparent. For example, to
@@ -216,6 +228,12 @@ text("Hello world!", 10, 10);
 
 ```zig
 w4.text("Hello world!", 10, 10);
+```
+
+```porth
+import proc text int int ptr in end
+
+10 10 "Hello World!"c text 
 ```
 
 </MultiLanguageCode>
@@ -304,6 +322,14 @@ for (w4.FRAMEBUFFER) |*x| {
     x.* = 3 | (3 << 2) | (3 << 4) | (3 << 6);
 }
 ```
+
+```porth
+  0xa0 cast(ptr) 
+  0 while dup 6400 < do
+    over over ptr+ 0xff swap !8
+    1 +
+  end drop drop
+)
 
 </MultiLanguageCode>
 

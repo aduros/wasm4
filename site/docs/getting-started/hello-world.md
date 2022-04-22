@@ -96,6 +96,15 @@ export fn update() void {
 }
 ```
 
+```porth
+import proc rect int int int int in end
+
+proc update in
+  ;; Draw a rectangle at (10, 10) with size (32, 32).
+  32 32 10 10 rect
+end
+```
+
 </MultiLanguageCode>
 
 The first line imports the WASM-4 API definitions. This is a stub source file included with all
@@ -180,6 +189,14 @@ w4.DRAW_COLORS.* = 2;
 w4.rect(10, 10, 32, 32);
 ```
 
+```porth
+;; Set DRAW_COLORS to 2.
+2 $DRAW_COLORS !16
+
+;; Draw a rectangle at (10, 10) with size (32, 32).
+32 32 10 10 rect
+```
+
 </MultiLanguageCode>
 
 ## Debugging
@@ -231,6 +248,12 @@ trace("Hello world!");
 
 ```zig
 w4.trace("Hello world!");
+```
+
+```wasm
+import proc trace ptr in end
+
+"Hello world!"c trace
 ```
 
 </MultiLanguageCode>

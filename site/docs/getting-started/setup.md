@@ -268,6 +268,29 @@ w4 run zig-out/lib/cart.wasm
 
 </Page>
 
+<Page value="porth">
+
+To compile Porth projects you will need to download [4orth](https://github.com/FrankWPA/4orth) and add it to `$PATH`.
+
+```shell
+w4 new --porth hello-world
+cd hello-world
+```
+
+Compile the .wasm cartridge:
+
+```shell
+make
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 run build/cart.wasm
+```
+
+</Page>
+
 </MultiLanguage>
 
 :::tip

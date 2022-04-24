@@ -89,6 +89,12 @@ var game_data: i32 = 1337;
 _ = w4.diskw(@ptrCast([*]u8, &game_data), @sizeOf(@TypeOf(game_data)));
 ```
 
+```porth
+const data "\\39\\05\\00\\00"c end
+
+4 data diskw
+```
+
 </MultiLanguageCode>
 
 ## Reading Data from Disk
@@ -158,6 +164,12 @@ let game_data = unsafe {
 ```zig
 var game_data: i32 = undefined;
 _ = w4.diskr(@ptrCast([*]u8, &game_data), @sizeOf(@TypeOf(game_data)));
+```
+
+```porth
+memory game_data 4 end
+
+4 game_data diskr
 ```
 
 </MultiLanguageCode>

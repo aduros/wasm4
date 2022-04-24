@@ -97,6 +97,15 @@ if (gamepad & w4.BUTTON_RIGHT != 0) {
 }
 ```
 
+```porth
+memory gamepad sizeof(u8) end
+$GAMEPAD1 @8 gamepad !8
+
+$gamepad @8 $BUTTON_RIGHT and cast(bool) if
+  "Right button is down!"c trace
+end
+```
+
 </MultiLanguageCode>
 
 | Gamepad Bit | Button                |
@@ -301,6 +310,23 @@ export fn update() void {
         w4.trace("Right button was just pressed!");
     }
 }
+```
+
+```porth
+memory prev-state sizeof(u8) end
+
+proc update in
+  $GAMEPAD1 @8
+  let gamepad in
+    gamepad prev-state @8 xor gamepad and
+    gamepad prev-state !8
+    let pressed-this-frame in
+      pressed-this-frame $BUTTON_RIGHT and cast(bool) if
+        "Right button was just pressed!"c trace
+      end
+    end
+  end
+end
 ```
 
 </MultiLanguageCode>

@@ -151,6 +151,18 @@ const smiley = [8]u8{
 };
 ```
 
+```porth
+const smiley "\\c3\\81\\24\\24\\00\\24\\99\\c3"c end
+;; 0b11000011,
+;; 0b10000001,
+;; 0b00100100,
+;; 0b00100100,
+;; 0b00000000,
+;; 0b00100100,
+;; 0b10011001,
+;; 0b11000011,
+```
+
 </MultiLanguageCode>
 
 Now that we have our sprite data, we can blit it to the screen at position (10, 10).
@@ -206,6 +218,10 @@ blit(&smiley, 10, 10, 8, 8, BLIT_1BPP);
 
 ```zig
 w4.blit(&smiley, 10, 10, 8, 8, w4.BLIT_1BPP);
+```
+
+```porth
+$BLIT_1BPP 8 8 10 smiley blit
 ```
 
 </MultiLanguageCode>
@@ -270,6 +286,10 @@ blit(&smiley, 10, 10, 8, 8, BLIT_1BPP | BLIT_FLIP_Y);
 
 ```zig
 w4.blit(&smiley, 10, 10, 8, 8, w4.BLIT_1BPP | w4.BLIT_FLIP_Y);
+```
+
+```porth
+$BLIT_FLIP_Y $BLIT_1BPP or 8 8 10 smiley blit
 ```
 
 </MultiLanguageCode>

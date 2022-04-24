@@ -250,7 +250,7 @@ trace("Hello world!");
 w4.trace("Hello world!");
 ```
 
-```wasm
+```porth
 import proc trace ptr in end
 
 "Hello world!"c trace

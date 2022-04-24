@@ -207,7 +207,7 @@ pub const Tone = struct {
     ///      /               \
     ///     /                 \
     pub const Volume = packed struct {
-        sustain : u8 = 100,
+        sustain : u8,
         attack  : u8 = 100,
 
         pub fn is_valid(volume: @This()) bool {
@@ -218,7 +218,8 @@ pub const Tone = struct {
 
     pub const Flags = packed struct {
         channel: Channel,
-        pulse_duty: DutyCycle,
+        pulse_duty: DutyCycle = 2,
+        pan: Pan = .both,
     };
 
     pub const Channel = enum(u2) {
@@ -232,16 +233,16 @@ pub const Tone = struct {
         @"1/8" = 0,
         @"1/4" = 1,
         @"1/2" = 2,
-        @"3/4" = 3, 
+    };
+
+    /// Which stereo channel(s) to play audio in
+    pub const Pan = enum(u2) {
+        /// play audio in both stereo channels
+        both  = 0,
+        left  = 1,
+        right = 2,
     };
 };
-
-pub const TONE_MODE1: u32 = 0;
-pub const TONE_MODE2: u32 = 4;
-pub const TONE_MODE3: u32 = 8;
-pub const TONE_MODE4: u32 = 12;
-pub const TONE_PAN_LEFT: u32 = 16;
-pub const TONE_PAN_RIGHT: u32 = 32;
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │

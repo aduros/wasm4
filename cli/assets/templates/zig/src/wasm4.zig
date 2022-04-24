@@ -1,6 +1,18 @@
 //
 // WASM-4: https://wasm4.org/docs
 
+const std = @import("std");
+
+fn assert_equal(a: anytype, b: anytype, comptime error_msg: []const u8) void {
+    if (a != b) @compileError(std.fmt.comptimePrint("{} != {}  {s}", .{a, b, error_msg}));
+}
+
+comptime {
+    const builtin = @import("builtin");
+    const native_endian = builtin.target.cpu.arch.endian();
+    assert_equal(native_endian, .Little, "Bit flags need little endian");
+}
+
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │
 // │ Platform Constants                                                        │
@@ -15,31 +27,89 @@ pub const SCREEN_SIZE: u32 = 160;
 // │                                                                           │
 // └───────────────────────────────────────────────────────────────────────────┘
 
-pub const PALETTE: *[4]u32 = @intToPtr(*[4]u32, 0x04);
-pub const DRAW_COLORS: *u16 = @intToPtr(*u16, 0x14);
-pub const GAMEPAD1: *const u8 = @intToPtr(*const u8, 0x16);
-pub const GAMEPAD2: *const u8 = @intToPtr(*const u8, 0x17);
-pub const GAMEPAD3: *const u8 = @intToPtr(*const u8, 0x18);
-pub const GAMEPAD4: *const u8 = @intToPtr(*const u8, 0x19);
-pub const MOUSE_X: *const i16 = @intToPtr(*const i16, 0x1a);
-pub const MOUSE_Y: *const i16 = @intToPtr(*const i16, 0x1c);
-pub const MOUSE_BUTTONS: *const u8 = @intToPtr(*const u8, 0x1e);
-pub const SYSTEM_FLAGS: *u8 = @intToPtr(*u8, 0x1f);
-pub const FRAMEBUFFER: *[6400]u8 = @intToPtr(*[6400]u8, 0xA0);
+pub const Memory = packed struct {
+    _padding: [4]u8,
+    palette: [4]Color,
+    colors: DrawColors,
+    gamepads: [4]GamePad,
+    mouse: Mouse,
+    system: SystemFlags,
+    _reserved: [128]u8,
+    framebuffer: [6400]u8,
+    userdata: [58976]u8,
+};
 
-pub const BUTTON_1: u8 = 1;
-pub const BUTTON_2: u8 = 2;
-pub const BUTTON_LEFT: u8 = 16;
-pub const BUTTON_RIGHT: u8 = 32;
-pub const BUTTON_UP: u8 = 64;
-pub const BUTTON_DOWN: u8 = 128;
+comptime {
+    assert_equal(@bitSizeOf(Memory), 64 * 1024 * 8, "Memory layout wrong");
+}
 
-pub const MOUSE_LEFT: u8 = 1;
-pub const MOUSE_RIGHT: u8 = 2;
-pub const MOUSE_MIDDLE: u8 = 4;
+pub const m = @intToPtr(*allowzero Memory, 0);
 
-pub const SYSTEM_PRESERVE_FRAMEBUFFER: u8 = 1;
-pub const SYSTEM_HIDE_GAMEPAD_OVERLAY: u8 = 2;
+pub const Color = packed struct {
+    blue  : u8,
+    green : u8,
+    red   : u8,
+    _reserved: u8 = 0,
+};
+
+pub const DrawColors = packed struct {
+    _0: ColorIndex,
+    _1: ColorIndex,
+    _2: ColorIndex,
+    _3: ColorIndex,
+};
+
+pub const ColorIndex = enum(u4) {
+    transparent = 0,
+    /// Use palette[0]
+    p0   = 1,
+    /// Use palette[1]
+    p1   = 2,
+    /// Use palette[2]
+    p2   = 3,
+    /// Use palette[3]
+    p3   = 4,
+};
+
+pub const GamePad = packed struct {
+    x: bool,
+    z: bool,
+    _reserved: u2,
+    left: bool,
+    right: bool,
+    up: bool,
+    down: bool,
+};
+
+pub const Mouse = packed struct {
+    x: i16,
+    y: i16,
+    /// primary button
+    b0: bool,
+    /// secondary button
+    b1: bool,
+    /// third button
+    b2: bool,
+    _reserved: u5,
+};
+
+pub const SystemFlags = packed struct {
+    preserve_framebuffer: bool,
+    hide_gamepad_overlay: bool,
+    _reserved: u6,
+};
+
+// ┌───────────────────────────────────────────────────────────────────────────┐
+// │                                                                           │
+// │ Raw Functions                                                             │
+// │                                                                           │
+// └───────────────────────────────────────────────────────────────────────────┘
+
+const raw_api = struct {
+    extern fn blit(sprite: [*]const u8, x: u32, y: u32, width: u32, height: u32, flags: u32) void;
+    extern fn blitSub(sprite: [*]const u8, x: u32, y: u32, width: u32, height: u32, src_x: u32, src_y: u32, stride: u32, flags: u32) void;
+    extern fn tone(frequency: u32, duration: u32, volume: u32, flags: u32) void;
+};
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │
@@ -47,38 +117,49 @@ pub const SYSTEM_HIDE_GAMEPAD_OVERLAY: u8 = 2;
 // │                                                                           │
 // └───────────────────────────────────────────────────────────────────────────┘
 
+pub const BlitFlags = packed struct {
+    /// one or two bits per pixel
+    two_bits:  bool = false,
+    flip_x: bool = false,
+    flip_y: bool = false,
+    rotate: bool = false,
+    _reserved: u28 = 0,
+};
+
 /// Copies pixels to the framebuffer.
-pub extern fn blit(sprite: [*]const u8, x: i32, y: i32, width: i32, height: i32, flags: u32) void;
+pub fn blit(sprite: []const u8, x: u32, y: u32, width: u32, height: u32, flags: BlitFlags) void {
+    
+    raw_api.blit(sprite.ptr, x, y, width, height, @bitCast(u32, flags));
+}
 
 /// Copies a subregion within a larger sprite atlas to the framebuffer.
-pub extern fn blitSub(sprite: [*]const u8, x: i32, y: i32, width: i32, height: i32, src_x: u32, src_y: u32, stride: i32, flags: u32) void;
-
-pub const BLIT_2BPP: u32 = 1;
-pub const BLIT_1BPP: u32 = 0;
-pub const BLIT_FLIP_X: u32 = 2;
-pub const BLIT_FLIP_Y: u32 = 4;
-pub const BLIT_ROTATE: u32 = 8;
+/// srcX: Source X position of the sprite region.
+/// srcY: Source Y position of the sprite region.
+/// stride: Total width of the overall sprite atlas. This is typically larger than width.
+pub fn blitSub(sprite: []const u8, x: u32, y: u32, width: u32, height: u32, src_x: u32, src_y: u32, stride: u32, flags: BlitFlags) void {
+    raw_api.blitSub(sprite.ptr, x, y, width, height, src_x, src_y, stride, @bitCast(u32, flags));
+}
 
 /// Draws a line between two points.
-pub extern fn line(x1: i32, y1: i32, x2: i32, y2: i32) void;
+pub extern fn line(x1: u32, y1: u32, x2: u32, y2: u32) void;
 
 /// Draws an oval (or circle).
-pub extern fn oval(x: i32, y: i32, width: i32, height: i32) void;
+pub extern fn oval(x: u32, y: u32, width: u32, height: u32) void;
 
 /// Draws a rectangle.
-pub extern fn rect(x: i32, y: i32, width: u32, height: u32) void;
+pub extern fn rect(x: u32, y: u32, width: u32, height: u32) void;
 
 /// Draws text using the built-in system font.
-pub fn text(str: []const u8, x: i32, y: i32) void {
+pub fn text(str: []const u8, x: u32, y: u32) void {
     textUtf8(str.ptr, str.len, x, y);
 }
-extern fn textUtf8(strPtr: [*]const u8, strLen: usize, x: i32, y: i32) void;
+extern fn textUtf8(strPtr: [*]const u8, strLen: usize, x: u32, y: u32) void;
 
 /// Draws a vertical line
-pub extern fn vline(x: i32, y: i32, len: u32) void;
+pub extern fn vline(x: u32, y: u32, len: u32) void;
 
 /// Draws a horizontal line
-pub extern fn hline(x: i32, y: i32, len: u32) void;
+pub extern fn hline(x: u32, y: u32, len: u32) void;
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │
@@ -87,12 +168,74 @@ pub extern fn hline(x: i32, y: i32, len: u32) void;
 // └───────────────────────────────────────────────────────────────────────────┘
 
 /// Plays a sound tone.
-pub extern fn tone(frequency: u32, duration: u32, volume: u32, flags: u32) void;
+/// frequency: Wave frequency in hertz.
+/// duration: Duration of the tone in frames (1/60th of a second), up to 255 frames.
+/// volume: Volume of the sustain and attack durations, between 0 and 100.
+pub fn tone(frequency: Tone.Frequency, duration: Tone.Duration, volume: Tone.Volume, flags: Tone.Flags) void {
+    std.debug.assert(volume.is_valid());
+    tone(@bitCast(u32, frequency), @bitCast(u32, duration), @bitCast(u32, volume), @bitCast(u32, flags));
+}
 
-pub const TONE_PULSE1: u32 = 0;
-pub const TONE_PULSE2: u32 = 1;
-pub const TONE_TRIANGLE: u32 = 2;
-pub const TONE_NOISE: u32 = 3;
+pub const Tone = struct {
+    /// Wave frequency in hertz.
+    pub const Frequency = packed struct {
+        start: u16,
+        end: u16 = 0,
+    };
+    
+    /// Duration of ADSR of note (unit: frames)
+    ///
+    ///          ^
+    ///         / \ decay
+    /// attack /   \ 
+    ///       /     \--------
+    ///      /       sustain \ release
+    ///     /                 \
+    pub const Duration = packed struct {
+        sustain : u8 = 0,
+        release : u8 = 0,
+        decay   : u8 = 0,
+        attack  : u8 = 0,
+    };
+    
+    /// Volume of note (0 to 100)
+    ///
+    ///          ^  <-- attack volume
+    ///         / \
+    ///        /   \ 
+    ///       /     \--------  <-- sustain valume
+    ///      /               \
+    ///     /                 \
+    pub const Volume = packed struct {
+        sustain : u8 = 100,
+        attack  : u8 = 100,
+
+        pub fn is_valid(volume: @This()) bool {
+            return (0 <= volume.sustain) and (volume.sustain <= 100)
+               and (0 <= volume.attack ) and (volume.attack  <= 100);
+        }
+    };
+
+    pub const Flags = packed struct {
+        channel: Channel,
+        pulse_duty: DutyCycle,
+    };
+
+    pub const Channel = enum(u2) {
+        pulse0 = 0,
+        pulse1 = 1,
+        triangle = 2,
+        noise = 3,
+    };
+
+    pub const DutyCycle = enum(u2) {
+        @"1/8" = 0,
+        @"1/4" = 1,
+        @"1/2" = 2,
+        @"3/4" = 3, 
+    };
+};
+
 pub const TONE_MODE1: u32 = 0;
 pub const TONE_MODE2: u32 = 4;
 pub const TONE_MODE3: u32 = 8;
@@ -123,13 +266,3 @@ pub fn trace(x: []const u8) void {
     traceUtf8(x.ptr, x.len);
 }
 extern fn traceUtf8(strPtr: [*]const u8, strLen: usize) void;
-
-/// Use with caution, as there's no compile-time type checking.
-///
-/// * %c, %d, and %x expect 32-bit integers.
-/// * %f expects 64-bit floats.
-/// * %s expects a *zero-terminated* string pointer.
-///
-/// See https://github.com/aduros/wasm4/issues/244 for discussion and type-safe
-/// alternatives.
-pub extern fn tracef(x: [*:0]const u8, ...) void;

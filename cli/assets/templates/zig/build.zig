@@ -15,4 +15,16 @@ pub fn build(b: *std.build.Builder) !void {
     lib.export_symbol_names = &[_][]const u8{ "start", "update" };
 
     lib.install();
+
+
+    const run_cmd = b.addSystemCommand(&.{"w4", "run-native"});
+    run_cmd.step.dependOn(&lib.step);
+    run_cmd.addFileSourceArg(lib.getOutputSource());
+    if (b.args) |args| {
+        run_cmd.addArgs(args);
+    }
+
+    const run_step = b.step("run", "Run Cartridge with w4");
+    run_step.dependOn(&run_cmd.step);
+
 }

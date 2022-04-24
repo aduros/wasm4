@@ -8,7 +8,7 @@ export function getUrlParam (name: string): string | null {
     }
 
     // Fallback to using the value in the hash
-    const hash = new URL(url.hash.substring(1), url.origin);
+    const hash = new URL(url.hash.substring(1), "https://x");
     return hash.searchParams.get(name);
 }
 

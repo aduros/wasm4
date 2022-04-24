@@ -324,12 +324,12 @@ for (w4.FRAMEBUFFER) |*x| {
 ```
 
 ```porth
-  0xa0 cast(ptr) 
-  0 while dup 6400 < do
-    over over ptr+ 0xff swap !8
-    1 +
-  end drop drop
-)
+$FRAMEBUFFER 
+0 while dup 6400 < do
+  over over ptr+ 0xff swap !8
+  1 +
+end drop drop
+```
 
 </MultiLanguageCode>
 
@@ -600,6 +600,10 @@ fn pixel(x: i32, y: i32) void {
     // Write to the framebuffer
     w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] & ~mask);
 }
+```
+
+```porth
+// TODO
 ```
 
 </MultiLanguageCode>

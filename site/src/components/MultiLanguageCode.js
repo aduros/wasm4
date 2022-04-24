@@ -15,6 +15,7 @@ const classNameToLanguage = {
     "language-odin": "odin",
     "language-wasm": "wat",
     "language-zig": "zig",
+    "language-porth": "porth",
 };
 
 export default function MultiLanguageCode (props) {

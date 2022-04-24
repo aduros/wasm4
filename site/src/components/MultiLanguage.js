@@ -17,6 +17,7 @@ const names = {
     "rust": "Rust",
     "wat": "WebAssembly Text",
     "zig": "Zig",
+    "porth": "Porth",
 };
 
 /**

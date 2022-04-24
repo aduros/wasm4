@@ -350,8 +350,12 @@ export class App extends LitElement {
 
         // Also listen to the top frame when we're embedded in an iframe
         if (top && top != window) {
-            top.addEventListener("keydown", onKeyboardEvent);
-            top.addEventListener("keyup", onKeyboardEvent);
+            try {
+                top.addEventListener("keydown", onKeyboardEvent);
+                top.addEventListener("keyup", onKeyboardEvent);
+            } catch {
+                // Ignore iframe security errors
+            }
         }
 
         const pollPhysicalGamepads = () => {

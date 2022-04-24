@@ -14,7 +14,7 @@ WASM-4 uses a fixed memory layout of 64 KB.
 | `$001f` | 1            | [SYSTEM_FLAGS](#system_flags)   |
 | `$0020` | 128          | Reserved for future use         |
 | `$00a0` | 6400         | [FRAMEBUFFER](#framebuffer)     |
-| `$19a0` | 58975        | Available program memory        |
+| `$19a0` | 58976        | Available program memory        |
 
 ### PALETTE
 

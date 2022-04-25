@@ -73,6 +73,16 @@ export class App extends LitElement {
 
     private netplay?: Netplay;
 
+    readonly onPointerUp = (event: PointerEvent) => {
+        if (event.pointerType == "touch") {
+            // Try to go fullscreen on mobile
+            utils.requestFullscreen();
+        }
+
+        // Try to begin playing audio
+        this.runtime.unlockAudio();
+    }
+
     constructor () {
         super();
 
@@ -350,8 +360,12 @@ export class App extends LitElement {
 
         // Also listen to the top frame when we're embedded in an iframe
         if (top && top != window) {
-            top.addEventListener("keydown", onKeyboardEvent);
-            top.addEventListener("keyup", onKeyboardEvent);
+            try {
+                top.addEventListener("keydown", onKeyboardEvent);
+                top.addEventListener("keyup", onKeyboardEvent);
+            } catch {
+                // Ignore iframe security errors
+            }
         }
 
         const pollPhysicalGamepads = () => {
@@ -468,16 +482,6 @@ export class App extends LitElement {
         loop();
     }
 
-    onPointerUp (event: PointerEvent) {
-        if (event.pointerType == "touch") {
-            // Try to go fullscreen on mobile
-            utils.requestFullscreen();
-        }
-
-        // Try to begin playing audio
-        this.runtime.unlockAudio();
-    }
-
     onMenuButtonPressed () {
         if (this.showMenu) {
             // If the pause menu is already open, treat it as an X button
@@ -558,9 +562,21 @@ export class App extends LitElement {
         return this.netplay ? this.netplay.getSummary() : [];
     }
 
+    connectedCallback () {
+        super.connectedCallback();
+
+        window.addEventListener("pointerup", this.onPointerUp);
+    }
+
+    disconnectedCallback () {
+        window.removeEventListener("pointerup", this.onPointerUp);
+
+        super.disconnectedCallback();
+    }
+
     render () {
         return html`
-            <div class="content" @pointerup="${this.onPointerUp}">
+            <div class="content">
                 ${this.showMenu ? html`<wasm4-menu-overlay .app=${this} />`: ""}
                 <wasm4-notifications></wasm4-notifications>
                 ${this.runtime.canvas}

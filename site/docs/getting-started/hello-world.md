@@ -100,7 +100,7 @@ export fn update() void {
 import proc rect int int int int in end
 
 proc update in
-  ;; Draw a rectangle at (10, 10) with size (32, 32).
+  // Draw a rectangle at (10, 10) with size (32, 32).
   32 32 10 10 rect
 end
 ```
@@ -190,10 +190,10 @@ w4.rect(10, 10, 32, 32);
 ```
 
 ```porth
-;; Set DRAW_COLORS to 2.
+// Set DRAW_COLORS to 2.
 2 $DRAW_COLORS !16
 
-;; Draw a rectangle at (10, 10) with size (32, 32).
+// Draw a rectangle at (10, 10) with size (32, 32).
 32 32 10 10 rect
 ```
 

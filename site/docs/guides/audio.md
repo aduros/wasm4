@@ -204,9 +204,7 @@ w4.tone(262 | (523 << 16), 60, 100, w4.TONE_PULSE1);
 ```
 
 ```porth
-$TONE_PULSE1 100 60 
-523 16 shl 262 or 
-tone
+$TONE_PULSE1 100 60 523 16 shl 262 or tone
 ```
 
 </MultiLanguageCode>
@@ -287,9 +285,7 @@ w4.tone(262, 60 | (30 << 8), 100, w4.TONE_PULSE1);
 ```
 
 ```porth
-$TONE_PULSE1 100
-30 8 shl 60 or 
-262 tone
+$TONE_PULSE1 100 30 8 shl 60 or 262 tone
 ```
 
 </MultiLanguageCode>

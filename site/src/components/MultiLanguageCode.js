@@ -13,9 +13,9 @@ const classNameToLanguage = {
     "language-rust": "rust",
     "language-go": "go",
     "language-odin": "odin",
+    "language-porth": "porth",
     "language-wasm": "wat",
     "language-zig": "zig",
-    "language-porth": "porth",
 };
 
 export default function MultiLanguageCode (props) {

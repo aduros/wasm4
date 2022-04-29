@@ -69,6 +69,15 @@ update :: proc "c" () {
 }
 ```
 
+```porth
+import proc rect int int int int in end
+
+proc update in
+  // Draw a rectangle at (10, 10) with size (32, 32).
+  32 32 10 10 rect
+end
+```
+
 ```rust
 mod wasm4;
 use wasm4::*;
@@ -94,15 +103,6 @@ const w4 = @import("wasm4.zig");
 export fn update() void {
     w4.rect(10, 10, 32, 32);
 }
-```
-
-```porth
-import proc rect int int int int in end
-
-proc update in
-  // Draw a rectangle at (10, 10) with size (32, 32).
-  32 32 10 10 rect
-end
 ```
 
 </MultiLanguageCode>
@@ -169,6 +169,14 @@ w4.DRAW_COLORS^ = 2
 w4.rect(10, 10, 32, 32)
 ```
 
+```porth
+// Set DRAW_COLORS to 2.
+2 $DRAW_COLORS !16
+
+// Draw a rectangle at (10, 10) with size (32, 32).
+32 32 10 10 rect
+```
+
 ```rust
 unsafe { *DRAW_COLORS = 2 }
 
@@ -187,14 +195,6 @@ rect(10, 10, 32, 32);
 w4.DRAW_COLORS.* = 2;
 
 w4.rect(10, 10, 32, 32);
-```
-
-```porth
-// Set DRAW_COLORS to 2.
-2 $DRAW_COLORS !16
-
-// Draw a rectangle at (10, 10) with size (32, 32).
-32 32 10 10 rect
 ```
 
 </MultiLanguageCode>
@@ -233,6 +233,12 @@ trace("Hello world!")
 w4.trace("Hello world!")
 ```
 
+```porth
+import proc trace ptr in end
+
+"Hello world!"c trace
+```
+
 ```rust
 trace("Hello world!");
 ```
@@ -248,12 +254,6 @@ trace("Hello world!");
 
 ```zig
 w4.trace("Hello world!");
-```
-
-```porth
-import proc trace ptr in end
-
-"Hello world!"c trace
 ```
 
 </MultiLanguageCode>

@@ -73,7 +73,7 @@ function start (opts) {
             return skip
         } else {
             // Only trigger on source file changes
-            return /\.(c|cpp|d|go|h|nelua|nim|odin|rs|ts|wat|zig|porth)$/.test(file);
+            return /\.(c|cpp|d|go|h|nelua|nim|odin|porth|rs|ts|wat|zig)$/.test(file);
         }
     }
     watch("./", {recursive: true, filter: watchFilter}, (event, file) => {

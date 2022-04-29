@@ -240,11 +240,11 @@ w4 png2src --lang rust top.png down.png left.png right.png
 | --nelua          |               | Uses Nelua for the new project            |
 | --nim            |               | Uses Nim for the new project              |
 | --odin           |               | Uses Odin for the new project             |
+| --porth          |               | Uses Porth for the new project            |
 | --rs             |               | Uses Rust for the new project             |
 | --rust           |               | Same as `--rs`                            |
 | --wat            |               | Uses WebAssembly Text for the new project |
 | --zig            |               | Uses Zig for the new project              |
-| --porth          |               | Uses Porth for the new project            |
 | --lang LANGUAGE  | as / W4_LANG  | Uses the provided language                |
 | -t FILE          |               | Uses a custom template file               |
 | --template FILE  |               | Same as `-t`                              |

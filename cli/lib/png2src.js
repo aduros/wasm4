@@ -74,6 +74,16 @@ var {{name}}: array[{{length}}, uint8] = [{{firstByte}}'u8,{{restBytes}}]
 
 {{/sprites}}`,
 
+porth:
+    `{{#sprites}}
+// {{name}} sprite
+const {{name}}-sprite \"{{porthBytes}}\"c end
+const {{name}}-flags  {{flags}} end // {{flagsHumanReadable}}
+const {{name}}-height {{height}} end
+const {{name}}-width  {{width}} end
+
+{{/sprites}}`,
+
     rust:
         `{{#sprites}}
 // {{name}}
@@ -104,16 +114,6 @@ const {{name}}_width = {{width}};
 const {{name}}_height = {{height}};
 const {{name}}_flags = {{flags}}; // {{flagsHumanReadable}}
 const {{name}} = [{{length}}]u8{ {{bytes}} };
-
-{{/sprites}}`,
-
-    porth:
-        `{{#sprites}}
-// {{name}} sprite
-const {{name}}-sprite \"{{porthBytes}}\"c end
-const {{name}}-flags  {{flags}} end // {{flagsHumanReadable}}
-const {{name}}-height {{height}} end
-const {{name}}-width  {{width}} end
 
 {{/sprites}}`,
 };

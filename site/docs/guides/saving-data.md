@@ -67,6 +67,12 @@ game_data : i32 = 1337
 w4.diskw(&game_data, size_of(game_data))
 ```
 
+```porth
+const data "\\39\\05\\00\\00"c end
+
+4 data diskw
+```
+
 ```rust
 let game_data: i32 = 1337;
 
@@ -87,12 +93,6 @@ unsafe {
 ```zig
 var game_data: i32 = 1337;
 _ = w4.diskw(@ptrCast([*]u8, &game_data), @sizeOf(@TypeOf(game_data)));
-```
-
-```porth
-const data "\\39\\05\\00\\00"c end
-
-4 data diskw
 ```
 
 </MultiLanguageCode>
@@ -146,6 +146,12 @@ game_data : i32
 w4.diskr(&game_data, size_of(game_data))
 ```
 
+```porth
+memory game_data 4 end
+
+4 game_data diskr
+```
+
 ```rust
 let game_data = unsafe {
     let mut buffer = [0u8; core::mem::size_of::<i32>()];
@@ -164,12 +170,6 @@ let game_data = unsafe {
 ```zig
 var game_data: i32 = undefined;
 _ = w4.diskr(@ptrCast([*]u8, &game_data), @sizeOf(@TypeOf(game_data)));
-```
-
-```porth
-memory game_data 4 end
-
-4 game_data diskr
 ```
 
 </MultiLanguageCode>

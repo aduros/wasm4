@@ -59,6 +59,13 @@ w4.PALETTE[2] = 0xeb6b6f
 w4.PALETTE[3] = 0x7c3f58
 ```
 
+```porth
+  0xfff6d3 $PALETTE0 !int
+  0xf9a875 $PALETTE1 !int
+  0xeb6b6f $PALETTE2 !int
+  0x7c3f58 $PALETTE3 !int
+```
+
 ```rust
 unsafe {
     *PALETTE = [
@@ -84,13 +91,6 @@ w4.PALETTE.* = .{
     0xeb6b6f,
     0x7c3f58,
 };
-```
-
-```porth
-  0xfff6d3 $PALETTE0 !int
-  0xf9a875 $PALETTE1 !int
-  0xeb6b6f $PALETTE2 !int
-  0x7c3f58 $PALETTE3 !int
 ```
 
 </MultiLanguageCode>
@@ -151,6 +151,11 @@ w4.DRAW_COLORS^ = 0x42
 w4.rect(10, 10, 32, 32)
 ```
 
+```porth
+0x42 $DRAW_COLORS !16
+32 32 10 10 rect
+```
+
 ```rust
 unsafe { *DRAW_COLORS = 0x42 }
 rect(10, 10, 32, 32);
@@ -167,11 +172,6 @@ rect(10, 10, 32, 32);
 ```zig
 w4.DRAW_COLORS.* = 0x42;
 w4.rect(10, 10, 32, 32);
-```
-
-```porth
-0x42 $DRAW_COLORS !16
-32 32 10 10 rect
 ```
 
 </MultiLanguageCode>
@@ -213,6 +213,12 @@ text("Hello world!", 10, 10)
 w4.text("Hello world!", 10, 10)
 ```
 
+```porth
+import proc text int int ptr in end
+
+10 10 "Hello World!"c text 
+```
+
 ```rust
 text("Hello world!", 10, 10);
 ```
@@ -228,12 +234,6 @@ text("Hello world!", 10, 10);
 
 ```zig
 w4.text("Hello world!", 10, 10);
-```
-
-```porth
-import proc text int int ptr in end
-
-10 10 "Hello World!"c text 
 ```
 
 </MultiLanguageCode>
@@ -295,6 +295,14 @@ for _, i in w4.FRAMEBUFFER {
 }
 ```
 
+```porth
+$FRAMEBUFFER 
+0 while dup 6400 < do
+  over over ptr+ 0xff swap !8
+  1 +
+end drop drop
+```
+
 ```rust
 unsafe {
     (&mut *FRAMEBUFFER).fill(3 | (3 << 2) | (3 << 4) | (3 << 6));
@@ -321,14 +329,6 @@ unsafe {
 for (w4.FRAMEBUFFER) |*x| {
     x.* = 3 | (3 << 2) | (3 << 4) | (3 << 6);
 }
-```
-
-```porth
-$FRAMEBUFFER 
-0 while dup 6400 < do
-  over over ptr+ 0xff swap !8
-  1 +
-end drop drop
 ```
 
 </MultiLanguageCode>
@@ -492,6 +492,10 @@ pixel :: proc "c" (x : int, y : int) {
 }
 ```
 
+```porth
+// TODO
+```
+
 ```rust
 fn pixel(x: i32, y: i32) {
     // The byte index into the framebuffer that contains (x, y)
@@ -600,10 +604,6 @@ fn pixel(x: i32, y: i32) void {
     // Write to the framebuffer
     w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] & ~mask);
 }
-```
-
-```porth
-// TODO
 ```
 
 </MultiLanguageCode>

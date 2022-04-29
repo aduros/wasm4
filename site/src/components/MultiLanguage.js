@@ -14,10 +14,10 @@ const names = {
     "nelua": "Nelua",
     "nim": "Nim",
     "odin": "Odin",
+    "porth": "Porth",
     "rust": "Rust",
     "wat": "WebAssembly Text",
     "zig": "Zig",
-    "porth": "Porth",
 };
 
 /**

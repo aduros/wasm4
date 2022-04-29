@@ -172,5 +172,14 @@ foreign wasm4 {
 	// Prints a message to the debug console.
 	@(link_name="traceUtf8")
 	trace :: proc(text: string) ---
+	// Prints a message to the debug console, with a format string.
+	// These formats are supported: 
+	// %c: Character
+	// %d: Decimal
+	// %f: Float (Cast ints to float with f64(your_int))
+	// %s: String
+	// %x: Hex
+	tracef :: proc(fmt:cstring, #c_vararg args: ..any) ---
+	
 }
 

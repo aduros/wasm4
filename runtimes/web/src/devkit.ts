@@ -1,1 +1,3 @@
-export const websocket = import.meta.env.DEV ? new WebSocket("ws://"+location.host) : null;
+export const websocket = import.meta.env.DEV
+    ? new WebSocket((location.protocol == "https:" ? "wss" : "ws") + "://" + location.host)
+    : null;

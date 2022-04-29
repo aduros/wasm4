@@ -93,6 +93,6 @@ export const memoryMap: Readonly<Record<string, Range>> = {
   },
   PROGRAM_MEMORY: {
     offset: 0x19a0,
-    len: 58975,
+    len: 58976,
   },
 };

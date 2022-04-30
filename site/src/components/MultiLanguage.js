@@ -15,6 +15,7 @@ const names = {
     "nim": "Nim",
     "odin": "Odin",
     "porth": "Porth",
+    "roland": "Roland",
     "rust": "Rust",
     "wat": "WebAssembly Text",
     "zig": "Zig",
@@ -110,8 +111,8 @@ export default function MultiLanguage (props) {
                     const to = `${history.location.pathname}?code-lang=${value}${history.location.hash || '#no-scroll'}`
 
                     return (<li key={value}>
-                        <Link 
-                          to={to} 
+                        <Link
+                          to={to}
                           replace
                           className={clsx('dropdown__link', value == activeLang && "dropdown__link--active")}
                         >
@@ -119,7 +120,7 @@ export default function MultiLanguage (props) {
                         </Link>
                     </li>);
                 }
-       
+
                 )}
             </ul>
         </div>

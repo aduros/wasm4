@@ -74,6 +74,9 @@ w4 init --lang nim
 | --nelua          |               | Uses Nelua for the new project            |
 | --nim            |               | Uses Nim for the new project              |
 | --odin           |               | Uses Odin for the new project             |
+| --porth          |               | Uses Porth for the new project            |
+| --roland         |               | Uses Roland for the new project           |
+| --odin           |               | Uses Odin for the new project             |
 | --rs             |               | Uses Rust for the new project             |
 | --rust           |               | Same as `--rs`                            |
 | --wat            |               | Uses WebAssembly Text for the new project |
@@ -232,20 +235,21 @@ w4 png2src --lang rust top.png down.png left.png right.png
 
 | Option           | Default value | Description                               |
 | ---------------- | ------------- | ----------------------------------------- |
-| --as             |               | Uses AssemblyScript for the new project   |
+| --as             |               | Generates AssemblyScript source           |
 | --assemblyscript |               | Same as `--as`                            |
-| --c              |               | Uses C/C++  for the new project           |
-| --d              |               | Uses D for the new project                |
-| --go             |               | Uses Go for the new project               |
-| --nelua          |               | Uses Nelua for the new project            |
-| --nim            |               | Uses Nim for the new project              |
-| --odin           |               | Uses Odin for the new project             |
-| --porth          |               | Uses Porth for the new project            |
-| --rs             |               | Uses Rust for the new project             |
+| --c              |               | Generates C/C++ source                    |
+| --d              |               | Generates D source                        |
+| --go             |               | Generates Go source                       |
+| --nelua          |               | Generates Nelua source                    |
+| --nim            |               | Generates Nim source                      |
+| --odin           |               | Generates Odin source                     |
+| --porth          |               | Generates Porth source                    |
+| --roland         |               | Generates Roland source                   |
+| --rs             |               | Generates Rust source                     |
 | --rust           |               | Same as `--rs`                            |
-| --wat            |               | Uses WebAssembly Text for the new project |
-| --zig            |               | Uses Zig for the new project              |
-| --lang LANGUAGE  | as / W4_LANG  | Uses the provided language                |
+| --wat            |               | Generates WebAssembly Text source         |
+| --zig            |               | Generates Zig source                      |
+| --lang LANGUAGE  | as / W4_LANG  | Generates source in the provided language |
 | -t FILE          |               | Uses a custom template file               |
 | --template FILE  |               | Same as `-t`                              |
 | -o FILE          |               | Use given file instead of stdout          |
@@ -342,7 +346,7 @@ w4 help run-native
 
 **Description:**
 
-This command shows all options, the usage and more about the `w4` CLI or its subcommands. 
+This command shows all options, the usage and more about the `w4` CLI or its subcommands.
 Providing the `-V` or `--version` option however has precedence over a subcommand.
 
 Therefore a `w4 help --version png2src` will not lead to show the help for the `png2src` command, but will only output the current version.

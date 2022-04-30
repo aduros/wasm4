@@ -1,0 +1,26 @@
+static SMILEY: [u8; 8] = [
+   0b11000011,
+   0b10000001,
+   0b00100100,
+   0b00100100,
+   0b00000000,
+   0b00100100,
+   0b10011001,
+   0b11000011,
+];
+
+proc start() {
+
+}
+
+proc update() {
+   DRAW_COLORS~ = 2;
+   text("Hello from Roland!", 10, 10);
+
+   if GAMEPADS~[0] & BUTTON_1 != 0 {
+      DRAW_COLORS~ = 4;
+   }
+
+   blit(&SMILEY[0], 76, 76, 8, 8, BLIT_1BPP);
+   text("Press X to blink", 16, 90);
+}

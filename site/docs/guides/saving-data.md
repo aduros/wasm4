@@ -73,6 +73,11 @@ const data "\\39\\05\\00\\00"c end
 4 data diskw
 ```
 
+```roland
+let game_data: i32 = 1337;
+diskw(&game_data transmute &u8, sizeof$i32());
+```
+
 ```rust
 let game_data: i32 = 1337;
 
@@ -150,6 +155,11 @@ w4.diskr(&game_data, size_of(game_data))
 memory game_data 4 end
 
 4 game_data diskr
+```
+
+```roland
+let game_data: i32 = 0;
+diskr(&game_data transmute &u8, sizeof$i32());
 ```
 
 ```rust

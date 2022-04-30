@@ -74,13 +74,23 @@ var {{name}}: array[{{length}}, uint8] = [{{firstByte}}'u8,{{restBytes}}]
 
 {{/sprites}}`,
 
-porth:
-    `{{#sprites}}
+    porth:
+        `{{#sprites}}
 // {{name}} sprite
 const {{name}}-sprite \"{{porthBytes}}\"c end
 const {{name}}-flags  {{flags}} end // {{flagsHumanReadable}}
 const {{name}}-height {{height}} end
 const {{name}}-width  {{width}} end
+
+{{/sprites}}`,
+
+    roland:
+        `{{#sprites}}
+// {{name}}
+const {{rustName}}_WIDTH: u32 = {{width}};
+const {{rustName}}_HEIGHT: u32 = {{height}};
+const {{rustName}}_FLAGS: u32 = {{flags}}; // {{flagsHumanReadable}}
+static {{rustName}}: [u8; {{length}}] = [ {{bytes}} ];
 
 {{/sprites}}`,
 

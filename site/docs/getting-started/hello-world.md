@@ -54,7 +54,7 @@ end
 ```nim
 import cart/wasm4
 
-proc update {.exportWasm.} = 
+proc update {.exportWasm.} =
   rect(10, 10, 32, 32)
 ```
 
@@ -76,6 +76,14 @@ proc update in
   // Draw a rectangle at (10, 10) with size (32, 32).
   32 32 10 10 rect
 end
+```
+
+```roland
+proc start() {}
+
+proc update() {
+   rect(10, 10, 32, 32);
+}
 ```
 
 ```rust
@@ -177,6 +185,12 @@ w4.rect(10, 10, 32, 32)
 32 32 10 10 rect
 ```
 
+```roland
+DRAW_COLORS~ = 2;
+
+rect(10, 10, 32, 32);
+```
+
 ```rust
 unsafe { *DRAW_COLORS = 2 }
 
@@ -237,6 +251,10 @@ w4.trace("Hello world!")
 import proc trace ptr in end
 
 "Hello world!"c trace
+```
+
+```roland
+trace("Hello world!");
 ```
 
 ```rust

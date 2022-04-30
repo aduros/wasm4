@@ -50,6 +50,11 @@ const HELP = {
       build: 'make',
       cart: 'build/cart.wasm',
     },
+    roland: {
+        name: 'Roland',
+        build: 'rolandc cart.rol --wasm4',
+        cart: 'cart.wasm',
+    },
     rust: {
         name: "Rust",
         build: "cargo build --release",
@@ -85,7 +90,7 @@ const HELP = {
         path.resolve(__dirname, '../assets/templates/readme-template.md'), { encoding: 'utf-8' }
     );
 
-    const readmeRender =  Mustache.render(readmeTemplate, { 
+    const readmeRender =  Mustache.render(readmeTemplate, {
         name: path.basename(path.resolve(destDir)),
         lang: HELP[lang],
         'code-lang': lang,

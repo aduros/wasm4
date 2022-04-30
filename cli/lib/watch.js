@@ -27,6 +27,10 @@ function start (opts) {
         buildCommand = "nimble";
         buildParams = ["dbg"];
         buildOutput = "build/cart.wasm";
+    } else if (fs.existsSync("cart.rol")) {
+        buildCommand = "rolandc";
+        buildParams = ["cart.rol", "--wasm4"];
+        buildOutput = "cart.wasm";
 
     } else if (fs.existsSync("Makefile")) {
         buildCommand = "make";
@@ -73,7 +77,7 @@ function start (opts) {
             return skip
         } else {
             // Only trigger on source file changes
-            return /\.(c|cpp|d|go|h|nelua|nim|odin|porth|rs|ts|wat|zig)$/.test(file);
+            return /\.(c|cpp|d|go|h|nelua|nim|odin|porth|rol|rs|ts|wat|zig)$/.test(file);
         }
     }
     watch("./", {recursive: true, filter: watchFilter}, (event, file) => {

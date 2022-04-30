@@ -10,6 +10,7 @@ const classNameToLanguage = {
     "language-lua": "nelua",
     "language-nelua": "nelua",
     "language-nim": "nim",
+    "language-roland": "roland",
     "language-rust": "rust",
     "language-go": "go",
     "language-odin": "odin",

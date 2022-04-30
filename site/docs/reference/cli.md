@@ -76,7 +76,6 @@ w4 init --lang nim
 | --odin           |               | Uses Odin for the new project             |
 | --porth          |               | Uses Porth for the new project            |
 | --roland         |               | Uses Roland for the new project           |
-| --odin           |               | Uses Odin for the new project             |
 | --rs             |               | Uses Rust for the new project             |
 | --rust           |               | Same as `--rs`                            |
 | --wat            |               | Uses WebAssembly Text for the new project |

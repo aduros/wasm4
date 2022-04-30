@@ -76,6 +76,12 @@ local prev_state = 0
 
 </Page>
 
+<Page value="porth">
+
+// TODO
+
+</Page>
+
 <Page value="rust">
 
 To place (and eat) a fruit, you first need to define it in `Game`. Since it's simply a point on the grid, `Point` will do:
@@ -257,6 +263,12 @@ local prev_state = 0
 </Page>
 
 <Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="porth">
 
 // TODO
 
@@ -614,6 +626,12 @@ With that out of the way, it's time to actually render the newly imported sprite
 
 </Page>
 
+<Page value="porth">
+
+// TODO
+
+</Page>
+
 <Page value="rust">
 
 Now you need to import the image. For this, the WASM-4 CLI tool `w4` comes with another tool: `png2src`. You can use it like this:
@@ -908,6 +926,12 @@ This way, w4 uses the color palette in its default configuration. Except for one
 </Page>
 
 <Page value="odin">
+
+// TODO
+
+</Page>
+
+<Page value="porth">
 
 // TODO
 

@@ -57,6 +57,12 @@ tone(262, 60, 100, TONE_PULSE1)
 w4.tone(262, 60, 100, .Pulse1)
 ```
 
+```porth
+import proc tone int int int int in end
+
+$TONE_PULSE1 60 60 262 tone
+```
+
 ```rust
 tone(262, 60, 100, TONE_PULSE1);
 ```
@@ -117,6 +123,10 @@ tone(262, 60, 100, TONE_PULSE1 or TONE_MODE3)
 w4.tone(262, 60, 100, .Pulse1, .Half)
 ```
 
+```porth
+$TONE_PULSE1 $TONE_MODE3 or 100 60 262 tone
+```
+
 ```rust
 tone(262, 60, 100, TONE_PULSE1 | TONE_MODE3);
 ```
@@ -173,6 +183,10 @@ tone(262 or (523 shl 16), 60, 100, TONE_PULSE1)
 
 ```odin
 w4.tone(262 | (523 << 16), 60, 100, .Pulse1)
+```
+
+```porth
+$TONE_PULSE1 100 60 523 16 shl 262 or tone
 ```
 
 ```rust
@@ -250,6 +264,10 @@ tone(262, 60 | (30 << 8), 100, TONE_PULSE1)
 w4.tone(262, 60 | (30 << 8), 100, .Pulse1)
 ```
 
+```porth
+$TONE_PULSE1 100 30 8 shl 60 or 262 tone
+```
+
 ```rust
 tone(262, 60 | (30 << 8), 100, TONE_PULSE1);
 ```
@@ -305,6 +323,10 @@ tone(262, 60, 100, TONE_PULSE1 or TONE_PAN_LEFT)
 
 ```odin
 w4.tone(262, 60, 100, .Pulse1, .Half, .Left)
+```
+
+```porth
+$TONE_PAN_LEFT $TONE_PULSE1 or 100 60 262 tone
 ```
 
 ```rust

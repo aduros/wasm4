@@ -1,0 +1,34 @@
+include "wasm4.porth"
+
+const smiley "\\c3\\81\\24\\24\\00\\24\\99\\c3"c end
+
+const hello "Hello from Porth!"c end
+const blink "Press X to blink"c  end
+
+proc main in end
+
+proc update in
+  memory $gamepad sizeof(u8) end
+  
+  // DRAW_COLORS = 2
+  2 $DRAW_COLORS !16
+
+  // text("Hello from Wat!", 10, 10);
+  10 10 hello text
+
+  // u8 gamepad = $GAMEPAD1;
+  $GAMEPAD1 @8 $gamepad !8
+
+  // if (gamepad & BUTTON_1) {
+  //     $DRAW_COLORS = 4;
+  // }
+  $gamepad @8 $BUTTON_1 and cast(bool) if
+    4 $DRAW_COLORS !16
+  end
+
+  // blit(smiley, 76, 76, 8, 8, $BLIT_1BPP);
+  $BLIT_1BPP 8 8 76 76 smiley blit
+
+  // text("Press X to blink", 16, 90);
+  90 16 blink text
+end

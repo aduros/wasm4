@@ -59,6 +59,13 @@ w4.PALETTE[2] = 0xeb6b6f
 w4.PALETTE[3] = 0x7c3f58
 ```
 
+```porth
+  0xfff6d3 $PALETTE0 !int
+  0xf9a875 $PALETTE1 !int
+  0xeb6b6f $PALETTE2 !int
+  0x7c3f58 $PALETTE3 !int
+```
+
 ```rust
 unsafe {
     *PALETTE = [
@@ -144,6 +151,11 @@ w4.DRAW_COLORS^ = 0x42
 w4.rect(10, 10, 32, 32)
 ```
 
+```porth
+0x42 $DRAW_COLORS !16
+32 32 10 10 rect
+```
+
 ```rust
 unsafe { *DRAW_COLORS = 0x42 }
 rect(10, 10, 32, 32);
@@ -199,6 +211,12 @@ text("Hello world!", 10, 10)
 
 ```odin
 w4.text("Hello world!", 10, 10)
+```
+
+```porth
+import proc text int int ptr in end
+
+10 10 "Hello World!"c text 
 ```
 
 ```rust
@@ -275,6 +293,14 @@ for i in 0..<len(FRAMEBUFFER[]):
 for _, i in w4.FRAMEBUFFER {
     w4.FRAMEBUFFER[i] = 3 | (3 << 2) | (3 << 4) | (3 << 6)
 }
+```
+
+```porth
+$FRAMEBUFFER 
+0 while dup 6400 < do
+  over over ptr+ 0xff swap !8
+  1 +
+end drop drop
 ```
 
 ```rust
@@ -464,6 +490,10 @@ pixel :: proc "c" (x : int, y : int) {
     // Write to the framebuffer
     w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &~ mask)
 }
+```
+
+```porth
+// TODO
 ```
 
 ```rust

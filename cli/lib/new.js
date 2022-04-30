@@ -45,6 +45,11 @@ const HELP = {
         build: "make",
         cart: "build/cart.wasm",
     },
+    porth: {
+      name: 'Porth',
+      build: 'make',
+      cart: 'build/cart.wasm',
+    },
     rust: {
         name: "Rust",
         build: "cargo build --release",
@@ -59,7 +64,7 @@ const HELP = {
       name: 'Zig',
       build: 'zig build -Drelease-small=true',
       cart: 'zig-out/lib/cart.wasm',
-    },
+    }
 };
 
 /**

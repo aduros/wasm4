@@ -68,6 +68,15 @@ if .RIGHT in w4.GAMEPAD1^ {
 }
 ```
 
+```porth
+memory gamepad sizeof(u8) end
+$GAMEPAD1 @8 gamepad !8
+
+$gamepad @8 $BUTTON_RIGHT and cast(bool) if
+  "Right button is down!"c trace
+end
+```
+
 ```rust
 let gamepad = unsafe { *GAMEPAD1 };
 
@@ -234,6 +243,23 @@ update :: proc "c" () {
     if .RIGHT in pressed_this_frame {
         w4.trace("Right button was just pressed!")
     }
+```
+
+```porth
+memory prev-state sizeof(u8) end
+
+proc update in
+  $GAMEPAD1 @8
+  let gamepad in
+    gamepad prev-state @8 xor gamepad and
+    gamepad prev-state !8
+    let pressed-this-frame in
+      pressed-this-frame $BUTTON_RIGHT and cast(bool) if
+        "Right button was just pressed!"c trace
+      end
+    end
+  end
+end
 ```
 
 ```rust

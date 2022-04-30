@@ -150,7 +150,7 @@ Once this done, simply relocate the fruit:
 fruit = { x = math.random(0, 19), y = math.random(0,19) }
 ```
 
-Just this however will realocate the fruit in the same places for every run because it uses always the same seed, to generate a random seed we need to call `math.randomseed` function with at least one argument, which can be `frame_count`:
+Just this however will reallocate the fruit in the same places for every run because it uses always the same seed, to generate a random seed we need to call `math.randomseed` function with at least one argument, which can be `frame_count`:
 
 ```lua
 math.randomseed(frame_count)

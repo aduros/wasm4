@@ -11,7 +11,7 @@ w4 bundle cart.wasm --title "My Game" --html my-game.html
 The bundled HTML contains no external dependencies, works offline, and can be easily shared on sites like [itch.io](https://itch.io/).
 
 For saving disks, the localStorage key used will be based on the game title you supply.
-Alternatively, you can specifiy a localStorage key prefix manually with `--html-disk-prefix <prefix>`.
+Alternatively, you can specify a localStorage key prefix manually with `--html-disk-prefix <prefix>`.
 This is useful to prevent disk conflicts between games.
 
 ## Bundle to Windows/Mac/Linux executable

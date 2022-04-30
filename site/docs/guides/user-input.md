@@ -77,6 +77,12 @@ $gamepad @8 $BUTTON_RIGHT and cast(bool) if
 end
 ```
 
+```roland
+if GAMEPADS~[0] & BUTTON_RIGHT != 0 {
+   trace("Right button is down!");
+}
+```
+
 ```rust
 let gamepad = unsafe { *GAMEPAD1 };
 
@@ -218,9 +224,9 @@ end
 ```nim
 var previousGamepad: uint8
 
-proc update {.exportWasm.} = 
+proc update {.exportWasm.} =
   var gamepad = GAMEPAD1[]
-  
+
   # Only the buttons that were pressed down this frame
   var pressedThisFrame = gamepad and (gamepad xor previousGamepad);
   previousGamepad = gamepad
@@ -260,6 +266,20 @@ proc update in
     end
   end
 end
+```
+
+```roland
+proc update() {
+   let previous = PREVIOUS_GAMEPAD;
+   let gamepad = GAMEPADS~[0];
+   // Only the buttons that were pressed down this frame
+   let pressed_this_frame = gamepad & (gamepad ^ previous);
+   PREVIOUS_GAMEPAD = gamepad;
+
+   if pressed_this_frame & BUTTON_RIGHT != 0 {
+      trace("Right button was just pressed!");
+   }
+}
 ```
 
 ```rust

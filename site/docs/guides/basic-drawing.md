@@ -66,6 +66,15 @@ w4.PALETTE[3] = 0x7c3f58
   0x7c3f58 $PALETTE3 !int
 ```
 
+```roland
+PALETTE~ = [
+   0xfff6d3,
+   0xf9a875,
+   0xeb6b6f,
+   0x7c3f58,
+];
+```
+
 ```rust
 unsafe {
     *PALETTE = [
@@ -156,6 +165,11 @@ w4.rect(10, 10, 32, 32)
 32 32 10 10 rect
 ```
 
+```roland
+DRAW_COLORS~ = 0x42;
+rect(10, 10, 32, 32);
+```
+
 ```rust
 unsafe { *DRAW_COLORS = 0x42 }
 rect(10, 10, 32, 32);
@@ -216,7 +230,11 @@ w4.text("Hello world!", 10, 10)
 ```porth
 import proc text int int ptr in end
 
-10 10 "Hello World!"c text 
+10 10 "Hello World!"c text
+```
+
+```roland
+text("Hello world!", 10, 10);
 ```
 
 ```rust
@@ -296,11 +314,17 @@ for _, i in w4.FRAMEBUFFER {
 ```
 
 ```porth
-$FRAMEBUFFER 
+$FRAMEBUFFER
 0 while dup 6400 < do
   over over ptr+ 0xff swap !8
   1 +
 end drop drop
+```
+
+```roland
+for i in 0..FRAMEBUFFER~.length {
+   FRAMEBUFFER~[i] = 3 | (3 << 2) | (3 << 4) | (3 << 6);
+}
 ```
 
 ```rust
@@ -375,7 +399,7 @@ void pixel (int x, int y) {
         // Transparent
         return;
     }
-    int color = (palette_color - 1) & 0b11;   
+    int color = (palette_color - 1) & 0b11;
 
     // Write to the framebuffer
     FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask);
@@ -457,7 +481,7 @@ proc pixel(x, y: int32) =
   # Calculate the bits within the byte that corresponds to our position
   let shift = (x and 0b11) shl 1
   let mask = uint8(0b11 shl shift)
-  
+
   # Use the first DRAW_COLOR as the pixel color
   let palette_color = uint8(DRAW_COLORS[] and 0b1111)
   if (palette_color == 0) {
@@ -494,6 +518,27 @@ pixel :: proc "c" (x : int, y : int) {
 
 ```porth
 // TODO
+```
+
+```roland
+proc pixel(x: i32, y: i32) {
+   // The byte index into the framebuffer that contains (x, y)
+   let idx = (y transmute usize * 160 + x transmute usize) >> 2;
+
+   // Calculate the bits within the byte that corresponds to our position
+   let shift = (x truncate u8 & 0b11) << 1;
+   let mask = 0b11 << shift;
+
+   let palette_color: u8 = (DRAW_COLORS~ & 0xf) truncate u8;
+   if (palette_color == 0) {
+      // Transparent
+      return;
+   }
+   let color = (palette_color - 1) & 0b11;
+
+   // Write to the framebuffer
+   FRAMEBUFFER~[idx] = (color << shift) | (FRAMEBUFFER~[idx] & !mask);
+}
 ```
 
 ```rust
@@ -567,7 +612,7 @@ fn pixel(x: i32, y: i32) {
 
   ;; Write to the framebuffer:
   ;; FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask);
-  ;; 
+  ;;
   ;; Note that WebAssembly doesn't have a bitwise not instruction, so
   ;; `~n` becomes `n ^ ~0` (where -1 is used for ~0 below).
   (i32.store8 offset=0xa0

@@ -225,6 +225,33 @@ w4 run build/cart.wasm
 
 </Page>
 
+<Page value="roland">
+
+:::note
+[Roland](https://github.com/DenialAdams/roland) is still under development. There are no stability guarantees, but your feedback will be highly influential!
+:::
+
+To compile Roland projects you will need to download [rolandc](https://github.com/DenialAdams/roland#getting-the-compiler) binary and put it on your path.
+
+```shell
+w4 new --roland hello-world
+cd hello-world
+```
+
+Compile the .wasm cartridge:
+
+```shell
+rolandc cart.rol --wasm4
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 run cart.wasm
+```
+
+</Page>
+
 <Page value="rust">
 
 To compile Rust projects you will need `cargo` installed. You will also need the wasm32 target,

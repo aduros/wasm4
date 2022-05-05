@@ -437,7 +437,7 @@ void update () {
         if (gravityDelay) {
             --gravityDelay;
         } else {
-            gravityDelay = LEVEL_SPEED[min(level, sizeof(LEVEL_SPEED))];
+            gravityDelay = LEVEL_SPEED[min(level, sizeof(LEVEL_SPEED)-1)];
             stepGravity();
         }
     }

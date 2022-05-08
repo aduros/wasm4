@@ -356,6 +356,8 @@ export class Netplay {
             } break;
 
             case "JOIN_REPLY": {
+                this.localPlayerIdx = message.yourPlayerIdx;
+
                 // Tell all other peers about our new player info
                 for (const otherPlayer of this.remotePlayers.values()) {
                     if (otherPlayer != remotePlayer) {
@@ -378,7 +380,6 @@ export class Netplay {
                 state.write(this.runtime);
 
                 this.rollbackMgr = new RollbackManager(message.frame, this.runtime);
-                this.localPlayerIdx = message.yourPlayerIdx;
 
                 if (this.onstart) {
                     this.onstart(this.localPlayerIdx);

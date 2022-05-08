@@ -83,6 +83,10 @@ export class Runtime {
         this.data.setUint8(constants.ADDR_GAMEPAD1 + idx, buttons);
     }
 
+    setNetplay (localPlayerIdx: number) {
+        this.data.setUint8(constants.ADDR_NETPLAY, 0b100 | (localPlayerIdx & 0b11));
+    }
+
     getSystemFlag (mask: number) {
         return this.data.getUint8(constants.ADDR_SYSTEM_FLAGS) & mask;
     }

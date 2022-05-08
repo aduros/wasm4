@@ -232,6 +232,8 @@ export class Netplay {
     }
 
     host () {
+        this.runtime.setNetplay(0);
+
         // Start at frame 1 because we treat frame 0 as a "null" state
         this.rollbackMgr = new RollbackManager(1, this.runtime);
         this.localPlayerIdx = 0;
@@ -378,6 +380,8 @@ export class Netplay {
                 const state = new State();
                 state.fromBytes(stateBytes);
                 state.write(this.runtime);
+
+                this.runtime.setNetplay(this.localPlayerIdx);
 
                 this.rollbackMgr = new RollbackManager(message.frame, this.runtime);
 

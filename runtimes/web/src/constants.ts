@@ -26,6 +26,7 @@ export const ADDR_MOUSE_X = 0x1a;
 export const ADDR_MOUSE_Y = 0x1c;
 export const ADDR_MOUSE_BUTTONS = 0x1e;
 export const ADDR_SYSTEM_FLAGS = 0x1f;
+export const ADDR_NETPLAY = 0x20;
 export const ADDR_FRAMEBUFFER = 0xa0;
 
 export const BUTTON_X = 1;

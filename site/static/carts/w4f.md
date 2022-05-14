@@ -4,9 +4,9 @@ github: ChuuniMage
 date: 2022-05-13
 ---
 
-Discord: Krzysztoφορος#9326
-
 # Win 4 Fighter (W4F)
+
+Discord: Krzysztoφορος#9326
 
 W4F is a minimalistic fighting game based on the core gameplay of Virtua Fighter.
 Intended exclusively for multiplayer.

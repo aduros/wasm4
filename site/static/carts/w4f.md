@@ -10,6 +10,8 @@ Discord: Krzysztoφορος#9326
 
 W4F is a minimalistic fighting game based on the core gameplay of Virtua Fighter.
 Intended exclusively for multiplayer.
+To play netplay, press Enter to open the WASM4 menu, and select "COPY NETPLAY URL".
+Share this URL with the person you want to play against. They will be able to use P1 controls to play.
 
 A = Guard
 B = Punch

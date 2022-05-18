@@ -25,7 +25,7 @@ enum gamepad4 = cast(const ubyte*)0x19;
 enum mouseX = cast(const short*)0x1a;
 enum mouseY = cast(const short*)0x1c;
 enum mouseButtons = cast(const ubyte*)0x1e;
-enum systemFlags = cast(const ubyte*)0x1f;
+enum systemFlags = cast(ubyte*)0x1f;
 enum framebuffer = cast(ubyte*)0xa0;
 
 enum button1 = 1;

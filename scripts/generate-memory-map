@@ -19,8 +19,9 @@ const memory = {
     MOUSE_BUTTONS: 1,
 
     SYSTEM_FLAGS: 1,
+    NETPLAY: 1,
 
-    _RESERVED: 128,
+    _RESERVED: 127,
 
     // Framebuffer should be 64 bit aligned
     FRAMEBUFFER: 160*160 >> 2,
@@ -86,7 +87,7 @@ console.log("// Go");
 generate((name, addr) => `var ${name} = (*${goTypes[name] || "uint8"})(unsafe.Pointer(uintptr(${addr})));`);
 
 console.log("// Nelua");
-generate((name, addr) => `global ${name} <const> = (@*${neluaTypes[name] || "uint8"})(${addr})`);
+generate((name, addr) => `global ${name} <comptime> = (@*${neluaTypes[name] || "uint8"})(${addr})`);
 
 var sum = 0;
 for (let name in memory) {

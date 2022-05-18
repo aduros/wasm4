@@ -12,6 +12,7 @@ const
   MOUSE_Y* = (cast[ptr int16](0x1c))
   MOUSE_BUTTONS* = (cast[ptr uint8](0x1e))
   SYSTEM_FLAGS* = (cast[ptr uint8](0x1f))
+  NETPLAY* = (cast[ptr uint8](0x20))
   FRAMEBUFFER* = (cast[ptr array[6400, uint8]](0xa0))
 
 const

@@ -23,6 +23,7 @@ MOUSE_X       := (^i16)(uintptr(0x1a))
 MOUSE_Y       := (^i16)(uintptr(0x1c))
 MOUSE_BUTTONS := (^Mouse_Buttons)(uintptr(0x1e))
 SYSTEM_FLAGS  := (^System_Flags)(uintptr(0x1f))
+NETPLAY       := (^u8)(uintptr(0x20))
 FRAMEBUFFER   := (^[6400]u8)(uintptr(0xa0)) // 4 bits * (160*160)
 
 Palette :: distinct [4]u32

@@ -26,6 +26,7 @@ enum mouseX = cast(const short*)0x1a;
 enum mouseY = cast(const short*)0x1c;
 enum mouseButtons = cast(const ubyte*)0x1e;
 enum systemFlags = cast(ubyte*)0x1f;
+enum netplay = cast(const ubyte*)0x20;
 enum framebuffer = cast(ubyte*)0xa0;
 
 enum button1 = 1;

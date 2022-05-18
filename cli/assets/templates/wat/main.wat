@@ -77,6 +77,7 @@
 (global $MOUSE_Y i32 (i32.const 0x1c))
 (global $MOUSE_BUTTONS i32 (i32.const 0x1e))
 (global $SYSTEM_FLAGS i32 (i32.const 0x1f))
+(global $NETPLAY i32 (i32.const 0x20))
 (global $FRAMEBUFFER i32 (i32.const 0xa0))
 
 (global $BUTTON_1 i32 (i32.const 1))

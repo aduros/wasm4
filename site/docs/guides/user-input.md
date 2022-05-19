@@ -254,6 +254,7 @@ update :: proc "c" () {
 ```porth
 memory prev-state sizeof(u8) end
 
+export update "update"
 proc update in
   $GAMEPAD1 @8
   let gamepad in

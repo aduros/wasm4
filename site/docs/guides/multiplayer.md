@@ -42,3 +42,26 @@ There are currently some caveats to keep in mind:
 - State saving/loading and cart reset is currently disabled during netplay.
 - Netplay is new and there may be bugs, please [report
   issues](https://github.com/aduros/wasm4/issues/new)!
+
+### The `NETPLAY` memory register
+
+WASM-4 exposes the state of netplay to the cart via the [`NETPLAY`](/docs/reference/memory#netplay)
+memory register.
+
+Reading this register is not required to implement netplay, but it can be used to implement advanced
+features such as non-shared screen multiplayer:
+
+```c
+// If netplay is active
+if (*NETPLAY & 0b100) {
+    int playerIdx = *NETPLAY & 0b011;
+    // Render the game from playerIdx's perspective
+    // ...
+}
+```
+
+This is a powerful feature enabling games with hidden information, like card games, strategy games,
+and first person shooters. However, caution must be taken by developers to not introduce
+desynchronization. In other words, the netplay player index should only be used to adjust how a
+frame is rendered, and not affect game logic. Each connected player must run the same game logic for
+all players in order to prevent desyncs.

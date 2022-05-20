@@ -201,7 +201,7 @@ w4 watch
 The tutorial for Porth is currently a Work-in-Progress. Most of the language specific instructions are currently missing.
 :::
 
-To compile Porth projects you will need to download [4orth](https://github.com/FrankWPA/4orth#4orth) and add it to `$PATH`.
+To compile Porth projects you will need to download [4orth](https://github.com/LunaAmora/4orth#4orth) and add it to `$PATH`.
 
 ```shell
 w4 new --porth snake

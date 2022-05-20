@@ -204,7 +204,7 @@ w4 run build/cart.wasm
 [Porth](https://gitlab.com/tsoding/porth#porth) is currently a work in progress language. Anything can change at any moment without notice.
 :::
 
-To compile Porth projects you will need to download [4orth](https://github.com/FrankWPA/4orth#4orth) and add it to `$PATH`.
+To compile Porth projects you will need to download [4orth](https://github.com/LunaAmora/4orth#4orth) and add it to `$PATH`.
 
 ```shell
 w4 new --porth hello-world

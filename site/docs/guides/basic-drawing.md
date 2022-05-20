@@ -60,10 +60,10 @@ w4.PALETTE[3] = 0x7c3f58
 ```
 
 ```porth
-  0xfff6d3 $PALETTE0 !int
-  0xf9a875 $PALETTE1 !int
-  0xeb6b6f $PALETTE2 !int
-  0x7c3f58 $PALETTE3 !int
+0xfff6d3 $PALETTE0 !int
+0xf9a875 $PALETTE1 !int
+0xeb6b6f $PALETTE2 !int
+0x7c3f58 $PALETTE3 !int
 ```
 
 ```roland

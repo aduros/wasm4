@@ -6,7 +6,7 @@ endif
 4ORTH_PATH  = $(shell command -v  $(4ORTH))
 
 ifeq (, $(4ORTH_PATH))
-$(error Download 4orth (https://github.com/FrankWPA/4orth) and add it to $$PATH)
+$(error Download 4orth (https://github.com/LunaAmora/4orth) and add it to $$PATH)
 endif
 
 4ORTH_ARGS = com -s

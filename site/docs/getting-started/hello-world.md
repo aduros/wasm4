@@ -72,6 +72,10 @@ update :: proc "c" () {
 ```porth
 import proc rect int int int int in end
 
+export main "start"
+proc main in end
+
+export update "update"
 proc update in
   // Draw a rectangle at (10, 10) with size (32, 32).
   32 32 10 10 rect

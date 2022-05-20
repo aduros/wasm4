@@ -280,7 +280,6 @@ blit(addr smiley[0], 10, 10, 8, 8, BLIT_1BPP or BLIT_FLIP_Y);
 // To use BLIT_2BPP:
 // w4.blit(&smiley[0], 10, 10, 8, 8, {.USE_2BPP, .FLIPY})
 w4.blit(&smiley[0], 10, 10, 8, 8, {.FLIPY})
-
 ```
 
 ```porth

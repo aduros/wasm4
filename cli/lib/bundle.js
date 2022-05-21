@@ -52,7 +52,7 @@ async function bundleHtml (cartFile, htmlFile, opts) {
     }
 
     const template = await fs.readFile(
-        path.resolve(__dirname, '../assets/bundle/template.html'),
+        (opts.htmlTemplate != null) ? opts.htmlTemplate : path.resolve(__dirname, '../assets/bundle/template.html'),
         { encoding: 'utf-8' }
     );
 

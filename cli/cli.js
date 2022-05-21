@@ -178,6 +178,7 @@ program.command("bundle <cart>")
     .option("--icon-url <url>", 'Favicon icon url')
     .option("--timestamp", 'Adds build timestamp to output', false)
     .option("--html-disk-prefix <prefix>", "Specify a prefix for the disk localStorage key. Defaults to game title")
+    .option("--html-template <file>", "Mustache HTML template file for standalone HTML. Defaults to a built-in template.")
     .action((cart, opts) => {
         const bundle = require("./lib/bundle");
         bundle.run(cart, opts);

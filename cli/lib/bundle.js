@@ -104,7 +104,7 @@ async function bundle(cartFile, opts) {
     const limit = 1 << 16;
     const stat = await fs.stat(cartFile);
     if (stat.size > limit) {
-        throw new Error(`Cart is above the size limit of ${limit} bytes.`);
+        throw new Error(`Cart size of ${stat.size} bytes is above the limit of ${limit} bytes.`);
     }
 
     if (opts.html) {

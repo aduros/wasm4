@@ -292,17 +292,18 @@ w4 bundle --windows wormhole.exe --title "Wormhole Deluxe" wormhole.wasm
 
 **Options:**
 
-| Option                    | Default value | Description                                                                           |
-| ------------------------- | ------------- | ------------------------------------------------------------------------------------- |
-| --html OUTPUT             |               | Bundle standalone HTML file                                                           |
-| --windows OUTPUT          |               | Bundle a native Windows executable                                                    |
-| --mac OUTPUT              |               | Bundle a native macOS executable                                                      |
-| --linux OUTPUT            |               | Bundle a native Linux executable                                                      |
-| --title TITLE             | "WASM-4 Game" | Title of the game                                                                     |
-| --description DESCRIPTION |               | The description of the game                                                           |
-| --icon-file FILE          |               | Icon of the game. Supported are png, ico and svg.<br/>This will override `--icon-url` |
-| --icon-url URL            |               | URL to the the Favicon of the game                                                    |
-| --timestamp               | false         | Adds build timestamp to output                                                        |
+| Option                    | Default value     | Description                                                                           |
+| ------------------------- | ----------------- | ------------------------------------------------------------------------------------- |
+| --html OUTPUT             |                   | Bundle standalone HTML file                                                           |
+| --windows OUTPUT          |                   | Bundle a native Windows executable                                                    |
+| --mac OUTPUT              |                   | Bundle a native macOS executable                                                      |
+| --linux OUTPUT            |                   | Bundle a native Linux executable                                                      |
+| --title TITLE             | "WASM-4 Game"     | Title of the game                                                                     |
+| --description DESCRIPTION |                   | The description of the game                                                           |
+| --icon-file FILE          |                   | Icon of the game. Supported are png, ico and svg.<br/>This will override `--icon-url` |
+| --icon-url URL            |                   | URL to the the Favicon of the game                                                    |
+| --timestamp               | false             | Adds build timestamp to output                                                        |
+| --html-template FILE      | built-in template | Mustache HTML template file for standalone HTML.                                      |
 
 **Description:**
 

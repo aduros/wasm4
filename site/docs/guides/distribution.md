@@ -14,6 +14,37 @@ For saving disks, the localStorage key used will be based on the game title you 
 Alternatively, you can specify a localStorage key prefix manually with `--html-disk-prefix <prefix>`.
 This is useful to prevent disk conflicts between games.
 
+You can customize the generated HTML file by giving a [Mustache](https://mustache.github.io/) template file with option `--html-template <file>`.
+Example of a template file:
+```html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+  {{#html.metadata}}
+  <meta name="{{name}}" content="{{content}}">
+  {{/html.metadata}}
+  {{#html.description}}
+  <meta name="description" content="{{html.description}}">
+  {{/html.description}}
+  {{#html.iconUrl}}
+  <link rel="shortcut icon" href="{{html.iconUrl}}">
+  {{/html.iconUrl}}
+  {{#html.diskPrefix}}
+  <script id="wasm4-disk-prefix" type="text/plain">{{{html.diskPrefix}}}</script>
+  {{/html.diskPrefix}}
+  <title>{{html.title}}</title>
+  <style>{{{html.wasm4Css}}}</style>
+</head>
+<body>
+  <script id="wasm4-cart-json" type="application/json">{{{html.wasmCartJson}}}</script>
+  <script>{{{html.wasm4js}}}</script>
+  <wasm4-app></wasm4-app>
+</body>
+</html>
+```
+
 ## Bundle to Windows/Mac/Linux executable
 
 Native executables for multiple platforms can also be bundled:

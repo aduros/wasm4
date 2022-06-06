@@ -506,9 +506,6 @@ This isn't hard either. Simple add the add the direction to the current head. An
 
         part[0].x = @mod((part[0].x + this.direction.x), 20);
         part[0].y = @mod((part[0].y + this.direction.y), 20);
-
-        if (part[0].x < 0) part[0].x = 19;
-        if (part[0].y < 0) part[0].y = 19;
     }
 ```
 

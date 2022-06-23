@@ -174,7 +174,7 @@ w4 watch
 The tutorial for Odin is currently a Work-in-Progress. Most of the language specific instructions are currently missing.
 :::
 
-To compile Odin projects you will need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable. You'll also need the latest version of [Odin](https://https://github.com/odin-lang/Odin).
+To compile Odin projects you will need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable. You'll also need the latest version of [Odin](https://github.com/odin-lang/Odin).
 
 ```shell
 w4 new --nim snake

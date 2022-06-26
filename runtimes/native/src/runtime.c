@@ -2,10 +2,10 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <m3_env.h>
 
 #include "apu.h"
 #include "framebuffer.h"
+#include "util.h"
 #include "wasm.h"
 #include "window.h"
 
@@ -45,14 +45,14 @@ void w4_runtimeInit (uint8_t* memoryBytes, w4_Disk* diskBytes) {
 
     // Set memory to initial state
     memset(memory, 0, 1 << 16);
-    m3ApiWriteMem32(&memory->palette[0], 0xe0f8cf);
-    m3ApiWriteMem32(&memory->palette[1], 0x86c06c);
-    m3ApiWriteMem32(&memory->palette[2], 0x306850);
-    m3ApiWriteMem32(&memory->palette[3], 0x071821);
+    w4_write32LE(&memory->palette[0], 0xe0f8cf);
+    w4_write32LE(&memory->palette[1], 0x86c06c);
+    w4_write32LE(&memory->palette[2], 0x306850);
+    w4_write32LE(&memory->palette[3], 0x071821);
     memory->drawColors[0] = 0x03;
     memory->drawColors[1] = 0x12;
-    m3ApiWriteMem16(&memory->mouseX, 0x7fff);
-    m3ApiWriteMem16(&memory->mouseY, 0x7fff);
+    w4_write16LE(&memory->mouseX, 0x7fff);
+    w4_write16LE(&memory->mouseY, 0x7fff);
 
     w4_apuInit();
     w4_framebufferInit(&memory->drawColors, memory->framebuffer);
@@ -63,8 +63,8 @@ void w4_runtimeSetGamepad (int idx, uint8_t gamepad) {
 }
 
 void w4_runtimeSetMouse (int16_t x, int16_t y, uint8_t buttons) {
-    m3ApiWriteMem16(&memory->mouseX, x);
-    m3ApiWriteMem16(&memory->mouseY, y);
+    w4_write16LE(&memory->mouseX, x);
+    w4_write16LE(&memory->mouseY, y);
     memory->mouseButtons = buttons;
 }
 
@@ -183,10 +183,10 @@ void w4_runtimeUpdate () {
     }
     w4_wasmCallUpdate();
     uint32_t palette[4] = {
-        m3ApiReadMem32(&memory->palette[0]),
-        m3ApiReadMem32(&memory->palette[1]),
-        m3ApiReadMem32(&memory->palette[2]),
-        m3ApiReadMem32(&memory->palette[3]),
+        w4_read32LE(&memory->palette[0]),
+        w4_read32LE(&memory->palette[1]),
+        w4_read32LE(&memory->palette[2]),
+        w4_read32LE(&memory->palette[3]),
     };
     w4_windowComposite(palette, memory->framebuffer);
 }

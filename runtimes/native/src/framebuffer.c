@@ -2,7 +2,8 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <m3_env.h>
+
+#include "util.h"
 
 static const uint8_t font[1792] = {
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -532,7 +533,7 @@ void w4_framebufferTextUtf8 (const uint8_t* str, int byteLength, int x, int y) {
 
 void w4_framebufferTextUtf16 (const uint16_t* str, int byteLength, int x, int y) {
     for (int currentX = x; byteLength > 0; ++str, byteLength -= 2) {
-        uint16_t c = m3ApiReadMem16(str);
+        uint16_t c = w4_read16LE(str);
         if (c == 10) {
             y += 8;
             currentX = x;

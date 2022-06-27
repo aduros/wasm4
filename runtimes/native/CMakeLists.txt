@@ -79,6 +79,21 @@ set_target_properties(wasm4 PROPERTIES C_STANDARD 99)
 install(TARGETS wasm4)
 endif ()
 
+if (WASMER_DIR)
+    set(WASMER_SOURCES
+        src/backend/main.c
+        src/backend/wasm_wasmer.c
+        src/backend/window_minifb.c
+    )
+    add_executable(wasm4_wasmer ${COMMON_SOURCES} ${WASMER_SOURCES})
+
+    target_include_directories(wasm4_wasmer PRIVATE "${WASMER_DIR}/include")
+    target_link_directories(wasm4_wasmer PRIVATE "${WASMER_DIR}/lib")
+    target_link_libraries(wasm4_wasmer minifb cubeb wasmer)
+    set_target_properties(wasm4 PROPERTIES C_STANDARD 99)
+    install(TARGETS wasm4_wasmer)
+endif ()
+
 # #
 # # Desktop (glfw + cubeb) backend
 # #

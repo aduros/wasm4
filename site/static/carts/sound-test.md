@@ -23,7 +23,7 @@ Everything is controlled with a mouse:
 
 If you don't know how to set all these values, you can use these functions as a guide to understand how the tone flags are calculated:
 
-```typeyscript
+```typescript
  export function toneFrequency(freq1: i32 = 0, freq2: i32 = 0): u32 {
 	return freq1 | (freq2 << 16);
 }

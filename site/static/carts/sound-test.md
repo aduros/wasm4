@@ -16,7 +16,7 @@ Everything is controlled with a mouse:
 * By default, frequencies are limited to 1000, just like the original *Sound Demo*. However, if you want to play with higher frequencies, you can click on the `@` symbol on the right.
 * Test a note once by clicking on "Play" button, or with middle button.
 * With the right button, you can play a note indefinitely.
-* Change the palette by clicking on "Palette" button.
+* Change the palette by pressing `Z` or `X` buttons.
 * On music composer, add notes by clicking on the track with left button, and delete then with right button.
 * Change speed using the slider above the track.
 * If you don't want to wait to test a note, you can click on the track with middle button, and it will play that note indefinitely.

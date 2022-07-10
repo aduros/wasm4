@@ -65,7 +65,7 @@ enum blitFlipY = 4;
 enum blitRotate = 8;
 
 /** Draws a line between two points. */
-void line(int x, int y, uint width, uint height);
+void line(int x1, int y1, int x2, int y2);
 
 /** Draws a horizontal line. */
 void hline(int x, int y, uint len);

@@ -86,7 +86,7 @@ global BLIT_FLIP_Y <comptime> = 4
 global BLIT_ROTATE <comptime> = 8
 
 -- Draws a line between two points.
-global function line(x: int32, y: int32, width: uint32, height: uint32): void <cimport,cattribute'import_name("line")'> end
+global function line(x1: int32, y1: int32, x2: int32, y2: int32): void <cimport,cattribute'import_name("line")'> end
 
 -- Draws a horizontal line.
 global function hline(x: int32, y: int32, len: uint32): void <cimport,cattribute'import_name("hline")'> end

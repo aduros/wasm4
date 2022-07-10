@@ -75,7 +75,7 @@ void blitSub (const uint8_t* data, int32_t x, int32_t y, uint32_t width, uint32_
 
 /** Draws a line between two points. */
 WASM_IMPORT("line")
-void line (int32_t x, int32_t y, uint32_t width, uint32_t height);
+void line (int32_t x1, int32_t y1, int32_t x2, int32_t y2);
 
 /** Draws a horizontal line. */
 WASM_IMPORT("hline")

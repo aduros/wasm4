@@ -60,7 +60,7 @@ proc blitSub*(data: ptr uint8; x: int32; y: int32; width: uint32;
 ## Copies a subregion within a larger sprite atlas to the framebuffer.
 
 
-proc line*(x: int32; y: int32; width: uint32; height: uint32)
+proc line*(x1: int32; y1: int32; x2: int32; y2: int32)
 ## Draws a line between two points.
 
 proc hline*(x: int32; y: int32; len: uint32)

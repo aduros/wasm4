@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import styles from './HomepageFeatures.module.css';
+import Link from '@docusaurus/Link';
 
 const FeatureList = [
   {
@@ -27,7 +28,25 @@ const FeatureList = [
     Svg: require('../../static/img/devices.svg').default,
     description: (
       <>
-        Besides great desktop/mobile web support, run your game natively (no webviews!) even on low-powered microcontrollers.
+        Besides great desktop/mobile web support, run your game natively (no webviews!) even on <Link href="https://twitter.com/alvaroviebrantz/status/1518343016011943939">low-powered microcontrollers</Link> and <Link href="https://twitter.com/wasm4_org/status/1483140582943956992">obsolete hardware</Link>.
+      </>
+    ),
+  },
+  {
+    title: 'Multiplayer',
+    Svg: require('../../static/img/modem.svg').default,
+    description: (
+      <>
+      Fast online multiplayer support with <Link href="/blog/release-2-4-0">rollback netcode</Link> based on GGPO.
+      </>
+    ),
+  },
+  {
+    title: 'Community',
+    Svg: require('../../static/img/heart.svg').default,
+    description: (
+      <>
+      WASM-4 is supported by a diverse and friendly <Link href="/community">community</Link> of creators who love building small.
       </>
     ),
   },

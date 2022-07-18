@@ -20,6 +20,5 @@
     "-zstack-size=14752",
     "--strip-all"
   ],
-  "emulator": [ "w4", "run" ],
   "wasm-abi": "js"
 }

@@ -14,7 +14,7 @@ else
 endif
 
 # wasm-opt flags
-WASM_OPT_FLAGS = -Oz --zero-filled-memory --strip-producers
+WASM_OPT_FLAGS = -Oz --zero-filled-memory --strip-producers --enable-bulk-memory
 
 all:
 	@mkdir -p build

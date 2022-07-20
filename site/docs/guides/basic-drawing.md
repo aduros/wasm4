@@ -264,6 +264,90 @@ custom fonts, handle the drawing yourself by looping over each character and
 drawing a sprite.
 :::
 
+## Custom Fonts
+
+There is no way to use a custom font with this function. To draw text with
+custom fonts, handle the drawing yourself by looping over each character and
+drawing a sprite.
+
+The example below will print a text using the [BitScript sprite font](https://opengameart.org/content/bitscript-a-low-res-handwriting-font):
+
+<MultiLanguageCode>
+
+```typescript
+import * as w4 from "./wasm4";
+
+const fontWidth = 208;
+const fontHeight = 8;
+const fontFlags = w4.BLIT_1BPP;
+const charWidth = 8;
+const charHeight = 8;
+const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const font = memory.data<u8>([0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x1c,0x1c,0x3c,0x18,0x3e,0x1c,0x26,0x10,0x2c,0x12,0x08,0x24,0x26,0x1c,0x3c,0x1c,0x78,0x1c,0x3c,0x62,0x42,0x82,0xc4,0x42,0x66,0x08,0x32,0x22,0x52,0x24,0x51,0x22,0x25,0x28,0x14,0x14,0x08,0x24,0x26,0x22,0x52,0x22,0xa4,0x22,0x52,0x22,0xa5,0x44,0x2a,0x24,0x1c,0x14,0x52,0x20,0x12,0x20,0x10,0x20,0x26,0x28,0x04,0x14,0x08,0x2c,0x24,0x22,0x52,0x22,0xa4,0x20,0x10,0x22,0x24,0x54,0x10,0x24,0x04,0x14,0x5c,0x40,0x22,0x38,0x38,0x4e,0x7c,0x28,0x08,0x28,0x10,0x54,0x58,0x42,0x14,0x44,0x78,0x18,0x10,0x24,0x28,0x54,0x10,0x14,0x08,0x24,0xa4,0x40,0x62,0x40,0x20,0x44,0x48,0x10,0x08,0x34,0x30,0x54,0x48,0x44,0x20,0x54,0x48,0x04,0x20,0x44,0x28,0x2c,0x28,0x08,0x10,0x3c,0xa4,0x42,0xa4,0x44,0xa0,0x44,0xc9,0x10,0x48,0x24,0x52,0x44,0x4a,0x44,0xa0,0x3a,0x48,0x44,0xa0,0x44,0x10,0x28,0xa8,0x48,0x38,0x42,0x5b,0x3c,0x58,0x38,0x40,0x38,0x46,0x68,0x34,0x42,0x2c,0x82,0x84,0x3a,0x40,0x08,0x86,0x38,0x40,0x3a,0x10,0x48,0x46,0x30,0x66]);
+
+function write(text: string, x: i32, y: i32, colors: u16): void {
+    // Set draw colors...
+    store<u16>(w4.DRAW_COLORS, colors);
+
+    // Line and column counters.
+    let line  : i32 = 0;
+    let column: i32 = 0;
+
+    // Special characters: "\n" (newline) and " " (space).
+    const newline: i32 = 10;
+    const space  : i32 = 32;
+
+    // Iterate through each character...
+    for(let i = 0; i < text.length; i += 1) {
+        const char: string = text.charAt(i);
+        const charCode: i32 = char.charCodeAt(0);
+
+        // Break into next line when encounter a "\n" (newline)...
+        if(charCode === newline) {
+            line  += 1;
+            column = 0;
+            continue;
+        }
+        // Advance to next column when encounter a " " (space)...
+        else if(charCode === space) {
+            column += 1;
+            continue;
+        }
+
+        // Character index on charset.
+        let charIndex: i32 = charset.indexOf(char);
+
+        // Skip invalid characters...
+        if(charIndex < 0 || charIndex >= charset.length) {
+            column += 1;
+            continue;
+        }
+
+        // Draw character...
+        w4.blitSub(
+            font,
+            x + (column * charWidth),
+            y + (line * charHeight),
+            charWidth,
+            charHeight,
+            charIndex * charWidth,
+            0,
+            fontWidth,
+            fontFlags
+        );
+
+        // Advance to next column...
+        column += 1;
+    }
+}
+
+export function update (): void {
+    write("HELLO WORLD WITH\nOUR CUSTOM FONT", 4, 4, 0x30);
+}
+```
+
+</MultiLanguageCode>
+
 ## Other Shapes
 
 For info on other shape drawing functions like `line()` and `oval()`, see the [Functions](/docs/reference/functions) reference.
@@ -648,6 +732,75 @@ fn pixel(x: i32, y: i32) void {
 
     // Write to the framebuffer
     w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] & ~mask);
+}
+```
+
+</MultiLanguageCode>
+
+For better control, we can also write functions to get and set pixels in a more direct way:
+
+<MultiLanguageCode>
+
+```typescript
+function setPixel(x: i32, y: i32, color: u8): boolean {
+    // Ignore pixels outside screen...
+    if((x < 0 || x >= w4.SCREEN_SIZE) || (y < 0 || y >= w4.SCREEN_SIZE)) {
+      return false;
+    }
+
+    // Calculate pixel offset and index on framebuffer.
+    const offset: i32 = ((y * 40) + (x / 4));
+    const index: i32 = Math.abs(x % 4) as i32;
+
+    // Get the byte representing the screen pixels.
+    let pixelData: u8 = load<u8>(w4.FRAMEBUFFER + offset);
+
+    // Split byte into pixels. On 2bpp, each byte will represent 4 pixels.
+    let pixels: u8[] = [
+      (pixelData & 0b00000011),
+      (pixelData & 0b00001100) >> 2,
+      (pixelData & 0b00110000) >> 4,
+      (pixelData & 0b11000000) >> 6
+    ];
+
+    // Change pixel index...
+    pixels[index] = color % 4;
+
+    // Pack all pixels back into a byte...
+    pixelData = (
+      (pixels[3] << 6) +
+      (pixels[2] << 4) +
+      (pixels[1] << 2) +
+      (pixels[0])
+    );
+
+    // Change framebuffer...
+    store<u8>(w4.FRAMEBUFFER + offset, pixelData);
+    return true;
+  }
+
+function getPixel(x: i32, y: i32): u8 {
+  // Ignore pixels outside screen...
+  if((x < 0 || x >= w4.SCREEN_SIZE) || (y < 0 || y >= w4.SCREEN_SIZE)) {
+    return 0;
+  }
+
+  // Calculate pixel offset and index on framebuffer.
+  const offset: i32 = ((y * 40) + (x / 4));
+  const index: i32 = Math.abs(x % 4) as i32;
+
+  // Get the byte representing the screen pixels.
+  const pixelData: u8 = load<u8>(w4.FRAMEBUFFER + offset);
+
+  // Split byte into pixels. On 2bpp, each byte will represent 4 pixels.
+  const pixels: u8[] = [
+    (pixelData & 0b00000011),
+    (pixelData & 0b00001100) >> 2,
+    (pixelData & 0b00110000) >> 4,
+    (pixelData & 0b11000000) >> 6
+  ];
+
+  return pixels[index];
 }
 ```
 

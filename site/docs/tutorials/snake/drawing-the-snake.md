@@ -162,11 +162,7 @@ That's all fine, but since there is no instance of the snake, nothing can be dra
 ```go {9-18,30}
 package main
 
-import (
-	"image"
-
-	"cart/w4"
-)
+import "cart/w4"
 
 var (
 	snake = &Snake{

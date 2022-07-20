@@ -159,7 +159,7 @@ Keep in mind you need to import `cart/w4` in case your editor doesn't do this fo
 
 That's all fine, but since there is no instance of the snake, nothing can be drawn. To fix this, simply create a new variable in main and call its draw function:
 
-```go {9-18,30}
+```go {5-14,26}
 package main
 
 import "cart/w4"

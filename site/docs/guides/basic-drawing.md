@@ -258,12 +258,6 @@ w4.text("Hello world!", 10, 10);
 
 `DRAW_COLORS` color 1 is used as the text color, `DRAW_COLORS` color 2 is used as the background color.
 
-:::note
-There is no way to use a custom font with this function. To draw text with
-custom fonts, handle the drawing yourself by looping over each character and
-drawing a sprite.
-:::
-
 ## Custom Fonts
 
 There is no way to use a custom font with this function. To draw text with

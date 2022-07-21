@@ -14,6 +14,7 @@ import { Notifications } from "./notifications";
 
 class InputState {
     gamepad = [0, 0, 0, 0];
+    gamepadUnavailableWarned = new Set<number>;
     mouseX = 0;
     mouseY = 0;
     mouseButtons = 0;
@@ -373,9 +374,17 @@ export class App extends LitElement {
                 return; // Browser doesn't support gamepads
             }
 
-            for (const gamepad of navigator.getGamepads()) {
-                if (gamepad == null || gamepad.mapping != "standard") {
-                    continue; // Disconnected or non-standard gamepad
+            for (const [i, gamepad] of navigator.getGamepads().entries()) {
+                if (gamepad == null) {
+                    continue; // Disconnected gamepad
+                } else if (gamepad.mapping != "standard") {
+                    // The gamepad is available, but nonstandard, so we don't actually know how to read it.
+                    // Let's warn once, and not use this gamepad afterwards.
+                    if (!this.inputState.gamepadUnavailableWarned.has(i)) {
+                        this.inputState.gamepadUnavailableWarned.add(i);
+                        console.warn("Your browser does not know the mapping for the %s gamepad (index %d) and we can't use it.", gamepad.id, i);
+                    }
+                    continue;
                 }
 
                 // https://www.w3.org/TR/gamepad/#remapping

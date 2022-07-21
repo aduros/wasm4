@@ -775,24 +775,11 @@ function setPixel(x: i32, y: i32, color: u8): boolean {
     // Get the byte representing the screen pixels.
     let pixelData = load<u8>(w4.FRAMEBUFFER + offset);
 
-    // Split byte into pixels. On 2bpp, each byte will represent 4 pixels.
-    let pixels: u8[] = [
-      (pixelData & 0b00000011),
-      (pixelData & 0b00001100) >> 2,
-      (pixelData & 0b00110000) >> 4,
-      (pixelData & 0b11000000) >> 6
-    ];
-
-    // Change pixel index...
-    pixels[index] = color % 4;
-
-    // Pack all pixels back into a byte...
-    pixelData = (
-      (pixels[3] << 6) +
-      (pixels[2] << 4) +
-      (pixels[1] << 2) +
-      (pixels[0])
-    );
+  let offset = index * 2;
+  // clear color component
+  pixelData &= ~(0b11 << offset);
+  // set new color component
+  pixelData |= color % 4 << offset;
 
     // Change framebuffer...
     store<u8>(w4.FRAMEBUFFER + offset, pixelData);

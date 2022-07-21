@@ -363,9 +363,9 @@ On the example below, we can make a rectangle follow the mouse position and expa
 
 ```typescript
 export function update (): void {
-    let mouse :  u8 = load<u8>(w4.MOUSE_BUTTONS);
-    let mouseX: i16 = load<i16>(w4.MOUSE_X);
-    let mouseY: i16 = load<i16>(w4.MOUSE_Y);
+    let mouse  = load<u8>(w4.MOUSE_BUTTONS);
+    let mouseX = load<i16>(w4.MOUSE_X);
+    let mouseY = load<i16>(w4.MOUSE_Y);
 
     if(mouse & w4.MOUSE_LEFT) {
         store<u16>(w4.DRAW_COLORS, 4);

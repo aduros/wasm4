@@ -367,14 +367,13 @@ export function update (): void {
     let mouseX = load<i16>(w4.MOUSE_X);
     let mouseY = load<i16>(w4.MOUSE_Y);
 
-    if(mouse & w4.MOUSE_LEFT) {
-        store<u16>(w4.DRAW_COLORS, 4);
-        w4.rect(mouseX - 8, mouseY - 8, 16, 16);
-    }
-    else {
-        store<u16>(w4.DRAW_COLORS, 2);
-        w4.rect(mouseX - 4, mouseY - 4, 8, 8);
-    }
+  if (mouse & w4.MOUSE_LEFT) {
+    store<u16>(w4.DRAW_COLORS, 4);
+    w4.rect(mouseX - 8, mouseY - 8, 16, 16);
+  } else {
+    store<u16>(w4.DRAW_COLORS, 2);
+    w4.rect(mouseX - 4, mouseY - 4, 8, 8);
+  }
 }
 ```
 

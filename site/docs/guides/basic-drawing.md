@@ -801,7 +801,7 @@ function setPixel(x: i32, y: i32, color: u8): boolean {
 
 function getPixel(x: i32, y: i32): u8 {
   // Ignore pixels outside screen...
-  if((x < 0 || x >= w4.SCREEN_SIZE) || (y < 0 || y >= w4.SCREEN_SIZE)) {
+  if (x < 0 || y < 0 || x >= w4.SCREEN_SIZE || y >= w4.SCREEN_SIZE) {
     return 0;
   }
 

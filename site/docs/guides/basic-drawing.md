@@ -793,8 +793,8 @@ function getPixel(x: i32, y: i32): u8 {
   }
 
   // Calculate pixel offset and index on framebuffer.
-  const offset: i32 = ((y * 40) + (x / 4));
-  const index: i32 = Math.abs(x % 4) as i32;
+  const offset = y * 40 + x / 4;
+  const index = x & 3;
 
   // Get the byte representing the screen pixels.
   const pixelData: u8 = load<u8>(w4.FRAMEBUFFER + offset);

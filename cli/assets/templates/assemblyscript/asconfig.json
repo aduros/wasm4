@@ -3,7 +3,7 @@
     "./src/main.ts"
   ],
   "options": {
-    "binaryFile": "build/cart.wasm",
+    "outFile": "build/cart.wasm",
     "runtime": "incremental",
     "importMemory": true,
     "initialMemory": 1,

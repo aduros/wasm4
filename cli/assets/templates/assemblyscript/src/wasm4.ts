@@ -60,8 +60,6 @@ export function setPixelUnsafe(color: u8, x: i32, y: i32): void {
 }
 
 /** Set single pixel to the framebuffer with specific color with bounds checking. */
-// @ts-ignore: decorator
-@inline
 export function setPixel(color: u8, x: i32, y: i32): void {
     if (<u32>x < SCREEN_SIZE && <u32>y < SCREEN_SIZE) {
         setPixelUnsafe(color, x, y);
@@ -79,8 +77,6 @@ export function getPixelUnsafe(x: i32, y: i32): u8 {
 }
 
 /** Get single pixel from the framebuffer with bounds checking. */
-// @ts-ignore: decorator
-@inline
 export function getPixel(x: i32, y: i32): u8 {
     if (<u32>x < SCREEN_SIZE && <u32>y < SCREEN_SIZE) {
         return getPixelUnsafe(x, y);

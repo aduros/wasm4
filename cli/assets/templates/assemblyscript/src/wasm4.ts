@@ -63,7 +63,7 @@ export function setPixelUnsafe(color: u8, x: i32, y: i32): void {
 // @ts-ignore: decorator
 @inline
 export function setPixel(color: u8, x: i32, y: i32): void {
-    if ((x >= 0 && x < SCREEN_SIZE) && (y >= 0 && y < SCREEN_SIZE)) {
+    if (<u32>x < SCREEN_SIZE && <u32>y < SCREEN_SIZE) {
         setPixelUnsafe(color, x, y);
     }
 }
@@ -82,7 +82,7 @@ export function getPixelUnsafe(x: i32, y: i32): u8 {
 // @ts-ignore: decorator
 @inline
 export function getPixel(x: i32, y: i32): u8 {
-    if ((x >= 0 && x < SCREEN_SIZE) && (y >= 0 && y < SCREEN_SIZE)) {
+    if (<u32>x < SCREEN_SIZE && <u32>y < SCREEN_SIZE) {
         return getPixelUnsafe(x, y);
     } else {
         return 0;

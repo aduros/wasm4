@@ -48,6 +48,47 @@ export const SYSTEM_HIDE_GAMEPAD_OVERLAY = 2;
 // │                                                                           │
 // └───────────────────────────────────────────────────────────────────────────┘
 
+/** Set single pixel to the framebuffer with specific color without bounds checking. */
+// @ts-ignore: decorator
+@inline
+export function setPixelUnsafe(color: u8, x: i32, y: i32): void {
+    let idx = y * (SCREEN_SIZE >>> 2) + (x >>> 2);
+    let shift = <u8>((x & 0x3) << 1);
+    let mask = 0x3 << shift;
+    let data = (color << shift) | (load<u8>(FRAMEBUFFER + idx) & ~mask);
+    store<u8>(FRAMEBUFFER + idx, data);
+}
+
+/** Set single pixel to the framebuffer with specific color with bounds checking. */
+// @ts-ignore: decorator
+@inline
+export function setPixel(color: u8, x: i32, y: i32): void {
+    if ((x >= 0 && x < SCREEN_SIZE) && (y >= 0 && y < SCREEN_SIZE)) {
+        setPixelUnsafe(color, x, y);
+    }
+}
+
+/** Get single pixel from the framebuffer without bounds checking. */
+// @ts-ignore: decorator
+@inline
+export function getPixelUnsafe(x: i32, y: i32): u8 {
+    let idx = y * (SCREEN_SIZE >>> 2) + (x >>> 2);
+    let shift = <u8>((x & 0x3) << 1);
+    let color = load<u8>(FRAMEBUFFER + idx);
+    return (color >> shift) & 0x3;
+}
+
+/** Get single pixel from the framebuffer with bounds checking. */
+// @ts-ignore: decorator
+@inline
+export function getPixel(x: i32, y: i32): u8 {
+    if ((x >= 0 && x < SCREEN_SIZE) && (y >= 0 && y < SCREEN_SIZE)) {
+        return getPixelUnsafe(x, y);
+    } else {
+        return 0;
+    }
+}
+
 /** Copies pixels to the framebuffer. */
 // @ts-ignore: decorator
 @external("env", "blit")

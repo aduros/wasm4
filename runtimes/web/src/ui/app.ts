@@ -14,7 +14,7 @@ import { Notifications } from "./notifications";
 
 class InputState {
     gamepad = [0, 0, 0, 0];
-    gamepadUnavailableWarned = new Set<number>;
+    gamepadUnavailableWarned = new Set<string>;
     mouseX = 0;
     mouseY = 0;
     mouseButtons = 0;
@@ -374,14 +374,14 @@ export class App extends LitElement {
                 return; // Browser doesn't support gamepads
             }
 
-            for (const [i, gamepad] of navigator.getGamepads().entries()) {
+            for (const gamepad of navigator.getGamepads()) {
                 if (gamepad == null) {
                     continue; // Disconnected gamepad
                 } else if (gamepad.mapping != "standard") {
                     // The gamepad is available, but nonstandard, so we don't actually know how to read it.
                     // Let's warn once, and not use this gamepad afterwards.
-                    if (!this.inputState.gamepadUnavailableWarned.has(i)) {
-                        this.inputState.gamepadUnavailableWarned.add(i);
+                    if (!this.inputState.gamepadUnavailableWarned.has(gamepad.id)) {
+                        this.inputState.gamepadUnavailableWarned.add(gamepad.id);
                         this.notifications.show("Unsupported gamepad: " + gamepad.id);
                     }
                     continue;

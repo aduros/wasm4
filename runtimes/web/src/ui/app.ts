@@ -382,7 +382,7 @@ export class App extends LitElement {
                     // Let's warn once, and not use this gamepad afterwards.
                     if (!this.inputState.gamepadUnavailableWarned.has(i)) {
                         this.inputState.gamepadUnavailableWarned.add(i);
-                        console.warn("Your browser does not know the mapping for the %s gamepad (index %d) and we can't use it.", gamepad.id, i);
+                        this.notifications.show("Unsupported gamepad: " + gamepad.id);
                     }
                     continue;
                 }

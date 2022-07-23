@@ -14,7 +14,6 @@ import { Notifications } from "./notifications";
 
 class InputState {
     gamepad = [0, 0, 0, 0];
-    gamepadUnavailableWarned = new Set<string>;
     mouseX = 0;
     mouseY = 0;
     mouseButtons = 0;
@@ -71,6 +70,7 @@ export class App extends LitElement {
     private savedGameState?: State;
 
     readonly inputState = new InputState();
+    private readonly gamepadUnavailableWarned = new Set<string>();
 
     private netplay?: Netplay;
 
@@ -380,8 +380,8 @@ export class App extends LitElement {
                 } else if (gamepad.mapping != "standard") {
                     // The gamepad is available, but nonstandard, so we don't actually know how to read it.
                     // Let's warn once, and not use this gamepad afterwards.
-                    if (!this.inputState.gamepadUnavailableWarned.has(gamepad.id)) {
-                        this.inputState.gamepadUnavailableWarned.add(gamepad.id);
+                    if (!this.gamepadUnavailableWarned.has(gamepad.id)) {
+                        this.gamepadUnavailableWarned.add(gamepad.id);
                         this.notifications.show("Unsupported gamepad: " + gamepad.id);
                     }
                     continue;

@@ -119,6 +119,10 @@ export fn update() void {
 
 </MultiLanguageCode>
 
+:::note
+Sometimes we may need to initialize a few things before starting our game. On these occasions, a `start()` function can be used, which will be called only once, which is when the game is started.
+:::
+
 The first line imports the WASM-4 API definitions. This is a stub source file included with all
 projects that describes which functions are available.
 
@@ -283,30 +287,3 @@ w4.trace("Hello world!");
 :::tip
 Press `F8` to toggle the WASM-4 developer tools, which displays system state, memory usage, and more.
 :::
-
-## Start Function
-
-Sometimes we may need to initialize a few things before starting our game. On these occasions, a `start()` function can be used, which will be called only once, which is when the game is started.
-
-For example, to set the palette to [Moonlight GB](https://lospec.com/palette-list/moonlight-gb) at the start of the game:
-
-<MultiLanguageCode>
-
-```typescript
-import * as w4 from "./wasm4";
-
-export function start (): void {
-    store<u32>(w4.PALETTE, 0x5fc75d, 0 * sizeof<u32>());
-    store<u32>(w4.PALETTE, 0x36868f, 1 * sizeof<u32>());
-    store<u32>(w4.PALETTE, 0x203671, 2 * sizeof<u32>());
-    store<u32>(w4.PALETTE, 0x0f052d, 3 * sizeof<u32>());
-}
-
-export function update (): void {
-    w4.rect(10, 10, 32, 32);
-}
-```
-
-</MultiLanguageCode>
-
-

@@ -119,6 +119,10 @@ export fn update() void {
 
 </MultiLanguageCode>
 
+:::note
+Sometimes we may need to initialize a few things before starting our game. On these occasions, a `start()` function can be used, which will be called only once, which is when the game is started.
+:::
+
 The first line imports the WASM-4 API definitions. This is a stub source file included with all
 projects that describes which functions are available.
 

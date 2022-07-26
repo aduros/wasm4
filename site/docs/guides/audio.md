@@ -369,9 +369,40 @@ w4.tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_PAN_LEFT);
 
 </MultiLanguageCode>
 
+## Calculating Flags
+
+Setting ADSR flags require the use of various bitwise and bitshift operations. This can be a little confusing to understand.
+
+These functions can be used to understand how they are calculated:
+
+<MultiLanguageCode>
+
+```typescript
+function toneFrequency(freq1: i32 = 0, freq2: i32 = 0): u32 {
+	return freq1 | (freq2 << 16);
+}
+
+function toneDuration(attack: i32 = 0, decay: i32 = 0, sustain: i32 = 0, release: i32 = 0): u32 {
+	return (attack << 24) | (decay << 16) | sustain | (release << 8);
+}
+
+function toneVolume(peak: i32 = 0, volume: i32 = 0): u32 {
+	return (peak << 8) | volume;
+}
+
+function toneFlags(channel: i32 = 0, mode: i32 = 0, pan: i32 = 0): u32 {
+	return channel | (mode << 2) | (pan << 4);
+}
+```
+
+</MultiLanguageCode>
+
 ## Sound Tool
 
-The sound demo is a great way to quickly experiment with different sounds and
+The sound demo and sound test are a great way to quickly experiment with different sounds and
 find values to plug into your game:
 
-<PlayButton slug="sound-demo" title="Sound Demo" author="Bruno Garcia" github="aduros"/>
+<div className="row margin-bottom--lg">
+    <PlayButton slug="sound-demo" title="Sound Demo" author="Bruno Garcia" github="aduros" colWidth="3"/>
+    <PlayButton slug="sound-test" title="Sound Test" author="Mr.Rafael" github="MrRafael-dev" colWidth="3"/>
+</div>

@@ -13,15 +13,16 @@ Aside from text and symbols, many slots are empty. This is because in UTF-8, the
 The `\n`, for example, is technically a character, but it's mapped to mark a line break.
 
 If we look closely at the font, we'll find four arrows and two buttons, highlighted by a circle.
+It's possible to print one of these characters by escaping it's charcode.
 
 | Key         | Escape Character |
 |-------------|------------------|
-| A button    | `x80`            |
-| B button    | `x81`            |
-| Left arrow  | `x84`            |
-| Right arrow | `x85`            |
-| Up arrow    | `x86`            |
-| Down arrow  | `x87`            |
+| A button    | `\x80`           |
+| B button    | `\x81`           |
+| Left arrow  | `\x84`           |
+| Right arrow | `\x85`           |
+| Up arrow    | `\x86`           |
+| Down arrow  | `\x87`           |
 
 We could use those as instructions for our games!
 

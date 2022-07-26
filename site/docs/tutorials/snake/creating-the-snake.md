@@ -330,17 +330,19 @@ The content is rather simple:
 
 ```zig
 const std = @import("std");
+
 pub const Point = struct {
     x: i32,
     y: i32,
-    pub fn init(x: i32, y: i32) @This() {
-        return @This() {
+
+    pub fn init(x: i32, y: i32) Point {
+        return .{
             .x = x,
             .y = y,
         };
     }
 
-    pub fn equals(this: @This(), other: @This()) bool {
+    pub fn equals(this: Point, other: Point) bool {
         return this.x == other.x and this.y == other.y;
     }
 };
@@ -349,8 +351,8 @@ pub const Snake = struct {
     body: std.BoundedArray(Point, 400),
     direction: Point,
 
-    pub fn init() @This() {
-        return @This() {
+    pub fn init() Point {
+        return .{
             .body = std.BoundedArray(Point, 400).fromSlice(&.{
                 Point.init(2, 0),
                 Point.init(1, 0),

@@ -21,8 +21,6 @@
 cartridges (ROMs) are small, self-contained `.wasm` files that can be built with any programming
 language that compiles to WebAssembly.
 
-> Development status: ⚡ Alpha
-
 ## Key Features
 
 * **No Glue Code**: If you've ever tried to write even a simple "Hello World"
@@ -38,8 +36,12 @@ language that compiles to WebAssembly.
   Zig.
 
 * **Portable**: WASM-4 is designed to run on any device that can execute WebAssembly, even outside
-  of the web! We're planning a lightweight implementation written in C that will run even on a
-  potato.
+  of the web! It includes a lightweight runtime written in C that runs even [low-powered microcontrollers](https://twitter.com/alvaroviebrantz/status/1518343016011943939)
+  and [obsolete hardware](https://twitter.com/wasm4_org/status/1483140582943956992).
+
+* **Netplay**: Instant online multiplayer, featuring rollback netcode. All games that support local
+  multiplayer automatically support netplay. WASM-4 handles syncing controller inputs over the
+  Internet.
 
 ## 🚀 60 Second Quickstart
 

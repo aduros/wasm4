@@ -358,57 +358,296 @@ for (w4.FRAMEBUFFER) |*x| {
 </MultiLanguageCode>
 
 Advanced users can implement their own drawing functions by carefully manipulating the framebuffer.
-For example, to implement a function which can get and set a single pixel at any position of screen:
+For example, to implement a `pixel()` function that draws a single pixel:
 
 <MultiLanguageCode>
 
 ```typescript
-function setPixel(x: i32, y: i32, color: u8): boolean {
-    // Ignore pixels outside screen...
-    if((x < 0 || x >= w4.SCREEN_SIZE) || (y < 0 || y >= w4.SCREEN_SIZE)) {
-      return false;
+function pixel (x: i32, y: i32): void {
+    // The byte index into the framebuffer that contains (x, y)
+    const idx = (y*160 + x) >> 2;
+
+    // Calculate the bits within the byte that corresponds to our position
+    const shift = u8((x & 0b11) << 1);
+    const mask = u8(0b11 << shift);
+
+    // Use the first DRAW_COLOR as the pixel color.
+    const palette_color = u8(load<u16>(w4.DRAW_COLORS) & 0b1111);
+    if (color == 0) {
+        // Transparent
+        return;
     }
+    const color = (palette_color - 1) & 0b11;
 
-    // Calculate pixel offset and index on framebuffer.
-    const offset = y * 40 + x / 4;
-    const index = x & 3;
+    // Write to the framebuffer
+    store<u8>(w4.FRAMEBUFFER + idx, (color << shift) | (load<u8>(w4.FRAMEBUFFER + idx) & ~mask));
+}
+```
 
-    // Get the byte representing the screen pixels.
-    let pixelData = load<u8>(w4.FRAMEBUFFER + offset);
+```c
+void pixel (int x, int y) {
+    // The byte index into the framebuffer that contains (x, y)
+    int idx = (y*160 + x) >> 2;
 
-    let offset = index * 2;
-    
-    // clear and set new color component...
-    pixelData &= ~(0b11 << offset);
-    pixelData |= color % 4 << offset;
+    // Calculate the bits within the byte that corresponds to our position
+    int shift = (x & 0b11) << 1;
+    int mask = 0b11 << shift;
 
-    // Change framebuffer...
-    store<u8>(w4.FRAMEBUFFER + offset, pixelData);
-    return true;
+    // Use the first DRAW_COLOR as the pixel color
+    int palette_color = *DRAW_COLORS & 0b1111;
+    if (color == 0) {
+        // Transparent
+        return;
+    }
+    int color = (palette_color - 1) & 0b11;
+
+    // Write to the framebuffer
+    FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask);
+}
+```
+
+```d
+void pixel(int x, int y) {
+    // The byte index into the framebuffer that contains (x, y)
+    int idx = (y * w4.screenSize + x) >> 2;
+
+    // Calculate the bits within the byte that corresponds to our position
+    int shift = (x & 0b11) << 1;
+    int mask = 0b11 << shift;
+
+    // Use the first draw color as the pixel color
+    int palette_color = *w4.drawColors & 0b1111;
+    if (palette_color == 0) {
+        // Transparent
+        return;
+    }
+    int color = (palette_color - 1) & 0b11;
+
+    // Write to the framebuffer
+    w4.framebuffer[idx] =
+        cast(ubyte)((color << shift) | (w4.framebuffer[idx] & ~mask));
+}
+```
+
+```go
+func pixel (x int, y int) {
+    // The byte index into the framebuffer that contains (x, y)
+    var idx = (y*160 + x) >> 2
+
+    // Calculate the bits within the byte that corresponds to our position
+    var shift = uint8((x & 0b11) << 1)
+    var mask = uint8(0b11 << shift)
+
+    // Use the first DRAW_COLOR as the pixel color
+    var palette_color = uint8(*w4.DRAW_COLORS & 0b1111)
+    if (palette_color == 0) {
+        // Transparent
+        return;
+    }
+    var color = uint8((palette_color - 1) & 0b11);
+
+    // Write to the framebuffer
+    w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &^ mask)
+}
+```
+
+```lua
+local function pixel(x: integer, y: integer)
+    -- The byte index into the framebuffer that contains (x, y)
+    local idx = (y*160 + x) >> 2
+
+    -- Calculate the bits within the byte that corresponds to our position
+    local shift = (x & 0b11) << 1
+    local mask = 0b11 << shift
+
+    -- Use the first DRAW_COLOR as the pixel color
+    local palette_color = $DRAW_COLORS & 0b1111
+    if (palette_color == 0) {
+        // Transparent
+        return;
+    }
+    var color = (palette_color - 1) & 0b11;
+
+    -- Write to the framebuffer
+    FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask)
+end
+```
+
+```nim
+proc pixel(x, y: int32) =
+  # The byte index into the framebuffer that contains (x, y)
+  let idx = (y * SCREEN_SIZE + x) shr 2
+
+  # Calculate the bits within the byte that corresponds to our position
+  let shift = (x and 0b11) shl 1
+  let mask = uint8(0b11 shl shift)
+
+  # Use the first DRAW_COLOR as the pixel color
+  let palette_color = uint8(DRAW_COLORS[] and 0b1111)
+  if (palette_color == 0) {
+      // Transparent
+      return;
   }
+  let color = (palette_color - 1) & 0b11
 
-function getPixel(x: i32, y: i32): u8 {
-  // Ignore pixels outside screen...
-  if (x < 0 || y < 0 || x >= w4.SCREEN_SIZE || y >= w4.SCREEN_SIZE) {
-    return 0;
-  }
+  # Write to the framebuffer
+  FRAMEBUFFER[idx] = uint8((color shl shift) or (FRAMEBUFFER[idx] and not mask))
+```
 
-  // Calculate pixel offset and index on framebuffer.
-  const offset = y * 40 + x / 4;
-  const index = x & 3;
+```odin
+pixel :: proc "c" (x : int, y : int) {
+    // The byte index into the framebuffer that contains (x, y)
+    idx := (y*160 + x) >> 2
 
-  // Get the byte representing the screen pixels.
-  const pixelData: u8 = load<u8>(w4.FRAMEBUFFER + offset);
+    // Calculate the bits within the byte that corresponds to our position
+    shift := u8((x & 0b11) << 1)
+    mask := u8(0b11 << shift)
 
-  // Split byte into pixels. On 2bpp, each byte will represent 4 pixels.
-  const pixels: u8[] = [
-    (pixelData & 0b00000011),
-    (pixelData & 0b00001100) >> 2,
-    (pixelData & 0b00110000) >> 4,
-    (pixelData & 0b11000000) >> 6
-  ];
+    // Use the first DRAW_COLOR as the pixel color
+    palette_color := u8(w4.DRAW_COLORS^ & 0b1111)
+    if (palette_color == 0) {
+        // Transparent
+        return
+    }
+    color := (palette_color - 1) & 0b11;
 
-  return pixels[index];
+    // Write to the framebuffer
+    w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &~ mask)
+}
+```
+
+```porth
+// TODO
+```
+
+```roland
+proc pixel(x: i32, y: i32) {
+   // The byte index into the framebuffer that contains (x, y)
+   let idx = (y transmute usize * 160 + x transmute usize) >> 2;
+
+   // Calculate the bits within the byte that corresponds to our position
+   let shift = (x truncate u8 & 0b11) << 1;
+   let mask = 0b11 << shift;
+
+   let palette_color: u8 = (DRAW_COLORS~ & 0xf) truncate u8;
+   if (palette_color == 0) {
+      // Transparent
+      return;
+   }
+   let color = (palette_color - 1) & 0b11;
+
+   // Write to the framebuffer
+   FRAMEBUFFER~[idx] = (color << shift) | (FRAMEBUFFER~[idx] & !mask);
+}
+```
+
+```rust
+fn pixel(x: i32, y: i32) {
+    // The byte index into the framebuffer that contains (x, y)
+    let idx = (y as usize * 160 + x as usize) >> 2;
+
+    // Calculate the bits within the byte that corresponds to our position
+    let shift = (x as u8 & 0b11) << 1;
+    let mask = 0b11 << shift;
+
+    unsafe {
+        let palette_color: u8 = (*DRAW_COLORS & 0xf) as u8;
+        if (palette_color == 0) {
+            // Transparent
+            return;
+        }
+        let color = (palette_color - 1) & 0b11;
+
+        let framebuffer = &mut *FRAMEBUFFER;
+
+        framebuffer[idx] = (color << shift) | (framebuffer[idx] & !mask);
+    }
+}
+```
+
+```wasm
+(func $pixel (param $x i32) (param $y i32)
+  (local $idx i32)
+  (local $shift i32)
+  (local $mask i32)
+  (local $color i32)
+
+  ;; The byte index into the framebuffer that contains (x, y)
+  ;;  idx = (y*160 + x) >> 2;
+  (local.set $idx
+    (i32.shr_u
+      (i32.add
+        (i32.mul
+          (local.get $y)
+          (i32.const 160))
+        (local.get $x))
+      (i32.const 2)))
+
+  ;; Calculate the bits within the byte that corresponds to our position
+  ;; shift = (x & 0b11) << 1;
+  (local.set $shift
+    (i32.mul
+      (i32.and
+        (local.get $x)
+        (i32.const 3))
+      (i32.const 2)))
+
+  ;; mask = 0b11 << shift;
+  (local.set $mask
+    (i32.shl
+      (i32.const 3)
+      (local.get $shift)))
+
+  ;; Use the first DRAW_COLOR as the pixel color
+  ;; color = *DRAW_COLORS & 0b1111;
+  (local.set $color
+    (i32.and
+      (i32.load16_u (global.get $DRAW_COLORS))
+      (i32.const 15)))
+  ;; return if $color is zero, then subtract 1 and mask.
+  (if (i32.eqz (local.get $color)) (then (return)))
+  (local.set $color (i32.and
+                      (i32.const 3)
+                      (i32.sub (local.get $color) (i32.const 1))))
+
+  ;; Write to the framebuffer:
+  ;; FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask);
+  ;;
+  ;; Note that WebAssembly doesn't have a bitwise not instruction, so
+  ;; `~n` becomes `n ^ ~0` (where -1 is used for ~0 below).
+  (i32.store8 offset=0xa0
+    (local.get $idx)
+    (i32.or
+      (i32.shl
+        (local.get $color)
+        (local.get $shift))
+      (i32.and
+        (i32.load8_u offset=0xa0 (local.get $idx))
+        (i32.xor
+          (local.get $mask)
+          (i32.const -1)))))
+)
+```
+
+```zig
+fn pixel(x: i32, y: i32) void {
+    // The byte index into the framebuffer that contains (x, y)
+    const idx = (@intCast(usize, y) * 160 + @intCast(usize, x)) >> 2;
+
+    // Calculate the bits within the byte that corresponds to our position
+    const shift = @intCast(u3, (x & 0b11) * 2);
+    const mask = @as(u8, 0b11) << shift;
+
+    // Use the first DRAW_COLOR as the pixel color
+    const palette_color = @intCast(u8, w4.DRAW_COLORS.* & 0b1111);
+    if (palette_color == 0) {
+        // Transparent
+        return;
+    }
+    const color = (palette_color - 1) & 0b11;
+
+    // Write to the framebuffer
+    w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] & ~mask);
 }
 ```
 

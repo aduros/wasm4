@@ -29,7 +29,8 @@ We could use those as instructions for our games!
 <MultiLanguageCode>
 
 ```typescript
-w4.text("Press \x86 to jump!");
+// Press UP to jump!
+w4.text("Press \x86 to jump!", 10, 10);
 ```
 
 </MultiLanguageCode>

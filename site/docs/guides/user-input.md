@@ -356,3 +356,25 @@ export fn update() void {
 
 Mouse (or touchscreen) input is supported. See the [Memory Map](/docs/reference/memory)
 reference for more details on `MOUSE_X`, `MOUSE_Y`, and `MOUSE_BUTTONS`.
+
+On the example below, we can make a rectangle follow the mouse position and expand when clicked:
+
+<MultiLanguageCode>
+
+```typescript
+export function update (): void {
+    const mouse  = load<u8>(w4.MOUSE_BUTTONS);
+    const mouseX = load<i16>(w4.MOUSE_X);
+    const mouseY = load<i16>(w4.MOUSE_Y);
+
+    if (mouse & w4.MOUSE_LEFT) {
+        store<u16>(w4.DRAW_COLORS, 4);
+        w4.rect(mouseX - 8, mouseY - 8, 16, 16);
+    } else {
+        store<u16>(w4.DRAW_COLORS, 2);
+        w4.rect(mouseX - 4, mouseY - 4, 8, 8);
+    }
+}
+```
+
+</MultiLanguageCode>

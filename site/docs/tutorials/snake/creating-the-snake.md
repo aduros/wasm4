@@ -351,7 +351,7 @@ pub const Snake = struct {
     body: std.BoundedArray(Point, 400),
     direction: Point,
 
-    pub fn init() Point {
+    pub fn init() Snake {
         return .{
             .body = std.BoundedArray(Point, 400).fromSlice(&.{
                 Point.init(2, 0),

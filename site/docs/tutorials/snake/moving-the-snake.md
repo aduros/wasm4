@@ -851,7 +851,7 @@ export fn update() void {
 Now all you need is to check if the passed frames are dividable by X:
 
 ```zig {4-6}
-export function update(): void {
+export fn update() void {
     frame_count += 1;
 
     if (frame_count % 15 == 0) {

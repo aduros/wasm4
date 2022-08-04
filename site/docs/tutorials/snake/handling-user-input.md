@@ -420,7 +420,7 @@ impl Game {
 <Page value="zig">
 
 ```zig
-export function update(): void {
+export fn update() void {
     frameCount++
 
     if (frameCount % 15 == 0) {
@@ -1258,7 +1258,7 @@ var prev_state: u8 = 0;
 To notice any change in the gamepad, you have to store the *current state* at the end of the input. This will make it the *previous state*. And while you're at it, why not add the other 3 directions along the way:
 
 ```zig {8-18}
-function input(): void {
+fn input() void {
     const gamepad = w4.GAMEPAD1.*;
     const just_pressed = gamepad & (gamepad ^ prev_state)
 

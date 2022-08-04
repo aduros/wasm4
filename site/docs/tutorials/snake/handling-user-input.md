@@ -2,7 +2,7 @@ import MultiLanguage, {Page} from '@site/src/components/MultiLanguage';
 
 # User Input
 
-With a moving snake, you've done a good part of the game. This part lets you give the control into the players hands. If the player presses a certain button, you just have to change the values of the "Direction"-Property of your snake.
+With a moving snake, you've done a good part of the game. This part lets you give the control into the players hands. WASM-4 supports both [gamepad](docs/guides/user-input#gamepad) and [mouse input](docs/guides/user-input#mouse), but for this tutorial we will only use gamepad input. If the player presses a certain button, you just have to change the values of the "Direction"-Property of your snake.
 
 That's it.
 

@@ -1,14 +1,77 @@
 import MultiLanguageCode from '@site/src/components/MultiLanguageCode';
 
-# Fonts
+# Drawing Text
 
-## Charset
+To draw some text at position (10, 10):
+
+<MultiLanguageCode>
+
+```typescript
+w4.text("Hello world!", 10, 10);
+```
+
+```c
+text("Hello world!", 10, 10);
+```
+
+```d
+w4.text("Hello world!", 10, 10);
+```
+
+```go
+w4.Text("Hello world!", 10, 10)
+```
+
+```lua
+text("Hello world!", 10, 10)
+```
+
+```nim
+text("Hello world!", 10, 10)
+```
+
+```odin
+w4.text("Hello world!", 10, 10)
+```
+
+```porth
+import proc text int int ptr in end
+
+10 10 "Hello World!"c text
+```
+
+```roland
+text("Hello world!", 10, 10);
+```
+
+```rust
+text("Hello world!", 10, 10);
+```
+
+```wasm
+(import "env" "text" (func $text (param i32 i32 i32)))
+
+;; Put the string at address 0x2000 in memory.
+(data (i32.const 0x2000) "Hello world!\00")
+
+(call $text (i32.const 0x2000) (i32.const 10) (i32.const 10))
+```
+
+```zig
+w4.text("Hello world!", 10, 10);
+```
+
+</MultiLanguageCode>
+
+`DRAW_COLORS` color 1 is used as the text color, `DRAW_COLORS` color 2 is used as the background color.
+
+## Special Characters
 
 The WASM-4 font contains 224 characters total.
 
-<img src="./images/charset.png" width="256" height="224"/>
+<img src="./images/charset.png" width="256" height="224" class="pixelated"/>
 
-Aside from text and symbols, many slots are empty. This is because in UTF-8, the text format used for the `text()` function, doesn't have any character indexed to it. Moreover, some of them *are* mapped, but as control characters.
+Aside from text and symbols, many slots are empty. This is because in ASCII, the text format used for the `text()` function, doesn't have any character indexed to it. Moreover, some of them *are* mapped, but as control characters.
 
 The `\n`, for example, is technically a character, but it's mapped to mark a line break.
 

@@ -51,7 +51,7 @@ function start (opts) {
         currentlyBuilding = true;
 
         // console.log("Calling "+buildCommand);
-        const child = spawn(buildCommand, buildParams, {stdio: "inherit"});
+        const child = spawn(buildCommand, buildParams, {stdio: "inherit", shell: true});
         child.on("exit", () => {
             currentlyBuilding = false;
             if (rebuildAfterBuild) {

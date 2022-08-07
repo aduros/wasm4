@@ -1,6 +1,6 @@
-import MultiLanguageCode from '@site/src/components/MultiLanguageCode';
-
 # Drawing Text
+
+import MultiLanguageCode from '@site/src/components/MultiLanguageCode';
 
 To draw some text at position (10, 10):
 

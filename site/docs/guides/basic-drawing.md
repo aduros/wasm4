@@ -1,6 +1,6 @@
-import MultiLanguageCode from '@site/src/components/MultiLanguageCode';
+# Drawing Basics
 
-# Basic Drawing
+import MultiLanguageCode from '@site/src/components/MultiLanguageCode';
 
 ## The `PALETTE` Register
 

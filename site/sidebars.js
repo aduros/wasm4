@@ -33,6 +33,7 @@ module.exports = {
             "guides/basic-drawing",
             "guides/user-input",
             "guides/sprites",
+            "guides/text",
             "guides/audio",
             "guides/saving-data",
             "guides/multiplayer",

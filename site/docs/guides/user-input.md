@@ -1,6 +1,6 @@
-import MultiLanguageCode from '@site/src/components/MultiLanguageCode';
+# Handling User Input
 
-# User Input
+import MultiLanguageCode from '@site/src/components/MultiLanguageCode';
 
 ## Gamepad
 

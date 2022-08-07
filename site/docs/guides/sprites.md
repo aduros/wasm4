@@ -1,6 +1,6 @@
-import MultiLanguageCode from '@site/src/components/MultiLanguageCode';
+# Drawing Sprites
 
-# Sprites
+import MultiLanguageCode from '@site/src/components/MultiLanguageCode';
 
 WASM-4 can [blit](https://en.wikipedia.org/wiki/Bit_blit) sprites directly to the screen. A sprite
 is simply a pointer to raw bytes in memory.

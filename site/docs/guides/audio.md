@@ -1,7 +1,7 @@
+# Playing Audio
+
 import MultiLanguageCode from '@site/src/components/MultiLanguageCode';
 import PlayButton from '@site/src/components/PlayButton';
-
-# Audio
 
 WASM-4's sound system has 4 independent channels. Each channel is dedicated to a different type of
 audio waveform.

@@ -214,7 +214,7 @@ w4.blit(&smiley[0], 10, 10, 8, 8)
 ```
 
 ```porth
-$BLIT_1BPP 8 8 10 smiley blit
+$BLIT_1BPP 8 8 10 10 smiley blit
 ```
 
 ```roland
@@ -283,7 +283,7 @@ w4.blit(&smiley[0], 10, 10, 8, 8, {.FLIPY})
 ```
 
 ```porth
-$BLIT_FLIP_Y $BLIT_1BPP or 8 8 10 smiley blit
+$BLIT_FLIP_Y $BLIT_1BPP or 8 8 10 10 smiley blit
 ```
 
 ```roland

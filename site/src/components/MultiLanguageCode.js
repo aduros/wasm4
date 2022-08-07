@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Children} from 'react';
 import MultiLanguage, {Page} from "./MultiLanguage";
 
 const classNameToLanguage = {
@@ -20,7 +20,8 @@ const classNameToLanguage = {
 };
 
 export default function MultiLanguageCode (props) {
-    const pages = props.children.map((child, idx) => (
+    const children = Children.toArray(props.children);
+    const pages = children.map((child, idx) => (
         <Page key={idx} value={classNameToLanguage[child.props.children.props.className]}>
             {child}
         </Page>

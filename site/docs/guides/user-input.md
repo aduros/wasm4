@@ -359,7 +359,7 @@ reference for more details on `MOUSE_X`, `MOUSE_Y`, and `MOUSE_BUTTONS`.
 
 On the example below, we can make a rectangle follow the mouse position and expand when clicked:
 
-<MultiLanguageCode>
+<!-- <MultiLanguageCode> -->
 
 ```typescript
 export function update (): void {
@@ -377,4 +377,4 @@ export function update (): void {
 }
 ```
 
-</MultiLanguageCode>
+<!-- </MultiLanguageCode> -->

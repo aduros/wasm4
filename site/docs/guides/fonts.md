@@ -26,14 +26,14 @@ It's possible to print one of these characters by escaping it's charcode.
 
 We could use those as instructions for our games!
 
-<MultiLanguageCode>
+<!-- <MultiLanguageCode> -->
 
 ```typescript
 // Press UP to jump!
 w4.text("Press \x86 to jump!", 10, 10);
 ```
 
-</MultiLanguageCode>
+<!-- </MultiLanguageCode> -->
 
 ## Custom Fonts
 
@@ -41,7 +41,7 @@ Since WASM-4 doesn't have a custom font, we have to figure a way to implement ou
 
 The example below will print a text using the [BitScript sprite font](https://opengameart.org/content/bitscript-a-low-res-handwriting-font):
 
-<MultiLanguageCode>
+<!-- <MultiLanguageCode> -->
 
 ```typescript
 import * as w4 from "./wasm4";
@@ -141,4 +141,4 @@ export function update (): void {
 }
 ```
 
-</MultiLanguageCode>
+<!-- </MultiLanguageCode> -->

@@ -69,7 +69,7 @@ w4.text("Hello world!", 10, 10);
 
 The WASM-4 font contains 224 characters total.
 
-<img src="./images/charset.png" width="256" height="224" class="pixelated"/>
+<img src="/img/charset.png" width="256" height="224" class="pixelated"/>
 
 Aside from text and symbols, many slots are empty. This is because in ASCII, the text format used for the `text()` function, doesn't have any character indexed to it. Moreover, some of them *are* mapped, but as control characters.
 

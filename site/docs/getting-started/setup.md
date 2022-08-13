@@ -85,7 +85,7 @@ w4 run build/cart.wasm
 
 <Page value="d">
 
-To compile D projects you will need `ldc` installed. To use libc, you also need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
+To compile D projects you will need `ldc` and `dub` installed. To use libc, you also need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
 
 ```shell
 w4 new --d hello-world
@@ -131,7 +131,7 @@ w4 run build/cart.wasm
 
 <Page value="nelua">
 
-To compile nelua projects you will need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
+To compile nelua projects you will need `nelua` installed. You will also need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
 
 ```shell
 w4 new --nelua hello-world

@@ -34,15 +34,15 @@ OBJECTS += $(patsubst src/%.cpp, build/%.o, $(wildcard src/*.cpp))
 DEPS = $(OBJECTS:.o=.d)
 
 ifeq '$(findstring ;,$(PATH))' ';'
-    detected_OS := Windows
+    DETECTED_OS := Windows
 else
-    detected_OS := $(shell uname 2>/dev/null || echo Unknown)
-    detected_OS := $(patsubst CYGWIN%,Cygwin,$(detected_OS))
-    detected_OS := $(patsubst MSYS%,MSYS,$(detected_OS))
-    detected_OS := $(patsubst MINGW%,MSYS,$(detected_OS))
+    DETECTED_OS := $(shell uname 2>/dev/null || echo Unknown)
+    DETECTED_OS := $(patsubst CYGWIN%,Cygwin,$(DETECTED_OS))
+    DETECTED_OS := $(patsubst MSYS%,MSYS,$(DETECTED_OS))
+    DETECTED_OS := $(patsubst MINGW%,MSYS,$(DETECTED_OS))
 endif
 
-ifeq ($(detected_OS), Windows)
+ifeq ($(DETECTED_OS), Windows)
 	MKDIR_BUILD = if not exist build md build
 	RMDIR = rd /s /q
 else

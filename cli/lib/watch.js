@@ -14,7 +14,7 @@ function start (opts) {
         buildOutput = "target/wasm32-unknown-unknown/debug/cart.wasm";
 
     } else if (fs.existsSync("package.json")) {
-        buildCommand = "npm";
+        buildCommand = process.platform === "win32"? "npm.cmd": "npm";
         buildParams = ["--silent", "run", "build:debug"];
         buildOutput = "build/cart.wasm";
 

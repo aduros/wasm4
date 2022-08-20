@@ -13,6 +13,6 @@ Original page on [itch.io](https://mrrafael.itch.io/ninja-vs-knights).
 ## Controls
 
 - **Left/Right:** Move the ninja.
-- **X /Spacebar:** Jump. Hold it to jump higher.
+- **X/Spacebar:** Jump. Hold it to jump higher.
 - **Down:** Drop to the ground.
 - **Z:** Attack. The sword can attack knights, bombs and statues.

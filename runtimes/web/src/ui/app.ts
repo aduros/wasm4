@@ -29,7 +29,7 @@ export class App extends LitElement {
             align-items: center;
             justify-content: center;
 
-            touch-action: none;
+            touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;

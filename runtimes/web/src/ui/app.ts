@@ -507,6 +507,8 @@ export class App extends LitElement {
             state = this.savedGameState = new State();
         }
         state.read(this.runtime);
+
+        this.notifications.show("State saved");
     }
 
     loadGameState () {
@@ -518,6 +520,9 @@ export class App extends LitElement {
         const state = this.savedGameState;
         if (state != null) {
             state.write(this.runtime);
+            this.notifications.show("State loaded");
+        } else {
+            this.notifications.show("Need to save a state first");
         }
     }
 

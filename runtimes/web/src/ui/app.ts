@@ -29,7 +29,7 @@ export class App extends LitElement {
             align-items: center;
             justify-content: center;
 
-            touch-action: manipulation;
+            touch-action: none;
             user-select: none;
             -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;
@@ -419,16 +419,13 @@ export class App extends LitElement {
             }
         }
 
-        let requestedAnimationFrame = false;
+        // When we should perform the next update
+        let timeNextUpdate = performance.now();
 
-        const update = () => {
-            // Pause updates and rendering while backgrounded, unless netplay is active
-            if (document.visibilityState == "hidden" && !this.netplay) {
-                return;
-            }
+        const onFrame = (timeFrameStart: number) => {
+            requestAnimationFrame(onFrame);
 
             pollPhysicalGamepads();
-
             let input = this.inputState;
 
             if (this.menuOverlay != null) {
@@ -443,52 +440,44 @@ export class App extends LitElement {
                 }
             }
 
-            let needRender;
+            let calledUpdate = false;
 
-            if (this.netplay) {
-                needRender = this.netplay.update(input.gamepad[0]);
+            // Prevent timeFrameStart from getting too far ahead and death spiralling
+            if (timeFrameStart - timeNextUpdate >= 200) {
+                timeNextUpdate = timeFrameStart;
+            }
 
-            } else {
-                // Pass inputs into runtime memory
-                for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
-                    runtime.setGamepad(playerIdx, input.gamepad[playerIdx]);
+            while (timeFrameStart >= timeNextUpdate) {
+                timeNextUpdate += 1000/60;
+
+                if (this.netplay) {
+                    if (this.netplay.update(input.gamepad[0])) {
+                        calledUpdate = true;
+                    }
+
+                } else {
+                    // Pass inputs into runtime memory
+                    for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
+                        runtime.setGamepad(playerIdx, input.gamepad[playerIdx]);
+                    }
+                    runtime.setMouse(input.mouseX, input.mouseY, input.mouseButtons);
+                    runtime.update();
+                    calledUpdate = true;
                 }
-                runtime.setMouse(input.mouseX, input.mouseY, input.mouseButtons);
-                runtime.update();
-                needRender = true;
             }
 
-            // If we need a render, schedule a composite if we haven't already
-            if (needRender && !requestedAnimationFrame) {
-                requestedAnimationFrame = true;
-                requestAnimationFrame(() => {
-                    requestedAnimationFrame = false;
-                    runtime.composite();
-                });
-            }
+            if (calledUpdate) {
+                this.hideGamepadOverlay = !!runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY);
 
-            this.hideGamepadOverlay = !!runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY);
+                runtime.composite();
+
+                if (import.meta.env.DEV) {
+                    // FIXME(2022-08-20): Pass the correct FPS for display
+                    devtoolsManager.updateCompleted(runtime, 1000/60);
+                }
+            }
         }
-
-        let timeLastUpdate = performance.now();
-
-        const loop = () => {
-            const timeFrameStart = performance.now();
-            const elapsedSinceLastUpdate = timeFrameStart - timeLastUpdate;
-            timeLastUpdate = timeFrameStart;
-
-            update();
-            if (import.meta.env.DEV) {
-                devtoolsManager.updateCompleted(runtime, elapsedSinceLastUpdate);
-            }
-
-            // Take our base 16.66ms, and subtract the amount of time we took in this update step.
-            // We round because setTimeout/setInterval doesn't support sub-millisecond precision
-            const elapsedSinceFrameStart = performance.now() - timeFrameStart;
-            const sleepTime = Math.round(1000/60 - elapsedSinceFrameStart);
-            setTimeout(loop, sleepTime);
-        };
-        loop();
+        requestAnimationFrame(onFrame);
     }
 
     onMenuButtonPressed () {

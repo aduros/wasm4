@@ -120,10 +120,10 @@ const {{rustName}}: [u8; {{length}}] = [ {{bytes}} ];
     zig:
         `{{#sprites}}
 // {{name}}
-const {{name}}_width = {{width}};
-const {{name}}_height = {{height}};
-const {{name}}_flags = {{flags}}; // {{flagsHumanReadable}}
-const {{name}} = [{{length}}]u8{ {{bytes}} };
+pub const {{name}}_width = {{width}};
+pub const {{name}}_height = {{height}};
+pub const {{name}}_flags = {{flags}}; // {{flagsHumanReadable}}
+pub const {{name}} = [{{length}}]u8{ {{bytes}} };
 
 {{/sprites}}`,
 };

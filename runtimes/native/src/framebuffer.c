@@ -389,14 +389,20 @@ void w4_framebufferOval (int x, int y, int width, int height) {
     uint8_t strokeColor = (dc1 - 1) & 0x3;
     uint8_t fillColor = (dc0 - 1) & 0x3;
 
+    // Get the width and height
     int a = width >> 1;
     int b = height >> 1;
 
     if (a <= 0) return;
     if (b <= 0) return;
 
+    // Calculate the midpoint
     int x0 = x + a, y0 = y + b;
     int aa2 = a * a * 2, bb2 = b * b * 2;
+
+    // Store even/odd offsets to allow non even ovals
+    int wo = (width + 1) % 2, ho = (height + 1) % 2;
+    int we = width % 2, he = height % 2;
 
     {
         int x = a, y = 0;
@@ -405,15 +411,15 @@ void w4_framebufferOval (int x, int y, int width, int height) {
         int e = 0;
 
         while (sx >= sy) {
-            drawPointUnclipped(strokeColor, x0 + x, y0 + y); /*   I. Quadrant */
-            drawPointUnclipped(strokeColor, x0 + x, y0 - y); /*  II. Quadrant */
-            drawPointUnclipped(strokeColor, x0 - x, y0 + y); /* III. Quadrant */
+            drawPointUnclipped(strokeColor, x0 + x - wo, y0 + y - ho); /*   I. Quadrant */
+            drawPointUnclipped(strokeColor, x0 + x - wo, y0 - y); /*  II. Quadrant */
+            drawPointUnclipped(strokeColor, x0 - x, y0 + y - ho); /* III. Quadrant */
             drawPointUnclipped(strokeColor, x0 - x, y0 - y); /*  IV. Quadrant */
 
             if (dc0 != 0) {
                 int start = x0 - x + 1;
-                int end = x0 + x;
-                drawHLineUnclipped(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
+                int end = x0 + x - wo;
+                drawHLineUnclipped(fillColor, start, y0 + y - ho, end); /*   I and III. Quadrant */
                 drawHLineUnclipped(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
             }
 
@@ -438,9 +444,9 @@ void w4_framebufferOval (int x, int y, int width, int height) {
         int ddx = 0;
 
         while (sy >= sx) {
-            drawPointUnclipped(strokeColor, x0 + x, y0 + y); /*   I. Quadrant */
-            drawPointUnclipped(strokeColor, x0 + x, y0 - y); /*  II. Quadrant */
-            drawPointUnclipped(strokeColor, x0 - x, y0 + y); /* III. Quadrant */
+            drawPointUnclipped(strokeColor, x0 + x - wo, y0 + y - ho); /*   I. Quadrant */
+            drawPointUnclipped(strokeColor, x0 + x - wo, y0 - y); /*  II. Quadrant */
+            drawPointUnclipped(strokeColor, x0 - x, y0 + y - ho); /* III. Quadrant */
             drawPointUnclipped(strokeColor, x0 - x, y0 - y); /*  IV. Quadrant */
 
             x++;
@@ -452,8 +458,8 @@ void w4_framebufferOval (int x, int y, int width, int height) {
                 if (dc0 != 0) {
                     int w = x - ddx - 1;
                     int start = x0 - w;
-                    int end = x0 + w + 1;
-                    drawHLineUnclipped(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
+                    int end = x0 + w + we;
+                    drawHLineUnclipped(fillColor, start, y0 + y - ho, end); /*   I and III. Quadrant */
                     drawHLineUnclipped(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
                 }
 

@@ -1,7 +1,7 @@
 ---
 author: Louis Pearson
 github: desttinghim
-date: 2022-01-23 00:00:39 GMT
+date: 2022-08-22 22:42:00 MST
 ---
 
 # Wired
@@ -16,6 +16,11 @@ Up/Down - Interact above/below
 Z - Interact (grab wires, flip switches)
 
 X - Jump
+
+## v0.2.0
+
+- Added a couple more puzzles to smooth out difficulty curve
+- Made it easier to manipulate levers and wires
 
 ## Links
 [Wired on Itch.io](https://desttinghim.itch.io/wired)

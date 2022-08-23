@@ -103,10 +103,11 @@ Plays a sound tone.
 * `volume`: Volume of the sustain and attack durations, between 0 and 100.
 * `flags`: Flags that modify behavior:
 
-| Flag bits | Description                                                                                     |
-| ---       | ---                                                                                             |
-| 0 - 1     | Channel (0-3): 0 = Pulse1, 1 = Pulse2, 2 = Triangle, 3 = Noise                                  |
-| 2 - 3     | Mode (0-3): For pulse channels, the pulse wave duty cycle. 0 = 1/8, 1 = 1/4, 2 = 1/2, 3 = 3/4   |
+| Flag bits | Description                                                                                   |
+| ---       | ---                                                                                           |
+| 0 - 1     | Channel (0-3): 0 = Pulse1, 1 = Pulse2, 2 = Triangle, 3 = Noise                                |
+| 2 - 3     | Mode (0-3): For pulse channels, the pulse wave duty cycle. 0 = 1/8, 1 = 1/4, 2 = 1/2, 3 = 3/4 |
+| 4 - 5     | Pan (0-2): 0 = Center, 1 = Left, 2 = Right                                                    |
 
 The high bits of `frequency` can optionally describe a pitch slide effect:
 

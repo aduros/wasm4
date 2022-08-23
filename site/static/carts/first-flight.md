@@ -1,3 +1,9 @@
+---
+author: bootra
+github: bootradev
+date: 2022-08-20
+---
+
 # First Flight
 
 You're a young witch on her first flight. Take to the skies and see how fast you can collect the rings. Can you beat the high score?

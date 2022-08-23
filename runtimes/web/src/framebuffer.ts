@@ -156,14 +156,20 @@ export class Framebuffer {
         const strokeColor = (dc1 - 1) & 0x3;
         const fillColor = (dc0 - 1) & 0x3;
 
+        // Get the width and height
         const a = width >>> 1;
         const b = height >>> 1;
 
         if (a <= 0) return;
         if (b <= 0) return;
 
+        // Calculate the midpoint
         const x0 = x + a, y0 = y + b;
         const aa2 = a * a * 2, bb2 = b * b * 2;
+
+        // Store even/odd offsets to allow non even ovals
+        const wo = (width + 1) % 2, ho = (height + 1) % 2;
+        const we = width % 2, he = height % 2;
 
         {
             let x = a, y = 0;
@@ -172,15 +178,15 @@ export class Framebuffer {
             let e = 0;
 
             while (sx >= sy) {
-                this.drawPointUnclipped(strokeColor, x0 + x, y0 + y); /*   I. Quadrant */
-                this.drawPointUnclipped(strokeColor, x0 + x, y0 - y); /*  II. Quadrant */
-                this.drawPointUnclipped(strokeColor, x0 - x, y0 + y); /* III. Quadrant */
+                this.drawPointUnclipped(strokeColor, x0 + x - wo, y0 + y - ho); /*   I. Quadrant */
+                this.drawPointUnclipped(strokeColor, x0 + x - wo, y0 - y); /*  II. Quadrant */
+                this.drawPointUnclipped(strokeColor, x0 - x, y0 + y - ho); /* III. Quadrant */
                 this.drawPointUnclipped(strokeColor, x0 - x, y0 - y); /*  IV. Quadrant */
 
                 if (dc0 !== 0) {
                     const start = x0 - x + 1;
-                    const end = x0 + x;
-                    this.drawHLineUnclipped(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
+                    const end = x0 + x - wo;
+                    this.drawHLineUnclipped(fillColor, start, y0 + y - ho, end); /*   I and III. Quadrant */
                     this.drawHLineUnclipped(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
                 }
 
@@ -205,9 +211,9 @@ export class Framebuffer {
             let ddx = 0;
 
             while (sy >= sx) {
-                this.drawPointUnclipped(strokeColor, x0 + x, y0 + y); /*   I. Quadrant */
-                this.drawPointUnclipped(strokeColor, x0 + x, y0 - y); /*  II. Quadrant */
-                this.drawPointUnclipped(strokeColor, x0 - x, y0 + y); /* III. Quadrant */
+                this.drawPointUnclipped(strokeColor, x0 + x - wo, y0 + y - ho); /*   I. Quadrant */
+                this.drawPointUnclipped(strokeColor, x0 + x - wo, y0 - y); /*  II. Quadrant */
+                this.drawPointUnclipped(strokeColor, x0 - x, y0 + y - ho); /* III. Quadrant */
                 this.drawPointUnclipped(strokeColor, x0 - x, y0 - y); /*  IV. Quadrant */
 
                 x++;
@@ -219,8 +225,8 @@ export class Framebuffer {
                     if (dc0 !== 0) {
                         const w = x - ddx - 1;
                         const start = x0 - w;
-                        const end = x0 + w + 1;
-                        this.drawHLineUnclipped(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
+                        const end = x0 + w + we;
+                        this.drawHLineUnclipped(fillColor, start, y0 + y - ho, end); /*   I and III. Quadrant */
                         this.drawHLineUnclipped(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
                     }
 

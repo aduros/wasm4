@@ -70,11 +70,11 @@ pub export fn update() void {
     @intToPtr([*c]u16, @as(c_int, 20)).* = 2;
     text("Hello from C!", @as(c_int, 10), @as(c_int, 10));
     @intToPtr([*c]u16, @as(c_int, 20)).* = 2;
-    text("ress \\x80 to blink", @as(c_int, 2), @as(c_int, 25));
+    text("Press \\x80 to blink", @as(c_int, 10), @as(c_int, 25));
     @intToPtr([*c]u16, @as(c_int, 20)).* = 3;
     text("Press \x80 to blink", @as(c_int, 10), @as(c_int, 35));
     @intToPtr([*c]u16, @as(c_int, 20)).* = 2;
-    text("ress \\xC2\\x80 to blink", @as(c_int, 2), @as(c_int, 50));
+    text("Press \\xC2\\x80 to blink", @as(c_int, 10), @as(c_int, 50));
     @intToPtr([*c]u16, @as(c_int, 20)).* = 3;
     text("Press \xc2\x80 to blink", @as(c_int, 10), @as(c_int, 60));
     @intToPtr([*c]u16, @as(c_int, 20)).* = 3;
@@ -82,9 +82,9 @@ pub export fn update() void {
     text("A\xc3\xbf!!! \xed\x95\x98\xec\x99\x80!!!", @as(c_int, 10), @as(c_int, 100));
     text("\xf0\x90\x8d\x85\xf0\x90\x8c\xb0\xf0\x90\x8d\x83\xf0\x90\x8c\xbc4!", @as(c_int, 10), @as(c_int, 110));
     @intToPtr([*c]u16, @as(c_int, 20)).* = 2;
-    text("\\xEF\\xBF\\xBD\\xEF\\xBF\\xBE\\xEF\\xBF\\xBF", @as(c_int, 2), @as(c_int, 130));
+    text("A\\xFF! \\xA3 10", @as(c_int, 10), @as(c_int, 130));
     @intToPtr([*c]u16, @as(c_int, 20)).* = 3;
-    text("\xef\xbf\xbd\xef\xbf\xbe\xef\xbf\xbf!", @as(c_int, 10), @as(c_int, 140));
+    text("A\xff! \xa3 10", @as(c_int, 10), @as(c_int, 140));
 }
 pub extern fn blit(data: [*c]const u8, x: i32, y: i32, width: u32, height: u32, flags: u32) void;
 pub extern fn blitSub(data: [*c]const u8, x: i32, y: i32, width: u32, height: u32, srcX: u32, srcY: u32, stride: u32, flags: u32) void;

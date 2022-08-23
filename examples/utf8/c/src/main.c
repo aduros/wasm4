@@ -7,12 +7,12 @@ void update () {
 
 
     *DRAW_COLORS = 2;
-    text("ress \\x80 to blink", 2, 25);
+    text("Press \\x80 to blink", 10, 25);
     *DRAW_COLORS = 3;
     text("Press \x80 to blink", 10, 35);
 
     *DRAW_COLORS = 2;
-    text("ress \\xC2\\x80 to blink", 2, 50);
+    text("Press \\xC2\\x80 to blink", 10, 50);
     *DRAW_COLORS = 3;
     text("Press \xC2\x80 to blink", 10, 60);
 
@@ -22,8 +22,8 @@ void update () {
     text("𐍅𐌰𐍃𐌼4!", 10, 110);
 
     *DRAW_COLORS = 2;
-    text("\\xEF\\xBF\\xBD\\xEF\\xBF\\xBE\\xEF\\xBF\\xBF", 2, 130);
+    text("A\\xFF! \\xA3 10", 10, 130);
     *DRAW_COLORS = 3;
-    text("\xEF\xBF\xBD\xEF\xBF\xBE\xEF\xBF\xBF!", 10, 140);
+    text("A\xFF! \xA3 10", 10, 140);
 }
 

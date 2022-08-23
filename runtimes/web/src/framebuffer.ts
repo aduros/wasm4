@@ -286,7 +286,13 @@ export class Framebuffer {
                 currentX = x;
                 break;
             default:
-                this.blit(FONT, currentX, y, 8, 8, 0, (charCode - 32) << 3, 8);
+                let offset = charCode - 32;
+                if (charCode == 0xFFFD) {
+                    offset = 224;
+                } else if (charCode >= 0xFF) {
+                    offset = 225;
+                }
+                this.blit(FONT, currentX, y, 8, 8, 0, offset << 3, 8);
                 currentX += 8;
                 break;
             }

@@ -194,9 +194,11 @@ export class Runtime {
         this.framebuffer.drawText(text, x, y);
     }
 
-    textUtf8 (textPtr: number, byteLength: number, x: number, y: number) {
-        const text = new Uint8Array(this.memory.buffer, textPtr, byteLength);
-        this.framebuffer.drawText(text, x, y);
+    textUtf8 (strUtf8Ptr: number, byteLength: number, x: number, y: number) {
+        const strUtf8 = new Uint8Array(this.memory.buffer, strUtf8Ptr, byteLength);
+        const str = new TextDecoder().decode(strUtf8);
+        let codepoints: number[] = [...str].map(x => x.codePointAt(0));
+        this.framebuffer.drawText(codepoints, x, y);
     }
 
     textUtf16 (textPtr: number, byteLength: number, x: number, y: number) {

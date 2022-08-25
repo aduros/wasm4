@@ -33,8 +33,9 @@ void w4_runtimeVLine (int x, int y, int len);
 void w4_runtimeOval (int x, int y, int width, int height);
 void w4_runtimeRect (int x, int y, int width, int height);
 void w4_runtimeText (const uint8_t* str, int x, int y);
-void w4_runtimeTextUtf8 (const uint8_t* str, int byteLength, int x, int y);
-void w4_runtimeTextUtf16 (const uint16_t* str, int byteLength, int x, int y);
+void w4_runtimeText8 (const uint8_t* str, int byteLength, int x, int y);
+void w4_runtimeTextFromUtf8 (const uint8_t* str, int byteLength, int x, int y);
+void w4_runtimeText16 (const uint16_t* str, int byteLength, int x, int y);
 
 void w4_runtimeTone (int frequency, int duration, int volume, int flags);
 

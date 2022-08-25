@@ -294,7 +294,9 @@ export class Framebuffer {
                         offset = 225;
                     }
                 }
-                this.blit(FONT, currentX, y, 8, 8, 0, offset << 3, 8);
+                if (offset >= 0) {
+                    this.blit(FONT, currentX, y, 8, 8, 0, offset << 3, 8);
+                }
                 currentX += 8;
                 break;
             }

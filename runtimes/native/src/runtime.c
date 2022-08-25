@@ -114,14 +114,19 @@ void w4_runtimeText (const uint8_t* str, int x, int y) {
     w4_framebufferText(str, x, y);
 }
 
-void w4_runtimeTextUtf8 (const uint8_t* str, int byteLength, int x, int y) {
-    // printf("textUtf8: %p, %d, %d, %d\n", str, byteLength, x, y);
-    w4_framebufferTextUtf8(str, byteLength, x, y);
+void w4_runtimeText8 (const uint8_t* str, int byteLength, int x, int y) {
+    // printf("text8: %p, %d, %d, %d\n", str, byteLength, x, y);
+    w4_framebufferText8(str, byteLength, x, y);
 }
 
-void w4_runtimeTextUtf16 (const uint16_t* str, int byteLength, int x, int y) {
-    // printf("textUtf16: %p, %d, %d, %d\n", str, byteLength, x, y);
-    w4_framebufferTextUtf16(str, byteLength, x, y);
+void w4_runtimeTextFromUtf8 (const uint8_t* str, int byteLength, int x, int y) {
+    // printf("textFromUtf8: %p, %d, %d, %d\n", str, byteLength, x, y);
+    w4_framebufferTextFromUtf8(str, byteLength, x, y);
+}
+
+void w4_runtimeText16 (const uint16_t* str, int byteLength, int x, int y) {
+    // printf("text16: %p, %d, %d, %d\n", str, byteLength, x, y);
+    w4_framebufferText16(str, byteLength, x, y);
 }
 
 void w4_runtimeTone (int frequency, int duration, int volume, int flags) {

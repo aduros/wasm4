@@ -97,21 +97,30 @@ static wasm_trap_t* text (const wasm_val_vec_t* args, wasm_val_vec_t* results) {
     return NULL;
 }
 
-static wasm_trap_t* textUtf8 (const wasm_val_vec_t* args, wasm_val_vec_t* results) {
+static wasm_trap_t* text8 (const wasm_val_vec_t* args, wasm_val_vec_t* results) {
     const uint8_t* str = getMemoryPointer(&args->data[0]);
     int32_t byteLength = args->data[1].of.i32;
     int32_t x = args->data[2].of.i32;
     int32_t y = args->data[3].of.i32;
-    w4_runtimeTextUtf8(str, byteLength, x, y);
+    w4_runtimeText8(str, byteLength, x, y);
     return NULL;
 }
 
-static wasm_trap_t* textUtf16 (const wasm_val_vec_t* args, wasm_val_vec_t* results) {
+static wasm_trap_t* textFromUtf8 (const wasm_val_vec_t* args, wasm_val_vec_t* results) {
+    const uint8_t* str = getMemoryPointer(&args->data[0]);
+    int32_t byteLength = args->data[1].of.i32;
+    int32_t x = args->data[2].of.i32;
+    int32_t y = args->data[3].of.i32;
+    w4_runtimeTextFromUtf8(str, byteLength, x, y);
+    return NULL;
+}
+
+static wasm_trap_t* text16 (const wasm_val_vec_t* args, wasm_val_vec_t* results) {
     const uint16_t* str = getMemoryPointer(&args->data[0]);
     int32_t byteLength = args->data[1].of.i32;
     int32_t x = args->data[2].of.i32;
     int32_t y = args->data[3].of.i32;
-    w4_runtimeTextUtf16(str, byteLength, x, y);
+    w4_runtimeText16(str, byteLength, x, y);
     return NULL;
 }
 
@@ -279,13 +288,27 @@ void w4_wasmLoadModule (const uint8_t* wasmBuffer, int byteLength) {
                     functype = createFuncType(3, 0);
                     callback = text;
 
-                } else if (strcmp(name->data, "textUtf8") == 0) {
+                } else if (strcmp(name->data, "text8") == 0) {
                     functype = createFuncType(4, 0);
-                    callback = textUtf8;
+                    callback = text8;
+
+                } else if (strcmp(name->data, "textUtf8") == 0) {
+                    // Deprecated.
+                    functype = createFuncType(4, 0);
+                    callback = text8;
+
+                } else if (strcmp(name->data, "textFromUtf8") == 0) {
+                    functype = createFuncType(4, 0);
+                    callback = textFromUtf8;
+
+                } else if (strcmp(name->data, "text16") == 0) {
+                    functype = createFuncType(4, 0);
+                    callback = text16;
 
                 } else if (strcmp(name->data, "textUtf16") == 0) {
+                    // Deprecated.
                     functype = createFuncType(4, 0);
-                    callback = textUtf16;
+                    callback = text16;
 
                 } else if (strcmp(name->data, "tone") == 0) {
                     functype = createFuncType(4, 0);

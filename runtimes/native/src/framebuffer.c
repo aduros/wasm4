@@ -5,7 +5,7 @@
 
 #include "util.h"
 
-static const uint8_t font[1792] = {
+static const uint8_t font[1808] = {
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
     0xc7, 0xc7, 0xc7, 0xcf, 0xcf, 0xff, 0xcf, 0xff,
     0x93, 0x93, 0x93, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -229,7 +229,9 @@ static const uint8_t font[1792] = {
     0x93, 0xff, 0x39, 0x39, 0x39, 0x39, 0x81, 0xff,
     0xf7, 0xef, 0x39, 0x39, 0x39, 0x81, 0xf9, 0x83,
     0x3f, 0x3f, 0x03, 0x39, 0x39, 0x03, 0x3f, 0x3f,
-    0x93, 0xff, 0x39, 0x39, 0x39, 0x81, 0xf9, 0x83
+    0x93, 0xff, 0x39, 0x39, 0x39, 0x81, 0xf9, 0x83,
+    0xef, 0xd7, 0xab, 0x09, 0x11, 0x83, 0xd7, 0xef,
+    0x83, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0xbb, 0x83
 };
 
 static const uint8_t* drawColors;
@@ -510,6 +512,8 @@ void w4_framebufferText (const uint8_t* str, int x, int y) {
         if (*str == 10) {
             y += 8;
             currentX = x;
+        } else if (*str < 32) {
+            currentX += 8;
         } else {
             w4_framebufferBlit(font, currentX, y, 8, 8, 0, (*str - 32) << 3, 8,
                 false, false, false, false);
@@ -518,11 +522,13 @@ void w4_framebufferText (const uint8_t* str, int x, int y) {
     }
 }
 
-void w4_framebufferTextUtf8 (const uint8_t* str, int byteLength, int x, int y) {
+void w4_framebufferText8 (const uint8_t* str, int byteLength, int x, int y) {
     for (int currentX = x; byteLength > 0; ++str, --byteLength) {
         if (*str == 10) {
             y += 8;
             currentX = x;
+        } else if (*str < 32) {
+            currentX += 8;
         } else {
             w4_framebufferBlit(font, currentX, y, 8, 8, 0, (*str - 32) << 3, 8,
                 false, false, false, false);
@@ -531,17 +537,60 @@ void w4_framebufferTextUtf8 (const uint8_t* str, int byteLength, int x, int y) {
     }
 }
 
-void w4_framebufferTextUtf16 (const uint16_t* str, int byteLength, int x, int y) {
+void w4_framebufferText16 (const uint16_t* str, int byteLength, int x, int y) {
     for (int currentX = x; byteLength > 0; ++str, byteLength -= 2) {
         uint16_t c = w4_read16LE(str);
         if (c == 10) {
             y += 8;
             currentX = x;
+        } else if (c < 32) {
+            currentX += 8;
+        } else if (c >= 256) {
+            w4_framebufferBlit(font, currentX, y, 8, 8, 0, 224 << 3, 8,
+                false, false, false, false);
+            currentX += 8;
         } else {
             w4_framebufferBlit(font, currentX, y, 8, 8, 0, (c - 32) << 3, 8,
                 false, false, false, false);
             currentX += 8;
         }
+    }
+}
+
+void w4_framebufferTextFromUtf8 (const uint8_t* str, int byteLength, int x, int y) {
+    // Instead of fully parsing UTF-8, make sure we can decode the lower (0-127)
+    // and upper (128-255) halves of ASCII characters encoded as UTF-8.
+    uint8_t previousByte = 0;
+    for (int currentX = x; byteLength > 0; ++str, --byteLength) {
+        uint8_t byte = *str;
+        uint8_t offset;
+        if (byte == 10) {
+            y += 8;
+            currentX = x;
+        } else if (byte < 32) {
+            currentX += 8;
+        } else if ((byte & 0b11111110) == (0b1100001 << 1)) {
+            // If str only contains UTF-8 encoded characters between U+0000
+            // and U+00FF, this is the first byte of an upper ASCII character.
+        } else {
+            if (byte < 128) {
+                // This is a lower ASCII character.
+                offset = byte - 32;
+            } else if (((previousByte & 0b11111110) == (0b1100001 << 1))
+                && ((byte & 0b11000000) == (0b10 << 6))) {
+                // This is an upper ASCII character.
+                uint8_t combined = ((previousByte & 0b00000011) << 6) | (byte & 0b00111111);
+                offset = combined - 32;
+            } else {
+                // This is either part of a UTF-8 encoded character above
+                // U+00FF, or invalid UTF-8.
+                offset = 224;
+            }
+            w4_framebufferBlit(font, currentX, y, 8, 8, 0, offset << 3, 8,
+                false, false, false, false);
+            currentX += 8;
+        }
+        previousByte = byte;
     }
 }
 

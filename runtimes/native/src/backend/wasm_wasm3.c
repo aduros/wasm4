@@ -87,21 +87,30 @@ static m3ApiRawFunction (text) {
     m3ApiSuccess();
 }
 
-static m3ApiRawFunction (textUtf8) {
+static m3ApiRawFunction (text8) {
     m3ApiGetArgMem(const uint8_t*, str);
     m3ApiGetArg(int, byteLength);
     m3ApiGetArg(int, x);
     m3ApiGetArg(int, y);
-    w4_runtimeTextUtf8(str, byteLength, x, y);
+    w4_runtimeText8(str, byteLength, x, y);
     m3ApiSuccess();
 }
 
-static m3ApiRawFunction (textUtf16) {
+static m3ApiRawFunction (textFromUtf8) {
+    m3ApiGetArgMem(const uint8_t*, str);
+    m3ApiGetArg(int, byteLength);
+    m3ApiGetArg(int, x);
+    m3ApiGetArg(int, y);
+    w4_runtimeTextFromUtf8(str, byteLength, x, y);
+    m3ApiSuccess();
+}
+
+static m3ApiRawFunction (text16) {
     m3ApiGetArgMem(const uint16_t*, str);
     m3ApiGetArg(int, byteLength);
     m3ApiGetArg(int, x);
     m3ApiGetArg(int, y);
-    w4_runtimeTextUtf16(str, byteLength, x, y);
+    w4_runtimeText16(str, byteLength, x, y);
     m3ApiSuccess();
 }
 
@@ -206,8 +215,13 @@ void w4_wasmLoadModule (const uint8_t* wasmBuffer, int byteLength) {
     m3_LinkRawFunction(module, "env", "oval", "v(iiii)", oval);
     m3_LinkRawFunction(module, "env", "rect", "v(iiii)", rect);
     m3_LinkRawFunction(module, "env", "text", "v(iii)", text);
-    m3_LinkRawFunction(module, "env", "textUtf8", "v(iiii)", textUtf8);
-    m3_LinkRawFunction(module, "env", "textUtf16", "v(iiii)", textUtf16);
+    m3_LinkRawFunction(module, "env", "text8", "v(iiii)", text8);
+    m3_LinkRawFunction(module, "env", "textFromUtf8", "v(iiii)", textFromUtf8);
+    m3_LinkRawFunction(module, "env", "text16", "v(iiii)", text16);
+
+    // Deprecated:
+    m3_LinkRawFunction(module, "env", "textUtf8", "v(iiii)", text8);
+    m3_LinkRawFunction(module, "env", "textUtf16", "v(iiii)", text16);
 
     m3_LinkRawFunction(module, "env", "tone", "v(iiii)", tone);
 

@@ -141,6 +141,11 @@ export class Runtime {
             vline: this.framebuffer.drawVLine.bind(this.framebuffer),
 
             text: this.text.bind(this),
+            text8: this.text8.bind(this),
+            text16: this.text16.bind(this),
+            textFromUtf8: this.textFromUtf8.bind(this),
+
+            // Deprecated:
             textUtf8: this.textUtf8.bind(this),
             textUtf16: this.textUtf16.bind(this),
 
@@ -194,14 +199,32 @@ export class Runtime {
         this.framebuffer.drawText(text, x, y);
     }
 
-    textUtf8 (strUtf8Ptr: number, byteLength: number, x: number, y: number) {
+    // Deprecated. This has been renamed to better reflect its behavior.
+    textUtf8 (textPtr: number, byteLength: number, x: number, y: number) {
+        return this.text8(textPtr, byteLength, x, y);
+    }
+
+    text8 (textPtr: number, byteLength: number, x: number, y: number) {
+        const text = new Uint8Array(this.memory.buffer, textPtr, byteLength);
+        this.framebuffer.drawText(text, x, y);
+    }
+
+    // Takes a UTF-8 encoded string, decodes it and turns it into an array
+    // of codepoints, essentially reencoding it as ASCII for the purposes of
+    // drawing the text in the default font.
+    textFromUtf8 (strUtf8Ptr: number, byteLength: number, x: number, y: number) {
         const strUtf8 = new Uint8Array(this.memory.buffer, strUtf8Ptr, byteLength);
         const str = new TextDecoder().decode(strUtf8);
         let codepoints = Array.from(str, x => x.codePointAt(0));
         this.framebuffer.drawText(codepoints, x, y);
     }
 
+    // Deprecated. This has been renamed to better reflect its behavior.
     textUtf16 (textPtr: number, byteLength: number, x: number, y: number) {
+        return this.text16(textPtr, byteLength, x, y);
+    }
+
+    text16 (textPtr: number, byteLength: number, x: number, y: number) {
         const text = new Uint16Array(this.memory.buffer, textPtr, byteLength >> 1);
         this.framebuffer.drawText(text, x, y);
     }

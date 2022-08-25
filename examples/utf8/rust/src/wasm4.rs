@@ -140,7 +140,7 @@ pub fn text<T: AsRef<str>>(text: T, x: i32, y: i32) {
     unsafe { extern_text(text_ref.as_ptr(), text_ref.len(), x, y) }
 }
 extern "C" {
-    #[link_name = "textUtf8"]
+    #[link_name = "textFromUtf8"]
     fn extern_text(text: *const u8, length: usize, x: i32, y: i32);
 }
 

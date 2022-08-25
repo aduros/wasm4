@@ -288,7 +288,7 @@ export class Framebuffer {
             default:
                 let offset = charCode - 32;
                 if (charCode > 0xFF) {
-                    if (charCode == 0xFFFD) {
+                    if (charCode === 0xFFFD) {
                         offset = 224;
                     } else {
                         offset = 225;

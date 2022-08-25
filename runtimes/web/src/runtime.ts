@@ -197,7 +197,7 @@ export class Runtime {
     textUtf8 (strUtf8Ptr: number, byteLength: number, x: number, y: number) {
         const strUtf8 = new Uint8Array(this.memory.buffer, strUtf8Ptr, byteLength);
         const str = new TextDecoder().decode(strUtf8);
-        let codepoints: number[] = [...str].map(x => x.codePointAt(0));
+        let codepoints = Array.from(str, x => x.codePointAt(0));
         this.framebuffer.drawText(codepoints, x, y);
     }
 

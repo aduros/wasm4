@@ -26,11 +26,11 @@ module.exports = {
     metadatas: [
         { name: 'description', property: 'og:description', content: 'Build retro games using WebAssembly for a fantasy console' },
     ],
-    announcementBar: {
-      id: 'gamejam2',
-      content: '📅 Join the second <a target="_blank" style="font-weight: bold" href="https://itch.io/jam/wasm4-v2">WASM-4 Game Jam</a> on August 12 - 21!',
-      backgroundColor: '#9bc86a',
-    },
+    // announcementBar: {
+    //   id: 'gamejam2',
+    //   content: '📅 Join the second <a target="_blank" style="font-weight: bold" href="https://itch.io/jam/wasm4-v2">WASM-4 Game Jam</a> on August 12 - 21!',
+    //   backgroundColor: '#9bc86a',
+    // },
     navbar: {
       title: 'WASM-4',
       logo: {

@@ -8,7 +8,7 @@ date: Aug 26, 2022
 # Game Jam 2 Results
 
 The [second WASM-4 game jam](https://itch.io/jam/wasm4-v2) is a wrap and the results are in! Thanks
-again to all our judges who each took the time to rate all 26 games. Thank you again to
+again to all our judges who each took the time to rate all 26 games. Thanks again to
 [Wasmer](https://wasmer.io/) for sponsoring a prize fund and helping us with promotion.
 
 The quality of many of the games in this jam were absolutely incredible. It was very difficult to
@@ -20,19 +20,22 @@ Without further ado, here is the final ranking!
 
 ## Winners
 
-**5th place** and $100, [Samurai Revenge](https://krylan.itch.io/samurai-revenge) by Krylan!
+**5th place** and $100, [Samurai Revenge](https://krylan.itch.io/samurai-revenge) ([wapm link](https://wapm.io/Krylan/samurai-revenge)) by Krylan!
 
-**4th place** and $250, [Asteroids 3000](https://hitchh1k3r.itch.io/asteroids-3000) by HitchH1k3r!
+**4th place** and $250, [Asteroids 3000](https://hitchh1k3r.itch.io/asteroids-3000) ([wapm link](https://wapm.io/hitchh1k3r/asteroids-3000)) by HitchH1k3r!
 
-**3rd place** and $500, [disk-0 MADNESS](https://maxcurzi.itch.io/disk-0-madness) by maxcurzi!
+**3rd place** and $500, [disk-0 MADNESS](https://maxcurzi.itch.io/disk-0-madness) ([wapm link](https://wapm.io/maxcurzi/disk-0-MADNESS)) by maxcurzi!
 
-**2nd place** and $750, [First Flight](https://bootra.itch.io/first-flight) by bootra!
+**2nd place** and $750, [First Flight](https://bootra.itch.io/first-flight) ([wapm link](https://wapm.io/bootra/first-flight)) by bootra!
 
-**1st place** and $1000, [Journey to Entorus](https://jerwuqu.itch.io/journey-to-entorus) by JerwuQu!
+**1st place** and $1000, [Journey to Entorus](https://jerwuqu.itch.io/journey-to-entorus) ([wapm link](https://wapm.io/JerwuQu/journey-to-entorus)) by JerwuQu!
 
 You can see the full rankings and play all 26 games [here on itch.io](https://itch.io/jam/wasm4-v2/results). Also be sure to check out the per-category rankings.
 There were so many great games in this jam, and they all deserve a playthrough and comment. If you
 managed to submit a game at all, congratulations! If not, I hope you join us for the next jam!
+
+Also check out all the [WASM-4 games on wapm](https://wapm.io/interface/wasm4), which now has a new
+category specifically for WASM-4.
 
 ## Developer Survey
 

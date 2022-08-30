@@ -93,12 +93,12 @@ export declare function rect (x: i32, y: i32, width: u32, height: u32): void;
 /** Draws text using the built-in system font. */
 export function text (str: string, x: i32, y: i32): void {
     const byteLength = load<u32>(changetype<usize>(str) - 4);
-    textUtf16(str, byteLength, x, y);
+    text16(str, byteLength, x, y);
 }
 
 // @ts-ignore: decorator
-@external("env", "textUtf16")
-declare function textUtf16 (text: string, byteLength: u32, x: i32, y: i32): void;
+@external("env", "text16")
+declare function text16 (text: string, byteLength: u32, x: i32, y: i32): void;
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │

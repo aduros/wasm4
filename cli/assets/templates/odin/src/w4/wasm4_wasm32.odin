@@ -92,7 +92,7 @@ foreign wasm4 {
 	rect :: proc(x, y: i32, width, height: u32) ---
 	
 	// Draws text using the built-in system font.
-	@(link_name="textUtf8")
+	@(link_name="textFromUtf8")
 	text :: proc(text: string, x, y: i32) ---
 }
 

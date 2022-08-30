@@ -85,11 +85,10 @@ The font is 8x8 pixels per character.
 `DRAW_COLORS` color 1 is used as the text color, `DRAW_COLORS` color 2 is used as the background color.
 
 :::note String Encoding
-By default, `str` is expected to be a `\0` terminated ASCII string. There are 2 additional variants
-of this function for passing unterminated UTF-8 and UTF-16 strings along with a byte length.
-
-* `textUtf8 (strUtf8, byteLength, x, y)`
-* `textUtf16 (strUtf16, byteLength, x, y)`
+By default, `str` is expected to be a `\0` terminated ASCII string.
+In programming languages with UTF-8 or UTF-16 string literals,
+only ASCII-equivalent characters (U+0000 through U+00FF) are [supported](text#special-characters),
+and no `\0` is needed.
 :::
 
 ## Sound
@@ -174,11 +173,9 @@ Called every frame, about 60 times per second.
 Prints a message to the debug console.
 
 :::note String Encoding
-By default, `str` is expected to be a `\0` terminated ASCII string. There are 2 additional variants
-of this function for passing unterminated UTF-8 and UTF-16 strings along with a byte length.
-
-* `traceUtf8 (strUtf8, byteLength)`
-* `traceUtf16 (strUtf16, byteLength)`
+By default, `str` is expected to be a `\0` terminated ASCII string.
+In programming languages with UTF-8 or UTF-16 string literals,
+no `\0` is needed.
 :::
 
 ### `tracef (fmt, stackPtr)`

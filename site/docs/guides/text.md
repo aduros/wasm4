@@ -80,8 +80,8 @@ It's possible to print one of these characters by escaping it's charcode.
 
 | Key         | Escape Character |
 |-------------|------------------|
-| A button    | `\x80`           |
-| B button    | `\x81`           |
+| X button    | `\x80`           |
+| Z button    | `\x81`           |
 | Left arrow  | `\x84`           |
 | Right arrow | `\x85`           |
 | Up arrow    | `\x86`           |
@@ -94,6 +94,67 @@ We could use those as instructions for our games!
 ```typescript
 // Press UP to jump!
 w4.text("Press \x86 to jump!", 10, 10);
+```
+
+```c
+// Press UP to jump!
+text("Press \x86 to jump!", 10, 10);
+```
+
+```d
+// Press UP to jump!
+w4.text("Press \x86 to jump!", 10, 10);
+```
+
+```go
+// Press UP to jump!
+w4.Text("Press \u0086 to jump!", 10, 10)
+```
+
+```lua
+-- Press UP to jump!
+text("Press \x86 to jump!", 10, 10)
+```
+
+```nim
+# Press UP to jump!
+text("Press \x86 to jump!", 10, 10)
+```
+
+```odin
+// Press UP to jump!
+w4.text("Press \u0086 to jump!", 10, 10)
+```
+
+```porth
+import proc text int int ptr in end
+
+// Press UP to jump!
+10 10 "Press \x86 to jump!"c text
+```
+
+```roland
+// Press UP to jump!
+text("Press \x86 to jump!", 10, 10);
+```
+
+```rust
+// Press UP to jump!
+text("Press \u{86} to jump!", 10, 10);
+```
+
+```wasm
+(import "env" "text" (func $text (param i32 i32 i32)))
+
+;; Press UP to jump!
+(data (i32.const 0x2000) "Press \86 to jump!\00")
+
+(call $text (i32.const 0x2000) (i32.const 10) (i32.const 10))
+```
+
+```zig
+// Press UP to jump!
+w4.text("Press \u{86} to jump!", 10, 10);
 ```
 
 <!-- </MultiLanguageCode> -->

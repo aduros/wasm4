@@ -19,7 +19,8 @@
   "targets": {
     "release": {
       "optimizeLevel": 3,
-      "shrinkLevel": 1,
+      "shrinkLevel": 2,
+      "converge": true,
       "noAssert": true,
       "use": "abort="
     },

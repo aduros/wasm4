@@ -170,7 +170,7 @@ export class Framebuffer {
         const fillColor = (dc0 - 1) & 0x3;
 
         let a = width;
-        let b = height;
+        const b = height;
         let b1 = (height + 1) % 2; // Compensates for precision loss when dividing
 
         let north = y;
@@ -182,7 +182,7 @@ export class Framebuffer {
 
         // Error increments. Also known as the decision parameters
         let dx = 4 * (1 - a) * b * b;
-        let dy = 4 * (b1 + 1) * a * a;
+        let dy = 4 * (b1 + 2) * a * a;
 
         // Error of 1 step
         let err = dx + dy + b1 * a * a;

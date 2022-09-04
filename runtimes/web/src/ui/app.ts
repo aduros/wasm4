@@ -526,6 +526,60 @@ export class App extends LitElement {
         }
     }
 
+    exportGameDisk () {
+        const blob = new Blob([this.runtime.diskBuffer], { type: "application/octet-stream" });
+        const link = document.createElement("a");
+
+        link.style.display = "none";
+        link.href = URL.createObjectURL(new Blob([this.runtime.diskBuffer], { type: "application/octet-stream" }));
+        link.download = "disk.bin";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    importGameDisk () {
+        if (this.netplay) {
+            this.notifications.show("Disk loading disabled during netplay");
+            return;
+        }
+
+        const app = this;
+        const input = document.createElement("input");
+
+        input.style.display = "none";
+        input.type = "file";
+        input.accept = ".bin";
+        input.multiple = false;
+
+        input.addEventListener("change", () => {
+            const files = input.files as FileList;
+            let reader = new FileReader();
+            
+            reader.addEventListener("load", () => {
+                let result = new Uint8Array(reader.result as ArrayBuffer, 0, constants.STORAGE_SIZE);
+                app.runtime.diskBuffer = result.buffer;
+                app.notifications.show("Disk loaded");
+            });
+
+            reader.readAsArrayBuffer(files[0]);
+        });
+
+        document.body.appendChild(input);
+        input.click();
+        document.body.removeChild(input);
+    }
+
+    clearGameDisk () {
+        if (this.netplay) {
+            this.notifications.show("Disk clearing disabled during netplay");
+            return;
+        }
+
+        this.runtime.diskBuffer = new ArrayBuffer(constants.STORAGE_SIZE);
+        this.notifications.show("Disk cleared");
+    }
+
     copyNetplayLink () {
         if (!this.netplay) {
             this.netplay = this.createNetplay();

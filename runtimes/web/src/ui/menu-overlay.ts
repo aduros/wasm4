@@ -5,11 +5,26 @@ import { map } from 'lit/directives/map.js';
 import { App } from "./app";
 import * as constants from "../constants";
 
+const optionIndex = {
+    CONTINUE: 0,
+    SAVE_STATE: 1,
+    LOAD_STATE: 2,
+    // OPTIONS: null,
+    EXPORT_DISK: 3,
+    IMPORT_DISK: 4,
+    CLEAR_DISK: 5,
+    COPY_NETPLAY_LINK: 6,
+    RESET_CART: 7,
+};
+
 const options = [
     "CONTINUE",
     "SAVE STATE",
     "LOAD STATE",
     // "OPTIONS",
+    "EXPORT DISK",
+    "IMPORT DISK",
+    "CLEAR DISK",
     "COPY NETPLAY URL",
     "RESET CART",
 ];
@@ -102,18 +117,27 @@ export class MenuOverlay extends LitElement {
 
         if (pressedThisFrame & (constants.BUTTON_X | constants.BUTTON_Z)) {
             switch (this.selectedIdx) {
-            case 0:
+            case optionIndex.CONTINUE:
                 break;
-            case 1:
+            case optionIndex.SAVE_STATE:
                 this.app.saveGameState();
                 break;
-            case 2:
+            case optionIndex.LOAD_STATE:
                 this.app.loadGameState();
                 break;
-            case 3:
+            case optionIndex.EXPORT_DISK:
+                this.app.exportGameDisk();
+                break;
+            case optionIndex.IMPORT_DISK:
+                this.app.importGameDisk();
+                break;
+            case optionIndex.CLEAR_DISK:
+                this.app.clearGameDisk();
+                break;
+            case optionIndex.COPY_NETPLAY_LINK:
                 this.app.copyNetplayLink();
                 break;
-            case 4:
+            case optionIndex.RESET_CART:
                 this.app.resetCart();
                 break;
             }

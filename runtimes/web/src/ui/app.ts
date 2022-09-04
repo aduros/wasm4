@@ -74,6 +74,8 @@ export class App extends LitElement {
 
     private netplay?: Netplay;
 
+    private readonly diskPrefix: string;
+
     readonly onPointerUp = (event: PointerEvent) => {
         if (event.pointerType == "touch") {
             // Try to go fullscreen on mobile
@@ -87,9 +89,8 @@ export class App extends LitElement {
     constructor () {
         super();
 
-        const diskPrefix = document.getElementById("wasm4-disk-prefix")?.textContent
-            ?? utils.getUrlParam("disk-prefix");
-        this.runtime = new Runtime(diskPrefix + "-disk");
+        this.diskPrefix = document.getElementById("wasm4-disk-prefix")?.textContent ?? utils.getUrlParam("disk-prefix") as string;
+        this.runtime = new Runtime(`${this.diskPrefix}-disk`);
 
         this.init();
     }
@@ -527,12 +528,18 @@ export class App extends LitElement {
     }
 
     exportGameDisk () {
-        const blob = new Blob([this.runtime.diskBuffer], { type: "application/octet-stream" });
+        if(this.runtime.diskSize <= 0) {
+            this.notifications.show("Disk is empty");
+            return;
+        }
+
+        const disk = new Uint8Array(this.runtime.diskBuffer).slice(0, this.runtime.diskSize);
+        const blob = new Blob([disk], { type: "application/octet-stream" });
         const link = document.createElement("a");
 
         link.style.display = "none";
-        link.href = URL.createObjectURL(new Blob([this.runtime.diskBuffer], { type: "application/octet-stream" }));
-        link.download = "disk.bin";
+        link.href = URL.createObjectURL(blob);
+        link.download = `${this.diskPrefix}.disk`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -540,7 +547,7 @@ export class App extends LitElement {
 
     importGameDisk () {
         if (this.netplay) {
-            this.notifications.show("Disk loading disabled during netplay");
+            this.notifications.show("Disk importing disabled during netplay");
             return;
         }
 
@@ -549,7 +556,7 @@ export class App extends LitElement {
 
         input.style.display = "none";
         input.type = "file";
-        input.accept = ".bin";
+        input.accept = ".disk";
         input.multiple = false;
 
         input.addEventListener("change", () => {
@@ -557,9 +564,23 @@ export class App extends LitElement {
             let reader = new FileReader();
             
             reader.addEventListener("load", () => {
-                let result = new Uint8Array(reader.result as ArrayBuffer, 0, constants.STORAGE_SIZE);
-                app.runtime.diskBuffer = result.buffer;
-                app.notifications.show("Disk loaded");
+                let result = new Uint8Array(reader.result as ArrayBuffer).slice(0, constants.STORAGE_SIZE);
+                let disk = new Uint8Array(constants.STORAGE_SIZE);
+
+                disk.set(result);
+                app.runtime.diskBuffer = disk;
+                this.runtime.diskSize = result.length;
+                
+                const str = z85.encode(disk);
+                try {
+                    localStorage.setItem(this.runtime.diskName, str);
+                    app.notifications.show("Disk imported");
+                } catch (error) {
+                    app.notifications.show("Error importing disk");
+                    if (constants.DEBUG) {
+                        console.error("Error importing disk", error);
+                    }
+                }
             });
 
             reader.readAsArrayBuffer(files[0]);
@@ -577,6 +598,17 @@ export class App extends LitElement {
         }
 
         this.runtime.diskBuffer = new ArrayBuffer(constants.STORAGE_SIZE);
+        this.runtime.diskSize = 0;
+        
+        try {
+            localStorage.removeItem(this.runtime.diskName);
+        } catch (error) {
+            this.notifications.show("Error clearing disk");
+            if (constants.DEBUG) {
+                console.error("Error clearing disk", error);
+            }
+        }
+
         this.notifications.show("Disk cleared");
     }
 

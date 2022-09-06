@@ -568,10 +568,10 @@ export class App extends LitElement {
                 let disk = new Uint8Array(constants.STORAGE_SIZE);
 
                 disk.set(result);
-                app.runtime.diskBuffer = disk;
+                app.runtime.diskBuffer = disk.buffer;
                 this.runtime.diskSize = result.length;
                 
-                const str = z85.encode(disk);
+                const str = z85.encode(result);
                 try {
                     localStorage.setItem(this.runtime.diskName, str);
                     app.notifications.show("Disk imported");

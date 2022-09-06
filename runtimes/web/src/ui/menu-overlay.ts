@@ -5,28 +5,45 @@ import { map } from 'lit/directives/map.js';
 import { App } from "./app";
 import * as constants from "../constants";
 
-const optionIndex = {
-    CONTINUE: 0,
-    SAVE_STATE: 1,
-    LOAD_STATE: 2,
-    // OPTIONS: null,
-    EXPORT_DISK: 3,
-    IMPORT_DISK: 4,
-    CLEAR_DISK: 5,
-    COPY_NETPLAY_LINK: 6,
-    RESET_CART: 7,
+const optionContext = {
+    DEFAULT: 0,
+    DISK: 1,
 };
 
+const optionIndex = [
+    {
+        CONTINUE: 0,
+        SAVE_STATE: 1,
+        LOAD_STATE: 2,
+        DISK_OPTIONS: 3,
+        // OPTIONS: null,
+        COPY_NETPLAY_LINK: 4,
+        RESET_CART: 5,
+    },
+    {
+        BACK: 0,
+        EXPORT_DISK: 1,
+        IMPORT_DISK: 2,
+        CLEAR_DISK: 3,
+    }
+];
+
 const options = [
-    "CONTINUE",
-    "SAVE STATE",
-    "LOAD STATE",
-    // "OPTIONS",
-    "EXPORT DISK",
-    "IMPORT DISK",
-    "CLEAR DISK",
-    "COPY NETPLAY URL",
-    "RESET CART",
+    [
+        "CONTINUE",
+        "SAVE STATE",
+        "LOAD STATE",
+        "DISK OPTIONS",
+        // "OPTIONS",
+        "COPY NETPLAY URL",
+        "RESET CART",
+    ],
+    [
+        "BACK",
+        "EXPORT DISK",
+        "IMPORT DISK",
+        "CLEAR DISK",
+    ]
 ];
 
 @customElement("wasm4-menu-overlay")
@@ -101,8 +118,41 @@ export class MenuOverlay extends LitElement {
 
     private netplayPollInterval?: number;
 
+    private optionContext: number = 0;
+
+    private optionContextHistory: {context: number, index: number}[] = [];
+
     constructor () {
         super();
+    }
+
+    get optionIndex (): any {
+        return optionIndex[this.optionContext];
+    }
+
+    get options (): string[] {
+        return options[this.optionContext];
+    }
+
+    previousContext () {
+        if(this.optionContextHistory.length > 0) {
+            const previousContext = this.optionContextHistory.pop() as {context: number, index: number};
+
+            this.app.inputState.gamepad[0] = 0;
+            this.optionContext = previousContext.context;
+            this.selectedIdx = previousContext.index;
+        }
+    }
+
+    switchContext (context: number, index: number = 0) {
+        this.optionContextHistory.push({
+            context: this.optionContext, 
+            index: this.selectedIdx
+        });
+
+        this.app.inputState.gamepad[0] = 0;
+        this.optionContext = context;
+        this.selectedIdx = index;
     }
 
     applyInput () {
@@ -116,32 +166,51 @@ export class MenuOverlay extends LitElement {
         this.lastGamepad = gamepad;
 
         if (pressedThisFrame & (constants.BUTTON_X | constants.BUTTON_Z)) {
-            switch (this.selectedIdx) {
-            case optionIndex.CONTINUE:
-                break;
-            case optionIndex.SAVE_STATE:
-                this.app.saveGameState();
-                break;
-            case optionIndex.LOAD_STATE:
-                this.app.loadGameState();
-                break;
-            case optionIndex.EXPORT_DISK:
-                this.app.exportGameDisk();
-                break;
-            case optionIndex.IMPORT_DISK:
-                this.app.importGameDisk();
-                break;
-            case optionIndex.CLEAR_DISK:
-                this.app.clearGameDisk();
-                break;
-            case optionIndex.COPY_NETPLAY_LINK:
-                this.app.copyNetplayLink();
-                break;
-            case optionIndex.RESET_CART:
-                this.app.resetCart();
-                break;
+            if(this.optionContext === optionContext.DEFAULT) {
+                switch (this.selectedIdx) {
+                    case this.optionIndex.CONTINUE:
+                        this.app.closeMenu();
+                        break;
+                    case this.optionIndex.SAVE_STATE:
+                        this.app.saveGameState();
+                        this.app.closeMenu();
+                        break;
+                    case this.optionIndex.LOAD_STATE:
+                        this.app.loadGameState();
+                        this.app.closeMenu();
+                        break;
+                    case this.optionIndex.DISK_OPTIONS:
+                        this.switchContext(optionContext.DISK);
+                        break;
+                    case this.optionIndex.COPY_NETPLAY_LINK:
+                        this.app.copyNetplayLink();
+                        this.app.closeMenu();
+                        break;
+                    case this.optionIndex.RESET_CART:
+                        this.app.resetCart();
+                        this.app.closeMenu();
+                        break;
+                }
             }
-            this.app.closeMenu();
+            else if(this.optionContext === optionContext.DISK) {
+                switch (this.selectedIdx) {
+                    case this.optionIndex.BACK:
+                        this.previousContext();
+                        break;
+                    case this.optionIndex.EXPORT_DISK:
+                        this.app.exportGameDisk();
+                        this.app.closeMenu();
+                        break;
+                    case this.optionIndex.IMPORT_DISK:
+                        this.app.importGameDisk();
+                        this.app.closeMenu();
+                        break;
+                    case this.optionIndex.CLEAR_DISK:
+                        this.app.clearGameDisk();
+                        this.app.closeMenu();
+                        break;
+                }
+            }
         }
 
         if (pressedThisFrame & constants.BUTTON_DOWN) {
@@ -150,7 +219,7 @@ export class MenuOverlay extends LitElement {
         if (pressedThisFrame & constants.BUTTON_UP) {
             this.selectedIdx--;
         }
-        this.selectedIdx = (this.selectedIdx + options.length) % options.length;
+        this.selectedIdx = (this.selectedIdx + this.options.length) % this.options.length;
     }
 
     connectedCallback () {
@@ -172,8 +241,12 @@ export class MenuOverlay extends LitElement {
     render () {
         return html`
             <div class="menu">
-                <ul>
-                    ${map(options, (option, idx) =>
+                <ul data-context="${optionContext.DEFAULT}" style="display:${this.optionContext === optionContext.DEFAULT? "inherit": "none"}">
+                    ${map(options[optionContext.DEFAULT], (option, idx) =>
+                        html`<li class="${this.selectedIdx == idx ? "selected" : ""}"}>${option}</li>`)}
+                </ul>
+                <ul data-context="${optionContext.DISK}" style="display:${this.optionContext === optionContext.DISK? "inherit": "none"}">
+                    ${map(options[optionContext.DISK], (option, idx) =>
                         html`<li class="${this.selectedIdx == idx ? "selected" : ""}"}>${option}</li>`)}
                 </ul>
             </div>

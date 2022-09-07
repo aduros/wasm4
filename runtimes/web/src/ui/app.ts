@@ -581,6 +581,8 @@ export class App extends LitElement {
                         console.error("Error importing disk", error);
                     }
                 }
+
+                app.closeMenu();
             });
 
             reader.readAsArrayBuffer(files[0]);

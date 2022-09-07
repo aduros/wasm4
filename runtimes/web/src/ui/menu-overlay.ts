@@ -138,7 +138,7 @@ export class MenuOverlay extends LitElement {
         if(this.optionContextHistory.length > 0) {
             const previousContext = this.optionContextHistory.pop() as {context: number, index: number};
 
-            this.app.inputState.gamepad[0] = 0;
+            this.resetInput();
             this.optionContext = previousContext.context;
             this.selectedIdx = previousContext.index;
         }
@@ -150,9 +150,13 @@ export class MenuOverlay extends LitElement {
             index: this.selectedIdx
         });
 
-        this.app.inputState.gamepad[0] = 0;
+        this.resetInput();
         this.optionContext = context;
         this.selectedIdx = index;
+    }
+
+    resetInput () {
+        this.app.inputState.gamepad[0] = 0;
     }
 
     applyInput () {
@@ -202,8 +206,8 @@ export class MenuOverlay extends LitElement {
                         this.app.closeMenu();
                         break;
                     case this.optionIndex.IMPORT_DISK:
+                        this.resetInput();
                         this.app.importGameDisk();
-                        this.app.closeMenu();
                         break;
                     case this.optionIndex.CLEAR_DISK:
                         this.app.clearGameDisk();
@@ -241,11 +245,11 @@ export class MenuOverlay extends LitElement {
     render () {
         return html`
             <div class="menu">
-                <ul data-context="${optionContext.DEFAULT}" style="display:${this.optionContext === optionContext.DEFAULT? "inherit": "none"}">
+                <ul style="display:${this.optionContext === optionContext.DEFAULT? "inherit": "none"}">
                     ${map(options[optionContext.DEFAULT], (option, idx) =>
                         html`<li class="${this.selectedIdx == idx ? "selected" : ""}"}>${option}</li>`)}
                 </ul>
-                <ul data-context="${optionContext.DISK}" style="display:${this.optionContext === optionContext.DISK? "inherit": "none"}">
+                <ul style="display:${this.optionContext === optionContext.DISK? "inherit": "none"}">
                     ${map(options[optionContext.DISK], (option, idx) =>
                         html`<li class="${this.selectedIdx == idx ? "selected" : ""}"}>${option}</li>`)}
                 </ul>

@@ -15,7 +15,7 @@ uint32_t bswap32(uint32_t x) {
             (( x & 0x000000ffu ) << 24 ));
 }
 
-uint16_t w4_read16LE (uint16_t* ptr) {
+uint16_t w4_read16LE (const uint16_t* ptr) {
 #ifdef W4_BIG_ENDIAN
     return bswap16(*ptr);
 #else
@@ -23,7 +23,7 @@ uint16_t w4_read16LE (uint16_t* ptr) {
 #endif
 }
 
-uint32_t w4_read32LE (uint32_t* ptr) {
+uint32_t w4_read32LE (const uint32_t* ptr) {
 #ifdef W4_BIG_ENDIAN
     return bswap32(*ptr);
 #else

@@ -415,7 +415,7 @@ void w4_framebufferOval (int x, int y, int width, int height) {
 
     // Error increments. Also known as the decision parameters
     int dx = 4 * (1 - a) * b * b;
-    int dy = 4 * (b1 + 2) * a * a;
+    int dy = 4 * (b1 + 1) * a * a;
 
     // Error of 1 step
     int err = dx + dy + b1 * a * a;

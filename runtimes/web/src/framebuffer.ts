@@ -182,7 +182,7 @@ export class Framebuffer {
 
         // Error increments. Also known as the decision parameters
         let dx = 4 * (1 - a) * b * b;
-        let dy = 4 * (b1 + 2) * a * a;
+        let dy = 4 * (b1 + 1) * a * a;
 
         // Error of 1 step
         let err = dx + dy + b1 * a * a;

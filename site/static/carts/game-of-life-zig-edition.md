@@ -6,6 +6,8 @@ date: 2022-09-10
 
 # Game of Life: Zig Edition
 
+[Source code](https://github.com/davidroman0O/wasm4-game-of-life)
+
 Controls:
 
 - Up/Down: brush size (up bigger / down smaller)

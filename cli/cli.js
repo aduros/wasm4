@@ -86,49 +86,36 @@ blankProject(
         newCmd.run(".", opts);
     });
 
-program.command("watch")
+function withCommonRunOptions (cmd) {
+    return cmd.option("--open", "Open the browser", true)
+        .addOption(
+            new Option("--port <port>", "Binds the runtime to a specific port")
+                .env("W4_PORT")
+                .default("4444")
+        )
+        .addOption(
+            new Option("-n, --no-open", "Don't open the browser")
+                .env("W4_NO_OPEN")
+                .default(false)
+        )
+        .option("--qr", "Displays a QR code", true)
+        .addOption(
+            new Option("--no-qr", "Don't display a QR code")
+                .env("W4_NO_QR")
+                .default(false)
+        )
+        .option("--hot", "Enable hot swapping. When the cart is reloaded, the console memory will be preserved, allowing code changes to the cart without resetting.", false);
+}
+
+withCommonRunOptions(program.command("watch"))
     .description("Rebuild and refresh when source code changes")
-    .option("--open", "Open the browser", true)
-    .addOption(
-        new Option("--port <port>", "Binds the runtime to a specific port")
-            .env("W4_PORT")
-            .default("4444")
-    )
-    .addOption(
-        new Option("-n, --no-open", "Don't open the browser")
-            .env("W4_NO_OPEN")
-            .default(false)
-    )
-    .option("--qr", "Displays a QR code", true)
-    .addOption(
-        new Option("--no-qr", "Don't display a QR code")
-            .env("W4_NO_QR")
-            .default(false)
-    )
     .action(opts => {
         const watch = require("./lib/watch");
         watch.start(opts);
     });
 
-program.command("run <cart>")
+withCommonRunOptions(program.command("run <cart>"))
     .description("Open a cartridge in the web runtime")
-    .option("--open", "Open the browser", true)
-    .addOption(
-        new Option("--port <port>", "Binds the runtime to a specific port")
-            .env("W4_PORT")
-            .default("4444")
-    )
-    .addOption(
-        new Option("-n, --no-open", "Don't open the browser")
-            .env("W4_NO_OPEN")
-            .default(false)
-    )
-    .option("--qr", "Display a QR code", true)
-    .addOption(
-        new Option("--no-qr", "Don't display a QR code")
-            .env("W4_NO_QR")
-            .default(false)
-    )
     .action((cart, opts) => {
         const server = require("./lib/server");
         server.start(cart, opts);

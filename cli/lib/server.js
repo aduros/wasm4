@@ -26,6 +26,8 @@ function start (cartFile, opts) {
         FIRST_PORT = opts.port;
     }
 
+    const hot = opts.hot;
+
     const server = app.listen(PORT, async () => {
         if (opts.qr) {
             const qr = await qrcode.toString(`http://${getIP()}:${PORT}`, {type: "terminal", small: true});
@@ -76,11 +78,16 @@ function start (cartFile, opts) {
             reloadTimeoutId = setTimeout(() => {
                 let sentReload = false;
                 for (let client of wsServer.clients) {
-                    client.send("reload");
+                    client.send(hot ? "hotswap" : "reload");
                     sentReload = true;
                 }
                 if (sentReload) {
-                    console.log("✔ Reloaded "+path.basename(cartFile));
+                    const cart = path.basename(cartFile);
+                    if (hot) {
+                        console.log(`✔ Hot swapped ${cart} (press R for full reload)`);
+                    } else {
+                        console.log(`✔ Reloaded ${cart}`);
+                    }
                 }
             }, 50);
         }

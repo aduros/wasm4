@@ -155,6 +155,9 @@ export class App extends LitElement {
                 case "reload":
                     this.resetCart(await loadCartWasm());
                     break;
+                case "hotswap":
+                    this.resetCart(await loadCartWasm(), true);
+                    break;
                 }
             });
         }
@@ -624,7 +627,7 @@ export class App extends LitElement {
         this.notifications.show("Netplay link copied to clipboard");
     }
 
-    async resetCart (wasmBuffer?: Uint8Array) {
+    async resetCart (wasmBuffer?: Uint8Array, preserveState: boolean = false) {
         if (this.netplay) {
             this.notifications.show("Reset disabled during netplay");
             return;
@@ -634,11 +637,25 @@ export class App extends LitElement {
             wasmBuffer = this.runtime.wasmBuffer!;
         }
 
-        this.runtime.reset(true);
+        let state;
+        if (preserveState) {
+            // Take a snapshot
+            state = new State();
+            state.read(this.runtime);
+        } else {
+            this.runtime.reset(true);
+        }
+
         this.runtime.pauseState |= constants.PAUSE_REBOOTING;
         await this.runtime.load(wasmBuffer);
-        this.runtime.start();
         this.runtime.pauseState &= ~constants.PAUSE_REBOOTING;
+
+        if (state) {
+            // Restore the previous snapshot
+            state.write(this.runtime);
+        } else {
+            this.runtime.start();
+        }
     }
 
     private createNetplay (): Netplay {

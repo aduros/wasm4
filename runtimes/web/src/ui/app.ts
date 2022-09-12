@@ -74,6 +74,8 @@ export class App extends LitElement {
 
     private netplay?: Netplay;
 
+    private readonly diskPrefix: string;
+
     readonly onPointerUp = (event: PointerEvent) => {
         if (event.pointerType == "touch") {
             // Try to go fullscreen on mobile
@@ -87,9 +89,8 @@ export class App extends LitElement {
     constructor () {
         super();
 
-        const diskPrefix = document.getElementById("wasm4-disk-prefix")?.textContent
-            ?? utils.getUrlParam("disk-prefix");
-        this.runtime = new Runtime(diskPrefix + "-disk");
+        this.diskPrefix = document.getElementById("wasm4-disk-prefix")?.textContent ?? utils.getUrlParam("disk-prefix") as string;
+        this.runtime = new Runtime(`${this.diskPrefix}-disk`);
 
         this.init();
     }
@@ -524,6 +525,93 @@ export class App extends LitElement {
         } else {
             this.notifications.show("Need to save a state first");
         }
+    }
+
+    exportGameDisk () {
+        if(this.runtime.diskSize <= 0) {
+            this.notifications.show("Disk is empty");
+            return;
+        }
+
+        const disk = new Uint8Array(this.runtime.diskBuffer).slice(0, this.runtime.diskSize);
+        const blob = new Blob([disk], { type: "application/octet-stream" });
+        const link = document.createElement("a");
+
+        link.style.display = "none";
+        link.href = URL.createObjectURL(blob);
+        link.download = `${this.diskPrefix}.disk`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    importGameDisk () {
+        if (this.netplay) {
+            this.notifications.show("Disk importing disabled during netplay");
+            return;
+        }
+
+        const app = this;
+        const input = document.createElement("input");
+
+        input.style.display = "none";
+        input.type = "file";
+        input.accept = ".disk";
+        input.multiple = false;
+
+        input.addEventListener("change", () => {
+            const files = input.files as FileList;
+            let reader = new FileReader();
+            
+            reader.addEventListener("load", () => {
+                let result = new Uint8Array(reader.result as ArrayBuffer).slice(0, constants.STORAGE_SIZE);
+                let disk = new Uint8Array(constants.STORAGE_SIZE);
+
+                disk.set(result);
+                app.runtime.diskBuffer = disk.buffer;
+                this.runtime.diskSize = result.length;
+                
+                const str = z85.encode(result);
+                try {
+                    localStorage.setItem(this.runtime.diskName, str);
+                    app.notifications.show("Disk imported");
+                } catch (error) {
+                    app.notifications.show("Error importing disk");
+                    if (constants.DEBUG) {
+                        console.error("Error importing disk", error);
+                    }
+                }
+
+                app.closeMenu();
+            });
+
+            reader.readAsArrayBuffer(files[0]);
+        });
+
+        document.body.appendChild(input);
+        input.click();
+        document.body.removeChild(input);
+    }
+
+    clearGameDisk () {
+        if (this.netplay) {
+            this.notifications.show("Disk clearing disabled during netplay");
+            return;
+        }
+
+        this.runtime.diskBuffer = new ArrayBuffer(constants.STORAGE_SIZE);
+        this.runtime.diskSize = 0;
+        
+        try {
+            localStorage.removeItem(this.runtime.diskName);
+        } catch (error) {
+            this.notifications.show("Error clearing disk");
+            if (constants.DEBUG) {
+                console.error("Error clearing disk", error);
+            }
+        }
+
+        this.notifications.show("Disk cleared");
     }
 
     copyNetplayLink () {

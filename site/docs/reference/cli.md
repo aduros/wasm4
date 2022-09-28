@@ -178,9 +178,9 @@ w4 run --no-open carts/watris.wasm
 
 The command starts the web runtime in a local server.
 
-Unlike the `w4 watch` command, the `w4 run` command doesn't start the build process. It also won't update the running game should it get updated during runtime.
+Unlike the `w4 watch` command, the `w4 run` command doesn't start the build process.
 
-Aside from those differences, it behaves the same as [`w4 watch`](#watch).
+Aside from that difference, it behaves the same as [`w4 watch`](#watch).
 
 ## `run-native`
 

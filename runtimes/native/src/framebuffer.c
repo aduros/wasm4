@@ -384,7 +384,7 @@ void w4_framebufferRect (int x, int y, int width, int height) {
 // Javatpoint has a in depth academic explanation that mostly went over my head:
 // https://www.javatpoint.com/computer-graphics-midpoint-ellipse-algorithm
 //
-// Draws the eliipse by "scanning" along the edge in one quadrant, and mirroring
+// Draws the ellipse by "scanning" along the edge in one quadrant, and mirroring
 // the movement for the other four quadrants.
 //
 // There are a lot of details to get correct while implementing this algorithm,
@@ -402,12 +402,11 @@ void w4_framebufferOval (int x, int y, int width, int height) {
     uint8_t strokeColor = (dc1 - 1) & 0x3;
     uint8_t fillColor = (dc0 - 1) & 0x3;
 
-    int a = width;
-    int b = height;
-    int b1 = (height + 1) % 2; // Compensates for precision loss when dividing
+    int a = width - 1;
+    int b = height - 1;
+    int b1 = b % 2; // Compensates for precision loss when dividing
 
-    int north = y;
-    north += b / 2; // Precision loss here
+    int north = y + height / 2; // Precision loss here
     int west = x;
     int east = x + width - 1;
     int south = north - b1; // Compensation here. Moves the bottom line up by

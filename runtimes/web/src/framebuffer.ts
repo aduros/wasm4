@@ -151,7 +151,7 @@ export class Framebuffer {
     // Javatpoint has a in depth academic explanation that mostly went over my head:
     // https://www.javatpoint.com/computer-graphics-midpoint-ellipse-algorithm
     //
-    // Draws the eliipse by "scanning" along the edge in one quadrant, and mirroring
+    // Draws the ellipse by "scanning" along the edge in one quadrant, and mirroring
     // the movement for the other four quadrants.
     //
     // There are a lot of details to get correct while implementing this algorithm,
@@ -169,12 +169,11 @@ export class Framebuffer {
         const strokeColor = (dc1 - 1) & 0x3;
         const fillColor = (dc0 - 1) & 0x3;
 
-        let a = width;
-        const b = height;
-        let b1 = (height + 1) % 2; // Compensates for precision loss when dividing
+        let a = width - 1;
+        const b = height - 1;
+        let b1 = b % 2; // Compensates for precision loss when dividing
 
-        let north = y;
-        north += Math.floor(b / 2); // Precision loss here
+        let north = y + Math.floor(height / 2); // Precision loss here
         let west = x;
         let east = x + width - 1;
         let south = north - b1; // Compensation here. Moves the bottom line up by

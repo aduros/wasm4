@@ -1,5 +1,7 @@
 # Multiplayer
 
+import MultiLanguageCode from '@site/src/components/MultiLanguageCode';
+
 WASM-4 supports realtime multiplayer of up to 4 players, either locally or online.
 
 Detecting [gamepad input](/docs/guides/user-input#gamepad) for Player 2 is the same as usual, but instead of
@@ -51,6 +53,8 @@ memory register.
 Reading this register is not required to implement netplay, but it can be used to implement advanced
 features such as non-shared screen multiplayer:
 
+<MultiLanguageCode>
+
 ```c
 // If netplay is active
 if (*NETPLAY & 0b100) {
@@ -59,6 +63,19 @@ if (*NETPLAY & 0b100) {
     // ...
 }
 ```
+
+```rust
+unsafe {
+    // If netplay is active
+    if *NETPLAY & 0b100 != 0 {
+        let player_idx = *NETPLAY & 0b011;
+        // Render the game from player_idx's perspective
+        // ...
+    }
+}
+```
+
+</MultiLanguageCode>
 
 This is a powerful feature enabling games with hidden information, like card games, strategy games,
 and first person shooters. However, caution must be taken by developers to not introduce

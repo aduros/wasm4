@@ -21,6 +21,7 @@ const classNameToLanguage = {
 
 export default function MultiLanguageCode (props) {
     const children = Children.toArray(props.children);
+    const languages = children.map(child => classNameToLanguage[child.props.children.props.className]);
     const pages = children.map((child, idx) => (
         <Page key={idx} value={classNameToLanguage[child.props.children.props.className]}>
             {child}
@@ -28,7 +29,7 @@ export default function MultiLanguageCode (props) {
     ));
 
     return (
-        <MultiLanguage>
+        <MultiLanguage languages={languages}>
             { pages }
         </MultiLanguage>
     );

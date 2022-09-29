@@ -359,7 +359,7 @@ reference for more details on `MOUSE_X`, `MOUSE_Y`, and `MOUSE_BUTTONS`.
 
 On the example below, we can make a rectangle follow the mouse position and expand when clicked:
 
-<!-- <MultiLanguageCode> -->
+<MultiLanguageCode>
 
 ```typescript
 export function update (): void {
@@ -377,4 +377,21 @@ export function update (): void {
 }
 ```
 
-<!-- </MultiLanguageCode> -->
+```rust
+#[no_mangle]
+fn update() {
+    let mouse = unsafe { *MOUSE_BUTTONS };
+    let mouse_x = unsafe { *MOUSE_X };
+    let mouse_y = unsafe { *MOUSE_Y };
+
+    if mouse & MOUSE_LEFT != 0 {
+        unsafe { *DRAW_COLORS = 4 }
+        rect(i32::from(mouse_x) - 8, i32::from(mouse_y) - 8, 16, 16);
+    } else {
+        unsafe { *DRAW_COLORS = 2 }
+        rect(i32::from(mouse_x) - 4, i32::from(mouse_y) - 4, 8, 8);
+    }
+}
+```
+
+</MultiLanguageCode>

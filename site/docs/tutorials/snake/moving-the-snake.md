@@ -730,7 +730,7 @@ That's it. Your snake should be quite a bit slower now. This reduces the snake f
 
 <Page value="rust">
 
-For this, you'd need to store a enw property inside `Game`. You can call it whatever you like, just be sure you know what its purpose is.
+For this, you'd need to store a new property inside `Game`. You can call it whatever you like, just be sure you know what its purpose is.
 
 ```rust {7,14}
 // src/game.rs

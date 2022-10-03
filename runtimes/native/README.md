@@ -31,5 +31,6 @@ If you want to build only one target:
 
 ``` shell
 cmake --build build --target wasm4_libretro
+cmake --build build --target wasm4_glfw
 cmake --build build --target wasm4
 ```

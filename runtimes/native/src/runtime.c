@@ -1,5 +1,7 @@
 #include "runtime.h"
 
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -13,6 +15,8 @@
 #define HEIGHT 160
 
 #define SYSTEM_PRESERVE_FRAMEBUFFER 1
+
+#define FRAME_STATS_BINS 100
 
 typedef struct {
     uint8_t _padding[4];
@@ -37,11 +41,14 @@ typedef struct {
 static Memory* memory;
 static w4_Disk* disk;
 static bool firstFrame;
+static uint64_t frameStats[FRAME_STATS_BINS];
+static char frameStatsLogBuf[256];
 
 void w4_runtimeInit (uint8_t* memoryBytes, w4_Disk* diskBytes) {
     memory = (Memory*)memoryBytes;
     disk = diskBytes;
     firstFrame = true;
+    memset(frameStats, 0, sizeof(frameStats));
 
     // Set memory to initial state
     memset(memory, 0, 1 << 16);
@@ -207,4 +214,41 @@ void w4_runtimeUnserialize (const void* src) {
     memcpy(memory, &state->memory, 1 << 16);
     memcpy(disk, &state->disk, sizeof(w4_Disk));
     firstFrame = state->firstFrame;
+}
+
+void w4_runtimeRecordFrameDuration(uint64_t durationUsec) {
+    uint64_t durationMsec = durationUsec / 1000;
+    size_t bin = (size_t) (
+        durationMsec >= FRAME_STATS_BINS
+        ? (FRAME_STATS_BINS - 1)
+        : durationMsec
+    );
+    frameStats[bin] += 1;
+}
+
+void w4_runtimeLogFrameStats(void (*logFrameStatsMsg)(const char *msg)) {
+    logFrameStatsMsg("Frame stats:\n");
+    size_t lastBin = FRAME_STATS_BINS - 1;
+    for (size_t bin = 0; bin < lastBin; bin++) {
+        uint64_t count = frameStats[bin];
+        if (count == 0) {
+            continue;
+        }
+        snprintf(
+            frameStatsLogBuf,
+            sizeof(frameStatsLogBuf),
+            "  %2" PRIu64 " ms: %8" PRIu64 "\n",
+            (uint64_t) bin,
+            count
+        );
+        logFrameStatsMsg(frameStatsLogBuf);
+    }
+    snprintf(
+        frameStatsLogBuf,
+        sizeof(frameStatsLogBuf),
+        ">=%2" PRIu64 " ms: %8" PRIu64 "\n",
+        (uint64_t) lastBin,
+        frameStats[lastBin]
+    );
+    logFrameStatsMsg(frameStatsLogBuf);
 }

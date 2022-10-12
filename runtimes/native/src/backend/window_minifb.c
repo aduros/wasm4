@@ -23,6 +23,8 @@ void w4_windowBoot (const char* title) {
 
     mfb_set_resize_callback(window, onResize);
 
+    struct mfb_timer* frameTimer = mfb_timer_create();
+
     do {
         // Keyboard handling
         const uint8_t* keyBuffer = mfb_get_key_buffer(window);
@@ -92,7 +94,12 @@ void w4_windowBoot (const char* title) {
         if (mfb_update_ex(window, pixels, 160, 160) < 0) {
             break;
         }
+
+        uint64_t durationUsec = (uint64_t) (mfb_timer_delta(frameTimer) * 1e6);
+        w4_runtimeRecordFrameDuration(durationUsec);
     } while (mfb_wait_sync(window));
+
+    mfb_timer_destroy(frameTimer);
 }
 
 void w4_windowComposite (const uint32_t* palette, const uint8_t* framebuffer) {

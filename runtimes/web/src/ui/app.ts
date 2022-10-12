@@ -19,6 +19,13 @@ class InputState {
     mouseButtons = 0;
 }
 
+const vibrateLevels: [string, number][] = [
+    ["OFF", 0],
+    ["LOW", 1],
+    ["MEDIUM", 2],
+    ["HIGH", 4]
+];
+
 @customElement("wasm4-app")
 export class App extends LitElement {
     static styles = css`
@@ -75,6 +82,11 @@ export class App extends LitElement {
     private netplay?: Netplay;
 
     private readonly diskPrefix: string;
+
+    private vibrateLevelIdx = 0;
+    get vibrateLevel (): [string, number] {
+        return vibrateLevels[this.vibrateLevelIdx];
+    }
 
     readonly onPointerUp = (event: PointerEvent) => {
         if (event.pointerType == "touch") {
@@ -664,6 +676,16 @@ export class App extends LitElement {
         netplay.onjoin = playerIdx => this.notifications.show(`Player ${playerIdx+1} joined`);
         netplay.onleave = playerIdx => this.notifications.show(`Player ${playerIdx+1} left`);
         return netplay;
+    }
+
+    canVibrate (): boolean {
+        // No reliable way to tell, so best guess
+        return 'ontouchstart' in window && navigator.vibrate !== undefined;
+    }
+
+    cycleVibrateLevel (): [string, number] {
+        this.vibrateLevelIdx = (this.vibrateLevelIdx + 1) % vibrateLevels.length;
+        return this.vibrateLevel;
     }
 
     getNetplaySummary () {

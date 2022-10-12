@@ -124,6 +124,8 @@ export class VirtualGamepad extends LitElement {
 
     readonly touchEvents = new Map();
 
+    private lastButtons = 0;
+
     readonly onPointerEvent = (event: PointerEvent) => {
         if (event.pointerType != "touch") {
             return;
@@ -193,6 +195,11 @@ export class VirtualGamepad extends LitElement {
                 }
             }
         }
+
+        if (this.lastButtons != buttons && this.app.canVibrate()) {
+            navigator.vibrate(this.app.vibrateLevel[1]);
+        }
+        this.lastButtons = buttons;
 
         setClass(this.action1, "pressed", buttons & constants.BUTTON_X);
         setClass(this.action2, "pressed", buttons & constants.BUTTON_Z);

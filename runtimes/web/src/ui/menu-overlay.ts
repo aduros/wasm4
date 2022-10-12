@@ -3,6 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 
 import { App } from "./app";
+import { VirtualGamepad } from "./virtual-gamepad";
 import * as constants from "../constants";
 
 const optionContext = {
@@ -15,10 +16,11 @@ const optionIndex = [
         CONTINUE: 0,
         SAVE_STATE: 1,
         LOAD_STATE: 2,
-        DISK_OPTIONS: 3,
+        BUTTON_VIBRATE: 3,
+        DISK_OPTIONS: 4,
         // OPTIONS: null,
-        COPY_NETPLAY_LINK: 4,
-        RESET_CART: 5,
+        COPY_NETPLAY_LINK: 5,
+        RESET_CART: 6,
     },
     {
         BACK: 0,
@@ -33,6 +35,7 @@ const options = [
         "CONTINUE",
         "SAVE STATE",
         "LOAD STATE",
+        "VIBRATE:",
         "DISK OPTIONS",
         // "OPTIONS",
         "COPY NETPLAY URL",
@@ -115,6 +118,7 @@ export class MenuOverlay extends LitElement {
 
     @state() private selectedIdx = 0;
     @state() private netplaySummary: { playerIdx: number, ping: number }[] = [];
+    @state() private vibrateLevel = "";
 
     private netplayPollInterval?: number;
 
@@ -183,6 +187,9 @@ export class MenuOverlay extends LitElement {
                         this.app.loadGameState();
                         this.app.closeMenu();
                         break;
+                    case this.optionIndex.BUTTON_VIBRATE:
+                        this.vibrateLevel = this.app.cycleVibrateLevel()[0];
+                        break;
                     case this.optionIndex.DISK_OPTIONS:
                         this.switchContext(optionContext.DISK);
                         break;
@@ -219,9 +226,17 @@ export class MenuOverlay extends LitElement {
 
         if (pressedThisFrame & constants.BUTTON_DOWN) {
             this.selectedIdx++;
+            if (this.optionContext === optionContext.DEFAULT && this.selectedIdx === this.optionIndex.BUTTON_VIBRATE &&
+                !this.app.canVibrate()) {
+                this.selectedIdx++;
+            }
         }
         if (pressedThisFrame & constants.BUTTON_UP) {
             this.selectedIdx--;
+            if (this.optionContext === optionContext.DEFAULT && this.selectedIdx === this.optionIndex.BUTTON_VIBRATE &&
+                !this.app.canVibrate()) {
+                this.selectedIdx--;
+            }
         }
         this.selectedIdx = (this.selectedIdx + this.options.length) % this.options.length;
     }
@@ -243,11 +258,16 @@ export class MenuOverlay extends LitElement {
     }
 
     render () {
+        if (!this.vibrateLevel) {
+            this.vibrateLevel = this.app.vibrateLevel[0];
+        }
         return html`
             <div class="menu">
                 <ul style="display:${this.optionContext === optionContext.DEFAULT? "inherit": "none"}">
                     ${map(options[optionContext.DEFAULT], (option, idx) =>
-                        html`<li class="${this.selectedIdx == idx ? "selected" : ""}"}>${option}</li>`)}
+                        idx == this.optionIndex.BUTTON_VIBRATE && !this.app.canVibrate() ? html`` :
+                            html`<li class="${this.selectedIdx == idx ? "selected" : ""}"}>
+                            ${option}${idx == this.optionIndex.BUTTON_VIBRATE ? this.vibrateLevel : ""}</li>`)}
                 </ul>
                 <ul style="display:${this.optionContext === optionContext.DISK? "inherit": "none"}">
                     ${map(options[optionContext.DISK], (option, idx) =>

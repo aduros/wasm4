@@ -33,7 +33,7 @@ uint32_t w4_read32LE (const uint32_t* ptr) {
 
 void w4_write16LE (uint16_t* ptr, uint16_t value) {
 #ifdef W4_BIG_ENDIAN
-    *ptr = bswap32(value);
+    *ptr = bswap16(value);
 #else
     *ptr = value;
 #endif

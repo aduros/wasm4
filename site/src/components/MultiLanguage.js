@@ -97,8 +97,8 @@ function useLanguageCode() {
 
 
 export default function MultiLanguage (props) {
-    const languages = props.languages;
     const children = Children.toArray(props.children);
+    const languages = children.map(child => child.props.value);
     const { activeLang } = useLanguageCode();
     const history = useHistory();
     const activeSupportedLang =

@@ -1,10 +1,10 @@
 ---
 author: huntrss@posteo.me
 github: huntr3ss
-date: 2022-01-23 00:00:44 GMT
+date: 2022-10-22
 ---
 
-# Seed creator showcase
+# Seed Creator Showcase
 
 Showcase that demonstrates how to create a random seed for (pseudo) random number generation in wasm4.
 

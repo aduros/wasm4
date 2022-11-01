@@ -135,7 +135,7 @@ At the top you will find some "actions" you can take: `Watch/Unwatch`, `Star/Uns
 
 ## Uploading Your Game
 
-Follow the [Distribution](https://wasm4.org/docs/guides/distribution/#publish-on-wasm4org) instructions from the earlier Guides section.
+Follow the [Distribution](../../guides/distribution/#publish-on-wasm4org) instructions from the earlier Guides section.
 
 ## Letting WASM-4 Know
 

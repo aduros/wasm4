@@ -98,14 +98,21 @@ function useLanguageCode() {
 
 export default function MultiLanguage (props) {
     const children = Children.toArray(props.children);
+    const languages = children.map(child => child.props.value);
     const { activeLang } = useLanguageCode();
     const history = useHistory();
+    const activeSupportedLang =
+        languages.includes(activeLang)
+        ? activeLang
+        : languages.includes('assemblyscript')
+        ? 'assemblyscript'
+        : languages[0];
 
     const dropdown = (
         <div className="dropdown dropdown--hoverable dropdown--right">
-            <a className="navbar__link">{names[activeLang]} </a>
+            <a className="navbar__link">{names[activeSupportedLang]} </a>
             <ul className="dropdown__menu text--left">
-                {Object.entries(names).map(([value, name]) => {
+                {Object.entries(names).filter(names => languages.includes(names[0])).map(([value, name]) => {
                     // We use `#no-scroll` to prevent scroll to top on page change.
                     // @see https://github.com/facebook/docusaurus/blob/73ee356949e6baf70732c69cf6be8d8919f3f75a/packages/docusaurus/src/client/PendingNavigation.tsx#L79
                     const to = `${history.location.pathname}?code-lang=${value}${history.location.hash || '#no-scroll'}`
@@ -114,7 +121,7 @@ export default function MultiLanguage (props) {
                         <Link
                           to={to}
                           replace
-                          className={clsx('dropdown__link', value == activeLang && "dropdown__link--active")}
+                          className={clsx('dropdown__link', value === activeSupportedLang && "dropdown__link--active")}
                         >
                         {name}
                         </Link>
@@ -135,7 +142,7 @@ export default function MultiLanguage (props) {
                 {children.map((item) =>
                     cloneElement(item, {
                         key: item.props.value,
-                        hidden: item.props.value !== activeLang,
+                        hidden: item.props.value !== activeSupportedLang,
                     })
                 )}
             </div>

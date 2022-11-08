@@ -375,7 +375,7 @@ Setting ADSR flags require the use of various bitwise and bitshift operations. T
 
 These functions can be used to understand how they are calculated:
 
-<!-- <MultiLanguageCode> -->
+<MultiLanguageCode>
 
 ```typescript
 function toneFrequency(freq1: i32 = 0, freq2: i32 = 0): u32 {
@@ -395,7 +395,25 @@ function toneFlags(channel: i32 = 0, mode: i32 = 0, pan: i32 = 0): u32 {
 }
 ```
 
-<!-- </MultiLanguageCode> -->
+```rust
+fn tone_frequency(freq1: u32, freq2: u32) -> u32 {
+	freq1 | (freq2 << 16)
+}
+
+fn tone_duration(attack: u32, decay: u32, sustain: u32, release: u32) -> u32 {
+	(attack << 24) | (decay << 16) | sustain | (release << 8)
+}
+
+fn tone_volume(peak: u32, volume: u32) -> u32 {
+	(peak << 8) | volume
+}
+
+fn tone_flags(channel: u32, mode: u32, pan: u32) -> u32 {
+	channel | (mode << 2) | (pan << 4)
+}
+```
+
+</MultiLanguageCode>
 
 ## Sound Tool
 

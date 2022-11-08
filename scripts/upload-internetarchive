@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+#
+# Uploads WASM-4 carts for preservation on the Internet Archive.
+#
+# Requirements:
+# - Build the site (`npm run build`) to generate carts.json. Alternatively you can get this file at
+#   https://wasm4.org/carts.json
+# - Run `ia configure` to authenticate
+
+from datetime import datetime
+from internetarchive import upload
+import json
+import os
+import subprocess
+
+site_root = "../site"
+
+db = json.load(open(site_root+"/build/carts.json"))
+
+for cart in db:
+    slug = cart["slug"]
+
+    subprocess.run(["npx", "--package=wasm4@latest", "--", "w4", "bundle", site_root+"/static/carts/"+slug+".wasm",
+        "--html", "/tmp/"+slug+".html", "--windows", "/tmp/"+slug+".exe"]);
+
+    metadata = {
+        "collection": "wasm4",
+
+        "mediatype": "software",
+        "subject": "video game; computer game; game; emulation; console; fantasy console; WASM-4",
+
+        "title": cart["title"],
+        "creator": cart["author"],
+        "date": datetime.utcfromtimestamp(cart["date"]/1000).strftime("%Y-%m-%d"),
+
+        "notes": "<p>This is a game cartridge for the WASM-4 fantasy console. The <code>"+slug+".wasm</code> file contains the cart data (ROM), in WebAssembly format. Also included are versions compiled to HTML and Windows.</p><p>Originally hosted at <a href=\"https://wasm4.org/play/"+slug+"\">https://wasm4.org/play/"+slug+"</a>.</p>",
+
+        # "external-identifier": slug,
+        "licenseurl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+        "source": "https://wasm4.org",
+    }
+
+    if "readme" in cart:
+        metadata["description"] = cart["readme"]
+
+    files = [
+        {"name": site_root+"/static/carts/"+slug+".png"},
+        {"name": site_root+"/static/carts/"+slug+".wasm"},
+        {"name": site_root+"/static/carts/"+slug+".md"},
+        {"name": "/tmp/"+slug+".html"},
+        {"name": "/tmp/"+slug+".exe"},
+    ]
+
+    print(metadata)
+    print(files)
+
+    r = upload("wasm4-"+slug, files=files, metadata=metadata, verbose=True)
+    print(r[0])
+
+    print("Uploaded to https://archive.org/details/wasm4-"+slug)
+
+    os.remove("/tmp/"+slug+".html")
+    os.remove("/tmp/"+slug+".exe")

@@ -26,11 +26,11 @@ module.exports = {
     metadatas: [
         { name: 'description', property: 'og:description', content: 'Build retro games using WebAssembly for a fantasy console' },
     ],
-    announcementBar: {
-      id: 'gamejam2',
-      content: '📅 Join the second <a target="_blank" style="font-weight: bold" href="https://itch.io/jam/wasm4-v2">WASM-4 Game Jam</a> on August 12 - 21!',
-      backgroundColor: '#9bc86a',
-    },
+    // announcementBar: {
+    //   id: 'gamejam2',
+    //   content: '📅 Join the second <a target="_blank" style="font-weight: bold" href="https://itch.io/jam/wasm4-v2">WASM-4 Game Jam</a> on August 12 - 21!',
+    //   backgroundColor: '#9bc86a',
+    // },
     navbar: {
       title: 'WASM-4',
       logo: {
@@ -142,6 +142,7 @@ module.exports = {
   ],
   plugins: [
       function cartsPlugin (context, options) {
+          let allCartData;
           return {
               name: "carts-plugin",
               async contentLoaded ({ content, actions }) {
@@ -150,7 +151,7 @@ module.exports = {
                       .use((await remarkRehype).default)
                       .use((await rehypeStringify).default)
 
-                  const allCarts = [];
+                  allCartData = [];
 
                   for (let wasmFile of glob.sync("static/carts/*.wasm")) {
                       const slug = path.basename(wasmFile, ".wasm");
@@ -193,7 +194,7 @@ module.exports = {
                           cartData = {
                               slug, title, author, github, date, readme: readme.contents,
                           };
-                          allCarts.push(cartData);
+                          allCartData.push(cartData);
 
                       } catch (error) {
                           console.error(error);
@@ -211,7 +212,10 @@ module.exports = {
                       });
                   }
 
-                  const indexData = allCarts.sort((a, b) => b.date - a.date).map(cartData => ({
+                  // Newest first
+                  allCartData.sort((a, b) => b.date - a.date);
+
+                  const indexData = allCartData.map(cartData => ({
                       slug: cartData.slug,
                       title: cartData.title,
                       author: cartData.author,
@@ -230,6 +234,11 @@ module.exports = {
                       path: "/netplay",
                       component: "@site/src/components/NetplayCart",
                   });
+              },
+
+              postBuild ({ outDir }) {
+                  // Generate a machine-readable carts.json
+                  fs.writeFileSync(outDir+"/carts.json", JSON.stringify(allCartData, null, "  "));
               },
           }
       }

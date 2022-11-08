@@ -379,6 +379,19 @@ void w4_framebufferRect (int x, int y, int width, int height) {
     }
 }
 
+// Oval drawing function using a variation on the midpoint algorithm.
+// TIC-80's ellipse drawing function used as reference.
+// https://github.com/nesbox/TIC-80/blob/main/src/core/draw.c
+//
+// Javatpoint has a in depth academic explanation that mostly went over my head:
+// https://www.javatpoint.com/computer-graphics-midpoint-ellipse-algorithm
+//
+// Draws the ellipse by "scanning" along the edge in one quadrant, and mirroring
+// the movement for the other four quadrants.
+//
+// There are a lot of details to get correct while implementing this algorithm,
+// so ensure the edge cases are covered when changing it. Long, thin ellipses
+// are particularly susceptible to being drawn incorrectly.
 void w4_framebufferOval (int x, int y, int width, int height) {
     uint8_t dc01 = drawColors[0];
     uint8_t dc0 = dc01 & 0xf;
@@ -391,81 +404,62 @@ void w4_framebufferOval (int x, int y, int width, int height) {
     uint8_t strokeColor = (dc1 - 1) & 0x3;
     uint8_t fillColor = (dc0 - 1) & 0x3;
 
-    int a = width >> 1;
-    int b = height >> 1;
+    int a = width - 1;
+    int b = height - 1;
+    int b1 = b % 2; // Compensates for precision loss when dividing
 
-    if (a <= 0) return;
-    if (b <= 0) return;
+    int north = y + height / 2; // Precision loss here
+    int west = x;
+    int east = x + width - 1;
+    int south = north - b1; // Compensation here. Moves the bottom line up by
+                            // one (overlapping the top line) for even heights
 
-    int x0 = x + a, y0 = y + b;
-    int aa2 = a * a * 2, bb2 = b * b * 2;
+    // Error increments. Also known as the decision parameters
+    int dx = 4 * (1 - a) * b * b;
+    int dy = 4 * (b1 + 1) * a * a;
 
-    {
-        int x = a, y = 0;
-        int dx = (1 - 2 * a) * b * b, dy = a * a;
-        int sx = bb2 * a, sy = 0;
-        int e = 0;
+    // Error of 1 step
+    int err = dx + dy + b1 * a * a;
 
-        while (sx >= sy) {
-            drawPointUnclipped(strokeColor, x0 + x, y0 + y); /*   I. Quadrant */
-            drawPointUnclipped(strokeColor, x0 + x, y0 - y); /*  II. Quadrant */
-            drawPointUnclipped(strokeColor, x0 - x, y0 + y); /* III. Quadrant */
-            drawPointUnclipped(strokeColor, x0 - x, y0 - y); /*  IV. Quadrant */
+    a *= 8 * a;
+    b1 = 8 * b * b;
 
-            if (dc0 != 0) {
-                int start = x0 - x + 1;
-                int end = x0 + x;
-                drawHLineUnclipped(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
-                drawHLineUnclipped(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
-            }
-
-            y++;
-            sy += aa2;
-            e += dy;
-            dy += aa2;
-            if (2 * e + dx > 0) {
-                x--;
-                sx -= bb2;
-                e += dx;
-                dx += bb2;
-            }
+    do {
+        drawPointUnclipped(strokeColor, east, north); /*   I. Quadrant     */
+        drawPointUnclipped(strokeColor, west, north); /*   II. Quadrant    */
+        drawPointUnclipped(strokeColor, west, south); /*   III. Quadrant   */
+        drawPointUnclipped(strokeColor, east, south); /*   IV. Quadrant    */
+        const start = west + 1;
+        const len = east - start;
+        if (dc0 != 0 && len > 0) { // Only draw fill if the length from west to east is not 0
+            drawHLineUnclipped(fillColor, start, north, east); /*   I and III. Quadrant */
+            drawHLineUnclipped(fillColor, start, south, east); /*  II and IV. Quadrant */
         }
-    }
-
-    {
-        int x = 0, y = b;
-        int dx = b * b, dy = (1 - 2 * b) * a * a;
-        int sx = 0, sy = aa2 * b;
-        int e = 0;
-        int ddx = 0;
-
-        while (sy >= sx) {
-            drawPointUnclipped(strokeColor, x0 + x, y0 + y); /*   I. Quadrant */
-            drawPointUnclipped(strokeColor, x0 + x, y0 - y); /*  II. Quadrant */
-            drawPointUnclipped(strokeColor, x0 - x, y0 + y); /* III. Quadrant */
-            drawPointUnclipped(strokeColor, x0 - x, y0 - y); /*  IV. Quadrant */
-
-            x++;
-            sx += bb2;
-            e += dx;
-            dx += bb2;
-            ddx++;
-            if (2 * e + dy > 0) {
-                if (dc0 != 0) {
-                    int w = x - ddx - 1;
-                    int start = x0 - w;
-                    int end = x0 + w + 1;
-                    drawHLineUnclipped(fillColor, start, y0 + y, end); /*   I and III. Quadrant */
-                    drawHLineUnclipped(fillColor, start, y0 - y, end); /*  II and IV. Quadrant */
-                }
-
-                y--;
-                sy -= aa2;
-                e += dy;
-                dy += aa2;
-                ddx = 0;
-            }
+        const err2 = 2 * err;
+        if (err2 <= dy) {
+            // Move vertical scan
+            north += 1;
+            south -= 1;
+            dy += a;
+            err += dy;
         }
+        if (err2 >= dx || 2 * err > dy) {
+            // Move horizontal scan
+            west += 1;
+            east -= 1;
+            dx += b1;
+            err += dx;
+        }
+    } while (west <= east);
+
+    // Make sure north and south have moved the entire way so top/bottom aren't missing
+    while (north - south < height) {
+        drawPointUnclipped(strokeColor, west - 1, north); /*   II. Quadrant    */
+        drawPointUnclipped(strokeColor, east + 1, north); /*   I. Quadrant     */
+        north += 1;
+        drawPointUnclipped(strokeColor, west - 1, south); /*   III. Quadrant   */
+        drawPointUnclipped(strokeColor, east + 1, south); /*   IV. Quadrant    */
+        south -= 1;
     }
 }
 

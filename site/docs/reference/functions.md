@@ -87,7 +87,7 @@ The font is 8x8 pixels per character.
 :::note String Encoding
 By default, `str` is expected to be a `\0` terminated ASCII string.
 In programming languages with UTF-8 or UTF-16 string literals,
-only ASCII-equivalent characters (U+0000 through U+00FF) are [supported](text#special-characters),
+only ASCII-equivalent characters (U+0000 through U+00FF) are supported,
 and no `\0` is needed.
 :::
 

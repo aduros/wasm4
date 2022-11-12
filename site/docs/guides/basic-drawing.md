@@ -391,11 +391,12 @@ local function pixel(x: integer, y: integer)
 
     -- Use the first DRAW_COLOR as the pixel color
     local palette_color = $DRAW_COLORS & 0b1111
-    if (palette_color == 0) {
-        // Transparent
-        return;
-    }
-    var color = (palette_color - 1) & 0b11;
+    if (palette_color == 0) then
+        -- Transparent
+        return
+    end
+    
+    local color = (palette_color - 1) & 0b11;
 
     -- Write to the framebuffer
     FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask)

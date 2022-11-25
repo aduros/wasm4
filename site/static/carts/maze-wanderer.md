@@ -13,7 +13,7 @@ A simple first person raycasting demo, written in [Rust](https://rust-lang.org).
 
 `X` - Start
 
-`Y` - Toggle betweeen modes
+`Z` - Toggle betweeen modes
 
 ### First Person Mode
 

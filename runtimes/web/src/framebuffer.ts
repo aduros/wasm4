@@ -126,7 +126,7 @@ export class Framebuffer {
             }
 
             // Right edge
-            if (endXUnclamped >= 0 && endXUnclamped <= WIDTH) {
+            if (endXUnclamped > 0 && endXUnclamped <= WIDTH) {
                 for (let yy = startY; yy < endY; ++yy) {
                     this.drawPoint(strokeColor, endXUnclamped - 1, yy);
                 }
@@ -138,7 +138,7 @@ export class Framebuffer {
             }
 
             // Bottom edge
-            if (endYUnclamped >= 0 && endYUnclamped <= HEIGHT) {
+            if (endYUnclamped > 0 && endYUnclamped <= HEIGHT) {
                 this.drawHLineFast(strokeColor, startX, endYUnclamped - 1, endX);
             }
         }
@@ -272,17 +272,16 @@ export class Framebuffer {
         let currentX = x;
         for (let ii = 0, len = charArray.length; ii < len; ++ii) {
             const charCode = charArray[ii];
-            switch (charCode) {
-            case 0:  // \0
+            if (charCode === 0) {
                 return;
-            case 10: // \n
+            } else if (charCode === 10) {
                 y += 8;
                 currentX = x;
-                break;
-            default:
+            } else if (charCode >= 32 && charCode <= 255) {
                 this.blit(FONT, currentX, y, 8, 8, 0, (charCode - 32) << 3, 8);
                 currentX += 8;
-                break;
+            } else {
+                currentX += 8;
             }
         }
     }

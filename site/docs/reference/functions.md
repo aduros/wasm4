@@ -113,7 +113,7 @@ The high bits of `frequency` can optionally describe a pitch slide effect:
 | Frequency bits | Description               |
 | ---            | ---                       |
 | 0 - 15         | Start frequency (0-65535) |
-| 16 - 31        | End frequency (0-65535)   |
+| 16 - 31        | End frequency (1-65535)   |
 
 If the end frequency is non-zero, then the frequency is ramped linearly over the total duration of the tone.
 

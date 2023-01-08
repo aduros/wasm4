@@ -14,6 +14,7 @@ const names = {
     "nelua": "Nelua",
     "nim": "Nim",
     "odin": "Odin",
+    "penne": "Penne",
     "porth": "Porth",
     "roland": "Roland",
     "rust": "Rust",

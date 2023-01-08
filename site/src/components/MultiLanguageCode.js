@@ -14,6 +14,7 @@ const classNameToLanguage = {
     "language-rust": "rust",
     "language-go": "go",
     "language-odin": "odin",
+    "language-penne": "penne",
     "language-porth": "porth",
     "language-wasm": "wat",
     "language-zig": "zig",

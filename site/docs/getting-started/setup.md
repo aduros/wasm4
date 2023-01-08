@@ -198,6 +198,33 @@ w4 run build/cart.wasm
 
 </Page>
 
+<Page value="penne">
+
+:::note
+[Penne](https://github.com/SLiV9/penne) is a work-in-progress esoteric language, so there are no stability guarantees. Your feedback is highly appreciated.
+:::
+
+To compile Penne projects you will need a recent version of LLVM and a [Penne](https://github.com/SLiV9/penne) compiler (version 0.3.0 or higher).
+
+```shell
+w4 new --penne hello-world
+cd hello-world
+```
+
+Compile the .wasm cartridge:
+
+```shell
+make
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 run build/cart.wasm
+```
+
+</Page>
+
 <Page value="porth">
 
 :::note

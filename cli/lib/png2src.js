@@ -74,6 +74,16 @@ var {{name}}: array[{{length}}, uint8] = [{{firstByte}}'u8,{{restBytes}}]
 
 {{/sprites}}`,
 
+    penne:
+        `{{#sprites}}
+// {{name}}
+const {{rustName}}_WIDTH: u32 = {{width}};
+const {{rustName}}_HEIGHT: u32 = {{height}};
+const {{rustName}}_FLAGS: u32 = {{flags}}; // {{flagsHumanReadable}}
+const {{rustName}}: [{{length}}]u8 = [ {{bytes}} ];
+
+{{/sprites}}`,
+
     porth:
         `{{#sprites}}
 // {{name}} sprite

@@ -69,6 +69,15 @@ update :: proc "c" () {
 }
 ```
 
+```penne
+import "wasm4.pn";
+
+pub extern fn update()
+{
+    rect(10, 10, 32, 32);
+}
+```
+
 ```porth
 import proc rect int int int int in end
 
@@ -185,6 +194,12 @@ w4.DRAW_COLORS^ = 2
 w4.rect(10, 10, 32, 32)
 ```
 
+```penne
+DRAW_COLORS = 2;
+
+rect(10, 10, 32, 32);
+```
+
 ```porth
 // Set DRAW_COLORS to 2.
 2 $DRAW_COLORS !16
@@ -253,6 +268,10 @@ trace("Hello world!")
 
 ```odin
 w4.trace("Hello world!")
+```
+
+```penne
+trace("Hello world!");
 ```
 
 ```porth

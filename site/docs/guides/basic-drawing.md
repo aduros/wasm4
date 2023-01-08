@@ -59,6 +59,13 @@ w4.PALETTE[2] = 0xeb6b6f
 w4.PALETTE[3] = 0x7c3f58
 ```
 
+```penne
+PALETTE[0] = 0xfff6d3;
+PALETTE[1] = 0xf9a875;
+PALETTE[2] = 0xeb6b6f;
+PALETTE[3] = 0x7c3f58;
+```
+
 ```porth
 0xfff6d3 $PALETTE0 !int
 0xf9a875 $PALETTE1 !int
@@ -160,6 +167,11 @@ w4.DRAW_COLORS^ = 0x42
 w4.rect(10, 10, 32, 32)
 ```
 
+```penne
+DRAW_COLORS = 0x42;
+rect(10, 10, 32, 32);
+```
+
 ```porth
 0x42 $DRAW_COLORS !16
 32 32 10 10 rect
@@ -239,6 +251,22 @@ for i in 0..<len(FRAMEBUFFER[]):
 ```odin
 for _, i in w4.FRAMEBUFFER {
     w4.FRAMEBUFFER[i] = 3 | (3 << 2) | (3 << 4) | (3 << 6)
+}
+```
+
+```penne
+{
+    var i = 0;
+    var row: [4]u8 = [3, 3 << 2, 3 << 4, 3 << 6];
+    var value = row[0] | row[1] | row[2] | row[3];
+    {
+        if i == |FRAMEBUFFER|
+            goto end;
+        FRAMEBUFFER[i] = value;
+        i = i + 1;
+        loop;
+    }
+    end:
 }
 ```
 
@@ -443,6 +471,41 @@ pixel :: proc "c" (x : int, y : int) {
 
     // Write to the framebuffer
     w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &~ mask)
+}
+```
+
+
+```penne
+fn pixel(x: i32, y: i32)
+{
+    // The logical offset into the framebuffer that corresponds with (x, y).
+    var offset = y as u32 * SCREEN_SIZE + x as u32;
+
+    // The byte index into the framebuffer that contains (x, y).
+    var byte_offset = offset >> 2;
+    var idx = byte_offset as usize;
+
+    // Calculate the bits within the byte that corresponds to our position.
+    var bits = x as u32 & 0b11;
+    var shift = bits as u8 << 1;
+    var mask = 0b11 << shift;
+
+    // Use the first DRAW_COLOR as the pixel color.
+    var palette_color = DRAW_COLORS & 0b1111;
+    if palette_color == 0
+    {
+        // Transparent
+        goto end;
+    }
+    var palette_color_offset = palette_color - 1;
+    var color = palette_color_offset as u8 & 0b11;
+
+    // Write to the framebuffer.
+    var new_bits = color << shift;
+    var old_bits = FRAMEBUFFER[idx] & !mask;
+    FRAMEBUFFER[idx] = new_bits | old_bits;
+
+    end:
 }
 ```
 

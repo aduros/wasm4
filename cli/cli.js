@@ -4,7 +4,7 @@ const { program, Option } = require("commander");
 const pkg = require('./package.json');
 const { supportedIconExtensions } = require('./lib/utils/icon');
 
-const LANGS = ["assemblyscript", "c", "cpp", "d", "go", "nelua", "nim", "odin", "porth", "roland", "rust", "wat", "zig"];
+const LANGS = ["assemblyscript", "c", "cpp", "d", "go", "nelua", "nim", "odin", "penne", "porth", "roland", "rust", "wat", "zig"];
 const langOption = new Option("--lang <lang>", "Use the given language")
     .env("W4_LANG")
     .choices(LANGS);
@@ -30,6 +30,8 @@ function requireLang (opts) {
         return "nim";
     } else if (opts.odin) {
         return "odin";
+    } else if (opts.penne) {
+        return "penne";
     } else if (opts.porth) {
         return "porth";
     } else if (opts.roland) {
@@ -56,6 +58,7 @@ const blankProject = (cmd) =>
         .option("--nelua", "Create Nelua project (Shorthand for --lang nelua)")
         .option("--nim", "Create Nim project (Shorthand for --lang nim)")
         .option("--odin", "Create Odin project (Shorthand for --lang odin)")
+        .option("--penne", "Create Penne project (Shorthand for --lang penne)")
         .option("--porth", "Create Porth project (Shorthand for --lang porth)")
         .option("--roland", "Create Roland project (Shorthand for --lang roland)")
         .option("--rs, --rust", "Create Rust project (Shorthand for --lang rust)")
@@ -137,6 +140,7 @@ program.command("png2src <images...>")
     .option("--nelua", "Generate Nelua source (Shorthand for --lang nelua)")
     .option("--nim", "Generate Nim source (Shorthand for --lang nim)")
     .option("--odin", "Generate Odin source (Shorthand for --lang odin)")
+    .option("--penne", "Generate Penne source (Shorthand for --lang penne)")
     .option("--porth", "Generate Porth source (Shorthand for --lang porth)")
     .option("--roland", "Generate Roland source (Shorthand for --lang roland)")
     .option("--rs, --rust", "Generate Rust source (Shorthand for --lang rust)")

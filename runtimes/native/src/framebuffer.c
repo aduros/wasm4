@@ -359,7 +359,7 @@ void w4_framebufferRect (int x, int y, int width, int height) {
         }
 
         // Right edge
-        if (endXUnclamped >= 0 && endXUnclamped <= WIDTH) {
+        if (endXUnclamped > 0 && endXUnclamped <= WIDTH) {
             for (int yy = startY; yy < endY; ++yy) {
                 drawPoint(strokeColor, endXUnclamped - 1, yy);
             }
@@ -371,7 +371,7 @@ void w4_framebufferRect (int x, int y, int width, int height) {
         }
 
         // Bottom edge
-        if (endYUnclamped >= 0 && endYUnclamped <= HEIGHT) {
+        if (endYUnclamped > 0 && endYUnclamped <= HEIGHT) {
             drawHLine(strokeColor, startX, endYUnclamped - 1, endX);
         }
     }
@@ -500,40 +500,46 @@ void w4_framebufferLine (int x1, int y1, int x2, int y2) {
 }
 
 void w4_framebufferText (const uint8_t* str, int x, int y) {
-    for (int currentX = x; *str != '\0'; ++str) {
+    for (int currentX = x; *str; ++str) {
         if (*str == 10) {
             y += 8;
             currentX = x;
-        } else {
+        } else if (*str >= 32 && *str <= 255) {
             w4_framebufferBlit(font, currentX, y, 8, 8, 0, (*str - 32) << 3, 8,
                 false, false, false, false);
+            currentX += 8;
+        } else {
             currentX += 8;
         }
     }
 }
 
 void w4_framebufferTextUtf8 (const uint8_t* str, int byteLength, int x, int y) {
-    for (int currentX = x; byteLength > 0; ++str, --byteLength) {
+    for (int currentX = x; byteLength > 0 && *str; ++str, --byteLength) {
         if (*str == 10) {
             y += 8;
             currentX = x;
-        } else {
+        } else if (*str >= 32 && *str <= 255) {
             w4_framebufferBlit(font, currentX, y, 8, 8, 0, (*str - 32) << 3, 8,
                 false, false, false, false);
+            currentX += 8;
+        } else {
             currentX += 8;
         }
     }
 }
 
 void w4_framebufferTextUtf16 (const uint16_t* str, int byteLength, int x, int y) {
-    for (int currentX = x; byteLength > 0; ++str, byteLength -= 2) {
+    for (int currentX = x; byteLength > 0 && *str; ++str, byteLength -= 2) {
         uint16_t c = w4_read16LE(str);
         if (c == 10) {
             y += 8;
             currentX = x;
-        } else {
+        } else if (c >= 32 && c <= 255) {
             w4_framebufferBlit(font, currentX, y, 8, 8, 0, (c - 32) << 3, 8,
                 false, false, false, false);
+            currentX += 8;
+        } else {
             currentX += 8;
         }
     }

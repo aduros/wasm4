@@ -135,7 +135,7 @@ extern "C" {
 }
 
 /// Draws text using the built-in system font.
-pub fn text<T: AsRef<str>>(text: T, x: i32, y: i32) {
+pub fn text<T: AsRef<[u8]>>(text: T, x: i32, y: i32) {
     let text_ref = text.as_ref();
     unsafe { extern_text(text_ref.as_ptr(), text_ref.len(), x, y) }
 }

@@ -1,4 +1,4 @@
-$"wasm4.pn"
+import "wasm4.pn";
 
 const SMILEY: [8]u8 = [
 	0b11000011,

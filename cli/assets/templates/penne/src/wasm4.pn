@@ -50,10 +50,10 @@ pub const SYSTEM_HIDE_GAMEPAD_OVERLAY: u8 = 2;
 
 /// Copies pixels to the framebuffer.
 pub extern fn blit(sprite: []u8, x: i32, y: i32, width: u32, height: u32,
-	flags: u32);
+    flags: u32);
 
 /// Copies a subregion within a larger sprite atlas to the framebuffer.
-pub extern fn blit_sub(sprite: []u8, x: i32, y: i32, width: u32, height: u32,
+pub extern fn blitSub(sprite: []u8, x: i32, y: i32, width: u32, height: u32,
     src_x: u32, src_y: u32, stride: u32, flags: u32);
 
 pub const BLIT_2BPP: u32 = 1;
@@ -74,7 +74,7 @@ pub extern fn rect(x: i32, y: i32, width: u32, height: u32);
 /// Draws text using the built-in system font.
 pub fn text(text: []u8, x: i32, y: i32)
 {
-	textUtf8(text, |text|, x, y);
+    textUtf8(text, |text|, x, y);
 }
 extern fn textUtf8(text: []u8, length: usize, x: i32, y: i32);
 
@@ -125,6 +125,6 @@ pub extern fn diskw(src: []u8, size: u32) -> u32;
 /// Prints a message to the debug console.
 pub fn trace(text: []u8)
 {
-	traceUtf8(text, |text|);
+    traceUtf8(text, |text|);
 }
 extern fn traceUtf8(text: []u8, length: usize);

@@ -67,6 +67,20 @@ game_data : i32 = 1337
 w4.diskw(&game_data, size_of(game_data))
 ```
 
+```penne
+var game_data: i32 = 1337;
+// Store the gamedata as little-endian bytes.
+var bits = game_data as u32;
+var buffer: [4]u8 = [
+    ((bits >> 24) & 0xFF) as u8,
+    ((bits >> 16) & 0xFF) as u8,
+    ((bits >> 8) & 0xFF) as u8,
+    (bits & 0xFF) as u8,
+];
+// Write the bytes to disk.
+diskw(buffer, |buffer|);
+```
+
 ```porth
 const data "\\39\\05\\00\\00"c end
 
@@ -149,6 +163,16 @@ discard diskr(addr gameData, uint32 sizeof(gameData))
 ```odin
 game_data : i32
 w4.diskr(&game_data, size_of(game_data))
+```
+
+```penne
+var game_data: i32;
+// Read little-endian bytes from disk.
+var buffer: [4]u8 = [0, 0, 0, 0];
+diskr(buffer, |buffer|);
+var bits = (buffer[0] as u32 << 24) | (buffer[1] as u32 << 16)
+    | (buffer[2] as u32 << 8) | (buffer[3] as u32);
+game_data = bits as i32;
 ```
 
 ```porth

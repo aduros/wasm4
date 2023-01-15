@@ -257,8 +257,7 @@ for _, i in w4.FRAMEBUFFER {
 ```penne
 {
     var i = 0;
-    var row: [4]u8 = [3, 3 << 2, 3 << 4, 3 << 6];
-    var value = row[0] | row[1] | row[2] | row[3];
+    var value = 3 | (3 << 2) | (3 << 4) | (3 << 6);
     {
         if i == |FRAMEBUFFER|
             goto end;
@@ -478,32 +477,24 @@ pixel :: proc "c" (x : int, y : int) {
 ```penne
 fn pixel(x: i32, y: i32)
 {
-    // The logical offset into the framebuffer that corresponds with (x, y).
-    var offset = y as u32 * SCREEN_SIZE + x as u32;
-
     // The byte index into the framebuffer that contains (x, y).
-    var byte_offset = offset >> 2;
-    var idx = byte_offset as usize;
+    var idx = ((y as u32 * SCREEN_SIZE + x as u32) >> 2) as usize;
 
     // Calculate the bits within the byte that corresponds to our position.
-    var bits = x as u32 & 0b11;
-    var shift = bits as u8 << 1;
+    var shift = (x as u8 & 0b11) << 1;
     var mask = 0b11 << shift;
 
     // Use the first DRAW_COLOR as the pixel color.
-    var palette_color = DRAW_COLORS & 0b1111;
+    var palette_color = (DRAW_COLORS & 0b1111) as u8;
     if palette_color == 0
     {
         // Transparent
         goto end;
     }
-    var palette_color_offset = palette_color - 1;
-    var color = palette_color_offset as u8 & 0b11;
+    var color = (palette_color - 1) & 0b11;
 
     // Write to the framebuffer.
-    var new_bits = color << shift;
-    var old_bits = FRAMEBUFFER[idx] & !mask;
-    FRAMEBUFFER[idx] = new_bits | old_bits;
+    FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & !mask);
 
     end:
 }

@@ -34,6 +34,10 @@ text("Hello world!", 10, 10)
 w4.text("Hello world!", 10, 10)
 ```
 
+```penne
+text("Hello world!", 10, 10);
+```
+
 ```porth
 import proc text int int ptr in end
 
@@ -124,6 +128,10 @@ text("Press \x86 to jump!", 10, 10)
 ```odin
 // Press UP to jump!
 w4.text("Press \x86 to jump!", 10, 10)
+```
+
+```penne
+text("Press \x86 to jump!", 10, 10);
 ```
 
 ```porth

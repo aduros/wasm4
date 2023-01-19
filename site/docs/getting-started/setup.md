@@ -198,6 +198,33 @@ w4 run build/cart.wasm
 
 </Page>
 
+<Page value="penne">
+
+:::note
+[Penne](https://github.com/SLiV9/penne) is a work-in-progress esoteric language, so there are no stability guarantees. Your feedback is highly appreciated.
+:::
+
+To compile WASM-4 cartridges written in Penne you will need a [Penne compiler](https://github.com/SLiV9/penne/releases/latest) and a wasm-compatible version of clang. The easiest way is to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.
+
+```shell
+w4 new --penne hello-world
+cd hello-world
+```
+
+Compile the .wasm cartridge:
+
+```shell
+make
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 run build/cart.wasm
+```
+
+</Page>
+
 <Page value="porth">
 
 :::note

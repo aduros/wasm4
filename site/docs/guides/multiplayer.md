@@ -64,6 +64,16 @@ if (*NETPLAY & 0b100) {
 }
 ```
 
+```penne
+// If netplay is active
+if NETPLAY & 0b100
+{
+    var player_idx = NETPLAY & 0b011;
+    // Render the game from playerIdx's perspective
+    // ...
+}
+```
+
 ```rust
 unsafe {
     // If netplay is active

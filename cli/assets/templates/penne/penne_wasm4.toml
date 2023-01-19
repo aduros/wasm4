@@ -1,0 +1,5 @@
+wasm = true
+backend_args = "-nostartfiles -nostdlib"
+link_args = """--allow-undefined --no-entry --export=start --export=update \
+	--import-memory --initial-memory=65536 --max-memory=65536 \
+	-z,stack-size=14752 --stack-first"""

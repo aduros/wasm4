@@ -68,6 +68,13 @@ if .RIGHT in w4.GAMEPAD1^ {
 }
 ```
 
+```penne
+if GAMEPAD1 & BUTTON_RIGHT != 0
+{
+    trace("Right button is down!");
+}
+```
+
 ```porth
 memory gamepad sizeof(u8) end
 $GAMEPAD1 @8 gamepad !8
@@ -251,6 +258,22 @@ update :: proc "c" () {
     }
 ```
 
+```penne
+const PREVIOUS_GAMEPAD: &u8 = 0xF700;
+
+pub extern fn update()
+{
+    // Only the buttons that were pressed down this frame.
+    var pressed_this_frame = GAMEPAD & (GAMEPAD ^ PREVIOUS_GAMEPAD);
+    PREVIOUS_GAMEPAD = GAMEPAD;
+
+    if pressed_this_frame & BUTTON_RIGHT != 0
+    {
+        trace("Right button was just pressed!");
+    }
+}
+```
+
 ```porth
 memory prev-state sizeof(u8) end
 
@@ -373,6 +396,22 @@ export function update (): void {
     } else {
         store<u16>(w4.DRAW_COLORS, 2);
         w4.rect(mouseX - 4, mouseY - 4, 8, 8);
+    }
+}
+```
+
+```penne
+pub extern update()
+{
+    if MOUSE & MOUSE_LEFT != 0
+    {
+        DRAW_COLORS = 4;
+        rect(MOUSE_X as i32 - 8, MOUSE_Y as i32 - 8, 16, 16);
+    }
+    else
+    {
+        DRAW_COLORS = 2;
+        rect(MOUSE_X as i32 - 4, MOUSE_Y as i32 - 4, 8, 8);
     }
 }
 ```

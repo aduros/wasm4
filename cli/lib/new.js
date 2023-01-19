@@ -45,6 +45,11 @@ const HELP = {
         build: "make",
         cart: "build/cart.wasm",
     },
+    penne: {
+        name: "Penne",
+        build: "make",
+        cart: "build/cart.wasm",
+    },
     porth: {
       name: 'Porth',
       build: 'make',

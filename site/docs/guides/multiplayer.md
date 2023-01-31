@@ -64,6 +64,16 @@ if (*NETPLAY & 0b100) {
 }
 ```
 
+```c3
+// If netplay is active
+if (*w4::NETPLAY & 0b100) 
+{
+    int player_idx = *w4::NETPLAY & 0b011;
+    // Render the game from player_idx's perspective
+    // ...
+}
+```
+
 ```penne
 // If netplay is active
 if NETPLAY & 0b100

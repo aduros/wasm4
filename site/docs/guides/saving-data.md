@@ -39,6 +39,11 @@ int gameData = 1337;
 diskw(&gameData, sizeof(gameData));
 ```
 
+```c3
+int game_data = 1337;
+w4::diskw(&game_data, $sizeof(game_data));
+```
+
 ```d
 int gameData = 1337;
 w4.diskw(&gameData, gameData.sizeof);
@@ -135,6 +140,11 @@ const gameData = load<i32>(ptr);
 ```c
 int gameData;
 diskr(&gameData, sizeof(gameData));
+```
+
+```c3
+int game_data;
+w4::diskr(&game_data, $sizeof(game_data));
 ```
 
 ```d

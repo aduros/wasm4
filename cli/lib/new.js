@@ -15,6 +15,11 @@ const HELP = {
         build: "make",
         cart: "build/cart.wasm",
     },
+    c3: {
+        name: "C3",
+        build: "build",
+        cart: "cart.wasm",
+    },
     cpp: {
         name: "C++",
         build: "make",

@@ -83,6 +83,30 @@ w4 run build/cart.wasm
 
 </Page>
 
+<Page value="C3">
+
+To compile WASM-4 cartridges written in C3 you will need the [C3 compiler](https://github.com/c3lang/c3c/releases/tag/latest). 
+The sample project uses freestanding WASM, so some libc-dependent features are unavailable.
+
+```shell
+w4 new --c3 hello-world
+cd hello-world
+```
+
+Compile the .wasm cartridge from within the project directory:
+
+```shell
+c3c build
+```
+
+Run it in WASM-4 with:
+
+```shell
+w4 run cart.wasm
+```
+
+</Page>
+
 <Page value="d">
 
 To compile D projects you will need `ldc` and `dub` installed. To use libc, you also need to download the [WASI SDK](https://github.com/WebAssembly/wasi-sdk) and set the `$WASI_SDK_PATH` environment variable.

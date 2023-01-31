@@ -31,6 +31,15 @@ if (gamepad & BUTTON_RIGHT) {
 }
 ```
 
+```c3
+char gamepad = *w4::GAMEPAD1;
+
+if (gamepad & w4::BUTTON_RIGHT) 
+{
+    w4::trace("Right button is down!");
+}
+```
+
 ```d
 ubyte gamepad = *w4.gamepad1;
 
@@ -173,6 +182,24 @@ void update () {
 
     if (pressedThisFrame & BUTTON_RIGHT) {
         trace("Right button was just pressed!");
+    }
+}
+```
+
+```c3
+char previous_gamepad;
+
+fn void update () 
+{
+    char gamepad = *w4::GAMEPAD1;
+
+    // Only the buttons that were pressed down this frame
+    char pressed_this_frame = gamepad & (gamepad ^ previous_gamepad);
+    previous_gamepad = gamepad;
+
+    if (pressed_this_frame & w4::BUTTON_RIGHT) 
+    {
+        w4::trace("Right button was just pressed!");
     }
 }
 ```
@@ -396,6 +423,22 @@ export function update (): void {
     } else {
         store<u16>(w4.DRAW_COLORS, 2);
         w4.rect(mouseX - 4, mouseY - 4, 8, 8);
+    }
+}
+```
+
+```c3
+fn void update() @wasm()
+{
+    if (*w4::MOUSE & *w4::MOUSE_LEFT != 0)
+    {
+        *w4::DRAW_COLORS = 4;
+        w4::rect(*w4::MOUSE_X - 8, *w4::MOUSE_Y - 8, 16, 16);
+    }
+    else
+    {
+        *w4::DRAW_COLORS = 2;
+        w4::rect(*w4::MOUSE_X - 4, *w4::MOUSE_Y - 4, 8, 8);
     }
 }
 ```

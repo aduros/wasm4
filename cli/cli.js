@@ -4,7 +4,7 @@ const { program, Option } = require("commander");
 const pkg = require('./package.json');
 const { supportedIconExtensions } = require('./lib/utils/icon');
 
-const LANGS = ["assemblyscript", "c", "cpp", "d", "go", "nelua", "nim", "odin", "penne", "porth", "roland", "rust", "wat", "zig"];
+const LANGS = ["assemblyscript", "c", "c3", "cpp", "d", "go", "nelua", "nim", "odin", "penne", "porth", "roland", "rust", "wat", "zig"];
 const langOption = new Option("--lang <lang>", "Use the given language")
     .env("W4_LANG")
     .choices(LANGS);
@@ -18,6 +18,8 @@ function requireLang (opts) {
         return "assemblyscript";
     } else if (opts.c) {
         return "c";
+    } else if (opts.c3) {
+        return "c3";
     } else if (opts.cpp) {
         return "cpp";
     } else if (opts.d) {
@@ -52,6 +54,7 @@ const blankProject = (cmd) =>
     cmd
         .option("--as, --assemblyscript", "Create AssemblyScript project (Shorthand for --lang assemblyscript)")
         .option("--c", "Create C project (Shorthand for --lang c)")
+        .option("--c3", "Create C3 project (Shorthand for --lang c3)")
         .option("--cpp", "Create C++ project (Shorthand for --lang cpp)")
         .option("--d", "Create D project (Shorthand for --lang d)")
         .option("--go", "Create Go project (Shorthand for --lang go)")
@@ -135,6 +138,7 @@ program.command("png2src <images...>")
     .description("Convert images to source code")
     .option("--as, --assemblyscript", "Generate AssemblyScript source (Shorthand for --lang assemblyscript)")
     .option("--c, --cpp", "Generate C/C++ source (Shorthand for --lang c)")
+    .option("--c3", "Generate C3 source (Shorthand for --lang c3)")
     .option("--d", "Generate D source (Shorthand for --lang d)")
     .option("--go", "Generate Go source (Shorthand for --lang go)")
     .option("--nelua", "Generate Nelua source (Shorthand for --lang nelua)")

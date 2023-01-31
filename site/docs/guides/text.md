@@ -14,6 +14,10 @@ w4.text("Hello world!", 10, 10);
 text("Hello world!", 10, 10);
 ```
 
+```c3
+w4::text("Hello world!", 10, 10);
+```
+
 ```d
 w4.text("Hello world!", 10, 10);
 ```
@@ -103,6 +107,11 @@ w4.text("Press \x86 to jump!", 10, 10);
 ```c
 // Press UP to jump!
 text("Press \x86 to jump!", 10, 10);
+```
+
+```c3
+// Press UP to jump!
+w4::text("Press \x86 to jump!", 10, 10);
 ```
 
 ```d

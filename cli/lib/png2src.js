@@ -24,6 +24,16 @@ const uint8_t {{name}}[{{length}}] = { {{bytes}} };
 
 {{/sprites}}`,
 
+    c3:
+        `{{#sprites}}
+// {{name}}
+const uint {{rustName}}_WIDTH = {{width}};
+const uint {{rustName}}_HEIGHT = {{height}};
+const uint {{rustName}}}_FLAGS = {{flag}}; // {{flagsHumanReadable}}
+const char[{{length}}] {{rustName}} = { {{bytes}} };
+
+{{/sprites}}`,
+
     d:
         `{{#sprites}}
 // {{name}}

@@ -5,6 +5,7 @@ const classNameToLanguage = {
     "language-typescript": "assemblyscript",
     "language-javascript": "assemblyscript",
     "language-c": "c",
+    "language-c3": "c3",
     "language-cpp": "c",
     "language-d": "d",
     "language-lua": "nelua",

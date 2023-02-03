@@ -9,6 +9,7 @@ import "./MultiLanguage.css";
 const names = {
     "assemblyscript": "AssemblyScript",
     "c": "C / C++",
+    "c3": "C3",
     "d": "D",
     "go": "Go",
     "nelua": "Nelua",

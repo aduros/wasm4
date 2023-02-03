@@ -37,6 +37,10 @@ w4.tone(262, 60, 100, w4.TONE_PULSE1);
 tone(262, 60, 100, TONE_PULSE1);
 ```
 
+```c3
+w4::tone(262, 60, 100, w4::TONE_PULSE1);
+```
+
 ```d
 w4.tone(262, 60, 100, w4.tonePulse1);
 ```
@@ -111,6 +115,10 @@ w4.tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_MODE3);
 tone(262, 60, 100, TONE_PULSE1 | TONE_MODE3);
 ```
 
+```c3
+w4::tone(262, 60, 100, w4::TONE_PULSE1 | w4::TONE_MODE3);
+```
+
 ```d
 w4.tone(262, 60, 100, w4.tonePulse1 | w4.toneMode3);
 ```
@@ -179,6 +187,10 @@ w4.tone(262 | (523 << 16), 60, 100, w4.TONE_PULSE1);
 
 ```c
 tone(262 | (523 << 16), 60, 100, TONE_PULSE1);
+```
+
+```c3
+w4::tone(262 | (523 << 16), 60, 100, w4::TONE_PULSE1);
 ```
 
 ```d
@@ -272,6 +284,10 @@ w4.tone(262, 60 | (30 << 8), 100, w4.TONE_PULSE1);
 tone(262, 60 | (30 << 8), 100, TONE_PULSE1);
 ```
 
+```c3
+w4::tone(262, 60 | (30 << 8), 100, w4::TONE_PULSE1);
+```
+
 ```d
 w4.tone(262, 60 | (30 << 8), 100, w4.tonePulse1);
 ```
@@ -335,6 +351,10 @@ w4.tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_PAN_LEFT);
 
 ```c
 tone(262, 60, 100, TONE_PULSE1 | TONE_PAN_LEFT);
+```
+
+```c3
+w4::tone(262, 60, 100, w4::TONE_PULSE1 | w4::TONE_PAN_LEFT);
 ```
 
 ```d
@@ -412,6 +432,28 @@ function toneVolume(peak: i32 = 0, volume: i32 = 0): u32 {
 
 function toneFlags(channel: i32 = 0, mode: i32 = 0, pan: i32 = 0): u32 {
 	return channel | (mode << 2) | (pan << 4);
+}
+```
+
+```c3
+fn uint tone_frequency(uint freq1, uint freq2)
+{
+    return freq1 | (freq2 << 16)
+}
+
+fn uint tone_duration(uint attack, uint decay, uint sustain, uint release)
+{
+    return (attack << 24) | (decay << 16) | sustain | (release << 8)
+}
+
+fn uint tone_volume(uint peak, uint volume)
+{
+    return: (peak << 8) | volume
+}
+
+fn uint tone_flags(uint channel, uint mode, uint pan)
+{
+    return: channel | (mode << 2) | (pan << 4)
 }
 ```
 

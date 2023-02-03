@@ -22,6 +22,15 @@ void update () {
 }
 ```
 
+```c3
+import w4;
+
+fn void update() @wasm 
+{
+    w4::rect(10, 10, 32, 32);
+}
+```
+
 ```d
 import w4 = wasm4;
 
@@ -164,6 +173,12 @@ w4.rect(10, 10, 32, 32);
 rect(10, 10, 32, 32);
 ```
 
+```c3
+*w4::DRAW_COLORS = 2;
+
+w4::rect(10, 10, 32, 32);
+```
+
 ```d
 *w4.drawColors = 2;
 
@@ -248,6 +263,10 @@ w4.trace("Hello world!");
 
 ```c
 trace("Hello world!");
+```
+
+```c3
+w4::trace("Hello world!");
 ```
 
 ```d

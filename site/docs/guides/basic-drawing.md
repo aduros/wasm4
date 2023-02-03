@@ -24,6 +24,13 @@ PALETTE[2] = 0xeb6b6f;
 PALETTE[3] = 0x7c3f58;
 ```
 
+```c3
+w4::PALETTE[0] = 0xfff6d3;
+w4::PALETTE[1] = 0xf9a875;
+w4::PALETTE[2] = 0xeb6b6f;
+w4::PALETTE[3] = 0x7c3f58;
+```
+
 ```d
 w4.palette[0] = 0xfff6d3;
 w4.palette[1] = 0xf9a875;
@@ -142,6 +149,11 @@ w4.rect(10, 10, 32, 32);
 rect(10, 10, 32, 32);
 ```
 
+```c3
+*w4::DRAW_COLORS = 0x42;
+w4::rect(10, 10, 32, 32);
+```
+
 ```d
 *w4.drawColors = 0x42;
 w4.rect(10, 10, 32, 32);
@@ -224,6 +236,10 @@ memory.fill(w4.FRAMEBUFFER, 3 | (3 << 2) | (3 << 4) | (3 << 6), 160*160/4);
 
 ```c
 memset(FRAMEBUFFER, 3 | (3 << 2) | (3 << 4) | (3 << 6), 160*160/4);
+```
+
+```c3
+mem::set(w4::FRAMEBUFFER, 3 | (3 << 2) | (3 << 4) | (3 << 6), 160*160/4);
 ```
 
 ```d
@@ -359,6 +375,30 @@ void pixel (int x, int y) {
 
     // Write to the framebuffer
     FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask);
+}
+```
+
+```c3
+fn void pixel(int x, int y) 
+{
+    // The byte index into the framebuffer that contains (x, y)
+    int idx = (y * 160 + x) >> 2;
+
+    // Calculate the bits within the byte that corresponds to our position
+    int shift = (x & 0b11) << 1;
+    int mask = 0b11 << shift;
+
+    // Use the first DRAW_COLOR as the pixel color
+    int palette_color = *w4::DRAW_COLORS & 0b1111;
+    if (color == 0) 
+    {
+        // Transparent
+        return;
+    }
+    int color = (palette_color - 1) & 0b11;
+
+    // Write to the framebuffer
+    w4::FRAMEBUFFER[idx] = (color << shift) | (w4::FRAMEBUFFER[idx] & ~mask);
 }
 ```
 

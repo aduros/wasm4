@@ -1,5 +1,7 @@
 import { DEV_NETPLAY } from "./index";
 
+const HOSTNAME = "aduros.com";
+
 /** WebRTC signaling messages. */
 type Message = OfferMessage | AnswerMessage | CandidateMessage | AbortMessage;
 
@@ -41,7 +43,7 @@ class SignalClient {
     private readonly bufferedOutput: string[] = [];
 
     constructor (localPeerId: string, onMessage: (source: string, message: Message) => void) {
-        this.socket = new WebSocket(`wss://aduros.com/webrtc-signal-server/?peerId=${encodeURIComponent(localPeerId)}`);
+        this.socket = new WebSocket(`wss://${HOSTNAME}/webrtc-signal-server/?peerId=${encodeURIComponent(localPeerId)}`);
         this.socket.addEventListener("message", event => {
             const { source, message } = JSON.parse(event.data);
             // console.log(`Received ${message.type} message from ${source}`);

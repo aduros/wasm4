@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  web:
+    image: wasm4:dev
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 500M
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "3030:3030"
+  wss:
+    image: wasm4-wss:dev
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 500M
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "4445:4445"

@@ -12,6 +12,8 @@ import { MovingAverage } from "./moving-average";
  */
 export const DEV_NETPLAY = false;
 
+const HOSTNAME = "wasm4.org";
+
 const SIMULATE_LAG = false;
 
 const MAX_OUTBOUND_INPUTS = 20;
@@ -249,7 +251,7 @@ export class Netplay {
     }
 
     getInviteLink (): string {
-        return `https://wasm4.org/netplay/#${this.peerMgr.localPeerId}`;
+        return `https://${HOSTNAME}/netplay/#${this.peerMgr.localPeerId}`;
     }
 
     close () {

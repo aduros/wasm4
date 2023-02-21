@@ -12,11 +12,11 @@ char[8] smiley = {
 	0b11000011,
 };
 
-fn void start() @extern("start") @wasm
+fn void start() @export("start")
 {
 }
 
-fn void update() @extern("update") @wasm
+fn void update() @export("update")
 {
 	w4::DRAW_COLORS[0] = 2;
 	w4::text("Hello from C3", 10, 10);

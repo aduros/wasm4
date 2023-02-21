@@ -48,11 +48,11 @@ const SYSTEM_HIDE_GAMEPAD_OVERLAY = 2;
 // └───────────────────────────────────────────────────────────────────────────┘
 
 /* Copies pixels to the framebuffer. */
-extern fn void blit(char* data, int x, int y, uint width, uint height, uint flags) @wasm;
+extern fn void blit(char* data, int x, int y, uint width, uint height, uint flags);
 
 /* Copies a subregion within a larger sprite atlas to the framebuffer. */
 extern fn void blit_sub(char* data, int x, int y, uint width, uint height,
-                     uint src_x, uint src_y, uint stride, uint flags) @extern("blitSub") @wasm;
+                     uint src_x, uint src_y, uint stride, uint flags) @extern("blitSub");
 
 const BLIT_2BPP = 1;
 const BLIT_1BPP = 0;
@@ -61,22 +61,22 @@ const BLIT_FLIP_Y = 4;
 const BLIT_ROTATE = 8;
 
 /* Draws a line between two points. */
-extern fn void line(int x1, int y1, int x2, int y2) @wasm;
+extern fn void line(int x1, int y1, int x2, int y2);
 
 /* Draws a horizontal line. */
-extern fn void hline(int x, int y, uint len) @wasm;
+extern fn void hline(int x, int y, uint len);
 
 /* Draws a vertical line. */
-extern fn void vline(int x, int y, uint len) @wasm;
+extern fn void vline(int x, int y, uint len);
 
 /* Draws an oval (or circle). */
-extern fn void oval(int x, int y, uint width, uint height) @wasm;
+extern fn void oval(int x, int y, uint width, uint height);
 
 /* Draws a rectangle. */
-extern fn void rect(int x, int y, uint width, uint height) @wasm;
+extern fn void rect(int x, int y, uint width, uint height);
 
 /* Draws text using the built-in system font. */
-extern fn void text(char* text, int x, int y) @extern("text") @wasm;
+extern fn void text(char* text, int x, int y) @extern("text");
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │
@@ -85,7 +85,7 @@ extern fn void text(char* text, int x, int y) @extern("text") @wasm;
 // └───────────────────────────────────────────────────────────────────────────┘
 
 /* Plays a sound tone. */
-extern fn void tone(uint frequency, uint duration, uint volume, uint flags) @wasm;
+extern fn void tone(uint frequency, uint duration, uint volume, uint flags);
 
 const TONE_PULSE1 = 0;
 const TONE_PULSE2 = 1;
@@ -105,16 +105,17 @@ const TONE_PAN_RIGHT = 32;
 // └───────────────────────────────────────────────────────────────────────────┘
 
 /* Reads up to `size` bytes from persistent storage into the pointer `dest`. */
-extern fn uint diskr(void* dest, uint size) @wasm;
+extern fn uint diskr(void* dest, uint size);
 
 /* Writes up to `size` bytes from the pointer `src` into persistent storage. */
-extern fn uint diskw (void* src, uint size) @wasm;
+extern fn uint diskw (void* src, uint size);
 
 /* Prints a message to the debug console. */
-extern fn void trace(char* str) @wasm;
+extern fn void trace(char* str);
 
 /* Prints a message to the debug console. */
-extern fn void tracef(char* fmt, ...) @wasm;
+extern fn void tracef(char* fmt, ...);
+
 
 fn void panic_trace(String message, String file, String function, uint line)
 {

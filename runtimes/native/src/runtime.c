@@ -14,6 +14,7 @@
 #define HEIGHT 160
 
 #define SYSTEM_PRESERVE_FRAMEBUFFER 1
+#define SYSTEM_STANDARD_TRACING 4
 
 typedef struct {
     uint8_t _padding[4];
@@ -171,7 +172,7 @@ static unsigned align(unsigned v, unsigned a) {
     return (v + a - 1) & ~(a - 1);
 }
 
-void w4_runtimeTracef (const uint8_t* fmt, const uint8_t * stk, const uint8_t * mem) {
+void w4_runtimeTracef (const uint8_t* fmt, const uint8_t * stk) {
     char out[256];
     char buf[256];
     size_t sofar = 0;
@@ -206,7 +207,7 @@ void w4_runtimeTracef (const uint8_t* fmt, const uint8_t * stk, const uint8_t * 
             si += 8;
             break;
         case 's':
-            sofar += snprintf(out+sofar, sizeof(out)-sofar, fb, mem+*(int32_t*)(stk+si));
+  	    sofar += snprintf(out+sofar, sizeof(out)-sofar, fb, ((uint8_t*)memory)+*(int32_t*)(stk+si));
             si += 4;
             break;
         default:
@@ -214,7 +215,10 @@ void w4_runtimeTracef (const uint8_t* fmt, const uint8_t * stk, const uint8_t * 
         }
         s = strsep(&ctx, "%");
     }
-    fputs(out, stdout);
+    if (memory->systemFlags & SYSTEM_STANDARD_TRACING)
+      fputs(out, stdout);
+    else
+      puts(out);
 }
 
 void w4_runtimeUpdate () {

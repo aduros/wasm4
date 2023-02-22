@@ -44,7 +44,7 @@ int w4_runtimeDiskw (const uint8_t* src, int size);
 void w4_runtimeTrace (const uint8_t* str);
 void w4_runtimeTraceUtf8 (const uint8_t* str, int byteLength);
 void w4_runtimeTraceUtf16 (const uint16_t* str, int byteLength);
-void w4_runtimeTracef (const uint8_t* str, const uint8_t* stack, const uint8_t* mem);
+void w4_runtimeTracef (const uint8_t* str, const uint8_t* stack);
 
 void w4_runtimeUpdate ();
 

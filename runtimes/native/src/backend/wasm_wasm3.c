@@ -151,7 +151,7 @@ static m3ApiRawFunction (traceUtf16) {
 static m3ApiRawFunction (tracef) {
     m3ApiGetArgMem(const char*, str);
     m3ApiGetArgMem(const void*, stack);
-    w4_runtimeTracef(str, stack, _mem);
+    w4_runtimeTracef(str, stack);
     m3ApiSuccess();
 }
 

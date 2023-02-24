@@ -153,7 +153,31 @@ int main (int argc, const char* argv[]) {
         strcat(diskPath, DISK_FILE_EXT);
         loadDiskFile(&disk, diskPath);
 
-    } else {
+    } else if (!strcmp(argv[1], "-") || !strcmp(argv[1], "/dev/stdin")) {
+        size_t bufsize = 1024;
+        cartBytes = malloc(bufsize);
+        cartLength = 0;
+        int c;
+
+        while((c = getc(stdin)) != EOF) {
+            cartBytes[cartLength++] = c;
+            if(cartLength == bufsize) {
+                if (cartLength >= 64 * 1024) {
+                    fprintf(stderr, "Error, overflown cartridge size limit of 64 KB\n");
+                    return 1;
+                }
+
+                bufsize *= 2;
+                cartBytes = realloc(cartBytes, bufsize);
+
+                if(!cartBytes) {
+                    fprintf(stderr, "Error reallocating cartridge buffer\n");
+                    return 1;
+                }
+            }
+        }
+    }
+    else {
         FILE* file = fopen(argv[1], "rb");
         if (file == NULL) {
             fprintf(stderr, "Error opening %s\n", argv[1]);

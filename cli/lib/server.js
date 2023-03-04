@@ -5,7 +5,7 @@ const path = require("path");
 const qrcode = require("qrcode");
 const { Server: WebSocketServer } = require("ws");
 const open = require("open");
-const { exit } = require("process");
+const { exit, stdin } = require("process");
 
 var attempts = 0;
 var PORT = 0;
@@ -13,12 +13,28 @@ var FIRST_PORT = 0;
 
 function start (cartFile, opts) {
     const app = express();
-    app.get("/cart.wasm", (req, res) => {
-        fs.createReadStream(cartFile).pipe(res);
+    setupCart(app, cartFile).then(() => {
+        startServer(app, opts, cartFile)
     });
-    app.get("/cart.wasm.map", (req, res) => {
-        fs.createReadStream(cartFile+".map").pipe(res);
-    });
+}
+
+async function setupCart(app, cartFile) {
+    if (cartFile === "-" || cartFile === "/dev/stdin") {
+        const data = await getStdinBuffer();
+        app.get("/cart.wasm", (req, res) => {
+            res.send(data);
+        });
+    } else {
+        app.get("/cart.wasm", (req, res) => {
+            fs.createReadStream(cartFile).pipe(res);
+        });
+        app.get("/cart.wasm.map", (req, res) => {
+            fs.createReadStream(cartFile+".map").pipe(res);
+        });
+    }
+}
+
+function startServer (app, opts, cartFile) {
     app.use(express.static(path.resolve(__dirname, "../assets/runtime/developer-build")));
 
     if (PORT == 0) {
@@ -94,6 +110,18 @@ function start (cartFile, opts) {
     });
 }
 exports.start = start;
+
+async function getStdinBuffer() {
+	const result = [];
+	var length = 0;
+
+	for await (const chunk of stdin) {
+		result.push(chunk);
+		length += chunk.length;
+	}
+
+	return Buffer.concat(result, length);
+}
 
 function getIP () {
     var ip = null;

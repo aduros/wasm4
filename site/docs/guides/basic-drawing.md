@@ -133,8 +133,8 @@ The first color in the palette register is used as the screen background color.
 
 All drawing functions are affected by the `DRAW_COLORS` memory register. `DRAW_COLORS` is a 16 bit value that can store up to 4 colors, using 4 bits each.
 
-For example, `rect()` uses the first draw color for the fill color, and the
-second draw color as the outline color. To draw a light-green (palette color 2)
+For example, `rect()` uses the first draw color for the outline color, and the
+second draw color as the fill color. To draw a light-green (palette color 2)
 rectangle with a black (palette color 4) outline:
 
 <MultiLanguageCode>

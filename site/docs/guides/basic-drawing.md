@@ -345,7 +345,7 @@ function pixel (x: i32, y: i32): void {
 
     // Use the first DRAW_COLOR as the pixel color.
     const palette_color = u8(load<u16>(w4.DRAW_COLORS) & 0b1111);
-    if (color == 0) {
+    if (palette_color == 0) {
         // Transparent
         return;
     }
@@ -367,7 +367,7 @@ void pixel (int x, int y) {
 
     // Use the first DRAW_COLOR as the pixel color
     int palette_color = *DRAW_COLORS & 0b1111;
-    if (color == 0) {
+    if (palette_color == 0) {
         // Transparent
         return;
     }
@@ -390,7 +390,7 @@ fn void pixel(int x, int y)
 
     // Use the first DRAW_COLOR as the pixel color
     int palette_color = *w4::DRAW_COLORS & 0b1111;
-    if (color == 0) 
+    if (palette_color == 0) 
     {
         // Transparent
         return;

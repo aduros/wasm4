@@ -221,13 +221,13 @@ const font = memory.data<u8>([
   0x38, 0x40, 0x3a, 0x10, 0x48, 0x46, 0x30, 0x66
 ]);
 
-function drawSpace(x: i32, y: i32, column: i32, line: i32, colors: u16) {
+function drawSpace(x: i32, y: i32, column: i32, line: i32, colors: u16): void {
     store<u16>(w4.DRAW_COLORS, w4.DRAW_COLORS & 0x0F);
     w4.rect(
-        x + (column * CHAR_WIDTH),
-        y + (line * CHAR_HEIGHT),
-        CHAR_WIDTH,
-        CHAR_HEIGHT
+        x + (column * charWidth),
+        y + (line * charHeight),
+        charWidth,
+        charHeight
     );
     store<u16>(w4.DRAW_COLORS, colors);
 }

@@ -779,7 +779,7 @@ export function update(): void {
 But since you set the drawing colors, you need to change the drawing colors too:
 
 ```typescript {3}
-    snaked.draw()
+    snake.draw()
 
     store<u16>(w4.DRAW_COLORS, 0x4320)
     w4.blit(fruitSprite, fruit.x * 8, fruit.y * 8, 8, 8, w4.BLIT_2BPP)

@@ -118,6 +118,8 @@ w4.PALETTE.* = .{
 
 </MultiLanguageCode>
 
+The palette colors are considered to be numbered 1-4, even though they may accessed with indices 0-3.
+
 The default Gameboy-ish palette looks like this:
 
 <div className="row row--no-gutters">
@@ -131,11 +133,17 @@ The first color in the palette register is used as the screen background color.
 
 ## The `DRAW_COLORS` Register
 
-All drawing functions are affected by the `DRAW_COLORS` memory register. `DRAW_COLORS` is a 16 bit value that can store up to 4 colors, using 4 bits each.
+`DRAW_COLORS` is a set of 4 indexes into `PALLETE`. Drawing functions use these indexes to
+decide which colors to use, and what to use them for.
 
-For example, `rect()` uses the first draw color (low bits) for the fill color, and the
-second draw color (high bits) as the outline color. To draw a light-green (palette color 2)
-rectangle with a black (palette color 4) outline:
+`DRAW_COLORS` is a 16 bit value that holds 4 indexes. Bits 0-3 (the least significant bits)
+hold the first draw color, bits 4-7 hold the second draw color, and so on.
+
+Setting a draw color to `1` means use `PALLETE` color 1 for that draw color. The same applies
+when setting a draw color to `2`, `3`, or `4`.
+
+For example, `rect()` uses the first draw color for the fill color, and the second draw color
+as the outline color. To draw a light-green (palette color 2) rectangle with a black (palette color 4) outline:
 
 <MultiLanguageCode>
 
@@ -214,7 +222,7 @@ w4.rect(10, 10, 32, 32);
 
 </MultiLanguageCode>
 
-A value of `0` in a draw color means it will be transparent. For example, to
+However, setting a draw color to `0` will make it transparent. For example, to
 draw a black outlined rectangle with no fill, set `DRAW_COLORS` to `0x40`.
 
 ## Other Shapes

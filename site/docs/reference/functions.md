@@ -32,8 +32,10 @@ Copies pixels to the framebuffer.
 | 2         | `BLIT_FLIP_Y` | Flip sprite vertically                           |
 | 3         | `BLIT_ROTATE` | Rotate sprite anti-clockwise 90 degrees          |
 
-A 1BPP sprite uses 1 bit for each pixel and can contain up to 2 colors. A 2BPP sprite uses 2 bits per
-pixel and can contain up to 4 colors.
+A 1BPP sprite uses 1 bit for each pixel and can contain 2 colors. A 2BPP sprite uses 2 bits per
+pixel and can contain 4 colors.
+
+Rotation is applied after any flipping.
 
 ### `blitSub (spritePtr, x, y, width, height, srcX, srcY, stride, flags)`
 

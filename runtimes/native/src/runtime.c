@@ -14,6 +14,7 @@
 
 #define SYSTEM_PRESERVE_FRAMEBUFFER 1
 
+#pragma pack(1)
 typedef struct {
     uint8_t _padding[4];
     uint32_t palette[4];
@@ -27,6 +28,7 @@ typedef struct {
     uint8_t framebuffer[WIDTH*HEIGHT>>2];
     uint8_t _user[58976];
 } Memory;
+#pragma pack()
 
 typedef struct {
     Memory memory;

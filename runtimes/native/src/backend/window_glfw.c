@@ -7,6 +7,7 @@
 
 #include "../window.h"
 #include "../runtime.h"
+#include "main.h"
 
 static uint32_t table[256];
 static GLuint paletteLocation;
@@ -143,6 +144,9 @@ static void onGlfwError(int error, const char* description)
 }
 
 static void update (GLFWwindow* window) {
+    if (glfwGetKey(window, GLFW_KEY_R)) {
+        resetCart();
+    }
     // Keyboard handling
     uint8_t gamepad = 0;
     if (glfwGetKey(window, GLFW_KEY_X)) {

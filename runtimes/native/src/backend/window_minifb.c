@@ -3,6 +3,7 @@
 
 #include "../window.h"
 #include "../runtime.h"
+#include "main.h"
 
 static uint32_t pixels[160*160];
 
@@ -26,6 +27,9 @@ void w4_windowBoot (const char* title) {
     do {
         // Keyboard handling
         const uint8_t* keyBuffer = mfb_get_key_buffer(window);
+        if (keyBuffer[KB_KEY_R]) {
+            resetCart();
+        }
 
         // Player 1
         uint8_t gamepad = 0;

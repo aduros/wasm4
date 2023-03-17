@@ -8,12 +8,18 @@
 #include "../runtime.h"
 #include "../wasm.h"
 #include "../window.h"
+#include "main.h"
 
 #if defined(_WIN32)
 #include <windows.h>
 #endif
 
 #define DISK_FILE_EXT ".disk"
+
+static uint8_t* memory;
+static w4_Disk disk = {0};
+static uint8_t* wasmData;
+static size_t wasmLength;
 
 typedef struct {
     // Should be the 4 byte ASCII string "CART" (1414676803)
@@ -23,7 +29,7 @@ typedef struct {
     char title[128];
 
     // Length of the cart.wasm bytes used to offset backwards from the footer
-    uint32_t cartLength;
+    uint32_t wasmLength;
 } FileFooter;
 
 static long audioDataCallback (cubeb_stream* stream, void* userData,
@@ -117,10 +123,12 @@ static void trimFileExtension (char *path) {
     }
 }
 
+void resetCart () {
+    w4_runtimeInit(memory, &disk);
+    w4_wasmLoadModule(wasmData, wasmLength);
+}
+
 int main (int argc, const char* argv[]) {
-    uint8_t* cartBytes;
-    size_t cartLength;
-    w4_Disk disk = {0};
     const char* title = "WASM-4";
     char* diskPath = NULL;
 
@@ -139,9 +147,9 @@ int main (int argc, const char* argv[]) {
         footer.title[sizeof(footer.title)-1] = '\0';
         title = footer.title;
 
-        cartBytes = malloc(footer.cartLength);
-        fseek(file, -sizeof(FileFooter) - footer.cartLength, SEEK_END);
-        cartLength = fread(cartBytes, 1, footer.cartLength, file);
+        wasmData = malloc(footer.wasmLength);
+        fseek(file, -sizeof(FileFooter) - footer.wasmLength, SEEK_END);
+        wasmLength = fread(wasmData, 1, footer.wasmLength, file);
         fclose(file);
 
         // Look for disk file
@@ -185,11 +193,11 @@ int main (int argc, const char* argv[]) {
         }
 
         fseek(file, 0, SEEK_END);
-        cartLength = ftell(file);
+        wasmLength = ftell(file);
         fseek(file, 0, SEEK_SET);
 
-        cartBytes = malloc(cartLength);
-        cartLength = fread(cartBytes, 1, cartLength, file);
+        wasmData = malloc(wasmLength);
+        wasmLength = fread(wasmData, 1, wasmLength, file);
         fclose(file);
 
         // Look for disk file
@@ -202,10 +210,10 @@ int main (int argc, const char* argv[]) {
 
     audioInit();
 
-    uint8_t* memory = w4_wasmInit();
+    memory = w4_wasmInit();
     w4_runtimeInit(memory, &disk);
 
-    w4_wasmLoadModule(cartBytes, cartLength);
+    w4_wasmLoadModule(wasmData, wasmLength);
 
     w4_windowBoot(title);
 

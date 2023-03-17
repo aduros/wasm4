@@ -1,4 +1,9 @@
-# Memory Map
+# Memory Layout
+
+### Endianness
+WebAssembly is, in general, a little-endian system.
+
+### Memory Map
 
 WASM-4 uses a fixed memory layout of 64 KB.
 
@@ -19,7 +24,8 @@ WASM-4 uses a fixed memory layout of 64 KB.
 
 ### PALETTE
 
-4 colors, with each color represented by a 32 bit integer.
+An array of 4 colors, each represented by a 32 bit integer.
+Each color is laid out in memory like this:
 
 | Bits    | Description           |
 | ---     | ---                   |
@@ -27,6 +33,15 @@ WASM-4 uses a fixed memory layout of 64 KB.
 | 8 - 15  | Green channel         |
 | 16 - 23 | Red channel           |
 | 24 - 31 | *Unused*              |
+
+Example:
+
+```c
+PALETTE[0] = 0xff0000; // Set the first palette color to red,
+PALETTE[1] = 0x00ff00; // the second to green,
+PALETTE[2] = 0x0000ff; // the third to blue,
+PALETTE[3] = 0xffffff; // and the fourth to white.
+```
 
 ### DRAW_COLORS
 

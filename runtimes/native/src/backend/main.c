@@ -117,6 +117,10 @@ static void trimFileExtension (char *path) {
     }
 }
 
+static void logFrameStatsMsg(const char* msg) {
+    printf("%s", msg);
+}
+
 int main (int argc, const char* argv[]) {
     uint8_t* cartBytes;
     size_t cartLength;
@@ -212,4 +216,6 @@ int main (int argc, const char* argv[]) {
     audioUninit();
 
     saveDiskFile(&disk, diskPath);
+
+    w4_runtimeLogFrameStats(logFrameStatsMsg);
 }

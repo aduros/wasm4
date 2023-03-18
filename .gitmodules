@@ -1,6 +1,9 @@
 [submodule "runtimes/native/vendor/wasm3"]
 	path = runtimes/native/vendor/wasm3
 	url = https://github.com/wasm3/wasm3
+[submodule "runtimes/native/vendor/glfw"]
+	path = runtimes/native/vendor/glfw
+	url = https://github.com/glfw/glfw
 [submodule "runtimes/native/vendor/minifb"]
 	path = runtimes/native/vendor/minifb
 	url = https://github.com/emoon/minifb

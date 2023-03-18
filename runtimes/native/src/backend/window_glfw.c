@@ -216,6 +216,10 @@ void w4_windowBoot (const char* title) {
         while ((timeRemaining = timeEnd - glfwGetTime()) > 0) {
             glfwWaitEventsTimeout(timeRemaining);
         }
+
+        double timeEndActual = glfwGetTime();
+        uint64_t durationUsec = (uint64_t) ((timeEndActual - timeStart) * 1e6);
+        w4_runtimeRecordFrameDuration(durationUsec);
     }
 
     glfwDestroyWindow(window);

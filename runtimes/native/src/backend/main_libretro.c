@@ -49,12 +49,20 @@ static void fallback_log(enum retro_log_level level,
 
 static retro_log_printf_t log_cb = fallback_log;
 
+static void logFrameStatsMsg(const char* msg) {
+    log_cb(RETRO_LOG_INFO, "%s", msg);
+}
+
 #if !defined(PSP) && !defined(PS2)
 static void audio_callback () {
     w4_apuWriteSamples(audio_output, AUDIO_BUFFER_FRAMES_CALLBACK);
     audio_batch_cb(audio_output, AUDIO_BUFFER_FRAMES_CALLBACK);
 }
 #endif
+
+static void frame_time_callback(retro_usec_t usec) {
+    w4_runtimeRecordFrameDuration(usec);
+}
 
 unsigned retro_api_version () {
     return RETRO_API_VERSION;
@@ -333,6 +341,9 @@ bool retro_load_game (const struct retro_game_info* game) {
 	log_cb(RETRO_LOG_INFO, "Using normal audio\n");
     }
 
+    struct retro_frame_time_callback frame_cb = { frame_time_callback, 1000000 / 60 };
+    environ_cb(RETRO_ENVIRONMENT_SET_FRAME_TIME_CALLBACK, &frame_cb);
+
     return true;
 }
 
@@ -345,6 +356,7 @@ void retro_unload_game () {
     if (wasmCopy) {
         free(wasmData);
     }
+    w4_runtimeLogFrameStats(logFrameStatsMsg);
 }
 
 void retro_reset () {

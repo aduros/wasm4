@@ -51,3 +51,11 @@ void w4_runtimeUpdate ();
 int w4_runtimeSerializeSize ();
 void w4_runtimeSerialize (void* dest);
 void w4_runtimeUnserialize (const void* src);
+
+/// Record duration of each frame (in microseconds)
+/// so that we can generate frame stats at the end of the run.
+void w4_runtimeRecordFrameDuration(uint64_t durationUsec);
+
+/// Log frame stats to stdout or local equivalent.
+/// The log function must accept and print a string.
+void w4_runtimeLogFrameStats(void (*logFrameStatsMsg)(const char *msg));

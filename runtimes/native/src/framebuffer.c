@@ -427,13 +427,13 @@ void w4_framebufferOval (int x, int y, int width, int height) {
         drawPointUnclipped(strokeColor, west, north); /*   II. Quadrant    */
         drawPointUnclipped(strokeColor, west, south); /*   III. Quadrant   */
         drawPointUnclipped(strokeColor, east, south); /*   IV. Quadrant    */
-        const start = west + 1;
-        const len = east - start;
+        const int start = west + 1;
+        const int len = east - start;
         if (dc0 != 0 && len > 0) { // Only draw fill if the length from west to east is not 0
             drawHLineUnclipped(fillColor, start, north, east); /*   I and III. Quadrant */
             drawHLineUnclipped(fillColor, start, south, east); /*  II and IV. Quadrant */
         }
-        const err2 = 2 * err;
+        const int err2 = 2 * err;
         if (err2 <= dy) {
             // Move vertical scan
             north += 1;

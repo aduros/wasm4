@@ -8,6 +8,7 @@
 #include "../apu.h"
 #include "../runtime.h"
 #include "../wasm.h"
+#include "../util.h"
 
 #define AUDIO_BUFFER_FRAMES_CALLBACK 256
 #define AUDIO_BUFFER_FRAMES_PER_VIDEO_FRAME 735
@@ -276,7 +277,7 @@ bool retro_load_game (const struct retro_game_info* game) {
         wasmCopy = false;
     } else {
         // Otherwise we need to manage our own copy
-        wasmData = malloc(wasmLength);
+        wasmData = xmalloc(wasmLength);
         wasmCopy = true;
         memcpy(wasmData, game->data, wasmLength);
     }

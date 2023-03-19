@@ -8,6 +8,7 @@
 #include "../runtime.h"
 #include "../wasm.h"
 #include "../window.h"
+#include "../util.h"
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -139,13 +140,13 @@ int main (int argc, const char* argv[]) {
         footer.title[sizeof(footer.title)-1] = '\0';
         title = footer.title;
 
-        cartBytes = malloc(footer.cartLength);
+        cartBytes = xmalloc(footer.cartLength);
         fseek(file, -sizeof(FileFooter) - footer.cartLength, SEEK_END);
         cartLength = fread(cartBytes, 1, footer.cartLength, file);
         fclose(file);
 
         // Look for disk file
-        diskPath = malloc(strlen(argv[0]) + sizeof(DISK_FILE_EXT));
+        diskPath = xmalloc(strlen(argv[0]) + sizeof(DISK_FILE_EXT));
         strcpy(diskPath, argv[0]);
 #ifdef _WIN32
         trimFileExtension(diskPath); // Trim .exe on Windows
@@ -155,7 +156,7 @@ int main (int argc, const char* argv[]) {
 
     } else if (!strcmp(argv[1], "-") || !strcmp(argv[1], "/dev/stdin")) {
         size_t bufsize = 1024;
-        cartBytes = malloc(bufsize);
+        cartBytes = xmalloc(bufsize);
         cartLength = 0;
         int c;
 
@@ -168,7 +169,7 @@ int main (int argc, const char* argv[]) {
                 }
 
                 bufsize *= 2;
-                cartBytes = realloc(cartBytes, bufsize);
+                cartBytes = xrealloc(cartBytes, bufsize);
 
                 if(!cartBytes) {
                     fprintf(stderr, "Error reallocating cartridge buffer\n");
@@ -188,12 +189,12 @@ int main (int argc, const char* argv[]) {
         cartLength = ftell(file);
         fseek(file, 0, SEEK_SET);
 
-        cartBytes = malloc(cartLength);
+        cartBytes = xmalloc(cartLength);
         cartLength = fread(cartBytes, 1, cartLength, file);
         fclose(file);
 
         // Look for disk file
-        diskPath = malloc(strlen(argv[1]) + sizeof(DISK_FILE_EXT));
+        diskPath = xmalloc(strlen(argv[1]) + sizeof(DISK_FILE_EXT));
         strcpy(diskPath, argv[1]);
         trimFileExtension(diskPath); // Trim .wasm
         strcat(diskPath, DISK_FILE_EXT);

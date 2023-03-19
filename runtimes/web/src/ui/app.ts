@@ -112,7 +112,11 @@ export class App extends LitElement {
                 // Load the cart from a url
                 const cartUrl = utils.getUrlParam("url") ?? "cart.wasm";
                 const res = await fetch(cartUrl);
-                return new Uint8Array(await res.arrayBuffer());
+                if (res.ok) {
+                    return new Uint8Array(await res.arrayBuffer());
+                } else {
+                    throw new Error(`Could not load cart at url: ${cartUrl}`);
+                }
             }
         }
 

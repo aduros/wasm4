@@ -376,7 +376,7 @@ export class Runtime {
     }
 
     composite () {
-        const palette = new Uint32Array(this.memory.buffer, constants.ADDR_PALETTE, 4*4);
+        const palette = new Uint32Array(this.memory.buffer, constants.ADDR_PALETTE, 4);
 
         this.compositor.composite(palette, this.framebuffer);
     }

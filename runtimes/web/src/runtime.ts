@@ -13,9 +13,9 @@ export class Runtime {
     data: DataView;
     framebuffer: Framebuffer;
     pauseState: number;
-    wasmBuffer?: Uint8Array;
+    wasmBuffer: Uint8Array | null = null;
     wasmBufferByteLen: number;
-    wasm?: WebAssembly.Instance;
+    wasm: WebAssembly.Instance | null = null;
     warnedFileSize = false;
 
     diskName: string;
@@ -118,6 +118,7 @@ export class Runtime {
         const limit = 1 << 16;
         this.wasmBuffer = wasmBuffer;
         this.wasmBufferByteLen = wasmBuffer.byteLength;
+        this.wasm = null;
 
         if (wasmBuffer.byteLength > limit) {
             if (import.meta.env.DEV) {
@@ -158,9 +159,17 @@ export class Runtime {
             tracef: this.tracef.bind(this),
         };
 
-        await this.safeCall(async () => {
+        await this.bluescreenOnError(async () => {
             const module = await WebAssembly.instantiate(wasmBuffer, { env });
             this.wasm = module.instance;
+
+            if (typeof this.wasm.exports["start"] !== 'function') {
+                throw new Wasm4Error('The cartridge does\nnot export a\n"start" function.');
+            }
+
+            if (typeof this.wasm.exports["update"] !== 'function') {
+                throw new Wasm4Error('The cartridge does\nnot export an\n"update" function.');
+            }
 
             // Call the WASI _start/_initialize function (different from WASM-4's start callback!)
             if (typeof this.wasm.exports._start === 'function') {
@@ -172,20 +181,17 @@ export class Runtime {
         });
     }
 
-    async safeCall (fn?: null | undefined | WebAssembly.ExportValue) {
-        if (typeof fn === 'function') {
-            try {
-                await fn();
-            } catch (err) {
-                if (err instanceof WebAssembly.RuntimeError
-                        || err instanceof WebAssembly.LinkError
-                        || err instanceof WebAssembly.CompileError) {
-                    this.blueScreen(err);
-                } else {
-                    // if we don't know what it is, throw it again
-                    throw err;
-                }
+    async bluescreenOnError (fn: Function) {
+        try {
+            await fn();
+        } catch (err) {
+            if (err instanceof Error) {
+                const errorExplanation = errorToBlueScreenText(err);
+                this.blueScreen(errorExplanation);
+                this.printToServer(err.stack ?? '');
             }
+
+            throw err;
         }
     }
 
@@ -260,12 +266,12 @@ export class Runtime {
         return str;
     }
 
-    print (str: string , error = false) {
-        if (error) {
-            console.error(str);
-        } else {
-            console.log(str);
-        }
+    print (str: string ) {
+        console.log(str);
+        this.printToServer(str);
+    }
+
+    printToServer (str: string) {
         if (devkit.websocket != null && devkit.websocket.readyState == 1) {
             devkit.websocket.send(str);
         }
@@ -322,7 +328,7 @@ export class Runtime {
     }
 
     start () {
-        this.safeCall(this.wasm!.exports.start);
+        this.bluescreenOnError(this.wasm!.exports["start"] as Function);
     }
 
     update () {
@@ -334,10 +340,10 @@ export class Runtime {
             this.framebuffer.clear();
         }
 
-        this.safeCall(this.wasm!.exports.update);
+        this.bluescreenOnError(this.wasm!.exports["update"] as Function);
     }
 
-    blueScreen (err: Error) {
+    blueScreen (text: string) {
         this.pauseState |= constants.PAUSE_CRASHED;
 
         const COLORS = [
@@ -365,12 +371,8 @@ export class Runtime {
         this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1131, true);
         this.framebuffer.drawText(toCharArr(headerTitle), headerX, headerY);
         this.data.setUint16(constants.ADDR_DRAW_COLORS, 0x1203, true);
-        const errorExplanation = errorToBlueScreenText(err);
-        this.framebuffer.drawText(toCharArr(errorExplanation), messageX, messageY);
+        this.framebuffer.drawText(toCharArr(text), messageX, messageY);
         this.composite();
-
-        // to help with debugging
-        this.print(err.stack ?? '', true);
     }
 
     composite () {
@@ -381,20 +383,30 @@ export class Runtime {
 }
 
 function errorToBlueScreenText(err: Error) {
-    let message = err.message;
-
     // hand written messages for specific errors
     if (err instanceof WebAssembly.RuntimeError) {
+        let message;
         if (err.message.match(/unreachable/)) {
             message = "The cartridge has\nreached a code \nsegment marked as\nunreachable.";
         } else if (err.message.match(/out of bounds/)) {
             message = "The cartridge has\nattempted a memory\naccess that is\nout of bounds.";
         }
-        message += "\n\n\n\n\nHit R to reboot.";
+        return message + "\n\n\n\n\nHit R to reboot.";
     } else if (err instanceof WebAssembly.LinkError) {
-        message = "The cartridge has\ntried to import\na missing function.\n\n\n\nSee console for\nmore details.";
+        return "The cartridge has\ntried to import\na missing function.\n\n\n\nSee console for\nmore details.";
     } else if (err instanceof WebAssembly.CompileError) {
-        message = "The cartridge is\ncorrupted.\n\n\n\nSee console for\nmore details.";
+        return "The cartridge is\ncorrupted.\n\n\n\nSee console for\nmore details.";
+    } else if (err instanceof Wasm4Error) {
+        return err.wasm4Message;
     }
-    return message;
+    return "Unknown error.\n\n\n\nSee console for\nmore details.";
+}
+
+class Wasm4Error extends Error {
+    wasm4Message: string;
+    constructor(w4Message: string) {
+        super(w4Message.replace('\n', ' '));
+        this.name = "Wasm4Error";
+        this.wasm4Message = w4Message;
+    }
 }

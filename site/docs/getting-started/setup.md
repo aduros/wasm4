@@ -362,7 +362,7 @@ cd hello-world
 Compile the .wasm cartridge:
 
 ```shell
-zig build -Drelease-small=true
+zig build -Doptimize=ReleaseSmall
 ```
 
 Run it in WASM-4 with:

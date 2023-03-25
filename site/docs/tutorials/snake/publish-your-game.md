@@ -108,7 +108,7 @@ This is a rather heavy, blunt hammer for functions that kind of look like nails 
 <Page value="zig">
 
 ```shell
-zig build -Drelease-small=true
+zig build -Doptimize=ReleaseSmall
 ```
 
 Your game will be here: `zig-out/lib/cart.wasm`

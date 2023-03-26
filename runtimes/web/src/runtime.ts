@@ -163,19 +163,11 @@ export class Runtime {
             const module = await WebAssembly.instantiate(wasmBuffer, { env });
             this.wasm = module.instance;
 
-            if (typeof this.wasm.exports["start"] !== 'function') {
-                throw new Wasm4Error('The cartridge does\nnot export a\n"start" function.');
-            }
-
-            if (typeof this.wasm.exports["update"] !== 'function') {
-                throw new Wasm4Error('The cartridge does\nnot export an\n"update" function.');
-            }
-
             // Call the WASI _start/_initialize function (different from WASM-4's start callback!)
-            if (typeof this.wasm.exports._start === 'function') {
+            if (typeof this.wasm.exports["_start"] === 'function') {
                 this.wasm.exports._start();
             }
-            if (typeof this.wasm.exports._initialize === 'function') {
+            if (typeof this.wasm.exports["_initialize"] === 'function') {
                 this.wasm.exports._initialize();
             }
         });
@@ -328,7 +320,10 @@ export class Runtime {
     }
 
     start () {
-        this.bluescreenOnError(this.wasm!.exports["start"] as Function);
+        let start_function = this.wasm!.exports["start"];
+        if (typeof start_function === "function") {
+            this.bluescreenOnError(start_function);
+        }
     }
 
     update () {
@@ -340,7 +335,10 @@ export class Runtime {
             this.framebuffer.clear();
         }
 
-        this.bluescreenOnError(this.wasm!.exports["update"] as Function);
+        let update_function = this.wasm!.exports["update"];
+        if (typeof update_function === "function") {
+            this.bluescreenOnError(update_function);
+        }
     }
 
     blueScreen (text: string) {

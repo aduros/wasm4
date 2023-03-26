@@ -179,28 +179,35 @@ export class Framebuffer {
         let south = north - b1; // Compensation here. Moves the bottom line up by
                                 // one (overlapping the top line) for even heights
 
+        const a2 = a * a;
+        const b2 = b * b;
+
         // Error increments. Also known as the decision parameters
-        let dx = 4 * (1 - a) * b * b;
-        let dy = 4 * (b1 + 1) * a * a;
+        let dx = 4 * (1 - a) * b2;
+        let dy = 4 * (b1 + 1) * a2;
 
         // Error of 1 step
-        let err = dx + dy + b1 * a * a;
+        let err = dx + dy + b1 * a2;
 
-        a *= 8 * a;
-        b1 = 8 * b * b;
+        a = 8 * a2;
+        b1 = 8 * b2;
 
         do {
             this.drawPointUnclipped(strokeColor, east, north); /*   I. Quadrant     */
             this.drawPointUnclipped(strokeColor, west, north); /*   II. Quadrant    */
             this.drawPointUnclipped(strokeColor, west, south); /*   III. Quadrant   */
             this.drawPointUnclipped(strokeColor, east, south); /*   IV. Quadrant    */
+
             const start = west + 1;
             const len = east - start;
+
             if (dc0 !== 0 && len > 0) { // Only draw fill if the length from west to east is not 0
                 this.drawHLineUnclipped(fillColor, start, north, east); /*   I and III. Quadrant */
                 this.drawHLineUnclipped(fillColor, start, south, east); /*  II and IV. Quadrant */
             }
+
             const err2 = 2 * err;
+
             if (err2 <= dy) {
                 // Move vertical scan
                 north += 1;
@@ -208,7 +215,8 @@ export class Framebuffer {
                 dy += a;
                 err += dy;
             }
-            if (err2 >= dx || 2 * err > dy) {
+
+            if (err2 >= dx || err2 > dy) {
                 // Move horizontal scan
                 west += 1;
                 east -= 1;

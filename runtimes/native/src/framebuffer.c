@@ -413,27 +413,34 @@ void w4_framebufferOval (int x, int y, int width, int height) {
                             // one (overlapping the top line) for even heights
 
     // Error increments. Also known as the decision parameters
-    int dx = 4 * (1 - a) * b * b;
-    int dy = 4 * (b1 + 1) * a * a;
+    const int a2 = a * a;
+    const int b2 = b * b;
+    
+    int dx = 4 * (1 - a) * b2;
+    int dy = 4 * (b1 + 1) * a2;
 
     // Error of 1 step
-    int err = dx + dy + b1 * a * a;
+    int err = dx + dy + b1 * a2;
 
-    a *= 8 * a;
-    b1 = 8 * b * b;
+    a = 8 * a2;
+    b1 = 8 * b2;
 
     do {
         drawPointUnclipped(strokeColor, east, north); /*   I. Quadrant     */
         drawPointUnclipped(strokeColor, west, north); /*   II. Quadrant    */
         drawPointUnclipped(strokeColor, west, south); /*   III. Quadrant   */
         drawPointUnclipped(strokeColor, east, south); /*   IV. Quadrant    */
+
         const int start = west + 1;
         const int len = east - start;
+
         if (dc0 != 0 && len > 0) { // Only draw fill if the length from west to east is not 0
             drawHLineUnclipped(fillColor, start, north, east); /*   I and III. Quadrant */
             drawHLineUnclipped(fillColor, start, south, east); /*  II and IV. Quadrant */
         }
+
         const int err2 = 2 * err;
+
         if (err2 <= dy) {
             // Move vertical scan
             north += 1;
@@ -441,7 +448,8 @@ void w4_framebufferOval (int x, int y, int width, int height) {
             dy += a;
             err += dy;
         }
-        if (err2 >= dx || 2 * err > dy) {
+
+        if (err2 >= dx || err2 > dy) {
             // Move horizontal scan
             west += 1;
             east -= 1;

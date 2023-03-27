@@ -142,7 +142,7 @@ export class App extends LitElement {
             },
         };
         if (import.meta.env.DEV) {
-            devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager())
+            devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager());
         }
 
         if (!this.netplay) {

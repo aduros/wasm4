@@ -109,10 +109,10 @@ async function start (cartFile, opts) {
             if (sentReload) {
                 const cart = path.basename(cartFile);
                 if (hot) {
-                        console.log(`✔ Hot swapped ${cart} (press R for full reload)`);
-                    } else {
-                        console.log(`✔ Reloaded ${cart}`);
-                    }
+                    console.log(`🔄🔥 Hot swapped ${cart} (press R for full reload)`);
+                } else {
+                    console.log(`🔄 Reloaded ${cart}`);
+                }
             }
         });
     }

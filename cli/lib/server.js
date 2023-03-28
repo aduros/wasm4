@@ -1,126 +1,182 @@
 const express = require("express");
-const fs = require("fs");
+const fs = require('node:fs/promises');
 const os = require("os");
 const path = require("path");
 const qrcode = require("qrcode");
 const { Server: WebSocketServer } = require("ws");
 const open = require("open");
-const { exit, stdin } = require("process");
+const process = require("process");
+const { buffer } = require('node:stream/consumers');
 
-var attempts = 0;
-var PORT = 0;
-var FIRST_PORT = 0;
 
-function start (cartFile, opts) {
+async function start (cartFile, opts) {
     const app = express();
-    setupCart(app, cartFile).then(() => {
-        startServer(app, opts, cartFile)
-    });
-}
 
-async function setupCart(app, cartFile) {
-    if (cartFile === "-" || cartFile === "/dev/stdin") {
-        const data = await getStdinBuffer();
+    let shouldWatch = false;
+    if (cartFile === "-") {
+        // Filename "-" means read from standard in.
+        // This can only be read once, so must be cached.
+        let cart_data = await buffer(process.stdin);
+
         app.get("/cart.wasm", (req, res) => {
-            res.send(data);
+            res.send(cart_data);
+        });
+    } else if (!(await fs.stat(cartFile)).isFile()) {
+        // If the file is not a regular file, such as a fifo, input stream etc.
+        // we must also cache the data.
+        let cart_data = await fs.readFile(cartFile);
+
+        app.get("/cart.wasm", (req, res) => {
+            res.send(cart_data);
         });
     } else {
+        // otherwise it's a regular file, and can be read from disk every time.
         app.get("/cart.wasm", (req, res) => {
-            fs.createReadStream(cartFile).pipe(res);
+            res.sendFile(path.resolve(cartFile));
         });
         app.get("/cart.wasm.map", (req, res) => {
-            fs.createReadStream(cartFile+".map").pipe(res);
+            res.sendFile(path.resolve(cartFile+".map"));
         });
+        shouldWatch = true;
     }
-}
 
-function startServer (app, opts, cartFile) {
+    // Serve the WASM-4 developer runtime.
     app.use(express.static(path.resolve(__dirname, "../assets/runtime/developer-build")));
 
-    if (PORT == 0) {
-        PORT = opts.port;
-        FIRST_PORT = opts.port;
-    }
 
-    const hot = opts.hot;
+    const first_port = opts.port;
+    let port = first_port;
 
-    const server = app.listen(PORT, async () => {
+    const webServer = app.listen(port, successfulListen);
+
+    async function successfulListen() {
         if (opts.qr) {
-            const qr = await qrcode.toString(`http://${getIP()}:${PORT}`, {type: "terminal", small: true});
+            const qr = await qrcode.toString(`http://${getIP()}:${port}`, {type: "terminal", small: true});
             console.log("\n  " + qr.replace(/\n/g, "\n  "));
         }
-        if (FIRST_PORT != PORT) {
-            console.log(`Unable to bind on port ${FIRST_PORT}, using ${PORT} instead.`);
+        if (port != first_port) {
+            console.log(`Unable to bind on port ${first_port}, using ${port} instead.`);
         }
-        console.log(`Open http://localhost:${PORT}${opts.qr ? ", or scan this QR code on your mobile device." : "."} Press ctrl-C to exit.`);
+        console.log(`Open http://localhost:${port}${opts.qr ? ", or scan this QR code on your mobile device." : "."} Press ctrl-C to exit.`);
 
-        if (opts.open) {
-            open(`http://localhost:${PORT}`);
+        if (opts.open) {   
+            open(`http://localhost:${port}`);
         }
-    })
-    .on("error", () => {
-        if (++attempts > 1000) {
-            console.log(`Unable to bind on port ${FIRST_PORT}.`);
-            console.log(`Error: Unable to find available port.`);
-            console.log(`Please specify a different port using the --port <port> option.\n`)
-            console.log(`Use\n`)
-            console.log(`\tw4 help watch\n`)
-            console.log('or\n')
-            console.log(`\tw4 help run\n`)
-            console.log('for more information.')
-            exit(1);
-        } else {
-            PORT++;
-            start(cartFile, opts);
+    }
+
+    let attempts = 0;
+    webServer.on("error", (e) => {
+        if (e.code === "EADDRINUSE") {
+            if (++attempts <= 1000) {
+                port++;
+                webServer.listen(port, successfulListen);
+            } else {
+                console.log(`Error: Unable to find an available port between ${first_port}-${port}`);
+                console.log(`Please specify a different port using the --port <port> option.\n`)
+                console.log(`Use\n`)
+                console.log(`\tw4 help watch\n`)
+                console.log('or\n')
+                console.log(`\tw4 help run\n`)
+                console.log('for more information.')
+                process.exit(1);
+            }
+        } else  {
+            throw e;
         }
     });
 
-    const wsServer = new WebSocketServer({ noServer: true });
-    wsServer.on("connection", socket => {
+    const wSocketServer = new WebSocketServer({ noServer: true });
+    wSocketServer.on("connection", socket => {
         socket.on("message", message => {
             console.log(message);
         });
     });
-    server.on("upgrade", (request, socket, head) => {
-        wsServer.handleUpgrade(request, socket, head, socket => {
-            wsServer.emit("connection", socket, request);
+    webServer.on("upgrade", (request, socket, head) => {
+        wSocketServer.handleUpgrade(request, socket, head, socket => {
+            wSocketServer.emit("connection", socket, request);
         });
     });
 
-    let reloadTimeoutId = 0;
-    fs.watch(path.dirname(cartFile), (event, file) => {
-        if (file == path.basename(cartFile)) {
-            clearTimeout(reloadTimeoutId);
-            reloadTimeoutId = setTimeout(() => {
-                let sentReload = false;
-                for (let client of wsServer.clients) {
-                    client.send(hot ? "hotswap" : "reload");
-                    sentReload = true;
-                }
-                if (sentReload) {
-                    const cart = path.basename(cartFile);
-                    if (hot) {
+    const hot = opts.hot;
+
+    if (shouldWatch) {
+        watch_path(cartFile, 250, () => {
+            let sentReload = false;
+            for (let client of wSocketServer.clients) {
+                client.send(hot ? "hotswap" : "reload");
+                sentReload = true;
+            }
+            if (sentReload) {
+                const cart = path.basename(cartFile);
+                if (hot) {
                         console.log(`✔ Hot swapped ${cart} (press R for full reload)`);
                     } else {
                         console.log(`✔ Reloaded ${cart}`);
                     }
-                }
-            }, 50);
-        }
-    });
+            }
+        });
+    }
 }
 exports.start = start;
 
-async function getStdinBuffer() {
-	const result = [];
-	var length = 0;
+async function wait (ms) {
+    return new Promise((resolve, reject) => setTimeout(resolve, ms));
+}
 
-	for await (const chunk of stdin) {
-		result.push(chunk);
-		length += chunk.length;
-	}
+// Watches a file-path, and calls handleFreshFile when the file is replaced or modified,
+// once all changes have settled down.
+async function watch_path(path, pollTime, handleFreshFile) {
+    let prev_modified_time = await get_modified_time(path);
+    while (true) {
 
-	return Buffer.concat(result, length);
+        // file is settled loop
+        while (true) {
+            await wait(pollTime);
+
+            let curr_modified_time = await get_modified_time(path);
+            if (curr_modified_time !== prev_modified_time) {
+                // The file has become unsettled
+                prev_modified_time = curr_modified_time;
+                break;
+            } else {
+                // The file is still settled
+                prev_modified_time = curr_modified_time;
+            }
+        }
+        
+        // file has disappeared or is being modified (i.e. unsettled) loop
+        while (true) {
+            await wait(pollTime);
+
+            let curr_modified_time = await get_modified_time(path);
+            let file_is_not_missing = curr_modified_time !== null;
+            let file_was_not_modified = curr_modified_time === prev_modified_time;
+            if (file_is_not_missing && file_was_not_modified) {
+                // If the file has not changed between two polls, assume the file has become settled.
+                handleFreshFile();
+                prev_modified_time = curr_modified_time;
+                break;
+            } else {
+                // The file is still unsettled.
+                prev_modified_time = curr_modified_time;
+            }
+        }
+    }
+}
+
+// Returns the last time the file was modified, or null if the file doesn't exist.
+async function get_modified_time (path) {
+    try {
+        return (await fs.stat(path)).mtimeMs;
+    } catch (error) {
+        // "ENOENT" means "Error, no such entry in the directory"
+        // i.e. the file doesn't exist.
+        if (error.code === "ENOENT") {
+            return null;
+        } else {
+            throw error;
+        }
+    }
 }
 
 function getIP () {

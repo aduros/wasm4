@@ -100,7 +100,8 @@ async function start (cartFile, opts) {
     const hot = opts.hot;
 
     if (shouldWatch) {
-        watch_path(cartFile, 250, () => {
+        console.log(opts.settleTime);
+        watch_path(cartFile, opts.settleTime, () => {
             let sentReload = false;
             for (let client of wSocketServer.clients) {
                 client.send(hot ? "hotswap" : "reload");

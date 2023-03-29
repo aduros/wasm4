@@ -122,6 +122,11 @@ withCommonRunOptions(program.command("watch"))
 
 withCommonRunOptions(program.command("run <cart>"))
     .description("Open a cartridge in the web runtime")
+    .addOption(
+        new Option("--settle-time <time>", "Changes to the cart must have stopped for at least this long before a reload happens. Increase this if you're getting erroneous double-reloads and cart corruption, decrease it if you want snappier reloads.  In milliseconds.")
+        .env("W4_SETTLE_TIME")
+        .default(500)
+    )
     .action((cart, opts) => {
         const server = require("./lib/server");
         server.start(cart, opts);

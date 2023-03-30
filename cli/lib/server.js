@@ -100,7 +100,7 @@ async function start (cartFile, opts) {
     const hot = opts.hot;
 
     if (shouldWatch) {
-        watch_path(cartFile, opts.settleTime, () => {
+        watchPath(cartFile, opts.settleTime, () => {
             let sentReload = false;
             for (let client of wSocketServer.clients) {
                 client.send(hot ? "hotswap" : "reload");
@@ -127,15 +127,15 @@ async function wait (ms) {
 
 // Watches a file-path, and calls handleFreshFile when the file is replaced or modified,
 // once all changes have settled down.
-async function watch_path(path, pollTime, handleFreshFile) {
-    let prev_modified_time = await get_modified_time(path);
+async function watchPath(path, pollTime, handleFreshFile) {
+    let prev_modified_time = await getModifiedTime(path);
     while (true) {
 
         // file is settled loop
         while (true) {
             await wait(pollTime);
 
-            let curr_modified_time = await get_modified_time(path);
+            let curr_modified_time = await getModifiedTime(path);
             if (curr_modified_time !== prev_modified_time) {
                 // The file has become unsettled
                 prev_modified_time = curr_modified_time;
@@ -150,7 +150,7 @@ async function watch_path(path, pollTime, handleFreshFile) {
         while (true) {
             await wait(pollTime);
 
-            let curr_modified_time = await get_modified_time(path);
+            let curr_modified_time = await getModifiedTime(path);
             let file_is_not_missing = curr_modified_time !== null;
             let file_was_not_modified = curr_modified_time === prev_modified_time;
             if (file_is_not_missing && file_was_not_modified) {
@@ -167,7 +167,7 @@ async function watch_path(path, pollTime, handleFreshFile) {
 }
 
 // Returns the last time the file was modified, or null if the file doesn't exist.
-async function get_modified_time (path) {
+async function getModifiedTime (path) {
     try {
         return (await fs.stat(path)).mtimeMs;
     } catch (error) {

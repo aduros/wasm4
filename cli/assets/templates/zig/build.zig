@@ -16,7 +16,7 @@ pub fn build(b: *std.Build) !void {
     lib.stack_size = 14752;
 
     // Export WASM-4 symbols
-    lib.rdynamic = true;
+    lib.export_symbol_names = &[_][]const u8{ "start", "update" };
 
     lib.install();
 }

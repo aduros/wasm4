@@ -11,6 +11,8 @@ const smiley = [8]u8{
     0b11000011,
 };
 
+export fn start() void {}
+
 export fn update() void {
     w4.DRAW_COLORS.* = 2;
     w4.text("Hello from Zig!", 10, 10);

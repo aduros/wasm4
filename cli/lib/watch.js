@@ -20,7 +20,7 @@ function start (opts) {
 
     } else if (fs.existsSync("build.zig")) {
         buildCommand = "zig";
-        buildParams = ["build", "--prominent-compile-errors"];
+        buildParams = ["build"];
         buildOutput = "zig-out/lib/cart.wasm";
 
     } else if (fs.existsSync("cart.nimble")) {

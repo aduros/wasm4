@@ -2,7 +2,7 @@ ifndef WASI_SDK_PATH
 $(error Download the WASI SDK (https://github.com/WebAssembly/wasi-sdk) and set $$WASI_SDK_PATH)
 endif
 
-CC = "$(WASI_SDK_PATH)/bin/clang" --sysroot="$(WASI_SDK_PATH)/share/wasi-sysroot"
+CC = "$(WASI_SDK_PATH)/bin/clang++" --sysroot="$(WASI_SDK_PATH)/share/wasi-sysroot"
 
 # Optional dependency from binaryen for smaller builds
 WASM_OPT = wasm-opt
@@ -30,7 +30,7 @@ endif
 
 all:
 	@mkdir -p build
-	$(CC) $(CFLAGS) $(LDFLAGS) src/main.c -o build/cart.wasm
+	$(CC) $(CFLAGS) $(LDFLAGS) src/main.cpp -o build/cart.wasm
 ifneq ($(DEBUG), 1)
 ifeq (, $(shell command -v $(WASM_OPT)))
 	@echo Tip: $(WASM_OPT) was not found. Install it from binaryen for smaller builds!

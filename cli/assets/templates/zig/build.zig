@@ -18,5 +18,5 @@ pub fn build(b: *std.Build) !void {
     // Export WASM-4 symbols
     lib.export_symbol_names = &[_][]const u8{ "start", "update" };
 
-    lib.install();
+    b.installArtifact(lib);
 }

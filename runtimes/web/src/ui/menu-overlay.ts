@@ -188,7 +188,7 @@ export class MenuOverlay extends LitElement {
                         this.app.closeMenu();
                         break;
                     case this.optionIndex.BUTTON_VIBRATE:
-                        this.vibrateLevel = this.app.cycleVibrateLevel()[0];
+                        this.vibrateLevel = this.app.cycleVibrateLevel() + "ms";
                         break;
                     case this.optionIndex.DISK_OPTIONS:
                         this.switchContext(optionContext.DISK);
@@ -259,7 +259,7 @@ export class MenuOverlay extends LitElement {
 
     render () {
         if (!this.vibrateLevel) {
-            this.vibrateLevel = this.app.vibrateLevel[0];
+            this.vibrateLevel = this.app.vibrateMs + "ms";
         }
         return html`
             <div class="menu">

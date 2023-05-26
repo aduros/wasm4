@@ -196,8 +196,8 @@ export class VirtualGamepad extends LitElement {
             }
         }
 
-        if (this.lastButtons != buttons && this.app.canVibrate()) {
-            navigator.vibrate(this.app.vibrateLevel[1]);
+        if (this.lastButtons != buttons && this.app.vibrateMs > 0 && this.app.canVibrate()) {
+            navigator.vibrate(this.app.vibrateMs);
         }
         this.lastButtons = buttons;
 

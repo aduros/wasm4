@@ -22,6 +22,15 @@ void update () {
 }
 ```
 
+```c3
+import w4;
+
+fn void update() @wasm 
+{
+    w4::rect(10, 10, 32, 32);
+}
+```
+
 ```d
 import w4 = wasm4;
 
@@ -66,6 +75,15 @@ import "w4"
 @export
 update :: proc "c" () {
     w4.rect(10, 10, 32, 32)
+}
+```
+
+```penne
+import "wasm4.pn";
+
+pub extern fn update()
+{
+    rect(10, 10, 32, 32);
 }
 ```
 
@@ -155,6 +173,12 @@ w4.rect(10, 10, 32, 32);
 rect(10, 10, 32, 32);
 ```
 
+```c3
+*w4::DRAW_COLORS = 2;
+
+w4::rect(10, 10, 32, 32);
+```
+
 ```d
 *w4.drawColors = 2;
 
@@ -183,6 +207,12 @@ rect(10, 10, 32, 32)
 w4.DRAW_COLORS^ = 2
 
 w4.rect(10, 10, 32, 32)
+```
+
+```penne
+DRAW_COLORS = 2;
+
+rect(10, 10, 32, 32);
 ```
 
 ```porth
@@ -235,6 +265,10 @@ w4.trace("Hello world!");
 trace("Hello world!");
 ```
 
+```c3
+w4::trace("Hello world!");
+```
+
 ```d
 w4.trace("Hello world!");
 ```
@@ -253,6 +287,10 @@ trace("Hello world!")
 
 ```odin
 w4.trace("Hello world!")
+```
+
+```penne
+trace("Hello world!");
 ```
 
 ```porth

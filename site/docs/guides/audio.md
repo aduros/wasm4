@@ -37,6 +37,10 @@ w4.tone(262, 60, 100, w4.TONE_PULSE1);
 tone(262, 60, 100, TONE_PULSE1);
 ```
 
+```c3
+w4::tone(262, 60, 100, w4::TONE_PULSE1);
+```
+
 ```d
 w4.tone(262, 60, 100, w4.tonePulse1);
 ```
@@ -55,6 +59,10 @@ tone(262, 60, 100, TONE_PULSE1)
 
 ```odin
 w4.tone(262, 60, 100, .Pulse1)
+```
+
+```penne
+tone(262, 60, 100, TONE_PULSE1);
 ```
 
 ```porth
@@ -107,6 +115,10 @@ w4.tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_MODE3);
 tone(262, 60, 100, TONE_PULSE1 | TONE_MODE3);
 ```
 
+```c3
+w4::tone(262, 60, 100, w4::TONE_PULSE1 | w4::TONE_MODE3);
+```
+
 ```d
 w4.tone(262, 60, 100, w4.tonePulse1 | w4.toneMode3);
 ```
@@ -125,6 +137,10 @@ tone(262, 60, 100, TONE_PULSE1 or TONE_MODE3)
 
 ```odin
 w4.tone(262, 60, 100, .Pulse1, .Half)
+```
+
+```penne
+tone(262, 60, 100, TONE_PULSE1 | TONE_MODE3);
 ```
 
 ```porth
@@ -173,6 +189,10 @@ w4.tone(262 | (523 << 16), 60, 100, w4.TONE_PULSE1);
 tone(262 | (523 << 16), 60, 100, TONE_PULSE1);
 ```
 
+```c3
+w4::tone(262 | (523 << 16), 60, 100, w4::TONE_PULSE1);
+```
+
 ```d
 w4.tone(262 | (523 << 16), 60, 100, w4.tonePulse1);
 ```
@@ -191,6 +211,10 @@ tone(262 or (523 shl 16), 60, 100, TONE_PULSE1)
 
 ```odin
 w4.tone(262 | (523 << 16), 60, 100, .Pulse1)
+```
+
+```penne
+tone(262 | (523 << 16), 60, 100, TONE_PULSE1);
 ```
 
 ```porth
@@ -260,6 +284,10 @@ w4.tone(262, 60 | (30 << 8), 100, w4.TONE_PULSE1);
 tone(262, 60 | (30 << 8), 100, TONE_PULSE1);
 ```
 
+```c3
+w4::tone(262, 60 | (30 << 8), 100, w4::TONE_PULSE1);
+```
+
 ```d
 w4.tone(262, 60 | (30 << 8), 100, w4.tonePulse1);
 ```
@@ -274,6 +302,10 @@ tone(262, 60 | (30 << 8), 100, TONE_PULSE1)
 
 ```odin
 w4.tone(262, 60 | (30 << 8), 100, .Pulse1)
+```
+
+```penne
+tone(262, 60 | (30 << 8), 100, TONE_PULSE1);
 ```
 
 ```porth
@@ -321,6 +353,10 @@ w4.tone(262, 60, 100, w4.TONE_PULSE1 | w4.TONE_PAN_LEFT);
 tone(262, 60, 100, TONE_PULSE1 | TONE_PAN_LEFT);
 ```
 
+```c3
+w4::tone(262, 60, 100, w4::TONE_PULSE1 | w4::TONE_PAN_LEFT);
+```
+
 ```d
 w4.tone(262, 60, 100, w4.tonePulse1 | w4.tonePanLeft);
 ```
@@ -339,6 +375,10 @@ tone(262, 60, 100, TONE_PULSE1 or TONE_PAN_LEFT)
 
 ```odin
 w4.tone(262, 60, 100, .Pulse1, .Half, .Left)
+```
+
+```penne
+tone(262, 60, 100, TONE_PULSE1 | TONE_PAN_LEFT);
 ```
 
 ```porth
@@ -392,6 +432,50 @@ function toneVolume(peak: i32 = 0, volume: i32 = 0): u32 {
 
 function toneFlags(channel: i32 = 0, mode: i32 = 0, pan: i32 = 0): u32 {
 	return channel | (mode << 2) | (pan << 4);
+}
+```
+
+```c3
+fn uint tone_frequency(uint freq1, uint freq2)
+{
+    return freq1 | (freq2 << 16)
+}
+
+fn uint tone_duration(uint attack, uint decay, uint sustain, uint release)
+{
+    return (attack << 24) | (decay << 16) | sustain | (release << 8)
+}
+
+fn uint tone_volume(uint peak, uint volume)
+{
+    return: (peak << 8) | volume
+}
+
+fn uint tone_flags(uint channel, uint mode, uint pan)
+{
+    return: channel | (mode << 2) | (pan << 4)
+}
+```
+
+```penne
+fn tone_frequency(freq1: u32, freq2: u32) -> u32
+{
+    return: freq1 | (freq2 << 16)
+}
+
+fn tone_duration(attack: u32, decay: u32, sustain: u32, release: u32) -> u32
+{
+    return: (attack << 24) | (decay << 16) | sustain | (release << 8)
+}
+
+fn tone_volume(peak: u32, volume: u32) -> u32
+{
+    return: (peak << 8) | volume
+}
+
+fn tone_flags(channel: u32, mode: u32, pan: u32) -> u32
+{
+    return: channel | (mode << 2) | (pan << 4)
 }
 ```
 

@@ -16,6 +16,15 @@ WASM-4 is still very early in development, but everyone is welcome to contribute
 
 ## Events
 
+The [second game jam](https://itch.io/jam/wasm4-v2/entries) took place on August 12th to 21st, 2022. The top 4 entries were:
+
+<div className="row margin-bottom--lg">
+    <PlayButton slug="journey-to-entorus" title="Journey to Entorus" author="Marcus Ramse" colWidth="3"/>
+    <PlayButton slug="first-flight" title="First Flight" author="bootra" colWidth="3"/>
+    <PlayButton slug="disk-0-madness" title="disk-0 MADNESS" author="Max Curzi" colWidth="3"/>
+    <PlayButton slug="samurai-revenge" title="Samurai Revenge" author="Krylan & Dominik Koperkiewicz" colWidth="3"/>
+</div>
+
 The [first game jam](https://itch.io/jam/wasm4/entries) took place on January 14th to 23rd, 2022. The top 4 entries were:
 
 <div className="row margin-bottom--lg">
@@ -41,13 +50,10 @@ There are many ways to contribute, here are just a few ideas:
 Here are WASM-4's goals for the future:
 
 - Grow and support a friendly open source community.
-- Add a pause button and options menu to the emulator.
 - First-class support for new languages: [Swift](https://swiftwasm.org/),
   [Ruby](https://crystal-lang.org), [C#](https://github.com/yowl/csharp-wasm4).
 - Port the C runtime to low end handheld devices.
 - Support importing and playing music from [Beepbox](https://www.beepbox.co) and other tools.
-- Improve responsiveness of the virtual gamepad on mobile.
-- Netplay support.
 
 ## Credits
 

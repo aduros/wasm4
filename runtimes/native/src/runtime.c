@@ -14,6 +14,7 @@
 
 #define SYSTEM_PRESERVE_FRAMEBUFFER 1
 
+#pragma pack(1)
 typedef struct {
     uint8_t _padding[4];
     uint32_t palette[4];
@@ -27,6 +28,7 @@ typedef struct {
     uint8_t framebuffer[WIDTH*HEIGHT>>2];
     uint8_t _user[58976];
 } Memory;
+#pragma pack()
 
 typedef struct {
     Memory memory;
@@ -55,7 +57,7 @@ void w4_runtimeInit (uint8_t* memoryBytes, w4_Disk* diskBytes) {
     w4_write16LE(&memory->mouseY, 0x7fff);
 
     w4_apuInit();
-    w4_framebufferInit(&memory->drawColors, memory->framebuffer);
+    w4_framebufferInit(memory->drawColors, memory->framebuffer);
 }
 
 void w4_runtimeSetGamepad (int idx, uint8_t gamepad) {

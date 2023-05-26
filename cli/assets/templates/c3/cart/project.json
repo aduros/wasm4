@@ -1,0 +1,32 @@
+{
+  // language version of C3
+  "langrev": "1",
+  // warnings used for all targets
+  "warnings": [ "no-unused" ],
+  // directories where C3 library files may be found
+  "dependency-search-paths": [ "lib" ],
+  // libraries to use for all targets
+  "dependencies": [ ],
+  // authors, optionally with email
+  "authors": [ "John Doe <john.doe@example.com>" ],
+  // Version using semantic versioning
+  "version": "0.1.0",
+  // sources compiled for all targets
+  "sources": [ "src/**" ],
+  "memory-env": "tiny",
+  "target" : "wasm32",
+  "nolibc" : true,
+  "no-entry" : true,
+  "link-args" : [ "--lto-O3", "--strip-all", "--gc-sections", "-zstack-size=14752", "--initial-memory=65536", "--import-memory", "--stack-first", "--max-memory=65536"],
+  "opt" : "Oz+",
+  // Targets
+  "targets": {
+    "cart": {
+      // executable or library
+      "type": "executable",
+      "debug-info" : "none"
+      // additional libraries, sources
+      // and overrides of global settings here
+    },
+  }
+}

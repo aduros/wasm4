@@ -17,18 +17,18 @@ pub const SCREEN_SIZE: u32 = 160;
 // │                                                                           │
 // └───────────────────────────────────────────────────────────────────────────┘
 
-pub const PALETTE: *mut [u32; 4] = 0x04 as *mut [u32; 4];
-pub const DRAW_COLORS: *mut u16 = 0x14 as *mut u16;
-pub const GAMEPAD1: *const u8 = 0x16 as *const u8;
-pub const GAMEPAD2: *const u8 = 0x17 as *const u8;
-pub const GAMEPAD3: *const u8 = 0x18 as *const u8;
-pub const GAMEPAD4: *const u8 = 0x19 as *const u8;
-pub const MOUSE_X: *const i16 = 0x1a as *const i16;
-pub const MOUSE_Y: *const i16 = 0x1c as *const i16;
-pub const MOUSE_BUTTONS: *const u8 = 0x1e as *const u8;
-pub const SYSTEM_FLAGS: *mut u8 = 0x1f as *mut u8;
-pub const NETPLAY: *const u8 = 0x20 as *const u8;
-pub const FRAMEBUFFER: *mut [u8; 6400] = 0xa0 as *mut [u8; 6400];
+pub const PALETTE: *mut [u32; 4] = 0x04 as _;
+pub const DRAW_COLORS: *mut u16 = 0x14 as _;
+pub const GAMEPAD1: *const u8 = 0x16 as _;
+pub const GAMEPAD2: *const u8 = 0x17 as _;
+pub const GAMEPAD3: *const u8 = 0x18 as _;
+pub const GAMEPAD4: *const u8 = 0x19 as _;
+pub const MOUSE_X: *const i16 = 0x1a as _;
+pub const MOUSE_Y: *const i16 = 0x1c as _;
+pub const MOUSE_BUTTONS: *const u8 = 0x1e as _;
+pub const SYSTEM_FLAGS: *mut u8 = 0x1f as _;
+pub const NETPLAY: *const u8 = 0x20 as _;
+pub const FRAMEBUFFER: *mut [u8; 6400] = 0xa0 as _;
 
 pub const BUTTON_1: u8 = 1;
 pub const BUTTON_2: u8 = 2;
@@ -135,7 +135,7 @@ extern "C" {
 }
 
 /// Draws text using the built-in system font.
-pub fn text<T: AsRef<str>>(text: T, x: i32, y: i32) {
+pub fn text<T: AsRef<[u8]>>(text: T, x: i32, y: i32) {
     let text_ref = text.as_ref();
     unsafe { extern_text(text_ref.as_ptr(), text_ref.len(), x, y) }
 }

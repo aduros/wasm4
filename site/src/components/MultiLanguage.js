@@ -9,11 +9,13 @@ import "./MultiLanguage.css";
 const names = {
     "assemblyscript": "AssemblyScript",
     "c": "C / C++",
+    "c3": "C3",
     "d": "D",
     "go": "Go",
     "nelua": "Nelua",
     "nim": "Nim",
     "odin": "Odin",
+    "penne": "Penne",
     "porth": "Porth",
     "roland": "Roland",
     "rust": "Rust",
@@ -97,8 +99,8 @@ function useLanguageCode() {
 
 
 export default function MultiLanguage (props) {
-    const languages = props.languages;
     const children = Children.toArray(props.children);
+    const languages = children.map(child => child.props.value);
     const { activeLang } = useLanguageCode();
     const history = useHistory();
     const activeSupportedLang =

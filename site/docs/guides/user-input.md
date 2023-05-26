@@ -31,6 +31,15 @@ if (gamepad & BUTTON_RIGHT) {
 }
 ```
 
+```c3
+char gamepad = *w4::GAMEPAD1;
+
+if (gamepad & w4::BUTTON_RIGHT) 
+{
+    w4::trace("Right button is down!");
+}
+```
+
 ```d
 ubyte gamepad = *w4.gamepad1;
 
@@ -65,6 +74,13 @@ if bool(gamepad and BUTTON_RIGHT):
 ```odin
 if .RIGHT in w4.GAMEPAD1^ {
     w4.trace("Right button is down!")
+}
+```
+
+```penne
+if GAMEPAD1 & BUTTON_RIGHT != 0
+{
+    trace("Right button is down!");
 }
 ```
 
@@ -170,6 +186,24 @@ void update () {
 }
 ```
 
+```c3
+char previous_gamepad;
+
+fn void update () 
+{
+    char gamepad = *w4::GAMEPAD1;
+
+    // Only the buttons that were pressed down this frame
+    char pressed_this_frame = gamepad & (gamepad ^ previous_gamepad);
+    previous_gamepad = gamepad;
+
+    if (pressed_this_frame & w4::BUTTON_RIGHT) 
+    {
+        w4::trace("Right button was just pressed!");
+    }
+}
+```
+
 ```d
 ubyte previousGamepad;
 
@@ -249,6 +283,22 @@ update :: proc "c" () {
     if .RIGHT in pressed_this_frame {
         w4.trace("Right button was just pressed!")
     }
+```
+
+```penne
+const PREVIOUS_GAMEPAD: &u8 = 0xF700;
+
+pub extern fn update()
+{
+    // Only the buttons that were pressed down this frame.
+    var pressed_this_frame = GAMEPAD & (GAMEPAD ^ PREVIOUS_GAMEPAD);
+    PREVIOUS_GAMEPAD = GAMEPAD;
+
+    if pressed_this_frame & BUTTON_RIGHT != 0
+    {
+        trace("Right button was just pressed!");
+    }
+}
 ```
 
 ```porth
@@ -373,6 +423,38 @@ export function update (): void {
     } else {
         store<u16>(w4.DRAW_COLORS, 2);
         w4.rect(mouseX - 4, mouseY - 4, 8, 8);
+    }
+}
+```
+
+```c3
+fn void update() @wasm()
+{
+    if (*w4::MOUSE & *w4::MOUSE_LEFT != 0)
+    {
+        *w4::DRAW_COLORS = 4;
+        w4::rect(*w4::MOUSE_X - 8, *w4::MOUSE_Y - 8, 16, 16);
+    }
+    else
+    {
+        *w4::DRAW_COLORS = 2;
+        w4::rect(*w4::MOUSE_X - 4, *w4::MOUSE_Y - 4, 8, 8);
+    }
+}
+```
+
+```penne
+pub extern update()
+{
+    if MOUSE & MOUSE_LEFT != 0
+    {
+        DRAW_COLORS = 4;
+        rect(MOUSE_X as i32 - 8, MOUSE_Y as i32 - 8, 16, 16);
+    }
+    else
+    {
+        DRAW_COLORS = 2;
+        rect(MOUSE_X as i32 - 4, MOUSE_Y as i32 - 4, 8, 8);
     }
 }
 ```

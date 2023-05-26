@@ -124,7 +124,11 @@ export class App extends LitElement {
                 // Load the cart from a url
                 const cartUrl = utils.getUrlParam("url") ?? "cart.wasm";
                 const res = await fetch(cartUrl);
-                return new Uint8Array(await res.arrayBuffer());
+                if (res.ok) {
+                    return new Uint8Array(await res.arrayBuffer());
+                } else {
+                    throw new Error(`Could not load cart at url: ${cartUrl}`);
+                }
             }
         }
 
@@ -154,7 +158,7 @@ export class App extends LitElement {
             },
         };
         if (import.meta.env.DEV) {
-            devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager())
+            devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager());
         }
 
         if (!this.netplay) {

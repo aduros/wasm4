@@ -359,7 +359,7 @@ void w4_framebufferRect (int x, int y, int width, int height) {
         }
 
         // Right edge
-        if (endXUnclamped >= 0 && endXUnclamped <= WIDTH) {
+        if (endXUnclamped > 0 && endXUnclamped <= WIDTH) {
             for (int yy = startY; yy < endY; ++yy) {
                 drawPoint(strokeColor, endXUnclamped - 1, yy);
             }
@@ -371,7 +371,7 @@ void w4_framebufferRect (int x, int y, int width, int height) {
         }
 
         // Bottom edge
-        if (endYUnclamped >= 0 && endYUnclamped <= HEIGHT) {
+        if (endYUnclamped > 0 && endYUnclamped <= HEIGHT) {
             drawHLine(strokeColor, startX, endYUnclamped - 1, endX);
         }
     }
@@ -413,27 +413,34 @@ void w4_framebufferOval (int x, int y, int width, int height) {
                             // one (overlapping the top line) for even heights
 
     // Error increments. Also known as the decision parameters
-    int dx = 4 * (1 - a) * b * b;
-    int dy = 4 * (b1 + 1) * a * a;
+    const int a2 = a * a;
+    const int b2 = b * b;
+    
+    int dx = 4 * (1 - a) * b2;
+    int dy = 4 * (b1 + 1) * a2;
 
     // Error of 1 step
-    int err = dx + dy + b1 * a * a;
+    int err = dx + dy + b1 * a2;
 
-    a *= 8 * a;
-    b1 = 8 * b * b;
+    a = 8 * a2;
+    b1 = 8 * b2;
 
     do {
         drawPointUnclipped(strokeColor, east, north); /*   I. Quadrant     */
         drawPointUnclipped(strokeColor, west, north); /*   II. Quadrant    */
         drawPointUnclipped(strokeColor, west, south); /*   III. Quadrant   */
         drawPointUnclipped(strokeColor, east, south); /*   IV. Quadrant    */
-        const start = west + 1;
-        const len = east - start;
+
+        const int start = west + 1;
+        const int len = east - start;
+
         if (dc0 != 0 && len > 0) { // Only draw fill if the length from west to east is not 0
             drawHLineUnclipped(fillColor, start, north, east); /*   I and III. Quadrant */
             drawHLineUnclipped(fillColor, start, south, east); /*  II and IV. Quadrant */
         }
-        const err2 = 2 * err;
+
+        const int err2 = 2 * err;
+
         if (err2 <= dy) {
             // Move vertical scan
             north += 1;
@@ -441,7 +448,8 @@ void w4_framebufferOval (int x, int y, int width, int height) {
             dy += a;
             err += dy;
         }
-        if (err2 >= dx || 2 * err > dy) {
+
+        if (err2 >= dx || err2 > dy) {
             // Move horizontal scan
             west += 1;
             east -= 1;
@@ -500,40 +508,46 @@ void w4_framebufferLine (int x1, int y1, int x2, int y2) {
 }
 
 void w4_framebufferText (const uint8_t* str, int x, int y) {
-    for (int currentX = x; *str != '\0'; ++str) {
+    for (int currentX = x; *str; ++str) {
         if (*str == 10) {
             y += 8;
             currentX = x;
-        } else {
+        } else if (*str >= 32 && *str <= 255) {
             w4_framebufferBlit(font, currentX, y, 8, 8, 0, (*str - 32) << 3, 8,
                 false, false, false, false);
+            currentX += 8;
+        } else {
             currentX += 8;
         }
     }
 }
 
 void w4_framebufferTextUtf8 (const uint8_t* str, int byteLength, int x, int y) {
-    for (int currentX = x; byteLength > 0; ++str, --byteLength) {
+    for (int currentX = x; byteLength > 0 && *str; ++str, --byteLength) {
         if (*str == 10) {
             y += 8;
             currentX = x;
-        } else {
+        } else if (*str >= 32 && *str <= 255) {
             w4_framebufferBlit(font, currentX, y, 8, 8, 0, (*str - 32) << 3, 8,
                 false, false, false, false);
+            currentX += 8;
+        } else {
             currentX += 8;
         }
     }
 }
 
 void w4_framebufferTextUtf16 (const uint16_t* str, int byteLength, int x, int y) {
-    for (int currentX = x; byteLength > 0; ++str, byteLength -= 2) {
+    for (int currentX = x; byteLength > 0 && *str; ++str, byteLength -= 2) {
         uint16_t c = w4_read16LE(str);
         if (c == 10) {
             y += 8;
             currentX = x;
-        } else {
+        } else if (c >= 32 && c <= 255) {
             w4_framebufferBlit(font, currentX, y, 8, 8, 0, (c - 32) << 3, 8,
                 false, false, false, false);
+            currentX += 8;
+        } else {
             currentX += 8;
         }
     }

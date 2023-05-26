@@ -46,6 +46,19 @@ const uint8_t smiley[] = {
 };
 ```
 
+```c3
+const char[*] SMILEY = {
+    0b11000011,
+    0b10000001,
+    0b00100100,
+    0b00100100,
+    0b00000000,
+    0b00100100,
+    0b10011001,
+    0b11000011,
+};
+```
+
 ```d
 immutable ubyte[] smiley = [
     0b11000011,
@@ -109,6 +122,19 @@ smiley := [8]u8 {
     0b10011001,
     0b11000011,
 }
+```
+
+```penne
+const SMILEY: [8]u8 = [
+    0b11000011,
+    0b10000001,
+    0b00100100,
+    0b00100100,
+    0b00000000,
+    0b00100100,
+    0b10011001,
+    0b11000011,
+];
 ```
 
 ```porth
@@ -190,6 +216,10 @@ w4.blit(smiley, 10, 10, 8, 8, w4.BLIT_1BPP);
 blit(smiley, 10, 10, 8, 8, BLIT_1BPP);
 ```
 
+```c3
+w4::blit(&smiley, 10, 10, 8, 8, w4::BLIT_1BPP);
+```
+
 ```d
 w4.blit(smiley.ptr, 10, 10, 8, 8, w4.blit1Bpp);
 ```
@@ -211,6 +241,10 @@ blit(addr smiley[0], 10, 10, 8, 8, BLIT_1BPP)
 // To use BLIT_2BPP:
 // w4.blit(&smiley[0], 10, 10, 8, 8, { .USE_2BPP })
 w4.blit(&smiley[0], 10, 10, 8, 8)
+```
+
+```penne
+blit(SMILEY, 10, 10, 8, 8, BLIT_1BPP);
 ```
 
 ```porth
@@ -259,6 +293,10 @@ w4.blit(smiley, 10, 10, 8, 8, w4.BLIT_1BPP | w4.BLIT_FLIP_Y);
 blit(smiley, 10, 10, 8, 8, BLIT_1BPP | BLIT_FLIP_Y);
 ```
 
+```c3
+w4::blit(&smiley, 10, 10, 8, 8, w4::BLIT_1BPP | w4::BLIT_FLIP_Y);
+```
+
 ```d
 w4.blit(smiley.ptr, 10, 10, 8, 8, w4.blit1Bpp | w4.blitFlipY);
 ```
@@ -280,6 +318,10 @@ blit(addr smiley[0], 10, 10, 8, 8, BLIT_1BPP or BLIT_FLIP_Y);
 // To use BLIT_2BPP:
 // w4.blit(&smiley[0], 10, 10, 8, 8, {.USE_2BPP, .FLIPY})
 w4.blit(&smiley[0], 10, 10, 8, 8, {.FLIPY})
+```
+
+```penne
+blit(SMILEY, 10, 10, 8, 8, BLIT_1BPP | BLIT_FLIP_Y);
 ```
 
 ```porth
@@ -347,6 +389,22 @@ const bunny_flags = 1; // BLIT_2BPP
 const bunny = memory.data<u8>([ 0xaa,0x9e,0xac,0xaa,0xaa,0x57,0xbf,0x2a,0xaa,0x57,0xbf,0x2a,0xaa,0x17,0xbf,0x2a,0xaa,0x17,0x03,0x2a,0xaa,0x57,0x54,0x2a,0xa8,0x55,0x55,0x6a,0xa9,0x55,0x05,0x0a,0xaf,0xd5,0x55,0x4a,0xa8,0x75,0x55,0x4a,0xaa,0xd5,0x57,0x2a,0xaa,0x1d,0x7c,0xaa,0xa8,0x75,0x15,0x2a,0xa8,0x45,0x15,0x2a,0xaa,0x10,0x54,0xaa,0xaa,0x85,0x52,0xaa ]);
 ```
 
+```c3
+// bunny
+const BUNNY_WIDTH = 16;
+const BUNNY_HEIGHT = 16;
+const BUNNY_FLAGS = 1; // BLIT_2BPP
+const char[64] BUNNY = { 0xaa,0x9e,0xac,0xaa,0xaa,0x57,0xbf,0x2a,0xaa,0x57,0xbf,0x2a,0xaa,0x17,0xbf,0x2a,0xaa,0x17,0x03,0x2a,0xaa,0x57,0x54,0x2a,0xa8,0x55,0x55,0x6a,0xa9,0x55,0x05,0x0a,0xaf,0xd5,0x55,0x4a,0xa8,0x75,0x55,0x4a,0xaa,0xd5,0x57,0x2a,0xaa,0x1d,0x7c,0xaa,0xa8,0x75,0x15,0x2a,0xa8,0x45,0x15,0x2a,0xaa,0x10,0x54,0xaa,0xaa,0x85,0x52,0xaa };
+```
+
+```penne
+// bunny
+const BUNNY_WIDTH: u32 = 16;
+const BUNNY_HEIGHT: u32 = 16;
+const BUNNY_FLAGS: u32 = 1; // BLIT_2BPP
+const BUNNY: [64]u8 = [ 0xaa,0x9e,0xac,0xaa,0xaa,0x57,0xbf,0x2a,0xaa,0x57,0xbf,0x2a,0xaa,0x17,0xbf,0x2a,0xaa,0x17,0x03,0x2a,0xaa,0x57,0x54,0x2a,0xa8,0x55,0x55,0x6a,0xa9,0x55,0x05,0x0a,0xaf,0xd5,0x55,0x4a,0xa8,0x75,0x55,0x4a,0xaa,0xd5,0x57,0x2a,0xaa,0x1d,0x7c,0xaa,0xa8,0x75,0x15,0x2a,0xa8,0x45,0x15,0x2a,0xaa,0x10,0x54,0xaa,0xaa,0x85,0x52,0xaa ];
+```
+
 ```rust
 const BUNNY_WIDTH: u32 = 16;
 const BUNNY_HEIGHT: u32 = 16;
@@ -363,6 +421,16 @@ Pasting that into our program, we can draw a bunny like so:
 ```typescript
 *DRAW_COLORS = 0x2013;
 blit(bunny, 10, 10, bunny_width, bunny_height, bunny_flags);
+```
+
+```c3
+*w4::DRAW_COLORS = 0x2013;
+w4::blit(&BUNNY, 10, 10, BUNNY_WIDTH, BUNNY_HEIGHT, BUNNY_FLAGS);
+```
+
+```penne
+DRAW_COLORS = 0x2013;
+blit(BUNNY, 10, 10, BUNNY_WIDTH, BUNNY_HEIGHT, BUNNY_FLAGS);
 ```
 
 ```rust
@@ -394,6 +462,17 @@ Basic template:
 #define {{name}}Height {{height}}
 #define {{name}}Flags {{flagsHumanReadable}}
 const uint8_t {{name}}[{{length}}] = { {{bytes}} };
+
+{{/sprites}}
+```
+
+```c3
+{{#sprites}}
+// {{name}}
+const uint {{rustName}}_WIDTH: u32 = {{width}};
+const uint {{rustName}}_HEIGHT: u32 = {{height}};
+const uint {{rustName}}_FLAGS: u32 = {{flags}}; // {{flagsHumanReadable}}
+const char[{{length}}] {{rustName}} = { {{bytes}} };
 
 {{/sprites}}
 ```

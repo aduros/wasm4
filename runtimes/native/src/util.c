@@ -1,8 +1,27 @@
 #include "util.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 #if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #    define W4_BIG_ENDIAN
 #endif
+
+void* xmalloc(size_t size) {
+    void* ptr = malloc(size);
+    if (ptr == NULL) {
+        fputs("Allocation failed.\n", stderr);
+        abort();
+    }
+    return ptr;
+}
+
+void* xrealloc(void* ptr, size_t size) {
+    ptr = realloc(ptr, size);
+    if (ptr == NULL) {
+        fputs("Allocation failed.\n", stderr);
+        abort();
+    }
+}
 
 uint16_t bswap16(uint16_t x) {
     return ((( x  >> 8 ) & 0xffu ) | (( x  & 0xffu ) << 8 ));
@@ -33,7 +52,7 @@ uint32_t w4_read32LE (const uint32_t* ptr) {
 
 void w4_write16LE (uint16_t* ptr, uint16_t value) {
 #ifdef W4_BIG_ENDIAN
-    *ptr = bswap32(value);
+    *ptr = bswap16(value);
 #else
     *ptr = value;
 #endif

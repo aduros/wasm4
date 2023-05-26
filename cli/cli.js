@@ -4,7 +4,7 @@ const { program, Option } = require("commander");
 const pkg = require('./package.json');
 const { supportedIconExtensions } = require('./lib/utils/icon');
 
-const LANGS = ["assemblyscript", "c", "cpp", "d", "go", "nelua", "nim", "odin", "porth", "roland", "rust", "wat", "zig"];
+const LANGS = ["assemblyscript", "c", "c3", "cpp", "d", "go", "nelua", "nim", "odin", "penne", "porth", "roland", "rust", "wat", "zig"];
 const langOption = new Option("--lang <lang>", "Use the given language")
     .env("W4_LANG")
     .choices(LANGS);
@@ -18,6 +18,8 @@ function requireLang (opts) {
         return "assemblyscript";
     } else if (opts.c) {
         return "c";
+    } else if (opts.c3) {
+        return "c3";
     } else if (opts.cpp) {
         return "cpp";
     } else if (opts.d) {
@@ -30,6 +32,8 @@ function requireLang (opts) {
         return "nim";
     } else if (opts.odin) {
         return "odin";
+    } else if (opts.penne) {
+        return "penne";
     } else if (opts.porth) {
         return "porth";
     } else if (opts.roland) {
@@ -50,12 +54,14 @@ const blankProject = (cmd) =>
     cmd
         .option("--as, --assemblyscript", "Create AssemblyScript project (Shorthand for --lang assemblyscript)")
         .option("--c", "Create C project (Shorthand for --lang c)")
+        .option("--c3", "Create C3 project (Shorthand for --lang c3)")
         .option("--cpp", "Create C++ project (Shorthand for --lang cpp)")
         .option("--d", "Create D project (Shorthand for --lang d)")
         .option("--go", "Create Go project (Shorthand for --lang go)")
         .option("--nelua", "Create Nelua project (Shorthand for --lang nelua)")
         .option("--nim", "Create Nim project (Shorthand for --lang nim)")
         .option("--odin", "Create Odin project (Shorthand for --lang odin)")
+        .option("--penne", "Create Penne project (Shorthand for --lang penne)")
         .option("--porth", "Create Porth project (Shorthand for --lang porth)")
         .option("--roland", "Create Roland project (Shorthand for --lang roland)")
         .option("--rs, --rust", "Create Rust project (Shorthand for --lang rust)")
@@ -116,6 +122,11 @@ withCommonRunOptions(program.command("watch"))
 
 withCommonRunOptions(program.command("run <cart>"))
     .description("Open a cartridge in the web runtime")
+    .addOption(
+        new Option("--settle-time <time>", "Changes to the cart must have stopped for at least this long before a reload happens. Increase this if you're getting erroneous double-reloads and cart corruption, decrease it if you want snappier reloads.  In milliseconds.")
+        .env("W4_SETTLE_TIME")
+        .default(300)
+    )
     .action((cart, opts) => {
         const server = require("./lib/server");
         server.start(cart, opts);
@@ -132,11 +143,13 @@ program.command("png2src <images...>")
     .description("Convert images to source code")
     .option("--as, --assemblyscript", "Generate AssemblyScript source (Shorthand for --lang assemblyscript)")
     .option("--c, --cpp", "Generate C/C++ source (Shorthand for --lang c)")
+    .option("--c3", "Generate C3 source (Shorthand for --lang c3)")
     .option("--d", "Generate D source (Shorthand for --lang d)")
     .option("--go", "Generate Go source (Shorthand for --lang go)")
     .option("--nelua", "Generate Nelua source (Shorthand for --lang nelua)")
     .option("--nim", "Generate Nim source (Shorthand for --lang nim)")
     .option("--odin", "Generate Odin source (Shorthand for --lang odin)")
+    .option("--penne", "Generate Penne source (Shorthand for --lang penne)")
     .option("--porth", "Generate Porth source (Shorthand for --lang porth)")
     .option("--roland", "Generate Roland source (Shorthand for --lang roland)")
     .option("--rs, --rust", "Generate Rust source (Shorthand for --lang rust)")

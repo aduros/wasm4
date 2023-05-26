@@ -5,6 +5,7 @@ const classNameToLanguage = {
     "language-typescript": "assemblyscript",
     "language-javascript": "assemblyscript",
     "language-c": "c",
+    "language-c3": "c3",
     "language-cpp": "c",
     "language-d": "d",
     "language-lua": "nelua",
@@ -14,6 +15,7 @@ const classNameToLanguage = {
     "language-rust": "rust",
     "language-go": "go",
     "language-odin": "odin",
+    "language-penne": "penne",
     "language-porth": "porth",
     "language-wasm": "wat",
     "language-zig": "zig",
@@ -21,7 +23,6 @@ const classNameToLanguage = {
 
 export default function MultiLanguageCode (props) {
     const children = Children.toArray(props.children);
-    const languages = children.map(child => classNameToLanguage[child.props.children.props.className]);
     const pages = children.map((child, idx) => (
         <Page key={idx} value={classNameToLanguage[child.props.children.props.className]}>
             {child}
@@ -29,7 +30,7 @@ export default function MultiLanguageCode (props) {
     ));
 
     return (
-        <MultiLanguage languages={languages}>
+        <MultiLanguage>
             { pages }
         </MultiLanguage>
     );

@@ -1,6 +1,6 @@
 {
   "name": "wasm4",
-  "version": "2.5.3",
+  "version": "2.5.4",
   "description": "Build retro games using WebAssembly for a fantasy console.",
   "bin": {
     "w4": "cli.js"
@@ -45,7 +45,7 @@
     "ws": "^7.5.3"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=14"
   },
   "pkg": {
     "assets": "assets/**/*"

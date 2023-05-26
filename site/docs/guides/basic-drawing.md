@@ -24,6 +24,13 @@ PALETTE[2] = 0xeb6b6f;
 PALETTE[3] = 0x7c3f58;
 ```
 
+```c3
+w4::PALETTE[0] = 0xfff6d3;
+w4::PALETTE[1] = 0xf9a875;
+w4::PALETTE[2] = 0xeb6b6f;
+w4::PALETTE[3] = 0x7c3f58;
+```
+
 ```d
 w4.palette[0] = 0xfff6d3;
 w4.palette[1] = 0xf9a875;
@@ -57,6 +64,13 @@ w4.PALETTE[0] = 0xfff6d3
 w4.PALETTE[1] = 0xf9a875
 w4.PALETTE[2] = 0xeb6b6f
 w4.PALETTE[3] = 0x7c3f58
+```
+
+```penne
+PALETTE[0] = 0xfff6d3;
+PALETTE[1] = 0xf9a875;
+PALETTE[2] = 0xeb6b6f;
+PALETTE[3] = 0x7c3f58;
 ```
 
 ```porth
@@ -104,6 +118,8 @@ w4.PALETTE.* = .{
 
 </MultiLanguageCode>
 
+The palette colors are considered to be numbered 1-4, even though they may accessed with indices 0-3.
+
 The default Gameboy-ish palette looks like this:
 
 <div className="row row--no-gutters">
@@ -117,11 +133,17 @@ The first color in the palette register is used as the screen background color.
 
 ## The `DRAW_COLORS` Register
 
-All drawing functions are affected by the `DRAW_COLORS` memory register. `DRAW_COLORS` is a 16 bit value that can store up to 4 colors, using 4 bits each.
+`DRAW_COLORS` is a set of 4 indexes into `PALLETE`. Drawing functions use these indexes to
+decide which colors to use, and what to use them for.
 
-For example, `rect()` uses the first draw color for the fill color, and the
-second draw color as the outline color. To draw a light-green (palette color 2)
-rectangle with a black (palette color 4) outline:
+`DRAW_COLORS` is a 16 bit value that holds 4 indexes. Bits 0-3 (the least significant bits)
+hold the first draw color, bits 4-7 hold the second draw color, and so on.
+
+Setting a draw color to `1` means use `PALLETE` color 1 for that draw color. The same applies
+when setting a draw color to `2`, `3`, or `4`.
+
+For example, `rect()` uses the first draw color for the fill color, and the second draw color
+as the outline color. To draw a light-green (palette color 2) rectangle with a black (palette color 4) outline:
 
 <MultiLanguageCode>
 
@@ -133,6 +155,11 @@ w4.rect(10, 10, 32, 32);
 ```c
 *DRAW_COLORS = 0x42;
 rect(10, 10, 32, 32);
+```
+
+```c3
+*w4::DRAW_COLORS = 0x42;
+w4::rect(10, 10, 32, 32);
 ```
 
 ```d
@@ -158,6 +185,11 @@ rect(10, 10, 32, 32)
 ```odin
 w4.DRAW_COLORS^ = 0x42
 w4.rect(10, 10, 32, 32)
+```
+
+```penne
+DRAW_COLORS = 0x42;
+rect(10, 10, 32, 32);
 ```
 
 ```porth
@@ -190,7 +222,7 @@ w4.rect(10, 10, 32, 32);
 
 </MultiLanguageCode>
 
-A value of `0` in a draw color means it will be transparent. For example, to
+However, setting a draw color to `0` will make it transparent. For example, to
 draw a black outlined rectangle with no fill, set `DRAW_COLORS` to `0x40`.
 
 ## Other Shapes
@@ -212,6 +244,10 @@ memory.fill(w4.FRAMEBUFFER, 3 | (3 << 2) | (3 << 4) | (3 << 6), 160*160/4);
 
 ```c
 memset(FRAMEBUFFER, 3 | (3 << 2) | (3 << 4) | (3 << 6), 160*160/4);
+```
+
+```c3
+mem::set(w4::FRAMEBUFFER, 3 | (3 << 2) | (3 << 4) | (3 << 6), 160*160/4);
 ```
 
 ```d
@@ -239,6 +275,21 @@ for i in 0..<len(FRAMEBUFFER[]):
 ```odin
 for _, i in w4.FRAMEBUFFER {
     w4.FRAMEBUFFER[i] = 3 | (3 << 2) | (3 << 4) | (3 << 6)
+}
+```
+
+```penne
+{
+    var i = 0;
+    var value = 3 | (3 << 2) | (3 << 4) | (3 << 6);
+    {
+        if i == |FRAMEBUFFER|
+            goto end;
+        FRAMEBUFFER[i] = value;
+        i = i + 1;
+        loop;
+    }
+    end:
 }
 ```
 
@@ -302,7 +353,7 @@ function pixel (x: i32, y: i32): void {
 
     // Use the first DRAW_COLOR as the pixel color.
     const palette_color = u8(load<u16>(w4.DRAW_COLORS) & 0b1111);
-    if (color == 0) {
+    if (palette_color == 0) {
         // Transparent
         return;
     }
@@ -324,7 +375,7 @@ void pixel (int x, int y) {
 
     // Use the first DRAW_COLOR as the pixel color
     int palette_color = *DRAW_COLORS & 0b1111;
-    if (color == 0) {
+    if (palette_color == 0) {
         // Transparent
         return;
     }
@@ -332,6 +383,30 @@ void pixel (int x, int y) {
 
     // Write to the framebuffer
     FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask);
+}
+```
+
+```c3
+fn void pixel(int x, int y) 
+{
+    // The byte index into the framebuffer that contains (x, y)
+    int idx = (y * 160 + x) >> 2;
+
+    // Calculate the bits within the byte that corresponds to our position
+    int shift = (x & 0b11) << 1;
+    int mask = 0b11 << shift;
+
+    // Use the first DRAW_COLOR as the pixel color
+    int palette_color = *w4::DRAW_COLORS & 0b1111;
+    if (palette_color == 0) 
+    {
+        // Transparent
+        return;
+    }
+    int color = (palette_color - 1) & 0b11;
+
+    // Write to the framebuffer
+    w4::FRAMEBUFFER[idx] = (color << shift) | (w4::FRAMEBUFFER[idx] & ~mask);
 }
 ```
 
@@ -391,11 +466,12 @@ local function pixel(x: integer, y: integer)
 
     -- Use the first DRAW_COLOR as the pixel color
     local palette_color = $DRAW_COLORS & 0b1111
-    if (palette_color == 0) {
-        // Transparent
-        return;
-    }
-    var color = (palette_color - 1) & 0b11;
+    if (palette_color == 0) then
+        -- Transparent
+        return
+    end
+    
+    local color = (palette_color - 1) & 0b11;
 
     -- Write to the framebuffer
     FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & ~mask)
@@ -442,6 +518,33 @@ pixel :: proc "c" (x : int, y : int) {
 
     // Write to the framebuffer
     w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &~ mask)
+}
+```
+
+
+```penne
+fn pixel(x: i32, y: i32)
+{
+    // The byte index into the framebuffer that contains (x, y).
+    var idx = ((y as u32 * SCREEN_SIZE + x as u32) >> 2) as usize;
+
+    // Calculate the bits within the byte that corresponds to our position.
+    var shift = (x as u8 & 0b11) << 1;
+    var mask = 0b11 << shift;
+
+    // Use the first DRAW_COLOR as the pixel color.
+    var palette_color = (DRAW_COLORS & 0b1111) as u8;
+    if palette_color == 0
+    {
+        // Transparent
+        goto end;
+    }
+    var color = (palette_color - 1) & 0b11;
+
+    // Write to the framebuffer.
+    FRAMEBUFFER[idx] = (color << shift) | (FRAMEBUFFER[idx] & !mask);
+
+    end:
 }
 ```
 

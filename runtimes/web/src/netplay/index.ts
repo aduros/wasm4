@@ -244,7 +244,7 @@ export class Netplay {
         this.createRemotePlayer(connection, peerId).then(remotePlayer => {
             remotePlayer.sendMessage({ type: "JOIN_REQUEST" });
         }, error => {
-            this.runtime.blueScreen(new Error("Failed to connect\nto peer. They may\nbe offline?"));
+            this.runtime.blueScreen("Failed to connect\nto peer. They may\nbe offline?");
         });
     }
 
@@ -391,7 +391,7 @@ export class Netplay {
             } break;
 
             case "JOIN_REJECT": {
-                this.runtime.blueScreen(new Error("Connected, but the\ngame is already\nfull!"));
+                this.runtime.blueScreen("Connected, but the\ngame is already\nfull!");
                 this.close();
             } break;
 

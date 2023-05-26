@@ -24,6 +24,16 @@ const uint8_t {{name}}[{{length}}] = { {{bytes}} };
 
 {{/sprites}}`,
 
+    c3:
+        `{{#sprites}}
+// {{name}}
+const uint {{rustName}}_WIDTH = {{width}};
+const uint {{rustName}}_HEIGHT = {{height}};
+const uint {{rustName}}}_FLAGS = {{flag}}; // {{flagsHumanReadable}}
+const char[{{length}}] {{rustName}} = { {{bytes}} };
+
+{{/sprites}}`,
+
     d:
         `{{#sprites}}
 // {{name}}
@@ -71,6 +81,16 @@ var {{name}}: array[{{length}}, uint8] = [{{firstByte}}'u8,{{restBytes}}]
 {{odinName}}_height : u32 : {{height}}
 {{odinName}}_flags : w4.Blit_Flags : {{odinFlags}} // {{flagsHumanReadable}}
 {{odinName}} := [{{length}}]u8{ {{bytes}} }
+
+{{/sprites}}`,
+
+    penne:
+        `{{#sprites}}
+// {{name}}
+const {{rustName}}_WIDTH: u32 = {{width}};
+const {{rustName}}_HEIGHT: u32 = {{height}};
+const {{rustName}}_FLAGS: u32 = {{flags}}; // {{flagsHumanReadable}}
+const {{rustName}}: [{{length}}]u8 = [ {{bytes}} ];
 
 {{/sprites}}`,
 

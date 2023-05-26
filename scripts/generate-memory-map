@@ -1,68 +1,109 @@
 #!/usr/bin/env node
 
+const SCREEN_SIZE = 160;
+const PIXELS_PER_BYTE = 4;
+const FRAMEBUFFER_SIZE_BYTES = SCREEN_SIZE * SCREEN_SIZE / PIXELS_PER_BYTE;
+
 const memory = {
     _PAD_START: 4,
 
-    PALETTE: 4*4,
-    DRAW_COLORS: 2,
-    // CLIP_X: 1,
-    // CLIP_Y: 1,
-    // CLIP_WIDTH: 1,
-    // CLIP_HEIGHT: 1,
+    PALETTE: 4*4, // 0x04
+    DRAW_COLORS: 2, // 0x14
 
-    GAMEPAD1: 1,
-    GAMEPAD2: 1,
-    GAMEPAD3: 1,
-    GAMEPAD4: 1,
-    MOUSE_X: 2,
-    MOUSE_Y: 2,
-    MOUSE_BUTTONS: 1,
+    GAMEPAD1: 1, // 0x16
+    GAMEPAD2: 1, // 0x17
+    GAMEPAD3: 1, // 0x18
+    GAMEPAD4: 1, // 0x19
+    MOUSE_X: 2, // 0x1a
+    MOUSE_Y: 2, // 0x1c
+    MOUSE_BUTTONS: 1, // 0x1e
 
-    SYSTEM_FLAGS: 1,
-    NETPLAY: 1,
+    SYSTEM_FLAGS: 1, // 0x1f
+    NETPLAY: 1, // 0x20
 
     _RESERVED: 127,
 
     // Framebuffer should be 64 bit aligned
-    FRAMEBUFFER: 160*160 >> 2,
+    FRAMEBUFFER: FRAMEBUFFER_SIZE_BYTES, // 0xa0
 };
 
 const cTypes = {
     PALETTE: "uint32_t",
     DRAW_COLORS: "uint16_t",
+    GAMEPAD1: "const uint8_t",
+    GAMEPAD2: "const uint8_t",
+    GAMEPAD3: "const uint8_t",
+    GAMEPAD4: "const uint8_t",
     MOUSE_X: "const int16_t",
     MOUSE_Y: "const int16_t",
+    MOUSE_BUTTONS: "const uint8_t",
     SYSTEM_FLAGS: "uint8_t",
+    NETPLAY: "const uint8_t",
     FRAMEBUFFER: "uint8_t",
 };
 
 const rustTypes = {
-    // TODO(2021-08-10)
+    PALETTE: "*mut [u32; 4]",
+    DRAW_COLORS: "*mut u16",
+    GAMEPAD1: "*const u8",
+    GAMEPAD2: "*const u8",
+    GAMEPAD3: "*const u8",
+    GAMEPAD4: "*const u8",
+    MOUSE_X: "*const i16",
+    MOUSE_Y: "*const i16",
+    MOUSE_BUTTONS: "*const u8",
+    SYSTEM_FLAGS: "*mut u8",
+    NETPLAY: "*const u8",
+    FRAMEBUFFER: "*mut [u8; 6400]",
 };
 
 const goTypes = {
     PALETTE: "[4]uint32",
     DRAW_COLORS: "uint16",
+    GAMEPAD1: "uint8",
+    GAMEPAD2: "uint8",
+    GAMEPAD3: "uint8",
+    GAMEPAD4: "uint8",
     MOUSE_X: "int16",
     MOUSE_Y: "int16",
+    MOUSE_BUTTONS: "uint8",
+    SYSTEM_FLAGS: "uint8",
+    NETPLAY: "uint8",
     FRAMEBUFFER: "[6400]uint8",
 };
 
 const neluaTypes = {
-    PALETTE: "uint32",
+    PALETTE: "[4]uint32",
     DRAW_COLORS: "uint16",
+    GAMEPAD1: "uint8",
+    GAMEPAD2: "uint8",
+    GAMEPAD3: "uint8",
+    GAMEPAD4: "uint8",
     MOUSE_X: "int16",
     MOUSE_Y: "int16",
+    MOUSE_BUTTONS: "uint8",
     SYSTEM_FLAGS: "uint8",
-    FRAMEBUFFER: "uint8",
+    NETPLAY: "uint8",
+    FRAMEBUFFER: "[6400]uint8",
 };
 
-function generate (fn) {
+function generateDefinitions(generateDefinition, types) {
+    if (generateDefinition.length >= 3 && types === undefined) {
+        throw new Error("Type-strings must be passed");
+    }
     let p = 0;
     for (let name in memory) {
         if (!name.startsWith("_")) {
             const addr = `0x${p.toString(16).padStart(2, "0")}`;
-            console.log(fn(name, addr));
+            let type;
+            if (types !== undefined) {
+                if (name in types) {
+                    type = types[name];
+                } else {
+                    throw new Error(`Type-string for ${name} not defined`);
+                }
+            }
+            console.log(generateDefinition(name, addr, type));
         }
         p += memory[name];
     }
@@ -70,27 +111,25 @@ function generate (fn) {
 }
 
 console.log("// Runtime constants.js");
-generate((name, addr) => `export const ADDR_${name} = ${addr};`);
+generateDefinitions((name, addr) => `export const ADDR_${name} = ${addr};`);
 
 console.log("// C");
-generate((name, addr) => `#define ${name} ((${cTypes[name] || "const uint8_t"}*)${addr})`);
-
-// TODO D
+generateDefinitions((name, addr, type) => `#define ${name} ((${type}*)${addr})`, cTypes);
 
 console.log("// AssemblyScript");
-generate((name, addr) => `export const ${name}: usize = ${addr};`);
+generateDefinitions((name, addr) => `export const ${name}: usize = ${addr};`);
 
 console.log("// Rust");
-generate((name, addr) => `pub const ${name}: *const u8 = ${addr} as *const u8;`);
+generateDefinitions((name, addr, type) => `pub const ${name}: ${type} = ${addr} as _;`, rustTypes);
 
 console.log("// Go");
-generate((name, addr) => `var ${name} = (*${goTypes[name] || "uint8"})(unsafe.Pointer(uintptr(${addr})));`);
+generateDefinitions((name, addr, type) => `var ${name} = (*${type})(unsafe.Pointer(uintptr(${addr})));`, goTypes);
 
 console.log("// Nelua");
-generate((name, addr) => `global ${name} <comptime> = (@*${neluaTypes[name] || "uint8"})(${addr})`);
+generateDefinitions((name, addr, type) => `global ${name} <comptime> = (@*${type})(${addr})`, neluaTypes);
 
 var sum = 0;
 for (let name in memory) {
     sum += memory[name];
 }
-console.log("--global-base="+sum);
+console.log("--global-base="+sum); // 6560

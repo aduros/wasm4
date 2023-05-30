@@ -249,7 +249,9 @@ export class Netplay {
     }
 
     getInviteLink (): string {
-        return `https://wasm4.org/netplay/#${this.peerMgr.localPeerId}`;
+        var url = new URL(window.location.href);
+        url.searchParams.set('netplay', this.peerMgr.localPeerId);
+        return url.href;
     }
 
     close () {

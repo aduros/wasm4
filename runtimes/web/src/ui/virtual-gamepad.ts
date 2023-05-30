@@ -28,7 +28,7 @@ export class VirtualGamepad extends LitElement {
         :host {
             display: none;
         }
-        @media (pointer: coarse) {
+        @media (hover: none) {
             :host {
                 display: inherit;
             }

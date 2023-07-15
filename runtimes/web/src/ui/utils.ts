@@ -42,25 +42,29 @@ export async function copyToClipboard (text: string): Promise<void> {
         // Attempt to use the async clipboard API, which is not universally supported
         await navigator.clipboard.writeText(text);
     } catch {
-        // Fall back to using execCommand on a dummy textarea element
-        const textArea = document.createElement('textarea');
+        // Safari does not allow writing to the clipboard outside of user interaction events.
+        // Fallback is to present user with a dialog box from which they can copy the link.
 
-        textArea.value = text;
+        let dialog = document.createElement('dialog');
+        dialog.title = 'Netplay URL';
+        dialog.textContent = text;
+        document.body.append(dialog);
 
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
+        let copyButton = document.createElement('button');
+        copyButton.textContent = 'Copy';
+        copyButton.style.marginLeft = '1em';
+        copyButton.onclick = () => navigator.clipboard.writeText(text);
+        dialog.appendChild(copyButton);
 
-        return new Promise((resolve, reject) => {
-            if (document.execCommand('copy')) {
-                resolve();
-            } else {
-                reject(new Error("Failed to copy to clipboard"));
-            }
-            textArea.remove();
-        });
+        let closeButton = document.createElement('button');
+        closeButton.textContent = 'Close';
+        closeButton.style.marginLeft = '1em';
+        closeButton.onclick = () => {
+          document.body.removeChild(dialog);
+        };
+        dialog.appendChild(closeButton);
+        
+        dialog.showModal();
+        
     }
 }

@@ -459,7 +459,7 @@ const w4 = @import("wasm4.zig");
 pub const Snake = struct {
     // ...
 
-    pub fn draw(this: @This()) void {
+    pub fn draw(this: *@This()) void {
         for(this.body.constSlice()) |part| {
             w4.rect(part.x * 8, part.y * 8, 8, 8);
         }
@@ -1071,7 +1071,7 @@ Since the body is drawn, head is not much of a problem. Simply use the `rect` fu
 The draw function should now look like this:
 
 ```zig {6}
-pub fn draw(this: @This()) void {
+pub fn draw(this: *@This()) void {
     for(this.body.constSlice()) |part| {
         w4.rect(part.x * 8, part.y * 8, 8, 8);
     }
@@ -1103,7 +1103,7 @@ The snippet above reads like this: "Color 1 uses Color 4 of the color palette, C
 If you change the source to
 
 ```zig {6}
-pub fn draw(this: @This()) void {
+pub fn draw(this: *@This()) void {
     for(this.body.constSlice()) |part| {
         w4.rect(part.x * 8, part.y * 8, 8, 8);
     }
@@ -1120,7 +1120,7 @@ Result:
 You'll see a change. The snake changed color. Not only the head, but the complete snake! Once you've set a color, it stays that way. So if you want to change only the head, you have to change Color 1 again. Right before you draw the body.
 
 ```zig {2}
-pub fn draw(this: @This()) void {
+pub fn draw(this: *@This()) void {
     w4.DRAW_COLORS.* = 0x0043;
     for(this.body.constSlice()) |part| {
         w4.rect(part.x * 8, part.y * 8, 8, 8);

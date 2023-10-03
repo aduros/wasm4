@@ -131,10 +131,6 @@ export class App extends LitElement {
             this.netplay.join(hostPeerId);
         } else {
             await runtime.load(await loadCartWasm());
-
-            if (DEV_NETPLAY) {
-                this.copyNetplayLink();
-            }
         }
 
         let devtoolsManager = {
@@ -151,6 +147,10 @@ export class App extends LitElement {
 
         if (!this.netplay) {
             runtime.start();
+        }
+
+        if (DEV_NETPLAY) {
+            this.copyNetplayLink();
         }
 
         if (import.meta.env.DEV) {

@@ -646,9 +646,9 @@ export class App extends LitElement {
             // Take a snapshot
             state = new State();
             state.read(this.runtime);
-        } else {
-            this.runtime.reset(true);
         }
+        this.runtime.reset(true);
+
 
         this.runtime.pauseState |= constants.PAUSE_REBOOTING;
         await this.runtime.load(wasmBuffer);

@@ -725,7 +725,7 @@ What you do, is up to you. You could stop the game and show the score. Or you co
 <Page value="zig">
 
 ```zig
-    pub fn isDead(this: @This()) bool {
+    pub fn isDead(this: *@This()) bool {
         const head = this.body.get(0);
         for (this.body.constSlice()) |part, i| {
             if (i == 0) continue;

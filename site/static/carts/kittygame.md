@@ -1,7 +1,7 @@
 ---
 author: Cannon Tuttle
 github: CanyonTurtle
-date: 2023-11-1
+date: 2023-11-23
 ---
 
 # Kitty Game

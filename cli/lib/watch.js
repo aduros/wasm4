@@ -21,7 +21,7 @@ function start (opts) {
     } else if (fs.existsSync("build.zig")) {
         buildCommand = "zig";
         buildParams = ["build"];
-        buildOutput = "zig-out/lib/cart.wasm";
+        buildOutput = "zig-out/bin/cart.wasm";
 
     } else if (fs.existsSync("cart.nimble")) {
         buildCommand = "nimble";

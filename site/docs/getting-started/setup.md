@@ -368,7 +368,7 @@ zig build -Doptimize=ReleaseSmall
 Run it in WASM-4 with:
 
 ```shell
-w4 run zig-out/lib/cart.wasm
+w4 run zig-out/bin/cart.wasm
 ```
 
 </Page>

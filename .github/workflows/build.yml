@@ -17,7 +17,8 @@ jobs:
                       wasm4: bin/wasm4
                       libretro: lib/wasm4_libretro.dylib
 
-                    - os: ubuntu-latest
+                    # glibc 2.31
+                    - os: ubuntu-20.04
                       artifact: "linux"
                       wasm4: bin/wasm4
                       libretro: lib/wasm4_libretro.so
@@ -33,9 +34,10 @@ jobs:
               with:
                   submodules: true
 
-            - if: matrix.config.os == 'ubuntu-latest'
+            - if: matrix.config.os == 'ubuntu-20.04'
               name: Install local dependencies
               run: |
+                  ldd --version
                   sudo apt update
                   sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libxkbcommon-dev libasound2-dev libpulse-dev
 

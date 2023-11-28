@@ -248,16 +248,18 @@ export class Netplay {
         });
     }
 
-    getInviteLink (): string {
+    async getInviteLink (): Promise<string> {
+        const localPeerId = await this.peerMgr.localPeerId;
+
         const loc = window.location;
         if (loc.protocol == "file:"
             || loc.hostname == "localhost"
             || loc.hostname == "127.0.0.1"
             || loc.hostname == "wasm4.org") {
-            return `https://wasm4.org/netplay/#${this.peerMgr.localPeerId}`;
+            return `https://wasm4.org/netplay/#${localPeerId}`;
         }
-        var url = new URL(loc.href);
-        url.searchParams.set('netplay', this.peerMgr.localPeerId);
+        const url = new URL(loc.href);
+        url.searchParams.set('netplay', localPeerId);
         return url.href;
     }
 

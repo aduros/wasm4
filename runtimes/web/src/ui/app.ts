@@ -621,13 +621,13 @@ export class App extends LitElement {
         this.notifications.show("Disk cleared");
     }
 
-    copyNetplayLink () {
+    async copyNetplayLink () {
         if (!this.netplay) {
             this.netplay = this.createNetplay();
             this.netplay.host();
         }
 
-        utils.copyToClipboard(this.netplay.getInviteLink());
+        utils.copyToClipboard(await this.netplay.getInviteLink());
         this.notifications.show("Netplay link copied to clipboard");
     }
 

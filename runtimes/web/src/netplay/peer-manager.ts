@@ -1,7 +1,15 @@
-import { DEV_NETPLAY } from "./index";
-
 /** WebRTC signaling messages. */
-type Message = OfferMessage | AnswerMessage | CandidateMessage | AbortMessage;
+type Message = WhoAmIRequestMessage | WhoAmIReplyMessage | OfferMessage | AnswerMessage | CandidateMessage | AbortMessage;
+
+/** Sent by a newly connecting client requesting its peer ID. */
+type WhoAmIRequestMessage = {
+    type: "WHOAMI_REQUEST";
+}
+
+type WhoAmIReplyMessage = {
+    type: "WHOAMI_REPLY";
+    yourPeerId: string;
+}
 
 type OfferMessage = {
     type: "OFFER";
@@ -23,15 +31,6 @@ type AbortMessage = {
     type: "ABORT";
 }
 
-function createRandomPeerId () {
-    const base62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    let peerId = "";
-    for (let ii = 0; ii < 22; ++ii) {
-        peerId += base62.charAt(Math.random() * 62 >>> 0);
-    }
-    return peerId;
-}
-
 /**
  * Connects to our websocket server for exchanging the signaling messages needed to establish WebRTC
  * peer-to-peer connections.
@@ -40,8 +39,11 @@ class SignalClient {
     private readonly socket: WebSocket;
     private readonly bufferedOutput: string[] = [];
 
-    constructor (localPeerId: string, onMessage: (source: string, message: Message) => void) {
-        this.socket = new WebSocket(`wss://aduros.com/webrtc-signal-server/?peerId=${encodeURIComponent(localPeerId)}`);
+    constructor (onMessage: (source: string, message: Message) => void) {
+        this.socket = new WebSocket("wss://webrtc-signal-server.wasm4.org");
+        // this.socket = new WebSocket("wss://ywc2h85cv1.execute-api.us-east-1.amazonaws.com/production");
+        // this.socket = new WebSocket("ws://localhost:3001");
+
         this.socket.addEventListener("message", event => {
             const { source, message } = JSON.parse(event.data);
             // console.log(`Received ${message.type} message from ${source}`);
@@ -76,7 +78,7 @@ class SignalClient {
  * Handles brokering P2P connections.
  */
 export class PeerManager {
-    readonly localPeerId: string;
+    readonly localPeerId: Promise<string>;
 
     /** Pending P2P connections that haven't been fully established yet. */
     private readonly connections = new Map<string,RTCPeerConnection>();
@@ -85,15 +87,17 @@ export class PeerManager {
     private readonly signalClient: SignalClient;
 
     constructor (onConnection: (connection: RTCPeerConnection, remotePeerId: string) => void) {
-        if (DEV_NETPLAY) {
-            const host = !location.hash; // Temporary
-            this.localPeerId = host ? "host" : createRandomPeerId();
-        } else {
-            this.localPeerId = createRandomPeerId();
-        }
+        let resolveLocalPeerId: (localPeerId: string) => void;
+        this.localPeerId = new Promise((resolve) => {
+            resolveLocalPeerId = resolve;
+        });
 
-        this.signalClient = new SignalClient(this.localPeerId, async (source, message) => {
+        this.signalClient = new SignalClient(async (source, message) => {
             switch (message.type) {
+            case "WHOAMI_REPLY": {
+                resolveLocalPeerId(message.yourPeerId);
+            } break;
+
             case "OFFER": {
                 if (!this.connections.has(source)) {
                     const connection = this.createConnection(source);
@@ -131,6 +135,10 @@ export class PeerManager {
                 }
             } break;
             }
+        });
+
+        this.signalClient.send("", {
+            type: "WHOAMI_REQUEST",
         });
     }
 

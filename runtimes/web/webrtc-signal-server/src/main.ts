@@ -3,13 +3,12 @@ import { ApiGatewayManagementApiClient, PostToConnectionCommand } from "@aws-sdk
 
 export const handler: APIGatewayProxyWebsocketHandlerV2 = async ({ body, requestContext }) => {
   async function sendToPeer (source: string, target: string, message: object) {
+    const region = process.env.AWS_REGION ?? process.env.AWS_DEFAULT_REGION ?? "us-east-1";
     const client = new ApiGatewayManagementApiClient({
       apiVersion: "2018-11-29",
       endpoint: process.env.IS_OFFLINE
         ? "http://localhost:3001"
-        : requestContext.domainName.endsWith(".wasm4.org")
-        ? `https://${requestContext.apiId}.execute-api.us-east-1.amazonaws.com/${requestContext.stage}`
-        : `https://${requestContext.domainName}/${requestContext.stage}`,
+        : `https://${requestContext.apiId}.execute-api.${region}.amazonaws.com/${requestContext.stage}`,
       credentials: process.env.IS_OFFLINE
         ? { accessKeyId: "offline", secretAccessKey: "offline" }
         : undefined,

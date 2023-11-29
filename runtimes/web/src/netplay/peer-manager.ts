@@ -36,33 +36,55 @@ type AbortMessage = {
  * peer-to-peer connections.
  */
 class SignalClient {
-    private readonly socket: WebSocket;
+    private socket?: WebSocket;
     private readonly bufferedOutput: string[] = [];
 
-    constructor (onMessage: (source: string, message: Message) => void) {
-        this.socket = new WebSocket("wss://webrtc-signal-server.wasm4.org");
-        // this.socket = new WebSocket("wss://ywc2h85cv1.execute-api.us-east-1.amazonaws.com/production");
-        // this.socket = new WebSocket("ws://localhost:3001");
+    constructor (private onMessage: (source: string, message: Message) => void) {
+        this.connect();
+    }
+
+    private async connect (): Promise<void> {
+        // Connect to the first available signal server
+        const servers = [
+            // "ws://localhost:3001",
+            "wss://webrtc-signal-server.wasm4.org",
+        ];
+        for (const server of servers) {
+            try {
+                this.socket = await new Promise((resolve, reject) => {
+                    const socket = new WebSocket(server);
+                    socket.addEventListener("open", () => {
+                        resolve(socket);
+                    });
+                    socket.addEventListener("error", () => {
+                        reject();
+                    });
+                });
+            } catch (error) {
+                console.error(error)
+            }
+        }
+        if (!this.socket) {
+            throw new Error("Unable to connect to signal server");
+        }
 
         this.socket.addEventListener("message", event => {
             const { source, message } = JSON.parse(event.data);
             // console.log(`Received ${message.type} message from ${source}`);
-            onMessage(source, message);
+            this.onMessage(source, message);
         });
 
-        this.socket.addEventListener("open", event => {
-            // Flush the output queue
-            for (const output of this.bufferedOutput) {
-                this.socket.send(output);
-            }
-            this.bufferedOutput.length = 0;
-        });
+        // Flush the output queue
+        for (const output of this.bufferedOutput) {
+            this.socket.send(output);
+        }
+        this.bufferedOutput.length = 0;
     }
 
     send (target: string, message: Message) {
         // console.log(`Sent ${message.type} message to ${target}`);
         const output = JSON.stringify({ target, message });
-        if (this.socket.readyState == 1) {
+        if (this.socket?.readyState == 1) {
             this.socket.send(output);
         } else {
             this.bufferedOutput.push(output);
@@ -70,7 +92,7 @@ class SignalClient {
     }
 
     close () {
-        this.socket.close();
+        this.socket?.close();
     }
 }
 

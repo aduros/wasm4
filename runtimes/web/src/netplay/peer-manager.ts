@@ -9,6 +9,7 @@ type WhoAmIRequestMessage = {
 type WhoAmIReplyMessage = {
     type: "WHOAMI_REPLY";
     yourPeerId: string;
+    iceServers?: RTCIceServer[];
 }
 
 type OfferMessage = {
@@ -120,6 +121,9 @@ export class PeerManager {
     /** Our connection to the signaling server. */
     private readonly signalClient: SignalClient;
 
+    /** The ICE servers we should use to setup RTC connections. */
+    private iceServers?: RTCIceServer[];
+
     constructor (onConnection: (connection: RTCPeerConnection, remotePeerId: string) => void) {
         let resolveLocalPeerId: (localPeerId: string) => void;
         this.localPeerId = new Promise((resolve) => {
@@ -129,6 +133,7 @@ export class PeerManager {
         this.signalClient = new SignalClient(async (source, message) => {
             switch (message.type) {
             case "WHOAMI_REPLY": {
+                this.iceServers = message.iceServers;
                 resolveLocalPeerId(message.yourPeerId);
             } break;
 
@@ -178,37 +183,7 @@ export class PeerManager {
 
     private createConnection (peerId: string): RTCPeerConnection {
         const connection = new RTCPeerConnection({
-            iceServers: [
-                {
-                    urls: "stun:stun.relay.metered.ca:80",
-                },
-                {
-                    urls: "turn:a.relay.metered.ca:80",
-                    username: "f63c9a30d2bfbdb8da7c411b",
-                    credential: "XBVS8RKEGvj2Y6ml",
-                },
-                {
-                    urls: "turn:a.relay.metered.ca:80?transport=tcp",
-                    username: "f63c9a30d2bfbdb8da7c411b",
-                    credential: "XBVS8RKEGvj2Y6ml",
-                },
-                {
-                    urls: "turn:a.relay.metered.ca:443",
-                    username: "f63c9a30d2bfbdb8da7c411b",
-                    credential: "XBVS8RKEGvj2Y6ml",
-                },
-                {
-                    urls: "turn:a.relay.metered.ca:443?transport=tcp",
-                    username: "f63c9a30d2bfbdb8da7c411b",
-                    credential: "XBVS8RKEGvj2Y6ml",
-                },
-                {
-                    urls: "stun:stun.l.google.com:19302",
-                },
-                {
-                    urls: "stun:global.stun.twilio.com:3478",
-                },
-            ],
+            iceServers: this.iceServers,
         });
         this.connections.set(peerId, connection);
 

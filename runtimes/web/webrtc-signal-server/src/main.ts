@@ -28,6 +28,37 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async ({ body, request
         await sendToPeer("server", requestContext.connectionId, {
           type: "WHOAMI_REPLY",
           yourPeerId: requestContext.connectionId,
+          iceServers: [
+              {
+                  urls: "stun:stun.relay.metered.ca:80",
+              },
+              {
+                  urls: "turn:a.relay.metered.ca:80",
+                  username: "f63c9a30d2bfbdb8da7c411b",
+                  credential: "XBVS8RKEGvj2Y6ml",
+              },
+              {
+                  urls: "turn:a.relay.metered.ca:80?transport=tcp",
+                  username: "f63c9a30d2bfbdb8da7c411b",
+                  credential: "XBVS8RKEGvj2Y6ml",
+              },
+              {
+                  urls: "turn:a.relay.metered.ca:443",
+                  username: "f63c9a30d2bfbdb8da7c411b",
+                  credential: "XBVS8RKEGvj2Y6ml",
+              },
+              {
+                  urls: "turn:a.relay.metered.ca:443?transport=tcp",
+                  username: "f63c9a30d2bfbdb8da7c411b",
+                  credential: "XBVS8RKEGvj2Y6ml",
+              },
+              {
+                  urls: "stun:stun.l.google.com:19302",
+              },
+              {
+                  urls: "stun:global.stun.twilio.com:3478",
+              },
+          ],
         });
         break;
       case "KEEPALIVE":

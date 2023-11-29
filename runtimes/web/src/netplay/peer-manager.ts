@@ -179,25 +179,33 @@ export class PeerManager {
         const connection = new RTCPeerConnection({
             iceServers: [
                 {
-                    urls: "stun:openrelay.metered.ca:80",
+                    urls: "stun:stun.relay.metered.ca:80",
                 },
                 {
-                    urls: "turn:openrelay.metered.ca:80",
-                    username: "openrelayproject",
-                    credential: "openrelayproject",
+                    urls: "turn:a.relay.metered.ca:80",
+                    username: "f63c9a30d2bfbdb8da7c411b",
+                    credential: "XBVS8RKEGvj2Y6ml",
                 },
                 {
-                    urls: "turn:openrelay.metered.ca:443",
-                    username: "openrelayproject",
-                    credential: "openrelayproject",
+                    urls: "turn:a.relay.metered.ca:80?transport=tcp",
+                    username: "f63c9a30d2bfbdb8da7c411b",
+                    credential: "XBVS8RKEGvj2Y6ml",
                 },
                 {
-                    urls: "turn:openrelay.metered.ca:443?transport=tcp",
-                    username: "openrelayproject",
-                    credential: "openrelayproject",
+                    urls: "turn:a.relay.metered.ca:443",
+                    username: "f63c9a30d2bfbdb8da7c411b",
+                    credential: "XBVS8RKEGvj2Y6ml",
+                },
+                {
+                    urls: "turn:a.relay.metered.ca:443?transport=tcp",
+                    username: "f63c9a30d2bfbdb8da7c411b",
+                    credential: "XBVS8RKEGvj2Y6ml",
                 },
                 {
                     urls: "stun:stun.l.google.com:19302",
+                },
+                {
+                    urls: "stun:global.stun.twilio.com:3478",
                 },
             ],
         });

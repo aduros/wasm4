@@ -72,6 +72,7 @@ class SignalClient {
                         reject();
                     });
                 });
+                break;
             } catch (error) {
                 console.error(error)
             }

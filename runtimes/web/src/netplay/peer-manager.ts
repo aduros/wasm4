@@ -1,5 +1,5 @@
 /** WebRTC signaling messages. */
-type Message = WhoAmIRequestMessage | WhoAmIReplyMessage | OfferMessage | AnswerMessage | CandidateMessage | AbortMessage;
+type Message = WhoAmIRequestMessage | WhoAmIReplyMessage | OfferMessage | AnswerMessage | CandidateMessage | AbortMessage | KeepaliveMessage;
 
 /** Sent by a newly connecting client requesting its peer ID. */
 type WhoAmIRequestMessage = {
@@ -31,6 +31,10 @@ type AbortMessage = {
     type: "ABORT";
 }
 
+type KeepaliveMessage = {
+    type: "KEEPALIVE";
+}
+
 /**
  * Connects to our websocket server for exchanging the signaling messages needed to establish WebRTC
  * peer-to-peer connections.
@@ -38,9 +42,15 @@ type AbortMessage = {
 class SignalClient {
     private socket?: WebSocket;
     private readonly bufferedOutput: string[] = [];
+    private keepaliveInterval: number;
 
     constructor (private onMessage: (source: string, message: Message) => void) {
         this.connect();
+
+        // Regularly send messages to keep the websocket connection from an idle timeout
+        this.keepaliveInterval = window.setInterval(() => {
+            this.send("", { type: "KEEPALIVE" }, false);
+        }, 15000);
     }
 
     private async connect (): Promise<void> {
@@ -81,18 +91,19 @@ class SignalClient {
         this.bufferedOutput.length = 0;
     }
 
-    send (target: string, message: Message) {
+    send (target: string, message: Message, deferIfNotReady = true) {
         // console.log(`Sent ${message.type} message to ${target}`);
         const output = JSON.stringify({ target, message });
         if (this.socket?.readyState == 1) {
             this.socket.send(output);
-        } else {
+        } else if (deferIfNotReady) {
             this.bufferedOutput.push(output);
         }
     }
 
     close () {
         this.socket?.close();
+        window.clearInterval(this.keepaliveInterval);
     }
 }
 

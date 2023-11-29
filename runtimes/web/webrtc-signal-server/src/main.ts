@@ -23,20 +23,26 @@ export const handler: APIGatewayProxyWebsocketHandlerV2 = async ({ body, request
   if (body) {
     const { target, message } = JSON.parse(body);
 
-    if (message.type === "WHOAMI_REQUEST") {
-      await sendToPeer("server", requestContext.connectionId, {
-        type: "WHOAMI_REPLY",
-        yourPeerId: requestContext.connectionId,
-      });
-    } else {
-      try {
-        await sendToPeer(requestContext.connectionId, target, message);
-      } catch (error) {
-        // Peer not found, send an abort message
-        await sendToPeer(target, requestContext.connectionId, {
-          type: "ABORT",
+    switch (message.type) {
+      case "WHOAMI_REQUEST":
+        await sendToPeer("server", requestContext.connectionId, {
+          type: "WHOAMI_REPLY",
+          yourPeerId: requestContext.connectionId,
         });
-      }
+        break;
+      case "KEEPALIVE":
+        // Ignore this message, it only exists to keep the connection open
+        break;
+      default:
+        // Route the message to the given target
+        try {
+          await sendToPeer(requestContext.connectionId, target, message);
+        } catch (error) {
+          // Peer not found, send an abort message
+          await sendToPeer(target, requestContext.connectionId, {
+            type: "ABORT",
+          });
+        }
     }
   }
 

@@ -58,6 +58,7 @@ class SignalClient {
         const servers = [
             // "ws://localhost:3001",
             "wss://webrtc-signal-server.wasm4.org",
+            "wss://ywc2h85cv1.execute-api.us-east-1.amazonaws.com/production",
         ];
         for (const server of servers) {
             try {

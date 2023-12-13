@@ -482,7 +482,7 @@ export class App extends LitElement {
                 runtime.composite();
 
                 if (import.meta.env.DEV) {
-                    // FIXED(2022-12-13): Pass the correct FPS for display                    
+                    // FIXED(2023-12-13): Pass the correct FPS for display                    
                     devtoolsManager.updateCompleted(runtime, timeFrameStart - lastTimeFrameStart);
                     lastTimeFrameStart = timeFrameStart;
                 }

@@ -65,7 +65,7 @@ export class DevtoolsManager {
     let sum = this._fpsBuffer[0];
     for (let i = 1; i < 10; i++)
       sum += this._fpsBuffer[i];
-    return sum / 10;
+    return Math.floor(sum / 10);
   }
   private _nextFPSBufferIdx = () => {
     (this._fpsBufferIdx == 9) ? this._fpsBufferIdx = 0 : this._fpsBufferIdx++;
@@ -80,7 +80,7 @@ export class DevtoolsManager {
     deltaFrame: number
   ) => {
     if (this._enabled) {
-      this._fpsBuffer[this._nextFPSBufferIdx()] = Math.floor(1_000 / deltaFrame);
+      this._fpsBuffer[this._nextFPSBufferIdx()] = 1_000 / deltaFrame;
       this._bufferedData.update(runtimeInfo.data);
       this._notifyUpdateCompleted(
         runtimeInfo.data,

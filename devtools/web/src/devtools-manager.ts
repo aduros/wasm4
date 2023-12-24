@@ -58,6 +58,20 @@ export class DevtoolsManager {
    */
   private _bufferedData = new BufferedRuntimeData();
 
+  private _fpsBuffer : number[] = [0,0,0,0,0,0,0,0,0,0];
+  private _fpsBufferIdx = 0;
+  //calculate an average FPS for the last 10 frames
+  private _calcAvgFPS = () => {
+    let sum = this._fpsBuffer[0];
+    for (let i = 1; i < 10; i++)
+      sum += this._fpsBuffer[i];
+    return Math.floor(sum / 10);
+  }
+  private _nextFPSBufferIdx = () => {
+    (this._fpsBufferIdx == 9) ? this._fpsBufferIdx = 0 : this._fpsBufferIdx++;
+    return this._fpsBufferIdx;
+  }
+
   /**
    * Notifies the devtools that the web runtime has completed an update.
    */
@@ -66,12 +80,12 @@ export class DevtoolsManager {
     deltaFrame: number
   ) => {
     if (this._enabled) {
-      const fps = Math.floor(1_000 / deltaFrame);
+      this._fpsBuffer[this._nextFPSBufferIdx()] = 1_000 / deltaFrame;
       this._bufferedData.update(runtimeInfo.data);
       this._notifyUpdateCompleted(
         runtimeInfo.data,
         runtimeInfo.wasmBufferByteLen,
-        fps
+        this._calcAvgFPS()
       );
     }
   };

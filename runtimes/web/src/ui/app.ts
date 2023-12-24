@@ -429,6 +429,8 @@ export class App extends LitElement {
 
         // When we should perform the next update
         let timeNextUpdate = performance.now();
+        // Track the timestamp of the last frame
+        let lastTimeFrameStart = timeNextUpdate;
 
         const onFrame = (timeFrameStart: number) => {
             requestAnimationFrame(onFrame);
@@ -480,8 +482,9 @@ export class App extends LitElement {
                 runtime.composite();
 
                 if (import.meta.env.DEV) {
-                    // FIXME(2022-08-20): Pass the correct FPS for display
-                    devtoolsManager.updateCompleted(runtime, 1000/60);
+                    // FIXED(2023-12-13): Pass the correct FPS for display                    
+                    devtoolsManager.updateCompleted(runtime, timeFrameStart - lastTimeFrameStart);
+                    lastTimeFrameStart = timeFrameStart;
                 }
             }
         }

@@ -9,6 +9,7 @@ export interface UpdateControllerState {
   memoryView: MemoryView;
   storedValue: string | null;
   fps: number;
+  gasUsed: number;
   wasmBufferByteLen: number;
 }
 
@@ -31,6 +32,7 @@ export class UpdateController implements ReactiveController {
         memoryView: detail.memory,
         storedValue: detail.storedValue ?? null,
         fps: detail.fps,
+        gasUsed: detail.gasUsed,
         wasmBufferByteLen: detail.wasmBufferByteLen,
       };
 

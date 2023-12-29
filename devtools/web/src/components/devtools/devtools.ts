@@ -70,6 +70,7 @@ export class Wasm4Devtools extends LitElement {
   private _renderGeneralView = ({
     memoryView,
     fps,
+    gasUsed,
     wasmBufferByteLen,
   }: UpdateControllerState) => {
     const drawColors = memoryView.drawColors ?? 0;
@@ -109,6 +110,10 @@ export class Wasm4Devtools extends LitElement {
       <section class="inline-section">
         <h4>fps</h4>
         <span class="info-box text-primary">${fps}</span>
+      </section>
+      <section class="inline-section">
+        <h4>gas</h4>
+        <span class="info-box text-primary">${gasUsed.toLocaleString('en-US')}</span>
       </section>
       <section class="cart-size-wrapper">
         <h4>cartridge size ${wasmBufferByteLen > MAX_CART_SIZE ? `⚠️` : ''}</h4>

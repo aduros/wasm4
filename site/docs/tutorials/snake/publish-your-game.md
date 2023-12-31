@@ -111,7 +111,7 @@ This is a rather heavy, blunt hammer for functions that kind of look like nails 
 zig build -Doptimize=ReleaseSmall
 ```
 
-Your game will be here: `zig-out/lib/cart.wasm`
+Your game will be here: `zig-out/bin/cart.wasm`
 
 </Page>
 

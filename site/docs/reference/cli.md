@@ -243,6 +243,7 @@ w4 png2src --lang rust top.png down.png left.png right.png
 | --nim            |               | Generates Nim source                      |
 | --odin           |               | Generates Odin source                     |
 | --porth          |               | Generates Porth source                    |
+| --roc            |               | Generates Roc source                      |
 | --roland         |               | Generates Roland source                   |
 | --rs             |               | Generates Rust source                     |
 | --rust           |               | Same as `--rs`                            |

@@ -4,7 +4,7 @@ const { program, Option } = require("commander");
 const pkg = require('./package.json');
 const { supportedIconExtensions } = require('./lib/utils/icon');
 
-const LANGS = ["assemblyscript", "c", "c3", "cpp", "d", "go", "nelua", "nim", "odin", "penne", "porth", "roland", "rust", "wat", "zig"];
+const LANGS = ["assemblyscript", "c", "c3", "cpp", "d", "go", "nelua", "nim", "odin", "penne", "porth", "roc", "roland", "rust", "wat", "zig"];
 const langOption = new Option("--lang <lang>", "Use the given language")
     .env("W4_LANG")
     .choices(LANGS);
@@ -36,6 +36,8 @@ function requireLang (opts) {
         return "penne";
     } else if (opts.porth) {
         return "porth";
+    } else if (opts.roc) {
+        return "roc";
     } else if (opts.roland) {
         return "roland";
     } else if (opts.rust) {
@@ -151,6 +153,7 @@ program.command("png2src <images...>")
     .option("--odin", "Generate Odin source (Shorthand for --lang odin)")
     .option("--penne", "Generate Penne source (Shorthand for --lang penne)")
     .option("--porth", "Generate Porth source (Shorthand for --lang porth)")
+    .option("--roc", "Generate Roc source (Shorthand for --lang roc)")
     .option("--roland", "Generate Roland source (Shorthand for --lang roland)")
     .option("--rs, --rust", "Generate Rust source (Shorthand for --lang rust)")
     .option("--wat", "Generate WebAssembly Text source (Shorthand for --lang wat)")

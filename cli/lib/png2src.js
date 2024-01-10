@@ -104,6 +104,18 @@ const {{name}}-width  {{width}} end
 
 {{/sprites}}`,
 
+    roc:
+        `{{#sprites}}
+# {{name}} sprite
+{{name}}Sprite = Sprite.new {
+    data: [ {{bytes}} ],
+    bpp: BPP{{bpp}},
+    width: {{width}},
+    height: {{height}},
+}
+
+{{/sprites}}`,
+
     roland:
         `{{#sprites}}
 // {{name}}
@@ -308,6 +320,7 @@ The first occurrence of another color is at (${x}, ${y}) and has the value of (R
         "flags": flags,
         "flagsHumanReadable": flagsHumanReadable,
         "bytes": data,
+        "bpp": bpp,
         "firstByte": dataBytes[0],
         "restBytes": dataBytes.slice(1).join(','),
         "wasmBytes": wasmBytes.join(''),

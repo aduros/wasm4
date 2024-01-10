@@ -5,6 +5,7 @@ export const updateCompletedEventType = 'wasm4-update-completed';
 export interface UpdateCompletedDetails {
   memory: MemoryView;
   fps: number;
+  gasUsed: number;
   wasmBufferByteLen: number;
   storedValue: string | null;
 }
@@ -28,6 +29,7 @@ function getStoredValue(): string | null {
 export interface UpdateCompletedData {
   dataView: DataView;
   fps: number;
+  gasUsed: number;
   bufferedData: BufferedMemoryData;
   wasmBufferByteLen: number;
 }
@@ -42,7 +44,7 @@ export interface UpdateCompletedData {
  * @returns
  */
 export function createUpdateCompletedEvent(
-  { dataView, fps, bufferedData, wasmBufferByteLen }: UpdateCompletedData,
+  { dataView, fps, gasUsed, bufferedData, wasmBufferByteLen }: UpdateCompletedData,
   eventInit: EventInit = { bubbles: true }
 ): Wasm4UpdateCompletedEvent {
   return new CustomEvent(updateCompletedEventType, {
@@ -50,6 +52,7 @@ export function createUpdateCompletedEvent(
     detail: {
       memory: new MemoryView(dataView, bufferedData),
       fps,
+      gasUsed,
       wasmBufferByteLen,
       storedValue: getStoredValue(),
     },

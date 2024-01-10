@@ -42,6 +42,7 @@
     "pngjs": "^6.0.0",
     "qrcode": "^1.4.4",
     "recursive-copy": "^2.0.13",
+    "wasm-metering": "^0.2.1",
     "ws": "^7.5.3"
   },
   "engines": {

@@ -7,6 +7,7 @@ const { Server: WebSocketServer } = require("ws");
 const open = require("open");
 const process = require("process");
 const { buffer } = require('node:stream/consumers');
+const metering = require("wasm-metering");
 
 
 async function start (cartFile, opts) {
@@ -16,23 +17,27 @@ async function start (cartFile, opts) {
     if (cartFile === "-") {
         // Filename "-" means read from standard in.
         // This can only be read once, so must be cached.
-        let cart_data = await buffer(process.stdin);
+        const cartRawWasm = await buffer(process.stdin);
+        const cartWasm = opts.metering ? metering.meterWASM(cartRawWasm) : cartRawWasm;
 
         app.get("/cart.wasm", (req, res) => {
-            res.send(cart_data);
+            res.send(cartWasm);
         });
     } else if (!(await fs.stat(cartFile)).isFile()) {
         // If the file is not a regular file, such as a fifo, input stream etc.
         // we must also cache the data.
-        let cart_data = await fs.readFile(cartFile);
+        const cartRawWasm = await fs.readFile(cartFile);
+        const cartWasm = opts.metering ? metering.meterWASM(cartRawWasm) : cartRawWasm;
 
         app.get("/cart.wasm", (req, res) => {
-            res.send(cart_data);
+            res.send(cartWasm);
         });
     } else {
         // otherwise it's a regular file, and can be read from disk every time.
-        app.get("/cart.wasm", (req, res) => {
-            res.sendFile(path.resolve(cartFile));
+        app.get("/cart.wasm", async (req, res) => {
+            const cartRawWasm = await fs.readFile(cartFile);
+            const cartWasm = opts.metering ? metering.meterWASM(cartRawWasm) : cartRawWasm;
+            res.send(cartWasm);
         });
         app.get("/cart.wasm.map", (req, res) => {
             res.sendFile(path.resolve(cartFile+".map"));

@@ -112,6 +112,7 @@ function withCommonRunOptions (cmd) {
                 .env("W4_NO_QR")
                 .default(false)
         )
+        .option("--metering", "Inject gas metering into WASM", false)
         .option("--hot", "Enable hot swapping. When the cart is reloaded, the console memory will be preserved, allowing code changes to the cart without resetting.", false);
 }
 

@@ -21,6 +21,7 @@ export class Runtime {
     diskName: string;
     diskBuffer: ArrayBuffer;
     diskSize: number;
+    gasUsed: number;
 
     constructor (diskName: string) {
         const canvas = document.createElement("canvas");
@@ -39,7 +40,7 @@ export class Runtime {
         }
 
         this.compositor = new WebGLCompositor(gl);
-        
+
         this.apu = new APU();
 
         this.diskName = diskName;
@@ -67,6 +68,7 @@ export class Runtime {
 
         this.pauseState = 0;
         this.wasmBufferByteLen = 0;
+        this.gasUsed = 0;
     }
 
     async init () {
@@ -159,8 +161,14 @@ export class Runtime {
             tracef: this.tracef.bind(this),
         };
 
+        const metering = {
+            usegas: (gas: number) => {
+                this.gasUsed += gas;
+            },
+        };
+
         await this.bluescreenOnError(async () => {
-            const module = await WebAssembly.instantiate(wasmBuffer, { env });
+            const module = await WebAssembly.instantiate(wasmBuffer, { env, metering });
             this.wasm = module.instance;
 
             // Call the WASI _start/_initialize function (different from WASM-4's start callback!)
@@ -335,6 +343,7 @@ export class Runtime {
             this.framebuffer.clear();
         }
 
+        this.gasUsed = 0;
         let update_function = this.wasm!.exports["update"];
         if (typeof update_function === "function") {
             this.bluescreenOnError(update_function);

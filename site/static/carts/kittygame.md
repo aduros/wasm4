@@ -1,10 +1,10 @@
 ---
 author: Cannon Tuttle
 github: CanyonTurtle
-date: 2024-1-10
+date: 2024-1-11
 ---
 
-# Kitty Game v1.1.0
+# Kitty Game v1.2.0
 
 Find the kitties!! Move with arrow keys, jump / use cards with buttons. Supports 2-4 player netplay multiplayer. Enjoy!
 

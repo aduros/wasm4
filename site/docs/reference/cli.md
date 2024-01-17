@@ -317,6 +317,46 @@ The `--title` option changes the visible title of the game. Like in the title ba
 At least one of the targets (`--html`, `--windows`, `--linux`, `--mac`) must be provided. If no target is provided, the command will fail.
 :::
 
+## `opt`
+
+**Summary:**
+
+Shrinks input wasm file and optimizes it.
+
+Powered by [binaryen](https://github.com/AssemblyScript/binaryen.js).
+
+**Usage:**
+
+```
+w4 opt <CART> [OPTIONS]
+w4 optimize <CART> [OPTIONS]
+```
+
+**Description:**
+
+`w4 opt` generates an optimized version of the input wasm module using [`wasm-opt`](https://github.com/WebAssembly/binaryen#binaryen-optimizations).
+
+**Examples:**
+
+```
+
+w4 opt carts/wormhole.wasm
+w4 opt target/wasm32-unknown-unknown/release/snake.wasm snake.opt.wasm 
+w4 opt carts/minesweeper.wasm -s
+```
+
+**Options:**
+
+| Option           | Default value | Description                             |
+| ---------------- | ------------- | --------------------------------------- |
+| -s               |               | Do not print to stdout                  |
+| -silent          |               | Same as `-s`                            |
+| -o FILE          | cart-opt.wasm | Output file                             |
+| --output FILE    | cart-opt.wasm | Same as `-o`                            |
+
+**Alias:** `optimize`
+
+
 ## `help`
 
 **Summary:**

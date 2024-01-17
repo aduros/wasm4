@@ -187,6 +187,16 @@ program.command("bundle <cart>")
         bundle.run(cart, opts);
     });
 
+program.command('opt <cart>')
+    .alias('optimize')
+    .description("optimize and minimize cart size using binaryen wasm-opt")
+    .option("-o, --output <file>", "output wasm file", "./cart-opt.wasm")
+    .option("-s, --silent", "do not print to stdout", false)
+    .action((cart, opts) => {
+        const opt = require("./lib/opt");
+        opt.optimizeCart(cart, opts);
+    });
+
 program
     .name("w4")
     .description("WASM-4: Build retro games using WebAssembly for a fantasy console.\n\nLearn more: https://wasm4.org")

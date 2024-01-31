@@ -247,4 +247,4 @@ class APUProcessor extends AudioWorkletProcessor {
     }
 }
 
-registerProcessor("wasm4-apu", APUProcessor as unknown as AudioWorkletProcessorConstructor);
+registerProcessor("wasm4-apu", APUProcessor);

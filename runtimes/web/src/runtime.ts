@@ -8,7 +8,7 @@ import * as devkit from "./devkit";
 export class Runtime {
     canvas: HTMLCanvasElement;
     memory: WebAssembly.Memory;
-    apu: any;
+    apu: APU;
     compositor: WebGLCompositor;
     data: DataView;
     framebuffer: Framebuffer;

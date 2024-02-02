@@ -2,7 +2,17 @@
 // is automatically generated in build and start scripts.
 import workletRawSource from "./apu-worklet.min.generated.js?raw";
 
+declare global {
+    interface Window {
+      webkitAudioContext: typeof AudioContext
+    }
+}
+
 export class APU {
+    audioCtx: AudioContext;
+    processor!: APUProcessor;
+    processorPort!: MessagePort;
+
     constructor () {
         this.audioCtx = new (window.AudioContext || window.webkitAudioContext)({
             sampleRate: 44100, // must match SAMPLE_RATE in worklet
@@ -27,9 +37,9 @@ export class APU {
             console.warn("AudioWorklet loading failed, falling back to slow audio", error);
 
             // Scoop out the APUProcessor with a simple polyfill
-            let processor;
-            const registerProcessor = (name, p) => {
-                processor = new p();
+            let processor!: APUProcessor;
+            const registerProcessor: typeof globalThis.registerProcessor = (name, p) => {
+                processor = new p() as APUProcessor;
             }
             const fn = new Function("registerProcessor", "AudioWorkletProcessor", workletRawSource);
             fn(registerProcessor, class {});
@@ -39,13 +49,13 @@ export class APU {
             scriptNode.onaudioprocess = event => {
                 const outputLeft = event.outputBuffer.getChannelData(0);
                 const outputRight = event.outputBuffer.getChannelData(1);
-                processor.process(null, [[outputLeft, outputRight]]);
+                processor.process(null, [[outputLeft, outputRight]], null);
             };
             scriptNode.connect(audioCtx.destination);
         }
     }
 
-    tone (frequency, duration, volume, flags) {
+    tone (frequency: number, duration: number, volume: number, flags: number) {
         const processorPort = this.processorPort;
         if (processorPort != null) {
             // Send params out to the worker

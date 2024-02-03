@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { withTheme } from '../../styles/commons';
-import gamepadCss from './gamepad.scss';
+import gamepadCss from './gamepad.scss?inline';
 import { classMap } from 'lit/directives/class-map.js';
 import {
   BUTTON_X,

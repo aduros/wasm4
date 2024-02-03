@@ -1,13 +1,13 @@
 {
   "name": "@wasm4/web-devtools",
   "version": "1.0.0",
-  "main": "dist/web-devtools.cjs.js",
-  "module": "dist/web-devtools.es.js",
+  "main": "dist/web-devtools.js",
+  "module": "dist/web-devtools.mjs",
   "private": true,
   "exports": {
     ".": {
-      "import": "./dist/web-devtools.es.js",
-      "require": "./dist/web-devtools.cjs.js"
+      "import": "./dist/web-devtools.mjs",
+      "require": "./dist/web-devtools.js"
     }
   },
   "author": {
@@ -28,17 +28,17 @@
     "prettify": "prettier . --write"
   },
   "dependencies": {
-    "lit": "^2.0.0",
+    "lit": "^3.1.2",
     "lodash-es": "^4.17.21",
-    "@types/lodash-es": "^4.17.5"
+    "@types/lodash-es": "^4.17.12"
   },
   "devDependencies": {
-    "@types/node": "^16.11.10",
-    "prettier": "2.5.0",
-    "rimraf": "3.0.2",
-    "rollup-plugin-postcss-lit": "^2.0.0",
-    "sass": "^1.43.5",
-    "typescript": "^4.3.2",
-    "vite": "^2.6.4"
+    "@types/node": "^20.11.16",
+    "prettier": "3.2.4",
+    "rimraf": "5.0.5",
+    "rollup-plugin-postcss-lit": "^2.1.0",
+    "sass": "^1.70.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12"
   }
 }

@@ -3,7 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { withTheme } from '../../styles/commons';
 import { classMap } from 'lit/directives/class-map.js';
 import { MOUSE_LEFT, MOUSE_MIDDLE, MOUSE_RIGHT } from '../../constants';
-import mouseButtonsCss from './mouse-buttons.scss';
+import mouseButtonsCss from './mouse-buttons.scss?inline';
 
 export const wasm4MouseTagName = 'wasm4-mouse-buttons';
 

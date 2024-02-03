@@ -5,7 +5,7 @@ import {
   UpdateControllerState,
 } from '../../controllers/UpdateController';
 import { createCloseDevtoolsEvent } from '../../events/close-devtools';
-import devtoolsCss from './devtools.scss';
+import devtoolsCss from './devtools.scss?inline';
 import { withTheme } from '../../styles/commons';
 import {
   MAX_CART_SIZE,

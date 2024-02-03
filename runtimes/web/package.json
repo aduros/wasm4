@@ -15,18 +15,18 @@
     "lint": "eslint src --fix"
   },
   "dependencies": {
-    "@types/audioworklet": "0.0.23",
     "@wasm4/web-devtools": "file:../../devtools/web",
-    "lit": "^2.2.0"
+    "lit": "^3.1.2"
   },
   "devDependencies": {
-    "@types/node": "^16.11.10",
-    "@typescript-eslint/eslint-plugin": "^5.16.0",
-    "@typescript-eslint/parser": "^5.16.0",
-    "concurrently": "7.0.0",
-    "eslint": "^8.11.0",
-    "rimraf": "3.0.2",
+    "@types/node": "^20.11.16",
+    "@typescript-eslint/eslint-plugin": "^6.20.0",
+    "@typescript-eslint/parser": "^6.20.0",
+    "concurrently": "8.2.2",
+    "eslint": "^8.56.0",
+    "rimraf": "5.0.5",
     "rollup-plugin-minify-html-literals": "^1.2.6",
-    "vite": "^2.6.4"
+    "vite": "^5.0.12",
+    "terser": "^5.27.0"
   }
 }

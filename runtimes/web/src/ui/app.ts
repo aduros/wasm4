@@ -141,7 +141,7 @@ export class App extends LitElement {
                 // Nothing
             },
         };
-        if (import.meta.env.DEV) {
+        if (constants.GAMEDEV_MODE) {
             devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager());
         }
 
@@ -153,7 +153,7 @@ export class App extends LitElement {
             this.copyNetplayLink();
         }
 
-        if (import.meta.env.DEV) {
+        if (constants.GAMEDEV_MODE) {
             devkit.websocket?.addEventListener("message", async event => {
                 switch (event.data) {
                 case "reload":
@@ -481,7 +481,7 @@ export class App extends LitElement {
 
                 runtime.composite();
 
-                if (import.meta.env.DEV) {
+                if (constants.GAMEDEV_MODE) {
                     // FIXED(2023-12-13): Pass the correct FPS for display                    
                     devtoolsManager.updateCompleted(runtime, timeFrameStart - lastTimeFrameStart);
                     lastTimeFrameStart = timeFrameStart;
@@ -587,9 +587,7 @@ export class App extends LitElement {
                     app.notifications.show("Disk imported");
                 } catch (error) {
                     app.notifications.show("Error importing disk");
-                    if (constants.DEBUG) {
-                        console.error("Error importing disk", error);
-                    }
+                    console.error("Error importing disk", error);
                 }
 
                 app.closeMenu();
@@ -616,9 +614,7 @@ export class App extends LitElement {
             localStorage.removeItem(this.runtime.diskName);
         } catch (error) {
             this.notifications.show("Error clearing disk");
-            if (constants.DEBUG) {
-                console.error("Error clearing disk", error);
-            }
+            console.error("Error clearing disk", error);
         }
 
         this.notifications.show("Disk cleared");

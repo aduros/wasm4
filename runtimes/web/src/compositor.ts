@@ -59,10 +59,8 @@ export class WebGLCompositor {
 
             gl.shaderSource(shader, source);
             gl.compileShader(shader);
-            if (constants.DEBUG) {
-                if (gl.getShaderParameter(shader, GL.COMPILE_STATUS) == 0) {
-                    throw new Error(gl.getShaderInfoLog(shader) + '');
-                }
+            if (!gl.getShaderParameter(shader, GL.COMPILE_STATUS)) {
+                throw new Error(gl.getShaderInfoLog(shader) + '');
             }
             return shader;
         }
@@ -115,10 +113,8 @@ export class WebGLCompositor {
         gl.attachShader(program, vertexShader);
         gl.attachShader(program, fragmentShader);
         gl.linkProgram(program);
-        if (constants.DEBUG) {
-            if (gl.getProgramParameter(program, GL.LINK_STATUS) == 0) {
-                throw new Error(gl.getProgramInfoLog(program) + '');
-            }
+        if (!gl.getProgramParameter(program, GL.LINK_STATUS)) {
+            throw new Error(gl.getProgramInfoLog(program) + '');
         }
         gl.useProgram(program);
 

@@ -1,4 +1,6 @@
-export const DEBUG = import.meta.env.DEV;
+// If you update this definition, make sure to also update the definition
+// in vite.config.ts to match.
+export const GAMEDEV_MODE: boolean = import.meta.env.VITE_WASM4_GAMEDEV_MODE !== "false";
 
 export const WIDTH = 160;
 export const HEIGHT = 160;

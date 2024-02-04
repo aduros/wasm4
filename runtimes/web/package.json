@@ -3,13 +3,13 @@
   "private": true,
   "scripts": {
     "clean": "rimraf dist public/cart.wasm src/apu-worklet.min.js",
-    "build:slim": "vite build",
-    "build:developer-build": "vite build --mode development",
+    "build:slim": "VITE_WASM4_GAMEDEV_MODE=false vite build",
+    "build:developer-build": "vite build",
     "build:apu-worklet": "esbuild src/apu-worklet.ts --minify --outfile=src/apu-worklet.min.generated.js --bundle",
     "build": "npm run build:apu-worklet && npm run build:slim && npm run build:developer-build",
     "start": "concurrently --kill-others -n apu-worklet,vite 'npm:build:apu-worklet -- --watch' 'npm:start:developer-build'",
-    "start:slim": "vite",
-    "start:developer-build": "vite --mode development --host",
+    "start:slim": "VITE_WASM4_GAMEDEV_MODE=false vite --host",
+    "start:developer-build": "vite --host",
     "prepare": "npm --prefix '../../devtools/web' i",
     "test": "tsc && eslint src",
     "lint": "eslint src --fix"

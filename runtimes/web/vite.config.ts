@@ -1,16 +1,24 @@
 import { defineConfig } from 'vite';
 import minifyHTML from 'rollup-plugin-minify-html-literals';
 
+function isGamedevBuild(): boolean {
+  // If you update this definition, make sure to also update the definition
+  // in src/constants.ts to match.
+  return process.env.VITE_WASM4_GAMEDEV_MODE !== "false";
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
+  const gamedev_build = isGamedevBuild();
+
   return {
     server: {
       port: 3000,
       open: '/?url=cart.wasm',
     },
     build: {
-      sourcemap: mode != 'production',
-      outDir: `dist/${mode == 'production' ? 'slim' : 'developer-build'}`,
+      sourcemap: gamedev_build,
+      outDir: `dist/${gamedev_build ? 'developer-build' : 'slim'}`,
       lib: {
         entry: 'src/index.ts',
         formats: ['iife'],

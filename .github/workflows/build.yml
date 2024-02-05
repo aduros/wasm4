@@ -107,8 +107,7 @@ jobs:
                   mv `npm pack` ../cli-build/wasm4-npm.tar.gz
 
                   npm ci
-                  npm install -g pkg
-                  pkg --compress Brotli --out-path ../cli-build --targets latest-win,latest-mac,latest-linux .
+                  npm run package
 
             - name: Quick w4 CLI tests
               run: |

@@ -10,7 +10,7 @@
     "start": "concurrently --kill-others -n apu-worklet,vite 'npm:build:apu-worklet -- --watch' 'npm:start:developer-build'",
     "start:slim": "VITE_WASM4_GAMEDEV_MODE=false vite --host",
     "start:developer-build": "vite --host",
-    "prepare": "npm --prefix '../../devtools/web' i",
+    "install-devtools": "cd '../../devtools/web' && npm install",
     "test": "tsc && eslint src",
     "lint": "eslint src --fix"
   },

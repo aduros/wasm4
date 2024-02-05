@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
-import minifyHTML from 'rollup-plugin-minify-html-literals';
+import { UserConfig, defineConfig } from 'vite';
+import minifyHTML from 'rollup-plugin-minify-html-literals-v3';
 
 function isGamedevBuild(): boolean {
   // If you update this definition, make sure to also update the definition
@@ -11,7 +11,7 @@ function isGamedevBuild(): boolean {
 export default defineConfig(({ mode }) => {
   const gamedev_build = isGamedevBuild();
 
-  return {
+  let user_config: UserConfig = {
     server: {
       port: 3000,
       open: '/?url=cart.wasm',
@@ -28,12 +28,16 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           inlineDynamicImports: true,
-          assetFileNames(assetInfo) {
-            if(/styles?\.css$/i.test(assetInfo.name)) {
-              return 'wasm4.css';
+          assetFileNames: (assetInfo): string => {
+            if (assetInfo.name) {
+              if(/styles?\.css$/i.test(assetInfo.name)) {
+                return 'wasm4.css';
+              } else {
+                return assetInfo.name;
+              }
+            } else {
+              throw new Error("Unexpected condition, assetInfo had no name");
             }
-
-            return assetInfo.name;
           },
         },
       },
@@ -43,4 +47,6 @@ export default defineConfig(({ mode }) => {
         minifyHTML(),
     ],
   };
+
+  return user_config;
 });

@@ -1,13 +1,14 @@
 {
   "name": "@wasm4/web-devtools",
   "version": "1.0.0",
-  "main": "dist/web-devtools.js",
-  "module": "dist/web-devtools.mjs",
+  "type": "module",
+  "module": "dist/web-devtools.js",
+  "main": "dist/web-devtools.cjs",
   "private": true,
   "exports": {
     ".": {
-      "import": "./dist/web-devtools.mjs",
-      "require": "./dist/web-devtools.js"
+      "import": "./dist/web-devtools.js",
+      "require": "./dist/web-devtools.cjs"
     }
   },
   "author": {

@@ -46,16 +46,13 @@
 ;; │                                                                           │
 ;; └───────────────────────────────────────────────────────────────────────────┘
 (; Reads up to `size` bytes from persistent storage into the pointer `dest`. ;)
-(import "env" "diskr" (func $diskr (param i32 i32)))
+(import "env" "diskr" (func $diskr (param i32 i32) (result i32)))
 
 (; Writes up to `size` bytes from the pointer `src` into persistent storage. ;)
-(import "env" "diskw" (func $diskw (param i32 i32)))
+(import "env" "diskw" (func $diskw (param i32 i32) (result i32)))
 
 (; Prints a message to the debug console. ;)
 (import "env" "trace" (func $trace (param i32)))
-
-(; Prints a message to the debug console. ;)
-(import "env" "tracef" (func $tracef (param i32 i32)))
 
 
 ;; ┌───────────────────────────────────────────────────────────────────────────┐

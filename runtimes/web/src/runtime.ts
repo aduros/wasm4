@@ -8,7 +8,7 @@ import * as devkit from "./devkit";
 export class Runtime {
     canvas: HTMLCanvasElement;
     memory: WebAssembly.Memory;
-    apu: any;
+    apu: APU;
     compositor: WebGLCompositor;
     data: DataView;
     framebuffer: Framebuffer;
@@ -50,9 +50,7 @@ export class Runtime {
         try {
             str = localStorage.getItem(diskName);
         } catch (error) {
-            if (constants.DEBUG) {
-                console.error("Error reading disk", error);
-            }
+            console.error("Error reading disk", error);
         }
         this.diskSize = (str != null)
             ? z85.decode(str, new Uint8Array(this.diskBuffer))
@@ -121,7 +119,7 @@ export class Runtime {
         this.wasm = null;
 
         if (wasmBuffer.byteLength > limit) {
-            if (import.meta.env.DEV) {
+            if (constants.GAMEDEV_MODE) {
                 if (!this.warnedFileSize) {
                     this.warnedFileSize = true;
                     this.print(`Warning: Cart is larger than ${limit} bytes. Ensure the release build of your cart is small enough to be bundled.`);
@@ -236,9 +234,7 @@ export class Runtime {
             localStorage.setItem(this.diskName, str);
         } catch (error) {
             // TODO(2022-02-13): Show a warning to the user that storage is not persisted
-            if (constants.DEBUG) {
-                console.error("Error writing disk", error);
-            }
+            console.error("Error writing disk", error);
         }
 
         dest.set(src);

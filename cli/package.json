@@ -13,6 +13,9 @@
     "type": "git",
     "url": "https://github.com/aduros/wasm4.git"
   },
+  "scripts": {
+    "package": "pkg --compress Brotli --out-path ../cli-build --targets latest-win,latest-mac,latest-linux ."
+  },
   "keywords": [
     "2d game engine",
     "assemblyscript",
@@ -43,6 +46,9 @@
     "qrcode": "^1.4.4",
     "recursive-copy": "^2.0.13",
     "ws": "^7.5.3"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
   },
   "engines": {
     "node": ">=14"

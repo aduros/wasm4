@@ -1,6 +1,6 @@
 import { unsafeCSS, CSSResult } from 'lit';
-import resetCss from './reset.scss';
-import themeCss from './theme.scss';
+import resetCss from './reset.scss?inline';
+import themeCss from './theme.scss?inline';
 
 export const themeStyles = [resetCss, themeCss].map((css) => unsafeCSS(css));
 

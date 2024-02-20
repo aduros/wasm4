@@ -17,7 +17,7 @@ export function requestFullscreen () {
         function expandIframe () {
             // Fullscreen failed, try to maximize our own iframe. We don't yet have a button to go
             // back to minimized, but this at least makes games on wasm4.org playable on iPhone
-            const iframe = window.frameElement;
+            const iframe = window.frameElement as HTMLIFrameElement | null;
             if (iframe) {
                 iframe.style.position = "fixed";
                 iframe.style.top = "0";

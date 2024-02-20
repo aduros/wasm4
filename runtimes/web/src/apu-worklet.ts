@@ -172,7 +172,7 @@ class APUProcessor extends AudioWorkletProcessor {
         }
     }
 
-    process (_inputs: Float32Array[][], [[ outputLeft, outputRight ]]: Float32Array[][], _parameters: Record<string, Float32Array>) {
+    process (_inputs: Float32Array[][] | null, [[ outputLeft, outputRight ]]: Float32Array[][], _parameters: Record<string, Float32Array> | null) {
         for (let ii = 0, frames = outputLeft.length; ii < frames; ++ii, ++this.time) {
             let mixLeft = 0, mixRight = 0;
 
@@ -247,4 +247,4 @@ class APUProcessor extends AudioWorkletProcessor {
     }
 }
 
-registerProcessor("wasm4-apu", APUProcessor as unknown as AudioWorkletProcessorConstructor);
+registerProcessor("wasm4-apu", APUProcessor);

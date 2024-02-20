@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { formatColor } from '../../utils/format';
-import paletteCss from './palette.scss';
+import paletteCss from './palette.scss?inline';
 import { withTheme } from '../../styles/commons';
 
 export const wasm4PaletteTagName = 'wasm4-palette' as const;

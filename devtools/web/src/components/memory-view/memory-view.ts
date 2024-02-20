@@ -5,7 +5,7 @@ import { MemoryView } from '../../models/MemoryView';
 import { withTheme } from '../../styles/commons';
 import { formatHex } from '../../utils/format';
 import { range, renderHexRow } from '../../utils/functions';
-import memoryViewCss from './memory-view.scss';
+import memoryViewCss from './memory-view.scss?inline';
 
 export const wasm4MemoryViewTagName = 'wasm4-memory-view';
 

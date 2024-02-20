@@ -13,7 +13,8 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "alwaysStrict": true,
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "isolatedModules": true
   },
   "include": ["src/**/*.ts", "src/**/*.js"],
   "exclude": []

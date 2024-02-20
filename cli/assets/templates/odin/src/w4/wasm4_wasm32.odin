@@ -92,8 +92,7 @@ foreign wasm4 {
 	rect :: proc(x, y: i32, width, height: u32) ---
 	
 	// Draws text using the built-in system font.
-	@(link_name="textUtf8")
-	text :: proc(text: string, x, y: i32) ---
+	text :: proc(text: cstring, x, y: i32) ---
 }
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
@@ -129,6 +128,7 @@ Tone_Duration :: struct {
 
 
 @(private)
+@(default_calling_convention="c")
 foreign wasm4 {
 	@(link_name="tone")
 	internal_tone :: proc(frequency: u32, duration_in_frames: u32, volume_percent: u32, flags: u32) ---
@@ -173,8 +173,7 @@ foreign wasm4 {
 @(default_calling_convention="c")
 foreign wasm4 {
 	// Prints a message to the debug console.
-	@(link_name="traceUtf8")
-	trace :: proc(text: string) ---
+	trace :: proc(text: cstring) ---
 	// Prints a message to the debug console, with a format string.
 	// These formats are supported: 
 	// %c: Character

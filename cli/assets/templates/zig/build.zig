@@ -19,4 +19,10 @@ pub fn build(b: *std.Build) !void {
     exe.stack_size = 14752;
 
     b.installArtifact(exe);
+
+    const run_exe = b.addSystemCommand(&.{ "w4", "run-native" });
+    run_exe.addArtifactArg(exe);
+
+    const step_run = b.step("run", "compile and run the cart");
+    step_run.dependOn(&run_exe.step);
 }

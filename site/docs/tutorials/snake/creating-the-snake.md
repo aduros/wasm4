@@ -123,7 +123,7 @@ void snake_push(struct snake *snake, struct point p)
 
 If you've used Go in the past, this next section won't be too surprising for you. You'll create a new type for the snake with the required properties.
 
-For this, create a new file an call it `snake.go`. Then fill it with th code-snippet below.
+For this, create a new file an call it `snake.go`. Then fill it with the code-snippet below.
 
 ```go
 package main

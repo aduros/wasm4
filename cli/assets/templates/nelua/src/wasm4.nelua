@@ -122,6 +122,7 @@ global TONE_MODE3 <comptime> = 8
 global TONE_MODE4 <comptime> = 12
 global TONE_PAN_LEFT <comptime> = 16
 global TONE_PAN_RIGHT <comptime> = 32
+global TONE_NOTE_MODE <comptime> = 64
 
 -- ┌───────────────────────────────────────────────────────────────────────────┐
 -- │                                                                           │

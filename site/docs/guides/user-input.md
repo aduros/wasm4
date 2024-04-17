@@ -404,8 +404,8 @@ export fn update() void {
 
 ## Mouse
 
-Mouse (or touchscreen) input is supported. See the [Memory Map](/docs/reference/memory)
-reference for more details on `MOUSE_X`, `MOUSE_Y`, and `MOUSE_BUTTONS`.
+Mouse (or touchscreen) input is supported and will work for positions even outside of the game window on supported platforms.
+See the [Memory Map](/docs/reference/memory) reference for more details on `MOUSE_X`, `MOUSE_Y`, and `MOUSE_BUTTONS`.
 
 On the example below, we can make a rectangle follow the mouse position and expand when clicked:
 

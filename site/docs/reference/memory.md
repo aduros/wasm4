@@ -82,11 +82,11 @@ Example:
 
 ### MOUSE_X
 
-Signed 16 bit integer containing the X position of the mouse.
+Signed 16 bit integer containing the X position of the mouse. Can contain positions outside of the game window.
 
 ### MOUSE_Y
 
-Signed 16 bit integer containing the Y position of the mouse.
+Signed 16 bit integer containing the Y position of the mouse. Can contain positions outside of the game window.
 
 ### MOUSE_BUTTONS
 

@@ -65,6 +65,11 @@ export class MenuOverlay extends LitElement {
             background: rgba(0, 0, 0, 0.85);
         }
 
+        .version {
+            color: #fff;
+            padding-bottom: 1em;
+        }
+
         .menu {
             border: 2px solid #f0f0f0;
             padding: 0 1em 0 1em;
@@ -244,6 +249,9 @@ export class MenuOverlay extends LitElement {
 
     render () {
         return html`
+            <div class="version">
+                WASM-4 v${WASM4_VERSION}
+            </div>
             <div class="menu">
                 <ul style="display:${this.optionContext === optionContext.DEFAULT? "inherit": "none"}">
                     ${map(options[optionContext.DEFAULT], (option, idx) =>

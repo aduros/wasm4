@@ -113,6 +113,7 @@ Plays a sound tone.
 | 0 - 1     | Channel (0-3): 0 = Pulse1, 1 = Pulse2, 2 = Triangle, 3 = Noise                                |
 | 2 - 3     | Mode (0-3): For pulse channels, the pulse wave duty cycle. 0 = 1/8, 1 = 1/4, 2 = 1/2, 3 = 3/4 |
 | 4 - 5     | Pan (0-2): 0 = Center, 1 = Left, 2 = Right                                                    |
+| 6         | Use *Note Mode* for frequencies: See below.                                                   |
 
 The high bits of `frequency` can optionally describe a pitch slide effect:
 
@@ -122,6 +123,13 @@ The high bits of `frequency` can optionally describe a pitch slide effect:
 | 16 - 31        | End frequency (0-65535)   |
 
 If the end frequency is non-zero, then the frequency is ramped linearly over the total duration of the tone.
+
+If *Note Mode* is enabled, both the Start and End frequency values are instead interpreted as notes with pitch bend rather than frequencies:
+
+| Frequency bits | Description                                                                                          |
+| ---            | ---                                                                                                  |
+| 0 - 7          | Note (0-255): Note number according to the MIDI specification, e.g. 60 = C4, 69 = A4 (440 Hz)        |
+| 8 - 15         | Note bend (0-255): Bend note upwards. 0 = Nothing, 255 = One 256th away from the next note above     |
 
 The high bits of `duration` can optionally describe an ADSR volume envelope:
 

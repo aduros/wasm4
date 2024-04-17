@@ -91,6 +91,10 @@ By default, `str` is expected to be a `\0` terminated ASCII string.
 This means bytes `0x80-0xFF` are treated as individual characters, even in programming languages where strings are normally UTF-8 encoded.
 No terminating `\0` is needed in those languages.
 In languages where all strings are UTF-16, `str` must only contain characters up to U+00FF and no `\0` is needed.
+
+The text drawing functions in WASM-4's internals and bindings are called `textUtf8` and `textUtf16` for UTF-8 and UTF-16 respectively,
+but these names are misnomers and don't actually use UTF-8 or UTF-16 encodings.
+If you encounter these functions, instead treat them according to the explanation above.
 :::
 
 ## Sound

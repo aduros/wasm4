@@ -1,15 +1,10 @@
 import { UserConfig, defineConfig } from 'vite';
 import minifyHTML from 'rollup-plugin-minify-html-literals-v3';
-
-function isGamedevBuild(): boolean {
-  // If you update this definition, make sure to also update the definition
-  // in src/constants.ts to match.
-  return process.env.VITE_WASM4_GAMEDEV_MODE !== "false";
-}
+import cliPackageJSON from '../../cli/package.json';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  const gamedev_build = isGamedevBuild();
+  const gamedev_build = process.env.VITE_WASM4_GAMEDEV_MODE !== "false";
 
   let user_config: UserConfig = {
     server: {
@@ -46,6 +41,10 @@ export default defineConfig(({ mode }) => {
     plugins: [
         minifyHTML(),
     ],
+    define: {
+      WASM4_GAMEDEV_MODE: gamedev_build,
+      WASM4_VERSION: JSON.stringify(cliPackageJSON.version),
+    },
   };
 
   return user_config;

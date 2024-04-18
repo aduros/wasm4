@@ -10,6 +10,9 @@ const langOption = new Option("--lang <lang>", "Use the given language")
     .choices(LANGS);
 
 function requireLang (opts) {
+    if (opts.lang) {
+        return opts.lang;
+    }
     if (opts.surpriseMe) {
         return LANGS[(Math.random()*LANGS.length) >>> 0];
     }

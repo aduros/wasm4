@@ -121,6 +121,7 @@ export const TONE_MODE3: u32 = 8;
 export const TONE_MODE4: u32 = 12;
 export const TONE_PAN_LEFT: u32 = 16;
 export const TONE_PAN_RIGHT: u32 = 32;
+export const TONE_NOTE_MODE: u32 = 64;
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │

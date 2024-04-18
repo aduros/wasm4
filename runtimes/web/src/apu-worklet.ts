@@ -68,6 +68,10 @@ function polyblep (phase: number, phaseInc: number) {
     }
 }
 
+function midiFreq (note: number, bend: number) {
+    return Math.pow(2, (note - 69 + bend / 256) / 12) * 440;
+}
+
 class APUProcessor extends AudioWorkletProcessor {
     time: number;
     ticks: number;
@@ -132,7 +136,6 @@ class APUProcessor extends AudioWorkletProcessor {
     tone (frequency: number, duration: number, volume: number, flags: number) {
         const freq1 = frequency & 0xffff;
         const freq2 = (frequency >> 16) & 0xffff;
-
         const sustain = (duration & 0xff);
         const release = ((duration >> 8) & 0xff);
         const decay = ((duration >> 16) & 0xff);
@@ -144,6 +147,7 @@ class APUProcessor extends AudioWorkletProcessor {
         const channelIdx = flags & 0x3;
         const mode = (flags >> 2) & 0x3;
         const pan = (flags >> 4) & 0x3;
+        const noteMode = flags & 0x40;
 
         const channel = this.channels[channelIdx];
 
@@ -151,9 +155,13 @@ class APUProcessor extends AudioWorkletProcessor {
         if (this.time > channel.releaseTime && this.ticks != channel.endTick) {
             channel.phase = (channelIdx == 2) ? 0.25 : 0;
         }
-
-        channel.freq1 = freq1;
-        channel.freq2 = freq2;
+        if (noteMode) {
+            channel.freq1 = midiFreq(freq1 & 0xff, freq1 >> 8);
+            channel.freq2 = (freq2 == 0) ? 0 : midiFreq(freq2 & 0xff, freq2 >> 8);
+        } else {
+            channel.freq1 = freq1;
+            channel.freq2 = freq2;
+        }
         channel.startTime = this.time;
         channel.attackTime = channel.startTime + ((SAMPLE_RATE*attack/60) >>> 0);
         channel.decayTime = channel.attackTime + ((SAMPLE_RATE*decay/60) >>> 0);

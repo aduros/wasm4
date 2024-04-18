@@ -109,6 +109,7 @@
 (global $TONE_MODE4 i32 (i32.const 12))
 (global $TONE_PAN_LEFT i32 (i32.const 16))
 (global $TONE_PAN_RIGHT i32 (i32.const 32))
+(global $TONE_NOTE_MODE i32 (i32.const 64))
 
 
 ;; smiley

@@ -101,6 +101,7 @@ enum toneMode3 = 8;
 enum toneMode4 = 12;
 enum tonePanLeft = 16;
 enum tonePanRight = 32;
+enum toneNoteMode = 64;
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │

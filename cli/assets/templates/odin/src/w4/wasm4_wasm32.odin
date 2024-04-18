@@ -118,6 +118,10 @@ Tone_Pan :: enum u32 {
 	Left   = 16,
 	Right  = 32,
 }
+Tone_Mode :: enum u32 {
+	Frequency = 0,
+	Note      = 64,
+}
 
 Tone_Duration :: struct {
 	attack:  u8, // in frames
@@ -135,13 +139,13 @@ foreign wasm4 {
 }
 
 // Plays a sound tone.
-tone :: proc "c" (frequency: u32, duration: u32, volume_percent: u32, channel: Tone_Channel, duty_cycle := Tone_Duty_Cycle.Eigth, pan := Tone_Pan.Center) {
-	flags := u32(channel) | u32(duty_cycle) | u32(pan)
+tone :: proc "c" (frequency: u32, duration: u32, volume_percent: u32, channel: Tone_Channel, duty_cycle := Tone_Duty_Cycle.Eigth, pan := Tone_Pan.Center, tone_mode := Tone_Mode.Frequency) {
+	flags := u32(channel) | u32(duty_cycle) | u32(pan) | u32(tone_mode)
 	internal_tone(frequency, duration, volume_percent, flags)
 }
 
-tone_complex :: proc "c" (start_frequency, end_frequency: u16, duration: Tone_Duration, volume_percent: u32, channel: Tone_Channel, duty_cycle := Tone_Duty_Cycle.Eigth, pan := Tone_Pan.Center) {
-	flags := u32(channel) | u32(duty_cycle) | u32(pan)
+tone_complex :: proc "c" (start_frequency, end_frequency: u16, duration: Tone_Duration, volume_percent: u32, channel: Tone_Channel, duty_cycle := Tone_Duty_Cycle.Eigth, pan := Tone_Pan.Center, tone_mode := Tone_Mode.Frequency) {
+	flags := u32(channel) | u32(duty_cycle) | u32(pan) | u32(tone_mode)
 	frequency := u32(start_frequency) | u32(end_frequency)<<16
 	duration_in_frames := u32(duration.attack)<<24 | u32(duration.delay)<<16 | u32(duration.release)<<8 | u32(duration.sustain)
 	

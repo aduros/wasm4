@@ -9,10 +9,10 @@
 
 typedef struct {
     /** Starting frequency. */
-    uint16_t freq1;
+    float freq1;
 
     /** Ending frequency, or zero for no frequency transition. */
-    uint16_t freq2;
+    float freq2;
 
     /** Time the tone was started. */
     unsigned long long startTime;
@@ -73,16 +73,23 @@ static int w4_min (int a, int b) {
 static int lerp (int value1, int value2, float t) {
     return value1 + t * (value2 - value1);
 }
+static float lerpf (float value1, float value2, float t) {
+    return value1 + t * (value2 - value1);
+}
 
 static int ramp (int value1, int value2, unsigned long long time1, unsigned long long time2) {
     if (time >= time2) return value2;
     float t = (float)(time - time1) / (time2 - time1);
     return lerp(value1, value2, t);
 }
+static float rampf (float value1, float value2, unsigned long long time1, unsigned long long time2) {
+    float t = (float)(time - time1) / (time2 - time1);
+    return lerpf(value1, value2, t);
+}
 
-static uint16_t getCurrentFrequency (const Channel* channel) {
+static float getCurrentFrequency (const Channel* channel) {
     if (channel->freq2 > 0) {
-        return ramp(channel->freq1, channel->freq2, channel->startTime, channel->releaseTime);
+        return rampf(channel->freq1, channel->freq2, channel->startTime, channel->releaseTime);
     } else {
         return channel->freq1;
     }
@@ -116,6 +123,10 @@ static float polyblep (float phase, float phaseInc) {
     }
 }
 
+static float midiFreq (uint8_t note, uint8_t bend) {
+    return powf(2.0f, ((float)note - 69.0f + (float)bend / 256.0f) / 12.0f) * 440.0f;
+}
+
 void w4_apuInit () {
     channels[3].noise.seed = 0x0001;
 }
@@ -139,6 +150,7 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     int channelIdx = flags & 0x03;
     int mode = (flags >> 2) & 0x3;
     int pan = (flags >> 4) & 0x3;
+    int noteMode = flags & 0x40;
 
     // TODO(2022-01-08): Thread safety
     Channel* channel = &channels[channelIdx];
@@ -147,9 +159,13 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     if (time > channel->releaseTime && ticks != channel->endTick) {
         channel->phase = (channelIdx == 2) ? 0.25 : 0;
     }
-
-    channel->freq1 = freq1;
-    channel->freq2 = freq2;
+    if (noteMode) {
+        channel->freq1 = midiFreq(freq1 & 0xff, freq1 >> 8);
+        channel->freq2 = (freq2 == 0) ? 0 : midiFreq(freq2 & 0xff, freq2 >> 8);
+    } else {
+        channel->freq1 = freq1;
+        channel->freq2 = freq2;
+    }
     channel->startTime = time;
     channel->attackTime = channel->startTime + SAMPLE_RATE*attack/60;
     channel->decayTime = channel->attackTime + SAMPLE_RATE*decay/60;
@@ -190,7 +206,7 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
             Channel* channel = &channels[channelIdx];
 
             if (time < channel->releaseTime || ticks == channel->endTick) {
-                uint16_t freq = getCurrentFrequency(channel);
+                float freq = getCurrentFrequency(channel);
                 int16_t volume = getCurrentVolume(channel);
                 int16_t sample;
 
@@ -207,7 +223,7 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
                     sample = volume * channel->noise.lastRandom;
 
                 } else {
-                    float phaseInc = (float)freq / SAMPLE_RATE;
+                    float phaseInc = freq / SAMPLE_RATE;
                     channel->phase += phaseInc;
 
                     if (channel->phase >= 1) {

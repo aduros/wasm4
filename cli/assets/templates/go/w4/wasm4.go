@@ -111,6 +111,7 @@ const TONE_MODE3 = 8
 const TONE_MODE4 = 12
 const TONE_PAN_LEFT = 16
 const TONE_PAN_RIGHT = 32
+const TONE_NOTE_MODE = 64
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │

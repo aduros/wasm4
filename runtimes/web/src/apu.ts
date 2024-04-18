@@ -55,12 +55,18 @@ export class APU {
         }
     }
 
-    tone (frequency: number, duration: number, volume: number, flags: number) {
-        const processorPort = this.processorPort;
-        if (processorPort != null) {
-            // Send params out to the worker
-            processorPort.postMessage([frequency, duration, volume, flags]);
+    tick() {
+        if (this.processorPort != null) {
+            this.processorPort.postMessage('tick');
+        } else {
+            this.processor.tick();
+        }
+    }
 
+    tone (frequency: number, duration: number, volume: number, flags: number) {
+        if (this.processorPort != null) {
+            // Send params out to the worker
+            this.processorPort.postMessage([frequency, duration, volume, flags]);
         } else {
             // For the ScriptProcessorNode fallback, just call tone() directly
             this.processor.tone(frequency, duration, volume, flags);

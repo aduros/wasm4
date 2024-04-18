@@ -184,6 +184,7 @@ void w4_runtimeUpdate () {
         w4_framebufferClear();
     }
     w4_wasmCallUpdate();
+    w4_apuTick();
     uint32_t palette[4] = {
         w4_read32LE(&memory->palette[0]),
         w4_read32LE(&memory->palette[1]),

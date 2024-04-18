@@ -29,6 +29,9 @@ typedef struct {
     /** Time the tone should end. */
     unsigned long long releaseTime;
 
+    /** The tick the tone should end. */
+    unsigned long long endTick;
+
     /** Sustain volume level. */
     int16_t sustainVolume;
 
@@ -59,8 +62,9 @@ typedef struct {
 
 static Channel channels[4] = { 0 };
 
-/** The current time, in samples. */
+/** The current time in samples and ticks respectively. */
 static unsigned long long time = 0;
+static unsigned long long ticks = 0;
 
 static int w4_min (int a, int b) {
     return a < b ? a : b;
@@ -71,6 +75,7 @@ static int lerp (int value1, int value2, float t) {
 }
 
 static int ramp (int value1, int value2, unsigned long long time1, unsigned long long time2) {
+    if (time >= time2) return value2;
     float t = (float)(time - time1) / (time2 - time1);
     return lerp(value1, value2, t);
 }
@@ -84,7 +89,7 @@ static uint16_t getCurrentFrequency (const Channel* channel) {
 }
 
 static int16_t getCurrentVolume (const Channel* channel) {
-    if (time >= channel->sustainTime) {
+    if (time >= channel->sustainTime && channel->releaseTime != channel->sustainTime) {
         // Release
         return ramp(channel->sustainVolume, 0, channel->sustainTime, channel->releaseTime);
     } else if (time >= channel->decayTime) {
@@ -115,6 +120,10 @@ void w4_apuInit () {
     channels[3].noise.seed = 0x0001;
 }
 
+void w4_apuTick () {
+    ticks++;
+}
+
 void w4_apuTone (int frequency, int duration, int volume, int flags) {
     int freq1 = frequency & 0xffff;
     int freq2 = (frequency >> 16) & 0xffff;
@@ -135,7 +144,7 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     Channel* channel = &channels[channelIdx];
 
     // Restart the phase if this channel wasn't already playing
-    if (time > channel->releaseTime) {
+    if (time > channel->releaseTime && ticks != channel->endTick) {
         channel->phase = (channelIdx == 2) ? 0.25 : 0;
     }
 
@@ -146,6 +155,7 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     channel->decayTime = channel->attackTime + SAMPLE_RATE*decay/60;
     channel->sustainTime = channel->decayTime + SAMPLE_RATE*sustain/60;
     channel->releaseTime = channel->sustainTime + SAMPLE_RATE*release/60;
+    channel->endTick = ticks + attack + decay + sustain + release;
     int16_t maxVolume = (channelIdx == 2) ? MAX_VOLUME_TRIANGLE : MAX_VOLUME;
     channel->sustainVolume = maxVolume * sustainVolume/100;
     channel->peakVolume = peakVolume ? maxVolume * peakVolume/100 : maxVolume;
@@ -179,7 +189,7 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
         for (int channelIdx = 0; channelIdx < 4; ++channelIdx) {
             Channel* channel = &channels[channelIdx];
 
-            if (time < channel->releaseTime) {
+            if (time < channel->releaseTime || ticks == channel->endTick) {
                 uint16_t freq = getCurrentFrequency(channel);
                 int16_t volume = getCurrentVolume(channel);
                 int16_t sample;

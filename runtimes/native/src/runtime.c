@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "apu.h"
 #include "framebuffer.h"
@@ -13,6 +14,7 @@
 #define HEIGHT 160
 
 #define SYSTEM_PRESERVE_FRAMEBUFFER 1
+#define SYSTEM_STANDARD_TRACING 4
 
 #pragma pack(1)
 typedef struct {
@@ -168,12 +170,57 @@ void w4_runtimeTraceUtf16 (const uint16_t* str, int byteLength) {
     printf("TODO: traceUtf16: %p, %d\n", str, byteLength);
 }
 
-void w4_runtimeTracef (const uint8_t* str, const void* stack) {
-    puts(str);
+static unsigned align(unsigned v, unsigned a) {
+    return (v + a - 1) & ~(a - 1);
+}
 
-    // This seems to crash on Linux release builds
-    // vprintf(str, (void*)&stack);
-    // putchar('\n');
+void w4_runtimeTracef (const uint8_t* fmt, const uint8_t * stk) {
+    char out[256];
+    char buf[256];
+    size_t sofar = 0;
+    unsigned si = 0;
+    char * ctx = buf;
+    char * s;
+    snprintf(buf, sizeof(buf), "%s", fmt);
+    s = strsep(&ctx, "%");
+    while (s) {
+        char fb[32];
+	char fc;
+        char * fm =  strsep(&ctx, "cdxfs");
+        if (!fm) {
+            sofar += snprintf(out+sofar, sizeof(out)-sofar, "%s", s);
+            break;
+        }
+        fc = fmt[(fm+strlen(fm)) - buf];
+        snprintf(fb, sizeof(fb), "%s%%%s%c", s, fm, fc);
+        switch (fc) {
+	case 0:
+            sofar += snprintf(out+sofar, sizeof(out)-sofar, fb);
+            break;
+        case 'c':
+        case 'd':
+        case 'x':
+            sofar += snprintf(out+sofar, sizeof(out)-sofar, fb, *(int32_t*)(stk+si));
+            si += 4;
+            break;
+        case 'f':
+            si = align(si, 8);
+            sofar += snprintf(out+sofar, sizeof(out)-sofar, fb, *(double*)(stk+si));
+            si += 8;
+            break;
+        case 's':
+  	    sofar += snprintf(out+sofar, sizeof(out)-sofar, fb, ((uint8_t*)memory)+*(int32_t*)(stk+si));
+            si += 4;
+            break;
+        default:
+            assert(0);
+        }
+        s = strsep(&ctx, "%");
+    }
+    if (memory->systemFlags & SYSTEM_STANDARD_TRACING)
+      fputs(out, stdout);
+    else
+      puts(out);
 }
 
 void w4_runtimeUpdate () {

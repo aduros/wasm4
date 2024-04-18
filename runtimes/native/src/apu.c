@@ -83,6 +83,7 @@ static int ramp (int value1, int value2, unsigned long long time1, unsigned long
     return lerp(value1, value2, t);
 }
 static float rampf (float value1, float value2, unsigned long long time1, unsigned long long time2) {
+    if (time >= time2) return value2;
     float t = (float)(time - time1) / (time2 - time1);
     return lerpf(value1, value2, t);
 }

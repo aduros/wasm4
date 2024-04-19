@@ -5,7 +5,10 @@
 
 #define SAMPLE_RATE 44100
 #define MAX_VOLUME 0x1333 // ~15% of INT16_MAX
+// The triangle channel sounds a bit quieter than the others, so give it higher amplitude
 #define MAX_VOLUME_TRIANGLE 0x2000 // ~25% of INT16_MAX
+// Also the triangle channel prevent popping on hard stops by adding a 1 ms release
+#define RELEASE_TIME_TRIANGLE (SAMPLE_RATE / 1000)
 
 typedef struct {
     /** Starting frequency. */
@@ -97,7 +100,7 @@ static float getCurrentFrequency (const Channel* channel) {
 }
 
 static int16_t getCurrentVolume (const Channel* channel) {
-    if (time >= channel->sustainTime && channel->releaseTime != channel->sustainTime) {
+    if (time >= channel->sustainTime && (channel->releaseTime - channel->sustainTime) > RELEASE_TIME_TRIANGLE) {
         // Release
         return ramp(channel->sustainVolume, 0, channel->sustainTime, channel->releaseTime);
     } else if (time >= channel->decayTime) {
@@ -192,9 +195,8 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
         }
 
     } else if (channelIdx == 2) {
-        // For the triangle channel, prevent popping on hard stops by adding a 1 ms release
         if (release == 0) {
-            channel->releaseTime += SAMPLE_RATE/1000;
+            channel->releaseTime += RELEASE_TIME_TRIANGLE;
         }
     }
 }

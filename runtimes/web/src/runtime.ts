@@ -334,8 +334,8 @@ export class Runtime {
         let update_function = this.wasm!.exports["update"];
         if (typeof update_function === "function") {
             this.bluescreenOnError(update_function);
-            this.apu.tick();
         }
+        this.apu.tick();
     }
 
     blueScreen (text: string) {

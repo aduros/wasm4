@@ -3,7 +3,10 @@
 // Audio worklet file: do not export anything directly.
 const SAMPLE_RATE = 44100;
 const MAX_VOLUME = 0.15;
+// The triangle channel sounds a bit quieter than the others, so give it higher amplitude
 const MAX_VOLUME_TRIANGLE = 0.25;
+// Also the triangle channel prevent popping on hard stops by adding a 1 ms release
+const RELEASE_TIME_TRIANGLE = Math.floor(SAMPLE_RATE / 1000);
 
 class Channel {
     /** Starting frequency. */
@@ -114,7 +117,7 @@ class APUProcessor extends AudioWorkletProcessor {
 
     getCurrentVolume (channel: Channel) {
         const time = this.time;
-        if (time >= channel.sustainTime && channel.releaseTime != channel.sustainTime) {
+        if (time >= channel.sustainTime && (channel.releaseTime - channel.sustainTime) > RELEASE_TIME_TRIANGLE) {
             // Release
             return this.ramp(channel.sustainVolume, 0, channel.sustainTime, channel.releaseTime);
         } else if (time >= channel.decayTime) {
@@ -188,9 +191,8 @@ class APUProcessor extends AudioWorkletProcessor {
             }
 
         } else if (channelIdx == 2) {
-            // For the triangle channel, prevent popping on hard stops by adding a 1 ms release
             if (release == 0) {
-                channel.releaseTime += (SAMPLE_RATE/1000) >>> 0;
+                channel.releaseTime += RELEASE_TIME_TRIANGLE;
             }
         }
     }

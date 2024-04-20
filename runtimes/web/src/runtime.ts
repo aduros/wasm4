@@ -307,6 +307,9 @@ export class Runtime {
                     output += this.data.getFloat64(argPtr, true);
                     argPtr += 8;
                     break;
+                default: // unknown
+                    output += "%" + String.fromCharCode(ch);
+                    break;
                 }
             } else {
                 output += String.fromCharCode(ch);

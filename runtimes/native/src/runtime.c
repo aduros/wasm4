@@ -169,11 +169,50 @@ void w4_runtimeTraceUtf16 (const uint16_t* str, int byteLength) {
 }
 
 void w4_runtimeTracef (const uint8_t* str, const void* stack) {
-    puts(str);
-
-    // This seems to crash on Linux release builds
-    // vprintf(str, (void*)&stack);
-    // putchar('\n');
+    const uint8_t* argPtr = stack;
+    uint32_t strPtr;
+    for (; *str != 0; ++str) {
+        if (*str == '%') {
+            const uint8_t sym = *(++str);
+            switch (sym) {
+            case 0:
+                return; // Interrupted
+            case '%':
+                putc('%', stdout);
+                break;
+            case 'c':
+                putc(*(char*)argPtr, stdout);
+                argPtr += 4;
+                break;
+            case 'd':
+                printf("%d", *(int32_t*)argPtr);
+                argPtr += 4;
+                break;
+            case 'x':
+                printf("%x", *(uint32_t*)argPtr);
+                argPtr += 4;
+                break;
+            case 's':
+                strPtr = *(uint32_t*)argPtr;
+                argPtr += 4;
+                if (strPtr > 0 && strPtr < sizeof(*memory)) {
+                    printf("%.*s", (int)(sizeof(*memory) - strPtr), (char*)memory + strPtr);
+                } else {
+                    printf("<invalid memory>");
+                }
+                break;
+            case 'f':
+                printf("%lg", *(double*)argPtr);
+                argPtr += 8;
+                break;
+            default:
+                printf("%%%c", sym);
+            }
+        } else {
+            putc(*str, stdout);
+        }
+    }
+    putc('\n', stdout);
 }
 
 void w4_runtimeUpdate () {

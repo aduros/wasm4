@@ -54,6 +54,16 @@ var {{name}} = [{{length}}]byte { {{bytes}} }
 
 {{/sprites}}`,
 
+grain:
+`{{#sprites}}
+// {{name}}
+let {{name}}Width = {{width}}us
+let {{name}}Height = {{height}}us
+let {{name}}Flags = {{flags}}us // {{flagsHumanReadable}}
+let {{name}} = b"{{charBytes}}"
+
+{{/sprites}}`,
+
     nelua:
         `{{#sprites}}
 -- {{name}}
@@ -302,6 +312,9 @@ The first occurrence of another color is at (${x}, ${y}) and has the value of (R
 
     const data = dataBytes.join(',')
 
+    const charBytes = [...bytes]
+        .map((b) => "\\x" + b.toString(16).padStart(2, "0"))
+
     const wasmBytes = [...bytes]
         .map((b) => "\\" + b.toString(16).padStart(2, "0"))
 
@@ -321,6 +334,7 @@ The first occurrence of another color is at (${x}, ${y}) and has the value of (R
         "flagsHumanReadable": flagsHumanReadable,
         "bytes": data,
         "bpp": bpp,
+        "charBytes": charBytes.join(''),
         "firstByte": dataBytes[0],
         "restBytes": dataBytes.slice(1).join(','),
         "wasmBytes": wasmBytes.join(''),

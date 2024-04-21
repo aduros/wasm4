@@ -35,6 +35,11 @@ const HELP = {
         build: "make",
         cart: "build/cart.wasm",
     },
+    grain: {
+        name: "Grain",
+        build: "make",
+        cart: "cart.wasm",
+    },
     nelua: {
         name: "Nelua",
         build: "make",

@@ -159,8 +159,10 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     // TODO(2022-01-08): Thread safety
     Channel* channel = &channels[channelIdx];
 
-    // Restart the phase if this channel wasn't already playing
-    if (time > channel->releaseTime && ticks != channel->endTick) {
+    // Restart the phase if the channel isn't already playing, but be
+    // careful to keep the phase if the channel is already playing to allow
+    // for continuous tones and smooth transitions to or from a glide etc.
+    if (time > channel->releaseTime && ticks > channel->endTick) {
         channel->phase = (channelIdx == 2) ? 0.25 : 0;
     }
     if (noteMode) {

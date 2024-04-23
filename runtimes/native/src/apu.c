@@ -208,7 +208,7 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
         for (int channelIdx = 0; channelIdx < 4; ++channelIdx) {
             Channel* channel = &channels[channelIdx];
 
-            if (time < channel->releaseTime || ticks == channel->endTick) {
+            if (time < channel->releaseTime || ticks <= channel->endTick) {
                 float freq = getCurrentFrequency(channel);
                 int16_t volume = getCurrentVolume(channel);
                 int16_t sample;

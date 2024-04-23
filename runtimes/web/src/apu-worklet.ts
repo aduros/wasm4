@@ -204,7 +204,7 @@ class APUProcessor extends AudioWorkletProcessor {
             for (let channelIdx = 0; channelIdx < 4; ++channelIdx) {
                 const channel = this.channels[channelIdx];
 
-                if (this.time < channel.releaseTime || this.ticks == channel.endTick) {
+                if (this.time < channel.releaseTime || this.ticks <= channel.endTick) {
                     const freq = this.getCurrentFrequency(channel);
                     const volume = this.getCurrentVolume(channel);
                     let sample;

@@ -6,6 +6,8 @@ For original source, see:
 
 Tips and source here are copied from there.
 
+Also, for fast compiling, be sure to [build Grain from source](https://grain-lang.org/docs/getting_grain#Building-Grain-from-Source).
+
 ## Tips to fit within 64k
 
 This limitation is part of the fun. Grain's extensive `Number` type brings in quite a bit of support code, so avoiding it (and standard libraries that depend on it) is the best way to keep the cartridge size small. This includes the math operations provided by `Pervasives`, like `+` and `==`, but conveniently, the WASM-4 API uses the `Uint8` and `Uint16` types. The `hello-world.gr` example is only 7k, and even with a number of sprites and a good chunk of music data, the `music.gr` example is 21k.

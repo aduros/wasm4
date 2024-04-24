@@ -1,12 +1,12 @@
 # Grain bindings for WASM-4
 
-For original source, see:
+Requires grain 0.6 or higher. Tested with Grain 0.6.3. For fast compiling, be sure to [build Grain from source](https://grain-lang.org/docs/getting_grain#Building-Grain-from-Source).
+
+For original template source, see:
 
 - https://github.com/ospencer/wasm4-gr
 
 Tips and source here are copied from there.
-
-Also, for fast compiling, be sure to [build Grain from source](https://grain-lang.org/docs/getting_grain#Building-Grain-from-Source).
 
 ## Tips to fit within 64k
 

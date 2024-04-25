@@ -157,7 +157,7 @@ class APUProcessor extends AudioWorkletProcessor {
         // Restart the phase if the channel isn't already playing, but be
         // careful to keep the phase if the channel is already playing to allow
         // for continuous tones and smooth transitions to or from a glide etc.
-        if (this.time > channel.releaseTime && this.ticks > channel.endTick) {
+        if (this.ticks > channel.endTick) {
             channel.phase = (channelIdx == 2) ? 0.25 : 0;
         }
         if (noteMode) {
@@ -206,7 +206,7 @@ class APUProcessor extends AudioWorkletProcessor {
             for (let channelIdx = 0; channelIdx < 4; ++channelIdx) {
                 const channel = this.channels[channelIdx];
 
-                if (this.time < channel.releaseTime || this.ticks <= channel.endTick) {
+                if (this.ticks <= channel.endTick) {
                     const freq = this.getCurrentFrequency(channel);
                     const volume = this.getCurrentVolume(channel);
                     let sample;

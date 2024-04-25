@@ -162,7 +162,7 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     // Restart the phase if the channel isn't already playing, but be
     // careful to keep the phase if the channel is already playing to allow
     // for continuous tones and smooth transitions to or from a glide etc.
-    if (time > channel->releaseTime && ticks > channel->endTick) {
+    if (ticks > channel->endTick) {
         channel->phase = (channelIdx == 2) ? 0.25 : 0;
     }
     if (noteMode) {
@@ -210,7 +210,7 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
         for (int channelIdx = 0; channelIdx < 4; ++channelIdx) {
             Channel* channel = &channels[channelIdx];
 
-            if (time < channel->releaseTime || ticks <= channel->endTick) {
+            if (ticks <= channel->endTick) {
                 float freq = getCurrentFrequency(channel);
                 int16_t volume = getCurrentVolume(channel);
                 int16_t sample;

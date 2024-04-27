@@ -40,6 +40,13 @@ static Memory* memory;
 static w4_Disk* disk;
 static bool firstFrame;
 
+static MaybeToneCall bufferedToneCalls[4] = {
+    {false, 0, 0, 0, 0},
+    {false, 0, 0, 0, 0},
+    {false, 0, 0, 0, 0},
+    {false, 0, 0, 0, 0},
+};
+
 void w4_runtimeInit (uint8_t* memoryBytes, w4_Disk* diskBytes) {
     memory = (Memory*)memoryBytes;
     disk = diskBytes;
@@ -128,7 +135,12 @@ void w4_runtimeTextUtf16 (const uint16_t* str, int byteLength, int x, int y) {
 
 void w4_runtimeTone (int frequency, int duration, int volume, int flags) {
     // printf("tone: %d, %d, %d, %d\n", frequency, duration, volume, flags);
-    w4_apuTone(frequency, duration, volume, flags);
+    int channelIdx = flags & 0x3;
+    bufferedToneCalls[channelIdx].active = true;
+    bufferedToneCalls[channelIdx].frequency = frequency;
+    bufferedToneCalls[channelIdx].duration = duration;
+    bufferedToneCalls[channelIdx].volume = volume;
+    bufferedToneCalls[channelIdx].flags = flags;
 }
 
 int w4_runtimeDiskr (uint8_t* dest, int size) {
@@ -223,7 +235,7 @@ void w4_runtimeUpdate () {
         w4_framebufferClear();
     }
     w4_wasmCallUpdate();
-    w4_apuTick();
+    w4_apuTick(bufferedToneCalls);
     uint32_t palette[4] = {
         w4_read32LE(&memory->palette[0]),
         w4_read32LE(&memory->palette[1]),

@@ -135,10 +135,6 @@ void w4_apuInit () {
     channels[3].noise.seed = 0x0001;
 }
 
-void w4_apuTick () {
-    ticks++;
-}
-
 void w4_apuTone (int frequency, int duration, int volume, int flags) {
     int freq1 = frequency & 0xffff;
     int freq2 = (frequency >> 16) & 0xffff;
@@ -201,6 +197,17 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
             channel->releaseTime += RELEASE_TIME_TRIANGLE;
         }
     }
+}
+
+void w4_apuTick (MaybeToneCall toneCalls[4]) {
+    for (int i=0; i<4; i++) {
+        MaybeToneCall* toneCall = &toneCalls[i];
+        if (toneCall->active) {
+            w4_apuTone(toneCall->frequency, toneCall->duration, toneCall->volume, toneCall->flags);
+            toneCall->active = false;
+        }
+    }
+    ticks++;
 }
 
 void w4_apuWriteSamples (int16_t* output, unsigned long frames) {

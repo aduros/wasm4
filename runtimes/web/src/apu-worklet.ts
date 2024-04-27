@@ -91,12 +91,8 @@ class APUProcessor extends AudioWorkletProcessor {
         }
 
         if (this.port != null) {
-            this.port.onmessage = (event: MessageEvent<'tick' | [number, number, number, number]>) => {
-                if (event.data === 'tick') {
-                    this.tick();
-                } else {
-                    this.tone(...event.data);
-                }
+            this.port.onmessage = (event: MessageEvent<BufferedToneCalls>) => {
+                this.tick(event.data);
             };
         }
     }
@@ -132,7 +128,12 @@ class APUProcessor extends AudioWorkletProcessor {
         }
     }
 
-    tick () {
+    tick (bufferedToneCalls: BufferedToneCalls) {
+        for (let maybeToneCall of bufferedToneCalls) {
+            if (maybeToneCall !== null) {
+                this.tone(...maybeToneCall);
+            }
+        }
         this.ticks++;
     }
 

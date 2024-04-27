@@ -12,6 +12,7 @@ export class APU {
     audioCtx: AudioContext;
     processor!: APUProcessor;
     processorPort!: MessagePort;
+    bufferedToneCalls: BufferedToneCalls = [null, null, null, null];
 
     constructor () {
         this.audioCtx = new (window.AudioContext || window.webkitAudioContext)({
@@ -55,22 +56,22 @@ export class APU {
         }
     }
 
-    tick() {
+    tick () {
         if (this.processorPort != null) {
-            this.processorPort.postMessage('tick');
+            // Send the buffered tone calls for this tick to the audio worklet
+            this.processorPort.postMessage(this.bufferedToneCalls);
         } else {
-            this.processor.tick();
+            // For the ScriptProcessorNode fallback, just call tick() directly
+            this.processor.tick(this.bufferedToneCalls);
         }
+        // Clear the buffered calls for the next update
+        this.bufferedToneCalls = [null, null, null, null];
     }
 
     tone (frequency: number, duration: number, volume: number, flags: number) {
-        if (this.processorPort != null) {
-            // Send params out to the worker
-            this.processorPort.postMessage([frequency, duration, volume, flags]);
-        } else {
-            // For the ScriptProcessorNode fallback, just call tone() directly
-            this.processor.tone(frequency, duration, volume, flags);
-        }
+        const channelIdx = flags & 0x3;
+
+        this.bufferedToneCalls[channelIdx] = [frequency, duration, volume, flags];
     }
 
     unlockAudio () {

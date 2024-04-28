@@ -255,7 +255,7 @@ The first occurrence of another color is at (${x}, ${y}) and has the value of (R
 
     // Write a color (palette index) to the output buffer
     function writeColor(color, x, y) {
-        if(bpp < 0 || bpp > 2){
+        if(bpp != 1 && bpp != 2){
             throw new Error("unexpexted bpp");
         }
 

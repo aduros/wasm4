@@ -89,12 +89,16 @@ export class Runtime {
         return this.data.getUint8(constants.ADDR_SYSTEM_FLAGS) & mask;
     }
 
-    unlockAudio () {
-        this.apu.unlockAudio();
+    unpauseAudio () {
+        this.apu.unpauseAudio();
     }
 
-    pauseAudio() {
+    pauseAudio () {
         this.apu.pauseAudio();
+    }
+
+    pokeAudio () {
+        this.apu.pokeAudio();
     }
 
     reset (zeroMemory?: boolean) {

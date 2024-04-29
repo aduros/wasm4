@@ -13,6 +13,7 @@ export class APU {
     processor!: APUProcessor;
     processorPort!: MessagePort;
     bufferedToneCalls: BufferedToneCalls = [null, null, null, null];
+    paused: boolean = false;
 
     constructor () {
         this.audioCtx = new (window.AudioContext || window.webkitAudioContext)({
@@ -74,7 +75,8 @@ export class APU {
         this.bufferedToneCalls[channelIdx] = [frequency, duration, volume, flags];
     }
 
-    unlockAudio () {
+    unpauseAudio () {
+        this.paused = false;
         const audioCtx = this.audioCtx;
         if (audioCtx.state == "suspended") {
             audioCtx.resume();
@@ -82,9 +84,20 @@ export class APU {
     }
 
     pauseAudio () {
+        this.paused = true;
         const audioCtx = this.audioCtx;
         if (audioCtx.state == "running") {
             audioCtx.suspend();
+        }
+    }
+
+    // Most web browsers won't play audio until the user has interacted with the web page.
+    // Even if there are already pending Promises from an AudioContext.resume() call when the
+    // page gets interaction, apparently the AudioContext still needs to be poked with a
+    // resume() call to start playing.
+    pokeAudio () {
+        if (!this.paused) {
+            this.audioCtx.resume();
         }
     }
 }

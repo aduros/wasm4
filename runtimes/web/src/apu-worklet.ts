@@ -5,7 +5,8 @@ const SAMPLE_RATE = 44100;
 const MAX_VOLUME = 0.15;
 // The triangle channel sounds a bit quieter than the others, so give it higher amplitude
 const MAX_VOLUME_TRIANGLE = 0.25;
-// Also the triangle channel prevent popping on hard stops by adding a 1 ms release
+// Also the triangle channel has a short release by default to reduce popping. Popping isn't
+// as noticable on the other channels.
 const RELEASE_TIME_TRIANGLE = Math.floor(SAMPLE_RATE / 1000);
 
 class Channel {
@@ -113,7 +114,7 @@ class APUProcessor extends AudioWorkletProcessor {
 
     getCurrentVolume (channel: Channel) {
         const time = this.time;
-        if (time >= channel.sustainTime && (channel.releaseTime - channel.sustainTime) > RELEASE_TIME_TRIANGLE) {
+        if (time >= channel.sustainTime) {
             // Release
             return this.ramp(channel.sustainVolume, 0, channel.sustainTime, channel.releaseTime);
         } else if (time >= channel.decayTime) {
@@ -158,7 +159,7 @@ class APUProcessor extends AudioWorkletProcessor {
         // Restart the phase if the channel isn't already playing, but be
         // careful to keep the phase if the channel is already playing to allow
         // for continuous tones and smooth transitions to or from a glide etc.
-        if (this.ticks > channel.endTick) {
+        if (this.time > channel.releaseTime && this.ticks > channel.endTick) {
             channel.phase = (channelIdx == 2) ? 0.25 : 0;
         }
         if (noteMode) {
@@ -209,7 +210,7 @@ class APUProcessor extends AudioWorkletProcessor {
             for (let channelIdx = 0; channelIdx < 4; ++channelIdx) {
                 const channel = this.channels[channelIdx];
 
-                if (this.ticks <= channel.endTick) {
+                if (this.time < channel.releaseTime || this.ticks <= channel.endTick) {
                     const freq = this.getCurrentFrequency(channel);
                     const volume = this.getCurrentVolume(channel);
                     let sample;

@@ -238,8 +238,8 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
                     sample = volume * channel->noise.lastRandom;
 
                 } else {
-                    float phaseInc = freq / SAMPLE_RATE;
-                    channel->phase += phaseInc;
+                    float phasePerSample = freq / SAMPLE_RATE;
+                    channel->phase += phasePerSample;
 
                     if (channel->phase >= 1) {
                         channel->phase--;
@@ -251,20 +251,20 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
 
                     } else {
                         // Pulse channel
-                        float dutyPhase, dutyPhaseInc;
+                        float fractionOfPulseWidth, fractionOfPulseWidthPerSample;
                         int16_t multiplier;
 
                         // Map duty to 0->1
                         if (channel->phase < channel->pulse.dutyCycle) {
-                            dutyPhase = channel->phase / channel->pulse.dutyCycle;
-                            dutyPhaseInc = phaseInc / channel->pulse.dutyCycle;
+                            fractionOfPulseWidth = channel->phase / channel->pulse.dutyCycle;
+                            fractionOfPulseWidthPerSample = phasePerSample / channel->pulse.dutyCycle;
                             multiplier = volume;
                         } else {
-                            dutyPhase = (channel->phase - channel->pulse.dutyCycle) / (1.f - channel->pulse.dutyCycle);
-                            dutyPhaseInc = phaseInc / (1.f - channel->pulse.dutyCycle);
+                            fractionOfPulseWidth = (channel->phase - channel->pulse.dutyCycle) / (1.f - channel->pulse.dutyCycle);
+                            fractionOfPulseWidthPerSample = phasePerSample / (1.f - channel->pulse.dutyCycle);
                             multiplier = -volume;
                         }
-                        sample = multiplier * polyblep(dutyPhase, dutyPhaseInc);
+                        sample = multiplier * polyblep(fractionOfPulseWidth, fractionOfPulseWidthPerSample);
                     }
                 }
 

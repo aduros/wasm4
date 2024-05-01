@@ -229,8 +229,8 @@ class APUProcessor extends AudioWorkletProcessor {
                         sample = volume * channel.noiseLastRandom;
 
                     } else {
-                        const phaseInc = freq / SAMPLE_RATE;
-                        let phase = channel.phase + phaseInc;
+                        const phasePerSample = freq / SAMPLE_RATE;
+                        let phase = channel.phase + phasePerSample;
 
                         if (phase >= 1) {
                             phase--;
@@ -243,20 +243,20 @@ class APUProcessor extends AudioWorkletProcessor {
 
                         } else {
                             // Pulse channel
-                            let dutyPhase, dutyPhaseInc, multiplier;
+                            let fractionOfPulseWidth, fractionOfPulseWidthPerSample, multiplier;
 
                             // Map duty to 0->1
-                            const pulseDutyCycle = channel.pulseDutyCycle;
-                            if (phase < pulseDutyCycle) {
-                                dutyPhase = phase / pulseDutyCycle;
-                                dutyPhaseInc = phaseInc / pulseDutyCycle;
+                            const phaseWhenDutyCycleEdge = channel.pulseDutyCycle;
+                            if (phase < phaseWhenDutyCycleEdge) {
+                                fractionOfPulseWidth = phase / phaseWhenDutyCycleEdge;
+                                fractionOfPulseWidthPerSample = phasePerSample / phaseWhenDutyCycleEdge;
                                 multiplier = volume;
                             } else {
-                                dutyPhase = (phase - pulseDutyCycle) / (1 - pulseDutyCycle);
-                                dutyPhaseInc = phaseInc / (1 - pulseDutyCycle);
+                                fractionOfPulseWidth = (phase - phaseWhenDutyCycleEdge) / (1 - phaseWhenDutyCycleEdge);
+                                fractionOfPulseWidthPerSample = phasePerSample / (1 - phaseWhenDutyCycleEdge);
                                 multiplier = -volume;
                             }
-                            sample = multiplier * polyblep(dutyPhase, dutyPhaseInc);
+                            sample = multiplier * polyblep(fractionOfPulseWidth, fractionOfPulseWidthPerSample);
                         }
                     }
 

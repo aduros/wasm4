@@ -185,12 +185,14 @@ class APUProcessor extends AudioWorkletProcessor {
             case 0:
                 channel.pulseDutyCycle = 0.125;
                 break;
-            case 1: case 3: default:
+            case 1:
                 channel.pulseDutyCycle = 0.25;
                 break;
             case 2:
                 channel.pulseDutyCycle = 0.5;
                 break;
+            case 3:
+                channel.pulseDutyCycle = 0.75;
             }
 
         } else if (channelIdx == 2) {

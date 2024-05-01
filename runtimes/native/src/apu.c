@@ -184,11 +184,14 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
         case 0:
             channel->pulse.dutyCycle = 0.125f;
             break;
-        case 1: case 3: default:
+        case 1:
             channel->pulse.dutyCycle = 0.25f;
             break;
         case 2:
             channel->pulse.dutyCycle = 0.5f;
+            break;
+        case 3:
+            channel->pulse.dutyCycle = 0.75f;
             break;
         }
 

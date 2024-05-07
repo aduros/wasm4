@@ -5,45 +5,80 @@ const SAMPLE_RATE = 44100;
 const MAX_VOLUME = 0.15;
 // The triangle channel sounds a bit quieter than the others, so give it higher amplitude
 const MAX_VOLUME_TRIANGLE = 0.25;
-// Also the triangle channel prevent popping on hard stops by adding a 1 ms release
-const RELEASE_TIME_TRIANGLE = Math.floor(SAMPLE_RATE / 1000);
-
 class Channel {
+
+    // Tone Parameters
+    /** Length of the attack section. */
+    attackLength = 0;
+
+    /** Length of the decay section. */
+    decayLength = 0;
+
+    /** Length of the sustain section. */
+    sustainLength = 0;
+
+    /** Length of the release section. */
+    releaseLength = 0;
+
     /** Starting frequency. */
-    freq1 = 0;
+    startFrequency = 0;
 
-    /** Ending frequency, or zero for no frequency transition. */
-    freq2 = 0;
+    /** Ending frequency. */
+    endFrequency = 0;
 
-    /** Time the tone was started. */
-    startTime = 0;
-
-    /** Time at the end of the attack period. */
-    attackTime = 0;
-
-    /** Time at the end of the decay period. */
-    decayTime = 0;
-
-    /** Time at the end of the sustain period. */
-    sustainTime = 0;
-
-    /** Time the tone should end. */
-    releaseTime = 0;
-
-    /** The tick the tone should end. */
-    endTick = 0;
-
-    /** Sustain volume level. */
+    /** Volume level during the sustain section. */
     sustainVolume = 0;
 
-    /** Peak volume level at the end of the attack phase. */
-    peakVolume = 0;
-
-    /** Used for time tracking. */
-    phase = 0;
+    /** Volume level at the end of the attack section and start of the decay section. */
+    attackVolume = 0;
 
     /** Tone panning. 0 = center, 1 = only left, 2 = only right. */
     pan = 0;
+
+
+    // ADSR section change ticks
+    /** The tick the Decay section of the envelope should start on. */
+    startDecayTick = 0;
+
+    /** The tick the Sustain section of the envelope should start on. */
+    startSustainTick = 0;
+
+    /** The tick the Release section of the envelope should start on. */
+    startReleaseTick = 0;
+
+    /** The first tick for which the tone should no longer play, after the release period. */
+    endTick = 0;
+
+
+    // Parameters of the current ADSR section
+    /** The time the current section of the ADSR envelope started. */
+    sectionStartTime = 0;
+
+    /** The time the current section of the ADSR envelope would end if it was the perfect length. */
+    sectionEndTimeTarget = 0;
+
+    /** The frequency at the start of the current section. */
+    sectionStartFrequency = 0;
+
+    /** The frequency at the end of the current section. */
+    sectionEndFrequency = 0;
+
+    /** The volume at the start of the current section. */
+    sectionStartVolume = 0;
+
+    /** The volume at the end of the current section. */
+    sectionEndVolume = 0;
+
+    /** The first tick for which this section is no longer playing. */
+    sectionEndTick = 0;
+
+
+    // State
+    /** True if this channel is currently playing. */
+    playing = false;
+
+    /** Position in the cycle, from 0 to 1. */
+    phase = 0;
 
     /** Duty cycle for pulse channels. */
     pulseDutyCycle = 0;
@@ -98,43 +133,78 @@ class APUProcessor extends AudioWorkletProcessor {
     }
 
     ramp (value1: number, value2: number, time1: number, time2: number) {
+        if (value1 == value2) return value1;
         if (this.time >= time2) return value2;
         const t = (this.time - time1) / (time2 - time1);
         return lerp(value1, value2, t);
     }
 
     getCurrentFrequency (channel: Channel) {
-        if (channel.freq2 > 0) {
-            return this.ramp(channel.freq1, channel.freq2, channel.startTime, channel.releaseTime);
-        } else {
-            return channel.freq1;
-        }
+        return this.ramp(channel.sectionStartFrequency, channel.sectionEndFrequency, channel.sectionStartTime, channel.sectionEndTimeTarget);
     }
 
     getCurrentVolume (channel: Channel) {
-        const time = this.time;
-        if (time >= channel.sustainTime && (channel.releaseTime - channel.sustainTime) > RELEASE_TIME_TRIANGLE) {
-            // Release
-            return this.ramp(channel.sustainVolume, 0, channel.sustainTime, channel.releaseTime);
-        } else if (time >= channel.decayTime) {
-            // Sustain
-            return channel.sustainVolume;
-        } else if (time >= channel.attackTime) {
-            // Decay
-            return this.ramp(channel.peakVolume, channel.sustainVolume, channel.attackTime, channel.decayTime);
-        } else {
-            // Attack
-            return this.ramp(0, channel.peakVolume, channel.startTime, channel.attackTime);
-        }
+        return this.ramp(channel.sectionStartVolume, channel.sectionEndVolume, channel.sectionStartTime, channel.sectionEndTimeTarget);
     }
 
     tick (bufferedToneCalls: BufferedToneCalls) {
+        this.ticks++;
+
+        // Enact any stored calls to tone()
         for (let maybeToneCall of bufferedToneCalls) {
             if (maybeToneCall !== null) {
                 this.tone(...maybeToneCall);
             }
         }
-        this.ticks++;
+
+        // Update currently playing tones
+        for (let channel of this.channels) {
+            if (channel.playing && this.ticks >= channel.sectionEndTick) {
+                // sectionStart is the start of the section, in ticks since the start of the tone.
+                let sectionStart;
+                let sectionLength;
+                if (this.ticks >= channel.endTick) {
+                    // No tone playing
+                    channel.playing = false;
+                    return;
+                } else if (this.ticks >= channel.startReleaseTick) {
+                    // Release section
+                    sectionStart = channel.attackLength + channel.decayLength + channel.sustainLength;
+                    sectionLength = channel.releaseLength;
+                    channel.sectionStartVolume = channel.sustainVolume;
+                    channel.sectionEndVolume = 0;
+                } else if (this.ticks >= channel.startSustainTick) {
+                    // Sustain section
+                    sectionStart = channel.attackLength + channel.decayLength;
+                    sectionLength = channel.sustainLength;
+                    channel.sectionStartVolume = channel.sustainVolume;
+                    channel.sectionEndVolume = channel.sustainVolume;
+                } else if (this.ticks >= channel.startDecayTick) {
+                    // Decay Section
+                    sectionStart = channel.attackLength;
+                    sectionLength = channel.decayLength;
+                    channel.sectionStartVolume = channel.attackVolume;
+                    channel.sectionEndVolume = channel.sustainVolume;
+                } else {
+                    // Attack Section
+                    sectionStart = 0;
+                    sectionLength = channel.attackLength;
+                    channel.sectionStartVolume = 0;
+                    channel.sectionEndVolume = channel.attackVolume;
+                }
+                // The end of the section, in ticks since the start of the tone.
+                let sectionEnd = sectionStart + sectionLength;
+
+                let totalLength = channel.attackLength + channel.decayLength + channel.sustainLength + channel.releaseLength;
+                channel.sectionStartFrequency = lerp(channel.startFrequency, channel.endFrequency, sectionStart/totalLength);
+                channel.sectionEndFrequency = lerp(channel.startFrequency, channel.endFrequency, sectionEnd/totalLength);
+
+                channel.sectionStartTime = this.time;
+                channel.sectionEndTimeTarget = channel.sectionStartTime + ((SAMPLE_RATE*sectionLength/60) >>> 0);
+
+                channel.sectionEndTick = this.ticks + sectionLength;
+            }
+        }
     }
 
     tone (frequency: number, duration: number, volume: number, flags: number) {
@@ -146,12 +216,12 @@ class APUProcessor extends AudioWorkletProcessor {
         const attack = ((duration >> 24) & 0xff);
 
         const sustainVolume = Math.min(volume & 0xff, 100);
-        const peakVolume = Math.min((volume >> 8) & 0xff, 100);
+        const attackVolume = Math.min((volume >> 8) & 0xff, 100);
 
         const channelIdx = flags & 0x3;
         const mode = (flags >> 2) & 0x3;
         const pan = (flags >> 4) & 0x3;
-        const noteMode = flags & 0x40;
+        const noteMode = Boolean(flags & 0x40);
 
         const channel = this.channels[channelIdx];
 
@@ -162,23 +232,33 @@ class APUProcessor extends AudioWorkletProcessor {
             channel.phase = (channelIdx == 2) ? 0.25 : 0;
         }
         if (noteMode) {
-            channel.freq1 = midiFreq(freq1 & 0xff, freq1 >> 8);
-            channel.freq2 = (freq2 == 0) ? 0 : midiFreq(freq2 & 0xff, freq2 >> 8);
+            channel.startFrequency = midiFreq(freq1 & 0xff, freq1 >> 8);
+            channel.endFrequency = (freq2 == 0) ? channel.startFrequency : midiFreq(freq2 & 0xff, freq2 >> 8);
         } else {
-            channel.freq1 = freq1;
-            channel.freq2 = freq2;
+            channel.startFrequency = freq1;
+            channel.endFrequency = (freq2 == 0) ? channel.startFrequency : freq2;
         }
-        channel.startTime = this.time;
-        channel.attackTime = channel.startTime + ((SAMPLE_RATE*attack/60) >>> 0);
-        channel.decayTime = channel.attackTime + ((SAMPLE_RATE*decay/60) >>> 0);
-        channel.sustainTime = channel.decayTime + ((SAMPLE_RATE*sustain/60) >>> 0);
-        channel.releaseTime = channel.sustainTime + ((SAMPLE_RATE*release/60) >>> 0);
-        channel.endTick = this.ticks + attack + decay + sustain + release;
+
+        channel.attackLength = attack;
+        channel.decayLength = decay;
+        channel.sustainLength = sustain;
+        channel.releaseLength = release;
+
+        channel.startDecayTick = this.ticks + attack;
+        channel.startSustainTick = channel.startDecayTick + decay;
+        channel.startReleaseTick = channel.startSustainTick + sustain;
+        channel.endTick = channel.startReleaseTick + release;
+
+        // If a tone is already playing, make it end now.
+        channel.sectionEndTick = this.ticks;
+        // And start the channel playing if it wasn't already.
+        channel.playing = true;
+
         channel.pan = pan;
 
         const maxVolume = (channelIdx == 2) ? MAX_VOLUME_TRIANGLE : MAX_VOLUME;
         channel.sustainVolume = maxVolume * sustainVolume/100;
-        channel.peakVolume = peakVolume ? maxVolume * peakVolume/100 : maxVolume;
+        channel.attackVolume = attackVolume ? maxVolume * attackVolume/100 : maxVolume;
 
         if (channelIdx == 0 || channelIdx == 1) {
             switch (mode) {
@@ -194,11 +274,6 @@ class APUProcessor extends AudioWorkletProcessor {
             case 3:
                 channel.pulseDutyCycle = 0.75;
             }
-
-        } else if (channelIdx == 2) {
-            if (release == 0) {
-                channel.releaseTime += RELEASE_TIME_TRIANGLE;
-            }
         }
     }
 
@@ -209,7 +284,7 @@ class APUProcessor extends AudioWorkletProcessor {
             for (let channelIdx = 0; channelIdx < 4; ++channelIdx) {
                 const channel = this.channels[channelIdx];
 
-                if (this.ticks <= channel.endTick) {
+                if (channel.playing) {
                     const freq = this.getCurrentFrequency(channel);
                     const volume = this.getCurrentVolume(channel);
                     let sample;

@@ -5,6 +5,8 @@ const SAMPLE_RATE = 44100;
 const MAX_VOLUME = 0.15;
 // The triangle channel sounds a bit quieter than the others, so give it higher amplitude
 const MAX_VOLUME_TRIANGLE = 0.25;
+// The small fade-out time channels use to reduce audio popping.
+const FADE_OUT_TIME = Math.floor(SAMPLE_RATE / 200);
 class Channel {
 
     // Tone Parameters
@@ -88,6 +90,9 @@ class Channel {
 
     /** The last generated random number, either -1 or 1. */
     noiseLastRandom = 0;
+
+    /** The time remaining until the fade out period ends. */
+    fadeOutTime = 0;
 }
 
 function lerp (value1: number, value2: number, t: number) {
@@ -159,13 +164,13 @@ class APUProcessor extends AudioWorkletProcessor {
 
         // Update currently playing tones
         for (let channel of this.channels) {
-            if (channel.playing && this.ticks >= channel.sectionEndTick) {
+            if (channel.playing && this.ticks >= channel.sectionEndTick && channel.fadeOutTime == 0) {
                 // sectionStart is the start of the section, in ticks since the start of the tone.
                 let sectionStart;
                 let sectionLength;
                 if (this.ticks >= channel.endTick) {
-                    // No tone playing
-                    channel.playing = false;
+                    // Tone is ending and should fade out
+                    channel.fadeOutTime = FADE_OUT_TIME;
                     return;
                 } else if (this.ticks >= channel.startReleaseTick) {
                     // Release section
@@ -251,6 +256,7 @@ class APUProcessor extends AudioWorkletProcessor {
 
         // If a tone is already playing, make it end now.
         channel.sectionEndTick = this.ticks;
+        channel.fadeOutTime = 0;
         // And start the channel playing if it wasn't already.
         channel.playing = true;
 
@@ -332,6 +338,14 @@ class APUProcessor extends AudioWorkletProcessor {
                                 multiplier = -volume;
                             }
                             sample = multiplier * polyblep(fractionOfPulseWidth, fractionOfPulseWidthPerSample);
+                        }
+                    }
+
+                    if (channel.fadeOutTime > 0) {
+                        sample *= channel.fadeOutTime / FADE_OUT_TIME;
+                        --channel.fadeOutTime;
+                        if (channel.fadeOutTime == 0) {
+                            channel.playing = false;
                         }
                     }
 

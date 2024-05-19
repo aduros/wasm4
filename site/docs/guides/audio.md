@@ -576,10 +576,11 @@ fn tone_flags(channel: u32, mode: u32, pan: u32) -> u32 {
 
 ## Sound Tool
 
-The sound demo and sound test are a great way to quickly experiment with different sounds and
+The sound demo, sound test and IWAS are a great way to quickly experiment with different sounds and
 find values to plug into your game:
 
 <div className="row margin-bottom--lg">
     <PlayButton slug="sound-demo" title="Sound Demo" author="Bruno Garcia" github="aduros" colWidth="3"/>
     <PlayButton slug="sound-test" title="Sound Test" author="Mr.Rafael" github="MrRafael-dev" colWidth="3"/>
+    <PlayButton slug="iwas" title="IWAS" author="Mr.Rafael" github="MrRafael-dev" colWidth="3"/>
 </div>

@@ -334,8 +334,8 @@ void w4_framebufferRect (int x, int y, int width, int height) {
     int startY = w4_max(0, y);
     int endXUnclamped = x + width;
     int endYUnclamped = y + height;
-    int endX = w4_min(endXUnclamped, WIDTH);
-    int endY = w4_min(endYUnclamped, HEIGHT);
+    int endX = w4_max(0, w4_min(endXUnclamped, WIDTH));
+    int endY = w4_max(0, w4_min(endYUnclamped, HEIGHT));
 
     uint8_t dc01 = drawColors[0];
     uint8_t dc0 = dc01 & 0xf;

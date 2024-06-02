@@ -53,10 +53,10 @@ module.exports = {
         ],
     },
     {
-	    type: "category",
-	    label: "Tutorials",
-	    collapsible: false,
-	    items: [
+        type: "category",
+        label: "Tutorials",
+        collapsible: false,
+        items: [
             {
                 type: "category",
                 label: "Snake",
@@ -74,14 +74,7 @@ module.exports = {
                     "tutorials/snake/further-ideas",
                     "tutorials/snake/publish-your-game",
                 ]
-            }
-	    ]
-    },
-    {
-	    type: "category",
-	    label: "Tutorials",
-	    collapsible: false,
-	    items: [
+            },
             {
                 type: "category",
                 label: "Making music with IWAS",
@@ -93,7 +86,7 @@ module.exports = {
                     "tutorials/iwas/finishing-the-sequencer",
                 ]
             }
-	    ]
+        ]
     }
   ],
 };

@@ -4,7 +4,7 @@ const { program, Option } = require("commander");
 const pkg = require('./package.json');
 const { supportedIconExtensions } = require('./lib/utils/icon');
 
-const LANGS = ["assemblyscript", "c", "c3", "cpp", "d", "go", "nelua", "nim", "odin", "penne", "porth", "roc", "roland", "rust", "wat", "zig"];
+const LANGS = ["assemblyscript", "c", "c3", "cpp", "d", "go", "grain", "nelua", "nim", "odin", "penne", "porth", "roc", "roland", "rust", "wat", "zig"];
 const langOption = new Option("--lang <lang>", "Use the given language")
     .env("W4_LANG")
     .choices(LANGS);
@@ -29,6 +29,8 @@ function requireLang (opts) {
         return "d";
     } else if (opts.go) {
         return "go";
+    } else if (opts.grain) {
+        return "grain";
     } else if (opts.nelua) {
         return "nelua";
     } else if (opts.nim) {
@@ -63,6 +65,7 @@ const blankProject = (cmd) =>
         .option("--cpp", "Create C++ project (Shorthand for --lang cpp)")
         .option("--d", "Create D project (Shorthand for --lang d)")
         .option("--go", "Create Go project (Shorthand for --lang go)")
+        .option("--grain", "Create Grain project (Shorthand for --lang grain)")
         .option("--nelua", "Create Nelua project (Shorthand for --lang nelua)")
         .option("--nim", "Create Nim project (Shorthand for --lang nim)")
         .option("--odin", "Create Odin project (Shorthand for --lang odin)")
@@ -151,6 +154,7 @@ program.command("png2src <images...>")
     .option("--c3", "Generate C3 source (Shorthand for --lang c3)")
     .option("--d", "Generate D source (Shorthand for --lang d)")
     .option("--go", "Generate Go source (Shorthand for --lang go)")
+    .option("--grain", "Generate Grain source (Shorthand for --lang grain)")
     .option("--nelua", "Generate Nelua source (Shorthand for --lang nelua)")
     .option("--nim", "Generate Nim source (Shorthand for --lang nim)")
     .option("--odin", "Generate Odin source (Shorthand for --lang odin)")

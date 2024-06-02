@@ -1,0 +1,49 @@
+module HelloWorld
+
+from "wasm4" include Wasm4 as W4
+from "uint8" include Uint8
+use Uint8.{ (+), (-), (&), (>), (==) }
+
+let smiley = b"\xc3\x81\x24\x24\x00\x24\x99\xc3"
+
+let itsDangerous = "IT'S DANGEROUS\n TO GO ALONE!"
+
+let mut x = 76us
+let mut y = 76us
+
+let mut frame = 0us
+
+provide let update = () => {
+  if (frame == 108us) {
+    frame = 0us
+  }
+
+  // Load the gamepad
+  let gamepad = W4.gamepad1()
+
+  // Move the player location
+  if ((gamepad & W4._BUTTON_LEFT) > 0us) {
+    x -= 1us
+  }
+  if ((gamepad & W4._BUTTON_RIGHT) > 0us) {
+    x += 1us
+  }
+  if ((gamepad & W4._BUTTON_UP) > 0us) {
+    y -= 1us
+  }
+  if ((gamepad & W4._BUTTON_DOWN) > 0us) {
+    y += 1us
+  }
+
+  // Swap to color 2
+  W4.drawColors(2uS)
+  // Write the text
+  W4.text(itsDangerous, 24us, 50us)
+
+  // Swap to color 3
+  W4.drawColors(3uS)
+  // Draw the sprite
+  W4.blit(smiley, x, y, 8us, 8us, W4._BLIT_1BPP)
+
+  frame += 1us
+}

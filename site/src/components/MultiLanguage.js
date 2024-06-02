@@ -12,6 +12,7 @@ const names = {
     "c3": "C3",
     "d": "D",
     "go": "Go",
+    "grain": "Grain",
     "nelua": "Nelua",
     "nim": "Nim",
     "odin": "Odin",

@@ -1,0 +1,378 @@
+/**
+ * This module provides Grain bindings to WASM-4, a low-level fantasy game
+ * console for building small games with WebAssembly. For a general overview of
+ * WASM-4, check our their docs at https://wasm4.org/docs/.
+ */
+module Wasm4
+
+from "runtime/unsafe/wasmi32" include WasmI32
+from "runtime/dataStructures" include DataStructures
+use DataStructures.{ newInt32, tagUint8, untagUint8, tagUint16, untagUint16 }
+
+//
+// WASM-4: https://wasm4.org/docs
+
+// ┌───────────────────────────────────────────────────────────────────────────┐
+// │                                                                           │
+// │ Platform Constants                                                        │
+// │                                                                           │
+// └───────────────────────────────────────────────────────────────────────────┘
+
+provide let _SCREEN_SIZE = 160us
+
+// ┌───────────────────────────────────────────────────────────────────────────┐
+// │                                                                           │
+// │ Memory Addresses                                                          │
+// │                                                                           │
+// └───────────────────────────────────────────────────────────────────────────┘
+
+@unsafe
+let _PALETTE = 0x04n
+@unsafe
+let _DRAW_COLORS = 0x14n
+@unsafe
+let _GAMEPAD1 = 0x16n
+@unsafe
+let _GAMEPAD2 = 0x17n
+@unsafe
+let _GAMEPAD3 = 0x18n
+@unsafe
+let _GAMEPAD4 = 0x19n
+@unsafe
+let _MOUSE_X = 0x1an
+@unsafe
+let _MOUSE_Y = 0x1cn
+@unsafe
+let _MOUSE_BUTTONS = 0x1en
+@unsafe
+let _SYSTEM_FLAGS = 0x1fn
+@unsafe
+let _FRAMEBUFFER = 0xa0n
+
+provide let _BUTTON_1 = 1us
+provide let _BUTTON_2 = 2us
+provide let _BUTTON_LEFT = 16us
+provide let _BUTTON_RIGHT = 32us
+provide let _BUTTON_UP = 64us
+provide let _BUTTON_DOWN = 128us
+
+provide let _MOUSE_LEFT = 1uS
+provide let _MOUSE_RIGHT = 2uS
+provide let _MOUSE_MIDDLE = 4uS
+
+provide let _SYSTEM_PRESERVE_FRAMEBUFFER = 1us
+provide let _SYSTEM_HIDE_GAMEPAD_OVERLAY = 2us
+
+provide let _BLIT_1BPP = 0us
+provide let _BLIT_2BPP = 1us
+provide let _BLIT_FLIP_X = 2us
+provide let _BLIT_FLIP_Y = 4us
+provide let _BLIT_ROTATE = 8us
+
+provide let _TONE_PULSE1 = 0us
+provide let _TONE_PULSE2 = 1us
+provide let _TONE_TRIANGLE = 2us
+provide let _TONE_NOISE = 3us
+provide let _TONE_MODE1 = 0us
+provide let _TONE_MODE2 = 4us
+provide let _TONE_MODE3 = 8us
+provide let _TONE_MODE4 = 12us
+
+@unsafe
+let loadi32 = (n: Uint32) => {
+  WasmI32.load(WasmI32.fromGrain(n), 4n)
+}
+
+/**
+ * Gets the values of the first gamepad.
+ * @example Wasm4.gamepad1() & Wasm4._BUTTON_LEFT
+ */
+@unsafe
+provide let gamepad1 = () => {
+  tagUint8(WasmI32.load8U(_GAMEPAD1, 0n))
+}
+
+/**
+ * Gets the values of the second gamepad.
+ * @example Wasm4.gamepad2() & Wasm4._BUTTON_LEFT
+ */
+@unsafe
+provide let gamepad2 = () => {
+  tagUint8(WasmI32.load8U(_GAMEPAD1, 1n))
+}
+
+/**
+ * Gets the values of the third gamepad.
+ * @example Wasm4.gamepad3() & Wasm4._BUTTON_LEFT
+ */
+@unsafe
+provide let gamepad3 = () => {
+  tagUint8(WasmI32.load8U(_GAMEPAD1, 2n))
+}
+
+/**
+ * Gets the values of the fourth gamepad.
+ * @example Wasm4.gamepad4() & Wasm4._BUTTON_LEFT
+ */
+@unsafe
+provide let gamepad4 = () => {
+  tagUint8(WasmI32.load8U(_GAMEPAD1, 3n))
+}
+
+/**
+ * Gets the values of the mouse buttons.
+ * @example Wasm4.mouseButtons() & Wasm4._MOUSE_LEFT
+ */
+@unsafe
+provide let mouseButtons = () => {
+  tagUint8(WasmI32.load8U(_MOUSE_BUTTONS, 0n))
+}
+
+/**
+ * Set the draw colors. The draw colors are a set of 4 indexes into the palette. Drawing functions use these indexes to decide which colors to use, and what to use them for.
+ *
+ * It's a 16 bit value that holds 4 indexes. Bits 0-3 (the least significant bits) hold the first draw color, bits 4-7 hold the second draw color, and so on.
+ *
+ * Setting a draw color to 1 means use the palette color 1 for that draw color. The same applies when setting a draw color to 2, 3, or 4.
+ *
+ * For example, rect() uses the first draw color for the fill color, and the second draw color as the outline color. 
+ */
+@unsafe
+provide let drawColors = (colors: Uint16) => {
+  WasmI32.store16(_DRAW_COLORS, untagUint16(colors), 0n)
+}
+
+/**
+ * Set the color palette.
+ */
+@unsafe
+provide let setPalette = (
+  color1: Uint32,
+  color2: Uint32,
+  color3: Uint32,
+  color4: Uint32,
+) => {
+  WasmI32.store(_PALETTE, loadi32(color1), 0n)
+  WasmI32.store(_PALETTE, loadi32(color2), 4n)
+  WasmI32.store(_PALETTE, loadi32(color3), 8n)
+  WasmI32.store(_PALETTE, loadi32(color4), 16n)
+}
+
+foreign wasm blit:
+  (WasmI32, WasmI32, WasmI32, WasmI32, WasmI32, WasmI32) => Void from "env"
+/**
+ * Copies pixels to the framebuffer.
+ *
+ * @param sprite: The raw pixel data stored in either 1BPP or 2BPP format.
+ * @param x: X position in the destination framebuffer.
+ * @param y: Y position in the destination framebuffer.
+ * @param width: Width of the sprite.
+ * @param height: Height of the sprite.
+ * @param flags: Flags that modify behavior: _BLIT_2BPP, _BLIT_FLIP_X, _BLIT_FLIP_Y, _BLIT_ROTATE
+ */
+@unsafe
+provide let blit = (
+  sprite: Bytes,
+  x: Uint8,
+  y: Uint8,
+  width: Uint8,
+  height: Uint8,
+  flags: Uint8,
+) => {
+  use WasmI32.{ (+) }
+  blit(
+    WasmI32.fromGrain(sprite) + 8n,
+    untagUint8(x),
+    untagUint8(y),
+    untagUint8(width),
+    untagUint8(height),
+    untagUint8(flags)
+  )
+  ignore(sprite)
+}
+
+foreign wasm blitSub:
+  (
+    WasmI32,
+    WasmI32,
+    WasmI32,
+    WasmI32,
+    WasmI32,
+    WasmI32,
+    WasmI32,
+    WasmI32,
+    WasmI32,
+  ) => Void from "env"
+/**
+ * Copies a subregion within a larger sprite atlas to the framebuffer. Same as blit, but with 3 additional parameters.
+ *
+ * @param sprite: The raw pixel data stored in either 1BPP or 2BPP format.
+ * @param x: X position in the destination framebuffer.
+ * @param y: Y position in the destination framebuffer.
+ * @param width: Width of the sprite.
+ * @param height: Height of the sprite.
+ * @param srcX: Source X position of the sprite region.
+ * @param srcY: Source Y position of the sprite region.
+ * @param stride: Total width of the overall sprite atlas. This is typically larger than width.
+ * @param flags: Flags that modify behavior: _BLIT_2BPP, _BLIT_FLIP_X, _BLIT_FLIP_Y, _BLIT_ROTATE
+ */
+@unsafe
+provide let blitSub = (
+  sprite: Bytes,
+  x: Uint8,
+  y: Uint8,
+  width: Uint8,
+  height: Uint8,
+  srcX: Uint16,
+  srcY: Uint16,
+  stride: Uint8,
+  flags: Uint8,
+) => {
+  use WasmI32.{ (+) }
+  blitSub(
+    WasmI32.fromGrain(sprite) + 8n,
+    untagUint8(x),
+    untagUint8(y),
+    untagUint8(width),
+    untagUint8(height),
+    untagUint16(srcX),
+    untagUint16(srcY),
+    untagUint8(stride),
+    untagUint8(flags)
+  )
+  ignore(sprite)
+}
+
+foreign wasm line: (WasmI32, WasmI32, WasmI32, WasmI32) => Void from "env"
+/**
+ * Draws a line between two points.
+ */
+@unsafe
+provide let line = (x1: Uint8, y1: Uint8, x2: Uint8, y2: Uint8) => {
+  line(untagUint8(x1), untagUint8(y1), untagUint8(x2), untagUint8(y2))
+}
+
+foreign wasm hline: (WasmI32, WasmI32, WasmI32) => Void from "env"
+/**
+ * Draws a horizontal line between (x, y) and (x + len - 1, y).
+ */
+@unsafe
+provide let hline = (x: Uint8, y: Uint8, len: Uint8) => {
+  hline(untagUint8(x), untagUint8(y), untagUint8(len))
+}
+
+foreign wasm vline: (WasmI32, WasmI32, WasmI32) => Void from "env"
+/**
+ * Draws a vertical line between (x, y) and (x, y + len - 1).
+ */
+@unsafe
+provide let vline = (x: Uint8, y: Uint8, len: Uint8) => {
+  vline(untagUint8(x), untagUint8(y), untagUint8(len))
+}
+
+foreign wasm oval: (WasmI32, WasmI32, WasmI32, WasmI32) => Void from "env"
+/**
+ * Draws an oval (or circle).
+ */
+@unsafe
+provide let oval = (x: Uint8, y: Uint8, width: Uint8, height: Uint8) => {
+  oval(untagUint8(x), untagUint8(y), untagUint8(width), untagUint8(height))
+}
+
+foreign wasm rect: (WasmI32, WasmI32, WasmI32, WasmI32) => Void from "env"
+/**
+ * Draws a rectangle.
+ */
+@unsafe
+provide let rect = (x: Uint8, y: Uint8, width: Uint8, height: Uint8) => {
+  rect(untagUint8(x), untagUint8(y), untagUint8(width), untagUint8(height))
+}
+
+foreign wasm textUtf8: (WasmI32, WasmI32, WasmI32, WasmI32) => Void from "env"
+/**
+ * Draws text using the built-in system font. The string may contain new-line (\n) characters.
+ */
+@unsafe
+provide let text = (string: String, x: Uint8, y: Uint8) => {
+  use WasmI32.{ (+) }
+  textUtf8(
+    WasmI32.fromGrain(string) + 8n,
+    WasmI32.load(WasmI32.fromGrain(string), 4n),
+    untagUint8(x),
+    untagUint8(y)
+  )
+  ignore(string)
+}
+
+foreign wasm tone: (WasmI32, WasmI32, WasmI32, WasmI32) => Void from "env"
+/**
+ * Plays a sound tone. The high bits of frequency can optionally describe a pitch slide effect.
+ *
+ * @param frequency: Wave frequency in hertz.
+ * @param slideFrequency: Wave frequency in hertz to slide up to.
+ * @param duration: Duration of the tone in frames (1/60th of a second), up to 255 frames.
+ * @param volume: Volume of the sustain and attack durations, between 0 and 100.
+ * @param flags: Flags that modify behavior.
+ */
+@unsafe
+provide let tone = (
+  frequency: Uint16,
+  slideFrequency: Uint16=0uS,
+  duration: Uint16,
+  volume: Uint8,
+  flags: Uint8,
+) => {
+  use WasmI32.{ (|), (<<) }
+  tone(
+    untagUint16(frequency) | untagUint16(slideFrequency) << 16n,
+    untagUint16(duration),
+    untagUint8(volume),
+    untagUint8(flags)
+  )
+}
+
+foreign wasm diskr: (WasmI32, WasmI32) => WasmI32 from "env"
+/**
+ * Reads up to size bytes from persistent storage.
+ *
+ * @returns the number of bytes read, which may be less than size.
+ */
+@unsafe
+provide let diskr = (size: Uint16) => {
+  use WasmI32.{ (+) }
+  let size = untagUint16(size)
+  let bytes = DataStructures.allocateBytes(size)
+  let nread = diskr(bytes + 8n, size)
+  WasmI32.store(bytes, nread, 4n)
+  WasmI32.toGrain(bytes): Bytes
+}
+
+foreign wasm diskw: (WasmI32, WasmI32) => WasmI32 from "env"
+/**
+ * Writes up to size bytes into persistent storage.
+ *
+ * Any previously saved data on the disk is replaced.
+ *
+ * @returns the number of bytes written, which may be less than size.
+ */
+@unsafe
+provide let diskw = (bytes: Bytes) => {
+  use WasmI32.{ (+) }
+  let bytesPtr = WasmI32.fromGrain(bytes)
+  let size = WasmI32.load(bytesPtr, 4n)
+  let nwritten = diskw(bytesPtr + 8n, size)
+  ignore(bytes)
+  tagUint16(nwritten)
+}
+
+foreign wasm traceUtf8: (WasmI32, WasmI32) => Void from "env"
+/**
+ * Prints a message to the debug console.
+ */
+@unsafe
+provide let trace = (msg: String) => {
+  use WasmI32.{ (+) }
+  let msgPtr = WasmI32.fromGrain(msg)
+  traceUtf8(msgPtr + 8n, WasmI32.load(msgPtr, 4n))
+  ignore(msg)
+}

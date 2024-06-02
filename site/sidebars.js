@@ -76,6 +76,24 @@ module.exports = {
                 ]
             }
 	    ]
+    },
+    {
+	    type: "category",
+	    label: "Tutorials",
+	    collapsible: false,
+	    items: [
+            {
+                type: "category",
+                label: "Making music with IWAS",
+                collapsible: true,
+                items: [
+                    "tutorials/iwas/introduction",
+                    "tutorials/iwas/the-iwas-file-format",
+                    "tutorials/iwas/implementing-the-driver",
+                    "tutorials/iwas/finishing-the-sequencer",
+                ]
+            }
+	    ]
     }
   ],
 };

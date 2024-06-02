@@ -1,6 +1,6 @@
 # The IWAS file format
 
-Before we can export an IWAS song into our project, first we need to understand it's file format.
+Before we can export an [IWAS](/play/iwas) song into our project, first we need to understand it's file format.
 
 The IWAS file format was made under the following goals:
  - **Size:** it must fit into WASM-4's limited 1KB (1024 bytes) of disk space normally used for save games.

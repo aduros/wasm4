@@ -1,6 +1,6 @@
 # Introduction
 
-It's possible to use IWAS as a minimal sound editor. To export your song:
+It's possible to use [IWAS](/play/iwas) as a minimal sound editor. To export your song:
  1. Press **Enter** to get to the main menu.
  2. Select the option **Disk Options**.
  3. Select the option **Export Disk**.

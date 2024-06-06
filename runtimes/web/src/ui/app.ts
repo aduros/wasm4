@@ -427,13 +427,137 @@ export class App extends LitElement {
             }
         }
 
-        // When we should perform the next update
-        let timeNextUpdate = performance.now();
-        // Track the timestamp of the last frame
-        let lastTimeFrameStart = timeNextUpdate;
+        // We use a scheme to switch between a vsync-based and timer-based update timing, depending on
+        // the vsync rate. This keeps the updates smooth and regular on a 60 fps monitor, but in-time for other
+        // framerates.
+        const idealIntervalMs = 1000 / 60;
 
-        const onFrame = (timeFrameStart: number) => {
-            requestAnimationFrame(onFrame);
+        type TimerMode = {
+            vsyncMode: false,
+            timerID: number,
+        }
+
+        type VsyncMode = {
+            vsyncMode: true,
+            vsyncTimeoutID: number,
+        }
+
+        type UpdateTimingMode = TimerMode | VsyncMode;
+
+        let updateTimingMode: UpdateTimingMode = {
+            vsyncMode: true,
+            // It's safe to just set this to 0 because that's never a valid timer ID, and clearing
+            // a non-existant ID does nothing.
+            vsyncTimeoutID: 0,
+        }
+
+        let previousVsyncTime: number | null = null;
+        let smoothedVsyncInterval = 60;
+        // A requestAnimationFrame callback generally happens once soon after vsync, and the time passed
+        // to it is essentially the vsync time. Roughly speaking, this is a vsync callback.
+        // Switching between timing modes is controlled from the this callback.
+        const onVsync = (vsyncTime: number) => {
+            if (previousVsyncTime !== null) {
+                let vsyncInterval = (vsyncTime - previousVsyncTime);
+                const a = 0.3
+                smoothedVsyncInterval = (1-a)*smoothedVsyncInterval + a*vsyncInterval;
+            }
+            previousVsyncTime = vsyncTime;
+
+            requestAnimationFrame(onVsync);
+
+            if (0.99*idealIntervalMs < smoothedVsyncInterval && smoothedVsyncInterval < 1.01*idealIntervalMs) {
+                // Go to (or stay in) Vsync mode, and do an update.
+                // In case requestAnimationFrame callbacks suddenly stop happening as often or stop altogether
+                // (such as when a desktop user puts the browser window in the background), we use a timeout that
+                // will rapidly switch to timer mode.
+                if (updateTimingMode.vsyncMode) {
+                    clearTimeout(updateTimingMode.vsyncTimeoutID);
+                } else {
+                    console.debug("going to vsync mode");
+                    clearTimeout(updateTimingMode.timerID);
+                }
+
+                updateTimingMode = {
+                    vsyncMode: true,
+                    vsyncTimeoutID: setTimeout(onTimer, 1.2*idealIntervalMs),
+                }
+
+                doUpdate();
+            } else {
+                // Switch to (or stay in) timer mode.
+                // We need to be able to handle going to either a lower vsync rate like 30 per second,
+                // or a higher one like 90 per second.
+                if (updateTimingMode.vsyncMode) {
+                    console.debug("going to timed mode 1");
+                    clearTimeout(updateTimingMode.vsyncTimeoutID);
+                    
+                    let timeout;
+                    let now = performance.now();
+                    if (previousFrameStartTime !== null) {
+                        target = previousFrameStartTime + idealIntervalMs
+                        timeout = target - now;
+                    } else {
+                        target = now;
+                        timeout = 0;
+                    }
+                    updateTimingMode = {
+                        vsyncMode: false,
+                        timerID: setTimeout(onTimer, timeout)
+                    };
+                }
+            }
+        }
+
+        // For framerates that aren't a multiple of 60, a setTimeout() solution is used.
+        // This is especially necessary when requestAnimationFrame callbacks happen at less
+        // than 60 times a second, to ensure that audio is updated at a uniform interval of 60 times per second.
+        // This could happen e.g. when the device only has a 30 fps screen, or on a desktop when the browser
+        // window is put in the background. The runtime also falls into timer mode when updates calls are taking
+        // too long.
+        // setTimeout() is used over setInterval() because setInterval rounds down 16.66ms to 16ms and some browsers
+        // run setInterval late whereas others try to keep it at the correct frequency on average. Overall, careful use
+        // of setTimeout() gives better control of timing.
+        let target = performance.now();
+        const onTimer = () => {
+            let now = performance.now();
+
+            if (updateTimingMode.vsyncMode) {
+                console.debug("going to timed mode 2");
+                clearTimeout(updateTimingMode.vsyncTimeoutID);
+                target = now;
+            }
+
+            // If it's been too long since our target time, don't try to catch up on lost time and frames.
+            // Just accept that there was lag and continue at normal pace from now.
+            // For this reason, the value chosen for this should be only just large enough to absorb timer jitter.
+            // I've chosen a conservatively large value of 16.6 milliseconds.
+            if (now - target > idealIntervalMs) {
+                console.debug("reset time target, difference ", now - target);
+                target = now + idealIntervalMs;
+            } else {
+                // By setting a target that increases at 60 fps and aiming next frame for it, various timer
+                // innaccuracies are corrected for and averaged out, including: the jitter added to performance.now()
+                // for security purposes, intrinsic lateness of setTimeout() callbacks, setTimeout() only taking
+                // an integer number of milliseconds and removing any fractional part (1000/60 = 16.666ms becomes 16ms
+                // on major browsers, which corresponds to 62.5 updates per second, a noticable speedup).
+                target += idealIntervalMs;
+            }
+
+            updateTimingMode = {
+                vsyncMode: false,
+                // Calling setTimeout before doUpdate means that the browser clamping the timeout to a minimum of 4ms
+                // isn't a problem. Otherwise we would get slowdown at high-load, when update ends less than 4ms before
+                // the start of the next frame.
+                timerID: setTimeout(onTimer, target-now)
+            };
+
+            doUpdate();
+        }
+
+        let previousFrameStartTime: number | null = null;
+        const doUpdate = () => {
+            let frameStartTime = performance.now();
 
             pollPhysicalGamepads();
             let input = this.inputState;
@@ -450,45 +574,29 @@ export class App extends LitElement {
                 }
             }
 
-            let calledUpdate = false;
-
-            // Prevent timeFrameStart from getting too far ahead and death spiralling
-            if (timeFrameStart - timeNextUpdate >= 200) {
-                timeNextUpdate = timeFrameStart;
+            if (this.netplay) {
+                this.netplay.update(input.gamepad[0]);
+            } else {
+                // Pass inputs into runtime memory
+                for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
+                    runtime.setGamepad(playerIdx, input.gamepad[playerIdx]);
+                }
+                runtime.setMouse(input.mouseX, input.mouseY, input.mouseButtons);
+                runtime.update();
             }
 
-            while (timeFrameStart >= timeNextUpdate) {
-                timeNextUpdate += 1000/60;
+            this.hideGamepadOverlay = !!runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY);
 
-                if (this.netplay) {
-                    if (this.netplay.update(input.gamepad[0])) {
-                        calledUpdate = true;
-                    }
+            runtime.composite();
 
-                } else {
-                    // Pass inputs into runtime memory
-                    for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
-                        runtime.setGamepad(playerIdx, input.gamepad[playerIdx]);
-                    }
-                    runtime.setMouse(input.mouseX, input.mouseY, input.mouseButtons);
-                    runtime.update();
-                    calledUpdate = true;
+            if (constants.GAMEDEV_MODE) {
+                if (previousFrameStartTime !== null) {
+                    devtoolsManager.updateCompleted(runtime, frameStartTime - previousFrameStartTime);
                 }
             }
-
-            if (calledUpdate) {
-                this.hideGamepadOverlay = !!runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY);
-
-                runtime.composite();
-
-                if (constants.GAMEDEV_MODE) {
-                    // FIXED(2023-12-13): Pass the correct FPS for display                    
-                    devtoolsManager.updateCompleted(runtime, timeFrameStart - lastTimeFrameStart);
-                    lastTimeFrameStart = timeFrameStart;
-                }
-            }
+            previousFrameStartTime = frameStartTime;
         }
-        requestAnimationFrame(onFrame);
+        requestAnimationFrame(onVsync);
     }
 
     onMenuButtonPressed () {

@@ -8,6 +8,7 @@ import * as z85 from "../z85";
 import { Netplay, DEV_NETPLAY } from "../netplay";
 import { Runtime } from "../runtime";
 import { State } from "../state";
+import { callAt60Hz } from "../update-timing";
 
 import { MenuOverlay } from "./menu-overlay";
 import { Notifications } from "./notifications";
@@ -427,13 +428,7 @@ export class App extends LitElement {
             }
         }
 
-        // When we should perform the next update
-        let timeNextUpdate = performance.now();
-        // Track the timestamp of the last frame
-        let lastTimeFrameStart = timeNextUpdate;
-
-        const onFrame = (timeFrameStart: number) => {
-            requestAnimationFrame(onFrame);
+        const doUpdate = (interFrameTime: number | null) => {
 
             pollPhysicalGamepads();
             let input = this.inputState;
@@ -450,45 +445,28 @@ export class App extends LitElement {
                 }
             }
 
-            let calledUpdate = false;
-
-            // Prevent timeFrameStart from getting too far ahead and death spiralling
-            if (timeFrameStart - timeNextUpdate >= 200) {
-                timeNextUpdate = timeFrameStart;
-            }
-
-            while (timeFrameStart >= timeNextUpdate) {
-                timeNextUpdate += 1000/60;
-
-                if (this.netplay) {
-                    if (this.netplay.update(input.gamepad[0])) {
-                        calledUpdate = true;
-                    }
-
-                } else {
-                    // Pass inputs into runtime memory
-                    for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
-                        runtime.setGamepad(playerIdx, input.gamepad[playerIdx]);
-                    }
-                    runtime.setMouse(input.mouseX, input.mouseY, input.mouseButtons);
-                    runtime.update();
-                    calledUpdate = true;
+            if (this.netplay) {
+                this.netplay.update(input.gamepad[0]);
+            } else {
+                // Pass inputs into runtime memory
+                for (let playerIdx = 0; playerIdx < 4; ++playerIdx) {
+                    runtime.setGamepad(playerIdx, input.gamepad[playerIdx]);
                 }
+                runtime.setMouse(input.mouseX, input.mouseY, input.mouseButtons);
+                runtime.update();
             }
 
-            if (calledUpdate) {
-                this.hideGamepadOverlay = !!runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY);
+            this.hideGamepadOverlay = !!runtime.getSystemFlag(constants.SYSTEM_HIDE_GAMEPAD_OVERLAY);
 
-                runtime.composite();
+            runtime.composite();
 
-                if (constants.GAMEDEV_MODE) {
-                    // FIXED(2023-12-13): Pass the correct FPS for display                    
-                    devtoolsManager.updateCompleted(runtime, timeFrameStart - lastTimeFrameStart);
-                    lastTimeFrameStart = timeFrameStart;
+            if (constants.GAMEDEV_MODE) {
+                if (interFrameTime !== null) {
+                    devtoolsManager.updateCompleted(runtime, interFrameTime);
                 }
             }
         }
-        requestAnimationFrame(onFrame);
+        callAt60Hz(doUpdate);
     }
 
     onMenuButtonPressed () {

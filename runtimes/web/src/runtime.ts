@@ -4,6 +4,7 @@ import { APU } from "./apu";
 import { Framebuffer } from "./framebuffer";
 import { WebGLCompositor } from "./compositor";
 import * as devkit from "./devkit";
+import { wasmPatchExportGlobals } from "./wasm-patch";
 
 export class Runtime {
     canvas: HTMLCanvasElement;
@@ -158,7 +159,8 @@ export class Runtime {
         };
 
         await this.bluescreenOnError(async () => {
-            const module = await WebAssembly.instantiate(wasmBuffer, { env });
+            const patchedWasmBuffer = wasmPatchExportGlobals(wasmBuffer);
+            const module = await WebAssembly.instantiate(patchedWasmBuffer, { env });
             this.wasm = module.instance;
 
             // Call the WASI _start/_initialize function (different from WASM-4's start callback!)

@@ -4,7 +4,7 @@ github: joyrider3774
 date: 2024-06-17
 ---
 
-# Formula 1 Game & Watch WASM4 Version
+# Formula 1
 Formula 1 Game & Watch is a small, fictive formula 1 game & watch style lcd game with high score keeping. The Game was initially created over a decade ago for a small retrogame competition, after which it got ported to the gp2x. This version is based on the gp2x version but with added high score saving.
 
 ## Playing the Game

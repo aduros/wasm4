@@ -25,6 +25,15 @@ The aim of the game, is to avoid hitting other traffic coming down the screen, y
 | left button | Move Player car left, start new game at the boot or gameover screen |
 | right button | Move Player car right |
 
+## version history
+
+### 1.1
+- Fixed mouse controls when virtual dpad overlaps game screen
+- Only react on mouse clicks if clicks are within game space 
+
+### 1.0
+- Inital Port
+
 ## Source Code
 [https://github.com/joyrider3774/formula1_wasm4](https://github.com/joyrider3774/formula1_wasm4)
 

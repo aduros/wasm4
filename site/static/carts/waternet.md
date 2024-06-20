@@ -49,3 +49,25 @@ You can find the music files i used for the game below:
 ## Credits
 Waternet game concept is based on the Net and Netslide game from the [Simon Tatham's Portable Puzzle Collection](https://www.chiark.greenend.org.uk/~sgtatham/puzzles/),
 it's my own implementation of these 2 game concepts mixed into one game
+
+## Version history
+
+### 1.1
+- Added Clickable Text & highlighting on mouse over
+- Added mouse controls
+- Adjusted black & white palette slightly
+- Switched from cpp to c
+- Add "back" option in menu's
+- Replace A / B button graphics with X / Z
+- Fixed No selector displayed in rotate help screen
+- Fixed music volume being very low
+- Fixed not necessary extra music related array for notes
+- Made Image unit8_t instead of struct since you may not initialize an array inside a struct
+- updated Makefile and wasm4.h to latest version that "w4 createnew" would generate
+- Fixed multiple warnings about int types being mixed or losing signedness etc
+
+### 1.0
+- Initial Port
+
+## Source Code
+[https://github.com/joyrider3774/waternet_wasm4](https://github.com/joyrider3774/waternet_wasm4)

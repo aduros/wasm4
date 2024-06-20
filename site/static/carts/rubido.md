@@ -53,6 +53,19 @@ Also depending on the difficulty you had chosen you can either jump horizontally
 | left button | Confirm in menu and difficulty selector. During gameplay activate the peg where the peg selector is. If there was a peg already selected it will deselect it |
 | right button | Return to Title Screen |
 
+## version history
+
+### 1.1
+- Better mouse controls
+- Clickable Text highlighting on mouse over
+- Retroarch version now works concerning input (mouse position was previously affecting it)
+- Fix virtual controls on mobile when it overlaps the game screen
+- Was not possible to return to title screen on win / lose dialog with left mouse click
+- Adjusted black & white palette slightly
+- Only react on mouse clicks if clicks are within game space 
+
+### 1.0
+- Initial Port
 
 ## Source Code
 [https://github.com/joyrider3774/rubido_wasm4](https://github.com/joyrider3774/rubido_wasm4)

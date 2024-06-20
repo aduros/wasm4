@@ -10,17 +10,20 @@ jobs:
                     - os: windows-latest
                       artifact: "windows"
                       wasm4: bin/wasm4.exe
+                      wasm4_glfw: bin/wasm4_glfw.exe
                       libretro: lib/wasm4_libretro.dll
 
                     - os: macos-latest
                       artifact: "mac"
                       wasm4: bin/wasm4
+                      wasm4_glfw: bin/wasm4_glfw
                       libretro: lib/wasm4_libretro.dylib
 
                     # glibc 2.31
                     - os: ubuntu-20.04
                       artifact: "linux"
                       wasm4: bin/wasm4
+                      wasm4_glfw: bin/wasm4_glfw
                       libretro: lib/wasm4_libretro.so
 
         name: Build ${{ matrix.config.artifact }}
@@ -54,6 +57,12 @@ jobs:
               with:
                   path: runtimes/native/instdir/${{ matrix.config.wasm4 }}
                   name: wasm4-${{ matrix.config.artifact }}
+
+            - name: Upload wasm4_glfw artifact
+              uses: actions/upload-artifact@v2
+              with:
+                  path: runtimes/native/instdir/${{ matrix.config.wasm4_glfw }}
+                  name: wasm4-glfw-${{ matrix.config.artifact }}
 
             - name: Upload libretro artifact
               uses: actions/upload-artifact@v2
@@ -96,7 +105,7 @@ jobs:
                   mkdir -p assets/natives
                   ls -R ../artifacts
                   mv ../artifacts/wasm4-windows/wasm4.exe assets/natives/wasm4-windows.exe
-                  mv ../artifacts/wasm4-mac/wasm4 assets/natives/wasm4-mac
+                  mv ../artifacts/wasm4-glfw-mac/wasm4_glfw assets/natives/wasm4-mac
                   mv ../artifacts/wasm4-linux/wasm4 assets/natives/wasm4-linux
                   chmod +x assets/natives/wasm4-*
 

@@ -1,5 +1,6 @@
 const
   SCREEN_SIZE* = 160
+  FONT_SIZE* = 8
 
 const
   PALETTE* = (cast[ptr array[4, uint32]](0x04))

@@ -19,6 +19,7 @@ use DataStructures.{ newInt32, tagUint8, untagUint8, tagUint16, untagUint16 }
 // └───────────────────────────────────────────────────────────────────────────┘
 
 provide let _SCREEN_SIZE = 160us
+provide let _FONT_SIZE = 8us
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │

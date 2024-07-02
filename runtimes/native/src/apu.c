@@ -135,10 +135,6 @@ void w4_apuInit () {
     channels[3].noise.seed = 0x0001;
 }
 
-void w4_apuTick () {
-    ticks++;
-}
-
 void w4_apuTone (int frequency, int duration, int volume, int flags) {
     int freq1 = frequency & 0xffff;
     int freq2 = (frequency >> 16) & 0xffff;
@@ -159,8 +155,10 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     // TODO(2022-01-08): Thread safety
     Channel* channel = &channels[channelIdx];
 
-    // Restart the phase if this channel wasn't already playing
-    if (time > channel->releaseTime && ticks != channel->endTick) {
+    // Restart the phase if the channel isn't already playing, but be
+    // careful to keep the phase if the channel is already playing to allow
+    // for continuous tones and smooth transitions to or from a glide etc.
+    if (time > channel->releaseTime && ticks > channel->endTick) {
         channel->phase = (channelIdx == 2) ? 0.25 : 0;
     }
     if (noteMode) {
@@ -186,11 +184,14 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
         case 0:
             channel->pulse.dutyCycle = 0.125f;
             break;
-        case 1: case 3: default:
+        case 1:
             channel->pulse.dutyCycle = 0.25f;
             break;
         case 2:
             channel->pulse.dutyCycle = 0.5f;
+            break;
+        case 3:
+            channel->pulse.dutyCycle = 0.75f;
             break;
         }
 
@@ -201,6 +202,17 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     }
 }
 
+void w4_apuTick (MaybeToneCall toneCalls[4]) {
+    for (int i=0; i<4; i++) {
+        MaybeToneCall* toneCall = &toneCalls[i];
+        if (toneCall->active) {
+            w4_apuTone(toneCall->frequency, toneCall->duration, toneCall->volume, toneCall->flags);
+            toneCall->active = false;
+        }
+    }
+    ticks++;
+}
+
 void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
     for (int ii = 0; ii < frames; ++ii, ++time) {
         int16_t mix_left = 0, mix_right = 0;
@@ -208,7 +220,7 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
         for (int channelIdx = 0; channelIdx < 4; ++channelIdx) {
             Channel* channel = &channels[channelIdx];
 
-            if (time < channel->releaseTime || ticks == channel->endTick) {
+            if (time < channel->releaseTime || ticks <= channel->endTick) {
                 float freq = getCurrentFrequency(channel);
                 int16_t volume = getCurrentVolume(channel);
                 int16_t sample;
@@ -226,8 +238,8 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
                     sample = volume * channel->noise.lastRandom;
 
                 } else {
-                    float phaseInc = freq / SAMPLE_RATE;
-                    channel->phase += phaseInc;
+                    float phasePerSample = freq / SAMPLE_RATE;
+                    channel->phase += phasePerSample;
 
                     if (channel->phase >= 1) {
                         channel->phase--;
@@ -239,20 +251,20 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
 
                     } else {
                         // Pulse channel
-                        float dutyPhase, dutyPhaseInc;
+                        float fractionOfPulseWidth, fractionOfPulseWidthPerSample;
                         int16_t multiplier;
 
                         // Map duty to 0->1
                         if (channel->phase < channel->pulse.dutyCycle) {
-                            dutyPhase = channel->phase / channel->pulse.dutyCycle;
-                            dutyPhaseInc = phaseInc / channel->pulse.dutyCycle;
+                            fractionOfPulseWidth = channel->phase / channel->pulse.dutyCycle;
+                            fractionOfPulseWidthPerSample = phasePerSample / channel->pulse.dutyCycle;
                             multiplier = volume;
                         } else {
-                            dutyPhase = (channel->phase - channel->pulse.dutyCycle) / (1.f - channel->pulse.dutyCycle);
-                            dutyPhaseInc = phaseInc / (1.f - channel->pulse.dutyCycle);
+                            fractionOfPulseWidth = (channel->phase - channel->pulse.dutyCycle) / (1.f - channel->pulse.dutyCycle);
+                            fractionOfPulseWidthPerSample = phasePerSample / (1.f - channel->pulse.dutyCycle);
                             multiplier = -volume;
                         }
-                        sample = multiplier * polyblep(dutyPhase, dutyPhaseInc);
+                        sample = multiplier * polyblep(fractionOfPulseWidth, fractionOfPulseWidthPerSample);
                     }
                 }
 

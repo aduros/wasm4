@@ -45,7 +45,7 @@ if (LIBRETRO)
 endif ()
 
 if (NOT LIBRETRO)
-# add_subdirectory(vendor/glfw)
+add_subdirectory(vendor/glfw)
 add_subdirectory(vendor/minifb)
 add_subdirectory(vendor/cubeb)
 endif ()
@@ -94,23 +94,23 @@ if (WASMER_DIR)
     install(TARGETS wasm4_wasmer)
 endif ()
 
-# #
-# # Desktop (glfw + cubeb) backend
-# #
-# 
-# set(GLFW_SOURCES
-#     src/backend/main.c
-#     src/backend/wasm_wasm3.c
-#     src/backend/window_glfw.c
-#     vendor/glad/src/glad.c
-# )
-# add_executable(wasm4_glfw)
-# target_sources(wasm4_glfw PRIVATE ${COMMON_SOURCES} ${GLFW_SOURCES} ${M3_SOURCES})
-# target_include_directories(wasm4_glfw PRIVATE "${CMAKE_SOURCE_DIR}/vendor/wasm3/source")
-# target_include_directories(wasm4_glfw PRIVATE "${CMAKE_SOURCE_DIR}/vendor/glad/include")
-# target_link_libraries(wasm4_glfw glfw cubeb)
-# set_target_properties(wasm4_glfw PROPERTIES C_STANDARD 99)
-# install(TARGETS wasm4_glfw)
+#
+# Desktop (glfw + cubeb) backend
+#
+
+set(GLFW_SOURCES
+    src/backend/main.c
+    src/backend/wasm_wasm3.c
+    src/backend/window_glfw.c
+    vendor/glad/src/glad.c
+)
+add_executable(wasm4_glfw)
+target_sources(wasm4_glfw PRIVATE ${COMMON_SOURCES} ${GLFW_SOURCES} ${M3_SOURCES})
+target_include_directories(wasm4_glfw PRIVATE "${CMAKE_SOURCE_DIR}/vendor/wasm3/source")
+target_include_directories(wasm4_glfw PRIVATE "${CMAKE_SOURCE_DIR}/vendor/glad/include")
+target_link_libraries(wasm4_glfw glfw cubeb)
+set_target_properties(wasm4_glfw PROPERTIES C_STANDARD 99)
+install(TARGETS wasm4_glfw)
 
 #
 # Libretro backend

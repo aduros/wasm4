@@ -7,45 +7,82 @@
 #define MAX_VOLUME 0x1333 // ~15% of INT16_MAX
 // The triangle channel sounds a bit quieter than the others, so give it higher amplitude
 #define MAX_VOLUME_TRIANGLE 0x2000 // ~25% of INT16_MAX
-// Also the triangle channel prevent popping on hard stops by adding a 1 ms release
-#define RELEASE_TIME_TRIANGLE (SAMPLE_RATE / 1000)
+// The small fade-out time channels use to reduce audio popping.
+#define FADE_OUT_TIME (SAMPLE_RATE / 200)
 
 typedef struct {
+    // Tone Parameters
+    /** Length of the attack section. */
+    unsigned long long attackLength;
+
+    /** Length of the decay section. */
+    unsigned long long decayLength;
+
+    /** Length of the sustain section. */
+    unsigned long long sustainLength;
+
+    /** Length of the release section. */
+    unsigned long long releaseLength;
+
     /** Starting frequency. */
-    float freq1;
+    float startFrequency;
 
-    /** Ending frequency, or zero for no frequency transition. */
-    float freq2;
+    /** Ending frequency. */
+    float endFrequency;
 
-    /** Time the tone was started. */
-    unsigned long long startTime;
-
-    /** Time at the end of the attack period. */
-    unsigned long long attackTime;
-
-    /** Time at the end of the decay period. */
-    unsigned long long decayTime;
-
-    /** Time at the end of the sustain period. */
-    unsigned long long sustainTime;
-
-    /** Time the tone should end. */
-    unsigned long long releaseTime;
-
-    /** The tick the tone should end. */
-    unsigned long long endTick;
-
-    /** Sustain volume level. */
+    /** Volume level during the sustain section. */
     int16_t sustainVolume;
 
-     /** Peak volume level at the end of the attack phase. */
-    int16_t peakVolume;
-
-    /** Used for time tracking. */
-    float phase;
+    /** Volume level at the end of the attack section and start of the decay section. */
+    int16_t attackVolume;
 
     /** Tone panning. 0 = center, 1 = only left, 2 = only right. */
     uint8_t pan;
+
+
+    // ADSR section change ticks
+    /** The tick the Decay section of the envelope should start on. */
+    unsigned long long startDecayTick;
+
+    /** The tick the Sustain section of the envelope should start on. */
+    unsigned long long startSustainTick;
+
+    /** The tick the Release section of the envelope should start on. */
+    unsigned long long startReleaseTick;
+
+    /** The first tick for which the tone should no longer play, after the release period. */
+    unsigned long long endTick;
+
+
+    // Parameters of the current ADSR section
+    /** The time the current section of the ADSR envelope started. */
+    unsigned long long sectionStartTime;
+
+    /** The time the current section of the ADSR envelope would end if it was the perfect length. */
+    unsigned long long sectionEndTimeTarget;
+
+    /** The frequency at the start of the current section. */
+    float sectionStartFrequency;
+
+    /** The frequency at the end of the current section. */
+    float sectionEndFrequency;
+
+    /** The volume at the start of the current section. */
+    int16_t sectionStartVolume;
+
+    /** The volume at the end of the current section. */
+    int16_t sectionEndVolume;
+
+    /** The first tick for which this section is no longer playing. */
+    unsigned long long sectionEndTick;
+
+
+    // State
+    /** True if this channel is currently playing. */
+    bool playing;
+
+    /** Position in the cycle, from 0 to 1. */
+    float phase;
 
     union {
         struct {
@@ -61,6 +98,9 @@ typedef struct {
             int16_t lastRandom;
         } noise;
     };
+
+    /** The time remaining until the fade out period ends. */
+    unsigned long long fadeOutTime;
 } Channel;
 
 static Channel channels[4] = { 0 };
@@ -81,38 +121,24 @@ static float lerpf (float value1, float value2, float t) {
 }
 
 static int ramp (int value1, int value2, unsigned long long time1, unsigned long long time2) {
+    if (value1 == value2) return value1;
     if (time >= time2) return value2;
     float t = (float)(time - time1) / (time2 - time1);
     return lerp(value1, value2, t);
 }
 static float rampf (float value1, float value2, unsigned long long time1, unsigned long long time2) {
+    if (value1 == value2) return value1;
     if (time >= time2) return value2;
     float t = (float)(time - time1) / (time2 - time1);
     return lerpf(value1, value2, t);
 }
 
 static float getCurrentFrequency (const Channel* channel) {
-    if (channel->freq2 > 0) {
-        return rampf(channel->freq1, channel->freq2, channel->startTime, channel->releaseTime);
-    } else {
-        return channel->freq1;
-    }
+    return rampf(channel->sectionStartFrequency, channel->sectionEndFrequency, channel->sectionStartTime, channel->sectionEndTimeTarget);
 }
 
 static int16_t getCurrentVolume (const Channel* channel) {
-    if (time >= channel->sustainTime && (channel->releaseTime - channel->sustainTime) > RELEASE_TIME_TRIANGLE) {
-        // Release
-        return ramp(channel->sustainVolume, 0, channel->sustainTime, channel->releaseTime);
-    } else if (time >= channel->decayTime) {
-        // Sustain
-        return channel->sustainVolume;
-    } else if (time >= channel->attackTime) {
-        // Decay
-        return ramp(channel->peakVolume, channel->sustainVolume, channel->attackTime, channel->decayTime);
-    } else {
-        // Attack
-        return ramp(0, channel->peakVolume, channel->startTime, channel->attackTime);
-    }
+    return ramp(channel->sectionStartVolume, channel->sectionEndVolume, channel->sectionStartTime, channel->sectionEndTimeTarget);
 }
 
 static float polyblep (float phase, float phaseInc) {
@@ -145,7 +171,7 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
     int attack = (duration >> 24) & 0xff;
 
     int sustainVolume = w4_min(volume & 0xff, 100);
-    int peakVolume = w4_min((volume >> 8) & 0xff, 100);
+    int attackVolume = w4_min((volume >> 8) & 0xff, 100);
 
     int channelIdx = flags & 0x03;
     int mode = (flags >> 2) & 0x3;
@@ -162,22 +188,36 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
         channel->phase = (channelIdx == 2) ? 0.25 : 0;
     }
     if (noteMode) {
-        channel->freq1 = midiFreq(freq1 & 0xff, freq1 >> 8);
-        channel->freq2 = (freq2 == 0) ? 0 : midiFreq(freq2 & 0xff, freq2 >> 8);
+        channel->startFrequency = midiFreq(freq1 & 0xff, freq1 >> 8);
+        channel->endFrequency = (freq2 == 0) ? channel->startFrequency : midiFreq(freq2 & 0xff, freq2 >> 8);
     } else {
-        channel->freq1 = freq1;
-        channel->freq2 = freq2;
+        channel->startFrequency = freq1;
+        channel->endFrequency = (freq2 == 0) ? channel->startFrequency : freq2;
     }
-    channel->startTime = time;
-    channel->attackTime = channel->startTime + SAMPLE_RATE*attack/60;
-    channel->decayTime = channel->attackTime + SAMPLE_RATE*decay/60;
-    channel->sustainTime = channel->decayTime + SAMPLE_RATE*sustain/60;
-    channel->releaseTime = channel->sustainTime + SAMPLE_RATE*release/60;
-    channel->endTick = ticks + attack + decay + sustain + release;
-    int16_t maxVolume = (channelIdx == 2) ? MAX_VOLUME_TRIANGLE : MAX_VOLUME;
-    channel->sustainVolume = maxVolume * sustainVolume/100;
-    channel->peakVolume = peakVolume ? maxVolume * peakVolume/100 : maxVolume;
+
+    channel->attackLength = attack;
+    channel->decayLength = decay;
+    channel->sustainLength = sustain;
+    channel->releaseLength = release;
+
+    channel->startDecayTick = ticks + attack;
+    channel->startSustainTick = channel->startDecayTick + decay;
+    channel->startReleaseTick = channel->startSustainTick + sustain;
+    channel->endTick = channel->startReleaseTick + release;
+
+    // If a tone is already playing, make it end now.
+    channel->sectionEndTick = ticks;
+    channel->fadeOutTime = 0;
+    // And start the channel playing if it wasn't already.
+    channel->playing = true;
+
     channel->pan = pan;
+
+    int16_t maxVolume = (channelIdx == 2) ? MAX_VOLUME_TRIANGLE : MAX_VOLUME;
+    // Note: this is integer arithmetic and gets evaluated left to right.
+    // int16_t gets promoted to int in expressions, so there shouldn't be any overflow issues.
+    channel->sustainVolume = maxVolume*sustainVolume/100;
+    channel->attackVolume = attackVolume ? maxVolume*attackVolume/100 : maxVolume;
 
     if (channelIdx == 0 || channelIdx == 1) {
         switch (mode) {
@@ -194,15 +234,13 @@ void w4_apuTone (int frequency, int duration, int volume, int flags) {
             channel->pulse.dutyCycle = 0.75f;
             break;
         }
-
-    } else if (channelIdx == 2) {
-        if (release == 0) {
-            channel->releaseTime += RELEASE_TIME_TRIANGLE;
-        }
     }
 }
 
 void w4_apuTick (MaybeToneCall toneCalls[4]) {
+    ticks++;
+
+    // Enact the stored calls to tone()
     for (int i=0; i<4; i++) {
         MaybeToneCall* toneCall = &toneCalls[i];
         if (toneCall->active) {
@@ -210,7 +248,57 @@ void w4_apuTick (MaybeToneCall toneCalls[4]) {
             toneCall->active = false;
         }
     }
-    ticks++;
+
+    // Update currently playing tones
+    for (int channelIdx = 0; channelIdx < 4; ++channelIdx) {
+        Channel* channel = &channels[channelIdx];
+        if (channel->playing && ticks >= channel->sectionEndTick && channel->fadeOutTime == 0) {
+            // sectionStart is the start of the section, in ticks since the start of the tone.
+            int sectionStart;
+            int sectionLength;
+            if (ticks >= channel->endTick) {
+                // Tone is fading out
+                channel->fadeOutTime = FADE_OUT_TIME;
+                return;
+            } else if (ticks >= channel->startReleaseTick) {
+                // Release section
+                sectionStart = channel->attackLength + channel->decayLength + channel->sustainLength;
+                sectionLength = channel->releaseLength;
+                channel->sectionStartVolume = channel->sustainVolume;
+                channel->sectionEndVolume = 0;
+            } else if (ticks >= channel->startSustainTick) {
+                // Sustain section
+                sectionStart = channel->attackLength + channel->decayLength;
+                sectionLength = channel->sustainLength;
+                channel->sectionStartVolume = channel->sustainVolume;
+                channel->sectionEndVolume = channel->sustainVolume;
+            } else if (ticks >= channel->startDecayTick) {
+                // Decay Section
+                sectionStart = channel->attackLength;
+                sectionLength = channel->decayLength;
+                channel->sectionStartVolume = channel->attackVolume;
+                channel->sectionEndVolume = channel->sustainVolume;
+            } else {
+                // Attack Section
+                sectionStart = 0;
+                sectionLength = channel->attackLength;
+                channel->sectionStartVolume = 0;
+                channel->sectionEndVolume = channel->attackVolume;
+            }
+            // The end of the section, in ticks since the start of the tone.
+            int sectionEnd = sectionStart + sectionLength;
+
+            int totalLength = channel->attackLength + channel->decayLength + channel->sustainLength + channel->releaseLength;
+            channel->sectionStartFrequency = lerpf(channel->startFrequency, channel->endFrequency, (float)sectionStart/totalLength);
+            channel->sectionEndFrequency = lerpf(channel->startFrequency, channel->endFrequency, (float)sectionEnd/totalLength);
+
+            channel->sectionStartTime = time;
+            channel->sectionEndTimeTarget = channel->sectionStartTime + SAMPLE_RATE*sectionLength/60;
+
+            channel->sectionEndTick = ticks + sectionLength;
+        }
+    }
+
 }
 
 void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
@@ -220,7 +308,7 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
         for (int channelIdx = 0; channelIdx < 4; ++channelIdx) {
             Channel* channel = &channels[channelIdx];
 
-            if (ticks <= channel->endTick) {
+            if (channel->playing) {
                 float freq = getCurrentFrequency(channel);
                 int16_t volume = getCurrentVolume(channel);
                 int16_t sample;
@@ -265,6 +353,15 @@ void w4_apuWriteSamples (int16_t* output, unsigned long frames) {
                             multiplier = -volume;
                         }
                         sample = multiplier * polyblep(fractionOfPulseWidth, fractionOfPulseWidthPerSample);
+                    }
+                }
+
+                if (channel->fadeOutTime > 0) {
+                    int16_t orig = sample;
+                    sample = sample * (signed long long)channel->fadeOutTime / FADE_OUT_TIME;
+                    --channel->fadeOutTime;
+                    if (channel->fadeOutTime == 0) {
+                        channel->playing = false;
                     }
                 }
 

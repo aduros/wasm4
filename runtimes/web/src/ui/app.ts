@@ -486,7 +486,6 @@ export class App extends LitElement {
                 if (updateTimingMode.vsyncMode) {
                     clearTimeout(updateTimingMode.vsyncTimeoutID);
                 } else {
-                    console.debug("going to vsync mode");
                     clearTimeout(updateTimingMode.timerID);
                 }
 
@@ -503,7 +502,6 @@ export class App extends LitElement {
                 // We need to be able to handle going to either a lower vsync rate like 30 per second,
                 // or a higher one like 90 per second.
                 if (updateTimingMode.vsyncMode) {
-                    console.debug("going to timed mode 1");
                     clearTimeout(updateTimingMode.vsyncTimeoutID);
                     
                     let timeout;
@@ -538,7 +536,6 @@ export class App extends LitElement {
             runtime.apu.tickIfNeedsTicking();
 
             if (updateTimingMode.vsyncMode) {
-                console.debug("going to timed mode 2");
                 clearTimeout(updateTimingMode.vsyncTimeoutID);
                 target = now;
             }
@@ -548,7 +545,6 @@ export class App extends LitElement {
             // For this reason, the value chosen for this should be only just large enough to absorb timer jitter.
             // I've chosen a conservatively large value of 16.6 milliseconds.
             if (now - target > idealIntervalMs) {
-                console.debug("reset time target, difference ", now - target);
                 target = now + idealIntervalMs;
             } else {
                 // By setting a target that increases at 60 fps and aiming next frame for it, various timer

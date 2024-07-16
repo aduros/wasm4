@@ -13,6 +13,7 @@ export class APU {
     processor!: APUProcessor;
     processorPort!: MessagePort;
     bufferedToneCalls: BufferedToneCalls = [null, null, null, null];
+    needsTicking: boolean = false;
     paused: boolean = false;
 
     constructor () {
@@ -67,6 +68,13 @@ export class APU {
         }
         // Clear the buffered calls for the next update
         this.bufferedToneCalls = [null, null, null, null];
+    }
+
+    tickIfNeedsTicking () {
+        if (this.needsTicking) {
+            this.tick();
+            this.needsTicking = false;
+        }
     }
 
     tone (frequency: number, duration: number, volume: number, flags: number) {

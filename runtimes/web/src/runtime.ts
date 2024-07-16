@@ -342,7 +342,7 @@ export class Runtime {
         if (typeof update_function === "function") {
             this.bluescreenOnError(update_function);
         }
-        this.apu.tick();
+        this.apu.needsTicking = true;
     }
 
     blueScreen (text: string) {

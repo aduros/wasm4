@@ -457,6 +457,12 @@ export class App extends LitElement {
         // to it is essentially the vsync time. Roughly speaking, this is a vsync callback.
         // Switching between timing modes is controlled from the this callback.
         const onVsync = (vsyncTime: number) => {
+            if (updateTimingMode.vsyncMode) {
+                // By updating the APU at vsync, we synchronise visual and audible updates,
+                // and reduce the effect that update() call execution time has on audio timing.
+                runtime.apu.tickIfNeedsTicking();
+            }
+
             if (previousVsyncTime !== null) {
                 let vsyncInterval = (vsyncTime - previousVsyncTime);
                 const a = 0.3
@@ -521,6 +527,7 @@ export class App extends LitElement {
         let target = performance.now();
         const onTimer = () => {
             let now = performance.now();
+            runtime.apu.tickIfNeedsTicking();
 
             if (updateTimingMode.vsyncMode) {
                 console.debug("going to timed mode 2");

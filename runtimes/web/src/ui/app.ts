@@ -453,6 +453,7 @@ export class App extends LitElement {
 
         let previousVsyncTime: number | null = null;
         let smoothedVsyncInterval = 60;
+        let vsyncCount = 0;
         // A requestAnimationFrame callback generally happens once soon after vsync, and the time passed
         // to it is essentially the vsync time. Roughly speaking, this is a vsync callback.
         // Switching between timing modes is controlled from the this callback.
@@ -463,6 +464,8 @@ export class App extends LitElement {
                 runtime.apu.tickIfNeedsTicking();
             }
 
+            vsyncCount++;
+
             if (previousVsyncTime !== null) {
                 let vsyncInterval = (vsyncTime - previousVsyncTime);
                 const a = 0.3
@@ -472,7 +475,10 @@ export class App extends LitElement {
 
             requestAnimationFrame(onVsync);
 
-            if (0.99*idealIntervalMs < smoothedVsyncInterval && smoothedVsyncInterval < 1.01*idealIntervalMs) {
+            let framerateRatio = idealIntervalMs / smoothedVsyncInterval;
+            let roundedFramerateRatio = Math.round(framerateRatio);
+            let fractionalFramerateRatio = framerateRatio % 1;
+            if (roundedFramerateRatio >= 1 && (fractionalFramerateRatio < 0.01 || fractionalFramerateRatio > 0.99)) {
                 // Go to (or stay in) Vsync mode, and do an update.
                 // In case requestAnimationFrame callbacks suddenly stop happening as often or stop altogether
                 // (such as when a desktop user puts the browser window in the background), we use a timeout that
@@ -489,7 +495,9 @@ export class App extends LitElement {
                     vsyncTimeoutID: setTimeout(onTimer, 1.2*idealIntervalMs),
                 }
 
-                doUpdate();
+                if (vsyncCount % roundedFramerateRatio === 0) {
+                    doUpdate();
+                }
             } else {
                 // Switch to (or stay in) timer mode.
                 // We need to be able to handle going to either a lower vsync rate like 30 per second,

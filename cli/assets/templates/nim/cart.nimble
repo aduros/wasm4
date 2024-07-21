@@ -13,10 +13,10 @@ let outFile = "build" / "cart.wasm"
 requires "nim >= 1.4.0"
 
 task dbg, "Build the cartridge in debug mode":
-  exec &"nim c -d:nimNoQuit -o:{outFile} src/cart.nim"
+  exec &"nim c --threads:off -d:nimNoQuit -o:{outFile} src/cart.nim"
 
 task rel, "Build the cartridge with all optimizations":
-  exec &"nim c -d:nimNoQuit -d:danger -o:{outFile} src/cart.nim"
+  exec &"nim c --threads:off -d:nimNoQuit -d:danger -o:{outFile} src/cart.nim"
 
 after rel:
   let exe = findExe("wasm-opt")

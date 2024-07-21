@@ -21,6 +21,6 @@ task rel, "Build the cartridge with all optimizations":
 after rel:
   let exe = findExe("wasm-opt")
   if exe != "":
-    exec(&"wasm-opt -Oz --zero-filled-memory --strip-producers {outFile} -o {outFile}")
+    exec(&"wasm-opt --enable-bulk-memory -Oz --zero-filled-memory --strip-producers {outFile} -o {outFile}")
   else:
     echo "Tip: wasm-opt was not found. Install it from binaryen for smaller builds!"

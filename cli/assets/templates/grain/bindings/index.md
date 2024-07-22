@@ -16,6 +16,12 @@ Functions and constants included in the Wasm4 module.
 _SCREEN_SIZE : Uint8
 ```
 
+### Wasm4.**_FONT_SIZE**
+
+```grain
+_FONT_SIZE : Uint8
+```
+
 ### Wasm4.**_BUTTON_1**
 
 ```grain

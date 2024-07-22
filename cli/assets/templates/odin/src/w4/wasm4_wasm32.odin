@@ -12,6 +12,7 @@ foreign import wasm4 "env"
 // └───────────────────────────────────────────────────────────────────────────┘
 
 SCREEN_SIZE :: 160
+FONT_SIZE :: 8
 
 PALETTE       := (^Palette)(uintptr(0x04))
 DRAW_COLORS   := (^u16)(uintptr(0x14))

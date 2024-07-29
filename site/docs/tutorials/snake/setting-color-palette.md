@@ -90,8 +90,8 @@ end
 ```
 
 ```rust
+#![no_std]
 #[cfg(feature = "buddy-alloc")]
-mod alloc;
 mod wasm4;
 
 #[no_mangle]

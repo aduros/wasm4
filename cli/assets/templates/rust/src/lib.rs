@@ -1,6 +1,7 @@
 #![no_std]
-#[cfg(feature = "buddy-alloc")]
-mod alloc;
+
+#[cfg(not(std))]
+extern crate alloc;
 mod wasm4;
 use wasm4::*;
 

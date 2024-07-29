@@ -225,3 +225,8 @@ extern "C" {
     #[link_name = "traceUtf8"]
     fn extern_trace(trace: *const u8, length: usize);
 }
+
+#[panic_handler]
+fn panic(_info: &core::panic::PanicInfo) -> ! {
+    core::arch::wasm32::unreachable();
+}

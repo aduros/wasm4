@@ -334,8 +334,9 @@ We'll store a global `Game` instance using [`Mutex`](https://doc.rust-lang.org/s
 
 ```rust
 // src/lib.rs
-#[cfg(feature = "buddy-alloc")]
-mod alloc;
+#![no_std]
+#[macro_use]
+extern crate alloc;
 mod game;
 mod palette;
 mod snake;
@@ -367,7 +368,6 @@ not compile our game.
 
 ```toml {3}
 [dependencies]
-buddy-alloc = { version = "0.4.1", optional = true }
 lazy_static = "1.4.0"
 ```
 

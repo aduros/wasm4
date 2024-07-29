@@ -334,9 +334,6 @@ We'll store a global `Game` instance using [`Mutex`](https://doc.rust-lang.org/s
 
 ```rust
 // src/lib.rs
-#![no_std]
-#[macro_use]
-extern crate alloc;
 mod game;
 mod palette;
 mod snake;

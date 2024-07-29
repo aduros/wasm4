@@ -90,9 +90,6 @@ end
 ```
 
 ```rust
-#![no_std]
-#[macro_use]
-extern crate alloc;
 mod wasm4;
 
 #[no_mangle]

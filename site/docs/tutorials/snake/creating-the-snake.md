@@ -236,8 +236,6 @@ You can learn more about these traits in the [rust-book](https://doc.rust-lang.o
 - [Clone, Copy](https://doc.rust-lang.org/book/appendix-03-derivable-traits.html?highlight=partialEq#clone-and-copy-for-duplicating-values) 
 
 ```rust
-use alloc::vec::Vec;
-
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Point {
     pub x: i32,

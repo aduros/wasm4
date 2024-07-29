@@ -91,7 +91,9 @@ end
 
 ```rust
 #![no_std]
-#[cfg(feature = "buddy-alloc")]
+
+#[cfg(not(std))]
+extern crate alloc;
 mod wasm4;
 
 #[no_mangle]

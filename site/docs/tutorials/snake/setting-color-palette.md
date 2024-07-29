@@ -91,8 +91,7 @@ end
 
 ```rust
 #![no_std]
-
-#[cfg(not(std))]
+#[macro_use]
 extern crate alloc;
 mod wasm4;
 

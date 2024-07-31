@@ -1,3 +1,4 @@
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,7 +32,7 @@ static int16_t audio_output[2*AUDIO_BUFFER_FRAMES_PER_VIDEO_FRAME];
 static w4_Disk disk = { 0 };
 
 static int hold_in_start_value = 10;
-
+static uint32_t destframe[160*160];
 #if !defined(PSP) && !defined(PS2)
 static void audio_set_state (bool enable) {
 }
@@ -479,7 +480,12 @@ void retro_run () {
     w4_runtimeSetMouse(80+80*mouseX/0x7fff, 80+80*mouseY/0x7fff, mouseButtons);
 
     w4_runtimeUpdate();
-
+    
+    if (pixel_format == RETRO_PIXEL_FORMAT_RGB565)
+      video_cb(destframe, 160, 160, 160*sizeof(uint16_t));
+    else
+      video_cb(destframe, 160, 160, 160*sizeof(uint32_t));
+    
     if (!use_audio_callback) {
 	w4_apuWriteSamples(audio_output, AUDIO_BUFFER_FRAMES_PER_VIDEO_FRAME);
 	audio_batch_cb(audio_output, AUDIO_BUFFER_FRAMES_PER_VIDEO_FRAME);
@@ -487,7 +493,7 @@ void retro_run () {
 }
 
 #define do_composite(type, palette) {			\
-	type* out = (type *)dest;			\
+	type* out = (type *)destframe;			\
 	for (int n = 0; n < 160*160/4; ++n) {		\
 	    uint8_t quartet = framebuffer[n];		\
 	    int color1 = (quartet & 0x03) >> 0;		\
@@ -500,7 +506,6 @@ void retro_run () {
 	    *out++ = palette[color3];			\
 	    *out++ = palette[color4];			\
 	}						\
-	video_cb(dest, 160, 160, 160*sizeof(type));	\
   }
 
 void w4_windowComposite (const uint32_t* palette, const uint8_t* framebuffer) {
@@ -524,7 +529,7 @@ void w4_windowComposite (const uint32_t* palette, const uint8_t* framebuffer) {
     //     dest = local;
     // }
 
-    static uint32_t dest[160*160];
+
 
     // Convert indexed 2bpp framebuffer to XRGB output
     if (pixel_format == RETRO_PIXEL_FORMAT_RGB565) {

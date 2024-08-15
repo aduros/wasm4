@@ -14,7 +14,15 @@ static GLuint paletteLocation;
 
 // Position and size of the viewport within the window, which may be smaller than the window size if
 // the window was forced to a non-square resolution
-static int contentX, contentY, contentSize;
+static int contentX = 0;
+static int contentY = 0;
+static int contentSizeX = 3 * 160;
+static int contentSizeY = 3 * 160;
+static bool update_viewport;
+static int viewportX;
+static int viewportY;
+static int viewportSize;
+
 static bool should_close = false;
 
 static void initLookupTable () {
@@ -132,11 +140,18 @@ static void onFramebufferResized (GLFWwindow* window, int width, int height) {
     int size = (width < height) ? width : height;
     int x = width/2 - size/2;
     int y = height/2 - size/2;
-    glViewport(x, y, size, size);
 
-    contentX = x;
-    contentY = y;
-    contentSize = size;
+    viewportX = x;
+    viewportY = y;
+    viewportSize = size;
+    update_viewport = true;
+
+    float xscale, yscale;
+    glfwGetWindowContentScale(window, &xscale, &yscale);
+    contentX = x / xscale;
+    contentY = y / yscale;
+    contentSizeX = size / xscale;
+    contentSizeY = size / yscale;
 }
 
 static void onGlfwError(int error, const char* description)
@@ -184,7 +199,7 @@ static void update (GLFWwindow* window) {
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE)) {
         mouseButtons |= W4_MOUSE_MIDDLE;
     }
-    w4_runtimeSetMouse(160*(mouseX-contentX)/contentSize, 160*(mouseY-contentY)/contentSize, mouseButtons);
+    w4_runtimeSetMouse(160*(mouseX-contentX)/contentSizeX, 160*(mouseY-contentY)/contentSizeY, mouseButtons);
 
     w4_runtimeUpdate();
 }
@@ -213,6 +228,18 @@ void w4_windowBoot (const char* title) {
     while (!glfwWindowShouldClose(window) && !should_close) {
         double timeStart = glfwGetTime();
         double timeEnd = timeStart + 1.0/60.0;
+        if (update_viewport) {
+            glViewport(viewportX, viewportY, viewportSize, viewportSize);
+            /*
+             * for macOS, keep updating the viewport to workaround a bug.
+             * cf.
+             * https://github.com/glfw/glfw/issues/2251
+             * https://github.com/glfw/glfw/issues/80
+             */
+#if !defined(__APPLE__)
+            update_viewport = false;
+#endif
+        }
 
         update(window);
         glfwSwapBuffers(window);

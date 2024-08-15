@@ -265,6 +265,16 @@ static const struct host_module host_modules[] = {{
 uint8_t *w4_wasmInit() {
     int ret;
     mem_context_init(&mctx);
+    /*
+     * set an arbitrary limit.
+     * this includes the 64KB linear memory.
+     * REVISIT: how much operand stack etc typical carts can consume?
+     */
+    ret = mem_context_setlimit(&mctx, 128 * 1024);
+    if (ret != 0) {
+        fprintf(stderr, "failed to set memory limit with %d\n", ret);
+        exit(1);
+    }
     ret = memory_instance_create(&mctx, &meminst, &memtype);
     if (ret != 0) {
         fprintf(stderr, "memory_instance_create failed with %d\n", ret);

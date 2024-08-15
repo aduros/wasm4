@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 3.7)
 project(WASM4)
 
 set(WASM_BACKEND "wasm3" CACHE STRING "webassembly runtime")
+if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
+set(WINDOW_BACKEND "glfw" CACHE STRING "window backend")
+else ()
 set(WINDOW_BACKEND "minifb" CACHE STRING "window backend")
+endif ()
 
 set (WASM3 OFF)
 set (TOYWASM OFF)

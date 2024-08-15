@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 3.7)
 project(WASM4)
 
-set(WASM_RUNTIME "wasm3" CACHE STRING "webassembly runtime")
+set(WASM_BACKEND "wasm3" CACHE STRING "webassembly runtime")
 
 set (WASM3 OFF)
 set (TOYWASM OFF)
-if (WASM_RUNTIME STREQUAL "wasm3")
+if (WASM_BACKEND STREQUAL "wasm3")
 set (WASM3 ON)
-elseif (WASM_RUNTIME STREQUAL "toywasm")
+elseif (WASM_BACKEND STREQUAL "toywasm")
 set (TOYWASM ON)
 else ()
-message (FATAL_ERROR "Unrecognized WASM_RUNTIME value: ${WASM_RUNTIME}")
+message (FATAL_ERROR "Unrecognized WASM_BACKEND value: ${WASM_BACKEND}")
 endif ()
 
 # Prevent BUILD_SHARED_LIBS and other options from being cleared by vendor CMakeLists

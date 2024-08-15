@@ -110,6 +110,8 @@ endif ()
 
 if (NOT LIBRETRO)
 if (GLFW)
+set (GLFW_BUILD_DOCS OFF)
+set (GLFW_INSTALL OFF)
 add_subdirectory(vendor/glfw)
 endif ()
 if (MINIFB)

@@ -1,5 +1,6 @@
 #include "runtime.h"
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -240,22 +241,22 @@ void w4_runtimeTracef (const uint8_t* str, const void* stack) {
                 break;
             case 'c':
                 bounds_check(argPtr, 4);
-                putc(*(char*)argPtr, stdout);
+                putc((char)w4_read32LE(argPtr), stdout);
                 argPtr += 4;
                 break;
             case 'd':
                 bounds_check(argPtr, 4);
-                printf("%d", *(int32_t*)argPtr);
+                printf("%" PRId32, w4_read32LE(argPtr));
                 argPtr += 4;
                 break;
             case 'x':
                 bounds_check(argPtr, 4);
-                printf("%x", *(uint32_t*)argPtr);
+                printf("%" PRIx32, w4_read32LE(argPtr));
                 argPtr += 4;
                 break;
             case 's':
                 bounds_check(argPtr, 4);
-                strPtr = *(uint32_t*)argPtr;
+                strPtr = w4_read32LE(argPtr);
                 argPtr += 4;
                 const char *strPtr_host = (const char *)memory + strPtr;
                 bounds_check_cstr(strPtr_host);
@@ -263,7 +264,7 @@ void w4_runtimeTracef (const uint8_t* str, const void* stack) {
                 break;
             case 'f':
                 bounds_check(argPtr, 8);
-                printf("%lg", *(double*)argPtr);
+                printf("%lg", w4_readf64LE(argPtr));
                 argPtr += 8;
                 break;
             default:

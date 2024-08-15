@@ -23,7 +23,7 @@ jobs:
                       wasm4: bin/wasm4
                       libretro: lib/wasm4_libretro.so
 
-                wasm_runtime:
+                wasm_backend:
                     - wasm3
 
                     - toywasm
@@ -48,7 +48,7 @@ jobs:
 
             - name: Build
               run: |
-                  cmake -B build -DCMAKE_BUILD_TYPE=Release -DWASM_RUNTIME=${{ matrix.wasm_runtime }}
+                  cmake -B build -DCMAKE_BUILD_TYPE=Release -DWASM_BACKEND=${{ matrix.wasm_backend }}
                   cmake --build build --config Release --parallel
 
             - name: Install
@@ -58,13 +58,13 @@ jobs:
               uses: actions/upload-artifact@v4.4.0
               with:
                   path: runtimes/native/instdir/${{ matrix.config.wasm4 }}
-                  name: wasm4-${{ matrix.wasm_runtime }}-${{ matrix.config.artifact }}
+                  name: wasm4-${{ matrix.wasm_backend }}-${{ matrix.config.artifact }}
 
             - name: Upload libretro artifact
               uses: actions/upload-artifact@v4.4.0
               with:
                   path: runtimes/native/instdir/${{ matrix.config.libretro }}
-                  name: wasm4-libretro-${{ matrix.wasm_runtime }}-${{ matrix.config.artifact }}
+                  name: wasm4-libretro-${{ matrix.wasm_backend }}-${{ matrix.config.artifact }}
 
     build-cli:
         name: Build w4 CLI

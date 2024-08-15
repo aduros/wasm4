@@ -1,6 +1,18 @@
 cmake_minimum_required(VERSION 3.7)
 project(WASM4)
 
+set(WASM_RUNTIME "wasm3" CACHE STRING "webassembly runtime")
+
+set (WASM3 OFF)
+set (TOYWASM OFF)
+if (WASM_RUNTIME STREQUAL "wasm3")
+set (WASM3 ON)
+elseif (WASM_RUNTIME STREQUAL "toywasm")
+set (TOYWASM ON)
+else ()
+message (FATAL_ERROR "Unrecognized WASM_RUNTIME value: ${WASM_RUNTIME}")
+endif ()
+
 # Prevent BUILD_SHARED_LIBS and other options from being cleared by vendor CMakeLists
 # https://stackoverflow.com/a/66342383
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
@@ -24,6 +36,43 @@ endif ()
 set(BUILD_SHARED_LIBS OFF)
 set(BUILD_TESTS OFF)
 set(BUILD_TOOLS OFF)
+
+# wasm3
+if (WASM3)
+file(GLOB M3_SOURCES RELATIVE "${CMAKE_SOURCE_DIR}" "vendor/wasm3/source/*.c")
+set(WASM3_SOURCES
+    src/backend/wasm_wasm3.c
+    ${M3_SOURCES}
+)
+endif ()
+
+# toywasm
+if (TOYWASM)
+set(toywasm_tmp_install ${CMAKE_CURRENT_BINARY_DIR}/install)
+
+include(ExternalProject)
+ExternalProject_Add(toywasm
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/toywasm"
+    CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX=${toywasm_tmp_install}
+        -DBUILD_TESTING=OFF
+        -DTOYWASM_BUILD_CLI=OFF
+        -DTOYWASM_BUILD_UNITTEST=OFF
+        -DTOYWASM_ENABLE_WASI=OFF
+        -DTOYWASM_ENABLE_WASM_SIMD=OFF
+        -DTOYWASM_USE_SHORT_ENUMS=OFF
+        -DTOYWASM_USE_SMALL_CELLS=OFF
+    BUILD_COMMAND
+        cmake --build .
+    INSTALL_COMMAND
+        cmake --build . --target install
+)
+
+set(TOYWASM_SOURCES
+    src/backend/wasm_toywasm.c
+)
+endif () # TOYWASM
+
 
 # MiniFB options
 set(MINIFB_BUILD_EXAMPLES OFF)
@@ -51,7 +100,6 @@ add_subdirectory(vendor/cubeb)
 endif ()
 
 file(GLOB COMMON_SOURCES RELATIVE "${CMAKE_SOURCE_DIR}" "src/*.c")
-file(GLOB M3_SOURCES RELATIVE "${CMAKE_SOURCE_DIR}" "vendor/wasm3/source/*.c")
 
 # Include a strnlen polyfill for some platforms where it's missing (OSX PPC, maybe others)
 include(CheckSymbolExists)
@@ -68,13 +116,24 @@ if (NOT LIBRETRO)
 
 set(MINIFB_SOURCES
     src/backend/main.c
-    src/backend/wasm_wasm3.c
     src/backend/window_minifb.c
 )
-add_executable(wasm4 ${COMMON_SOURCES} ${MINIFB_SOURCES} ${M3_SOURCES})
 
-target_include_directories(wasm4 PRIVATE "${CMAKE_SOURCE_DIR}/vendor/wasm3/source")
-target_link_libraries(wasm4 minifb cubeb)
+add_executable(wasm4 ${COMMON_SOURCES} ${MINIFB_SOURCES}
+    $<$<BOOL:${WASM3}>:${WASM3_SOURCES}>
+    $<$<BOOL:${TOYWASM}>:${TOYWASM_SOURCES}>)
+if (TOYWASM)
+add_dependencies(wasm4 toywasm)
+endif ()
+
+target_include_directories(wasm4 PRIVATE
+    $<$<BOOL:${WASM3}>:${CMAKE_SOURCE_DIR}/vendor/wasm3/source>
+    $<$<BOOL:${TOYWASM}>:${toywasm_tmp_install}/include>)
+target_link_directories(wasm4 PRIVATE
+    $<$<BOOL:${TOYWASM}>:${toywasm_tmp_install}/lib>)
+
+target_link_libraries(wasm4 minifb cubeb
+    $<$<BOOL:${TOYWASM}>:toywasm-core>)
 set_target_properties(wasm4 PROPERTIES C_STANDARD 99)
 install(TARGETS wasm4)
 endif ()
@@ -117,15 +176,26 @@ endif ()
 #
 set(LIBRETRO_SOURCES
     src/backend/main_libretro.c
-    src/backend/wasm_wasm3.c
 )
 if(LIBRETRO_STATIC)
-  add_library(wasm4_libretro STATIC ${COMMON_SOURCES} ${LIBRETRO_SOURCES} ${M3_SOURCES})
+  add_library(wasm4_libretro STATIC ${COMMON_SOURCES} ${LIBRETRO_SOURCES}
+      $<$<BOOL:${WASM3}>:${WASM3_SOURCES}>
+      $<$<BOOL:${TOYWASM}>:${TOYWASM_SOURCES}>)
 else()
-  add_library(wasm4_libretro SHARED ${COMMON_SOURCES} ${LIBRETRO_SOURCES} ${M3_SOURCES})
+  add_library(wasm4_libretro SHARED ${COMMON_SOURCES} ${LIBRETRO_SOURCES}
+      $<$<BOOL:${WASM3}>:${WASM3_SOURCES}>
+      $<$<BOOL:${TOYWASM}>:${TOYWASM_SOURCES}>)
 endif()
-target_include_directories(wasm4_libretro PRIVATE "${CMAKE_SOURCE_DIR}/vendor/wasm3/source")
+if (TOYWASM)
+add_dependencies(wasm4_libretro toywasm)
+endif ()
+target_include_directories(wasm4_libretro PRIVATE
+    $<$<BOOL:${WASM3}>:${CMAKE_SOURCE_DIR}/vendor/wasm3/source>
+    $<$<BOOL:${TOYWASM}>:${toywasm_tmp_install}/include>)
+target_link_directories(wasm4_libretro PRIVATE
+    $<$<BOOL:${TOYWASM}>:${toywasm_tmp_install}/lib>)
 target_include_directories(wasm4_libretro PRIVATE "${CMAKE_SOURCE_DIR}/vendor/libretro/include")
+target_link_libraries(wasm4_libretro $<$<BOOL:${TOYWASM}>:toywasm-core>)
 set_target_properties(wasm4_libretro PROPERTIES C_STANDARD 99)
 install(TARGETS wasm4_libretro
   ARCHIVE DESTINATION lib

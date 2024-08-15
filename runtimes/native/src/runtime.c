@@ -65,8 +65,8 @@ static uint32_t mul_u32_with_overflow_check(uint32_t a, uint32_t b)
 static void bounds_check(const void *sp, size_t sz)
 {
     const void *memory_sp = (const void *)memory;
-    const void *memory_ep = memory_sp + (1 << 16);
-    const void *ep = sp + sz;
+    const void *memory_ep = (const uint8_t *)memory_sp + (1 << 16);
+    const void *ep = (const uint8_t *)sp + sz;
     if (ep <= sp || sp < memory_sp || memory_ep < ep) {
         out_of_bounds_access();
     }
@@ -75,7 +75,7 @@ static void bounds_check(const void *sp, size_t sz)
 static void bounds_check_cstr(const char *p)
 {
     const void *memory_sp = (const void *)memory;
-    const void *memory_ep = memory_sp + (1 << 16);
+    const void *memory_ep = (const uint8_t *)memory_sp + (1 << 16);
     if (p < memory_sp || memory_ep <= p) {
         out_of_bounds_access();
     }

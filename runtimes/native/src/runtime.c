@@ -67,7 +67,7 @@ static void bounds_check(const void *sp, size_t sz)
     const void *memory_sp = (const void *)memory;
     const void *memory_ep = (const uint8_t *)memory_sp + (1 << 16);
     const void *ep = (const uint8_t *)sp + sz;
-    if (ep <= sp || sp < memory_sp || memory_ep < ep) {
+    if (ep < sp || sp < memory_sp || memory_ep < ep) {
         out_of_bounds_access();
     }
 }

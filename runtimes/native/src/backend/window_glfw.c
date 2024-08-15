@@ -2,6 +2,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,6 +15,7 @@ static GLuint paletteLocation;
 // Position and size of the viewport within the window, which may be smaller than the window size if
 // the window was forced to a non-square resolution
 static int contentX, contentY, contentSize;
+static bool should_close = false;
 
 static void initLookupTable () {
     // Create a lookup table for each byte mapping to 4 bytes:
@@ -165,6 +167,10 @@ static void update (GLFWwindow* window) {
     }
     w4_runtimeSetGamepad(0, gamepad);
 
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
+        should_close = true;
+    }
+
     // Mouse handling
     double mouseX, mouseY;
     uint8_t mouseButtons = 0;
@@ -204,7 +210,7 @@ void w4_windowBoot (const char* title) {
     initOpenGL();
     initLookupTable();
 
-    while (!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(window) && !should_close) {
         double timeStart = glfwGetTime();
         double timeEnd = timeStart + 1.0/60.0;
 

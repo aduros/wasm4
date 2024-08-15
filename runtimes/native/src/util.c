@@ -21,6 +21,7 @@ void* xrealloc(void* ptr, size_t size) {
         fputs("Allocation failed.\n", stderr);
         abort();
     }
+    return ptr;
 }
 
 uint16_t bswap16(uint16_t x) {
@@ -48,6 +49,19 @@ uint32_t w4_read32LE (const uint32_t* ptr) {
 #else
     return *ptr;
 #endif
+}
+
+double w4_readf64LE (const uint64_t* ptr) {
+    union {
+        uint64_t u;
+        double d;
+    } u;
+#ifdef W4_BIG_ENDIAN
+    u.u = bswap32(*ptr);
+#else
+    u.u = *ptr;
+#endif
+    return u.d;
 }
 
 void w4_write16LE (uint16_t* ptr, uint16_t value) {

@@ -28,6 +28,12 @@ jobs:
 
                     - toywasm
 
+                # toywasm doesn't support windows
+                exclude:
+                    - wasm_runtime: toywasm
+                      config:
+                        os: windows-latest
+
         name: Build ${{ matrix.config.artifact }}
         runs-on: ${{ matrix.config.os }}
         defaults:

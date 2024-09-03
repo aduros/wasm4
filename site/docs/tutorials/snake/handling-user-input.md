@@ -10,7 +10,7 @@ But first, you need to understand how WASM-4 handles user input.
 
 ## Gamepad Basics
 
-WASM-4 provides 4 variables that represent the current state of the respective gamepad. It's `0` (Zero) if nothing is pressed right now. Otherwise it contains a sum of those values:
+WASM-4 provides 4 variables (one for each different Gamepad) that represent the current state of the respective gamepad. It contains a value `0` (zero) if nothing has been pressed; otherwise, it contains a sum of the directions pressed, based on the table below:
 
 | Button   | Value |
 |----------|:-----:|
@@ -421,9 +421,9 @@ impl Game {
 
 ```zig
 export fn update() void {
-    frameCount++
+    frame_count += 1;
 
-    if (frameCount % 15 == 0) {
+    if (frame_count % 15 == 0) {
         snake.update()
     }
 

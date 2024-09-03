@@ -1,10 +1,10 @@
 # Inspiration & Goals
 
-Snake is a simple game. You can implement it in pretty any language or engine. It also allows for real-time user interaction and is a challenging game in itself.
+Snake is a simple game. You can implement it in pretty much any language or engine. It also allows for real-time user interaction and is a challenging game in itself.
 
 ## Goals
 
-And the end of the tutorial, you will have a working version of snake.  
+At the end of the tutorial, you will have a working version of the game Snake.  
 You can expand on it and make your very own version along the way.
 
 During this tutorial you will learn how to ...

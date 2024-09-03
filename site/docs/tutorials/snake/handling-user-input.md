@@ -10,7 +10,7 @@ But first, you need to understand how WASM-4 handles user input.
 
 ## Gamepad Basics
 
-WASM-4 provides 4 variables (one for each different Gamepad) that represent the current state of the respective gamepad. It contains a value `0` (zero) if nothing has been pressed; otherwise, it contains a sum of the directions pressed, based on the table below:
+WASM-4 accepts up to 4 gamepads and provides 4 variables that represent the current state of this gamepads. It contains a value `0` (zero) if nothing has been pressed; otherwise, it contains a sum of the buttons pressed, based on the table below:
 
 | Button   | Value |
 |----------|:-----:|

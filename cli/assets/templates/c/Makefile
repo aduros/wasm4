@@ -7,7 +7,7 @@ CXX = "$(WASI_SDK_PATH)/bin/clang++" --sysroot="$(WASI_SDK_PATH)/share/wasi-sysr
 
 # Optional dependency from binaryen for smaller builds
 WASM_OPT = wasm-opt
-WASM_OPT_FLAGS = -Oz --zero-filled-memory --strip-producers
+WASM_OPT_FLAGS = -Oz --zero-filled-memory --strip-producers --enable-bulk-memory
 
 # Whether to build for debugging instead of release
 DEBUG = 0

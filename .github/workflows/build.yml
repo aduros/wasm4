@@ -50,13 +50,13 @@ jobs:
               run: cmake --install build --prefix instdir --config Release --strip || true
 
             - name: Upload wasm4 artifact
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v4.4.0
               with:
                   path: runtimes/native/instdir/${{ matrix.config.wasm4 }}
                   name: wasm4-${{ matrix.config.artifact }}
 
             - name: Upload libretro artifact
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v4.4.0
               with:
                   path: runtimes/native/instdir/${{ matrix.config.libretro }}
                   name: wasm4-libretro-${{ matrix.config.artifact }}
@@ -87,7 +87,7 @@ jobs:
                   cp -r ../runtimes/web/dist assets/runtime
 
             - name: Download artifacts
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v4.1.8
               with:
                   path: artifacts
 
@@ -123,7 +123,7 @@ jobs:
                     --mac /tmp/test-w4/cart-mac \
 
             - name: Upload artifacts
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v4.4.0
               with:
                   path: cli-build
                   name: w4
@@ -140,7 +140,7 @@ jobs:
                   submodules: true
 
             - name: Download artifacts
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v4.1.8
               with:
                   path: artifacts
                   name: w4

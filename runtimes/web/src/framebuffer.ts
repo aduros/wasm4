@@ -160,10 +160,10 @@ export class Framebuffer {
     drawOval (x: number, y: number, width: number, height: number) {
         const drawColors = this.drawColors[0];
         const dc0 = drawColors & 0xf;
-        const dc1 = (drawColors >>> 4) & 0xf;
+        let dc1 = (drawColors >>> 4) & 0xf;
 
-        if (dc1 === 0xf) {
-            return;
+        if (dc1 == 0) {
+            dc1 = dc0;
         }
 
         const strokeColor = (dc1 - 1) & 0x3;

@@ -395,8 +395,8 @@ void w4_framebufferOval (int x, int y, int width, int height) {
     uint8_t dc0 = dc01 & 0xf;
     uint8_t dc1 = (dc01 >> 4) & 0xf;
 
-    if (dc1 == 0xf) {
-        return;
+    if (dc1 == 0) {
+        dc1 = dc0;
     }
 
     uint8_t strokeColor = (dc1 - 1) & 0x3;

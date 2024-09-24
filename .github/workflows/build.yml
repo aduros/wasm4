@@ -99,7 +99,11 @@ jobs:
                   mv ../artifacts/wasm4-mac/wasm4 assets/natives/wasm4-mac
                   mv ../artifacts/wasm4-linux/wasm4 assets/natives/wasm4-linux
                   chmod +x assets/natives/wasm4-*
-
+            
+            - name: Test CLI
+              run: |
+                  npm ci
+                  npm test
             - name: Build CLI
               run: |
                   cp ../README.md ../LICENSE.txt .

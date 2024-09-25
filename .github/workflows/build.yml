@@ -23,6 +23,11 @@ jobs:
                       wasm4: bin/wasm4
                       libretro: lib/wasm4_libretro.so
 
+                wasm_backend:
+                    - wasm3
+
+                    - toywasm
+
         name: Build ${{ matrix.config.artifact }}
         runs-on: ${{ matrix.config.os }}
         defaults:
@@ -43,7 +48,7 @@ jobs:
 
             - name: Build
               run: |
-                  cmake -B build -DCMAKE_BUILD_TYPE=Release
+                  cmake -B build -DCMAKE_BUILD_TYPE=Release -DWASM_BACKEND=${{ matrix.wasm_backend }}
                   cmake --build build --config Release --parallel
 
             - name: Install
@@ -53,13 +58,13 @@ jobs:
               uses: actions/upload-artifact@v4.4.0
               with:
                   path: runtimes/native/instdir/${{ matrix.config.wasm4 }}
-                  name: wasm4-${{ matrix.config.artifact }}
+                  name: wasm4-${{ matrix.wasm_backend }}-${{ matrix.config.artifact }}
 
             - name: Upload libretro artifact
               uses: actions/upload-artifact@v4.4.0
               with:
                   path: runtimes/native/instdir/${{ matrix.config.libretro }}
-                  name: wasm4-libretro-${{ matrix.config.artifact }}
+                  name: wasm4-libretro-${{ matrix.wasm_backend }}-${{ matrix.config.artifact }}
 
     build-cli:
         name: Build w4 CLI
@@ -95,9 +100,9 @@ jobs:
               run: |
                   mkdir -p assets/natives
                   ls -R ../artifacts
-                  mv ../artifacts/wasm4-windows/wasm4.exe assets/natives/wasm4-windows.exe
-                  mv ../artifacts/wasm4-mac/wasm4 assets/natives/wasm4-mac
-                  mv ../artifacts/wasm4-linux/wasm4 assets/natives/wasm4-linux
+                  mv ../artifacts/wasm4-wasm3-windows/wasm4.exe assets/natives/wasm4-windows.exe
+                  mv ../artifacts/wasm4-wasm3-mac/wasm4 assets/natives/wasm4-mac
+                  mv ../artifacts/wasm4-wasm3-linux/wasm4 assets/natives/wasm4-linux
                   chmod +x assets/natives/wasm4-*
             
             - name: Test CLI

@@ -19,6 +19,18 @@ cmake -B build
 cmake --build build
 ```
 
+By default, it uses [wasm3] as a WebAssembly runtime.
+Alternatively, you can use [toywasm] instead by setting
+the `WASM_BACKEND` cmake option:
+
+```shell
+cmake -B build -DWASM_BACKEND=toywasm
+cmake --build build
+```
+
+[wasm3]: https://github.com/wasm3/wasm3
+[toywasm]: https://github.com/yamt/toywasm
+
 Running:
 
 ```shell

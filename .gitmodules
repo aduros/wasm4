@@ -7,3 +7,6 @@
 [submodule "runtimes/native/vendor/cubeb"]
 	path = runtimes/native/vendor/cubeb
 	url = https://github.com/mozilla/cubeb
+[submodule "runtimes/native/vendor/toywasm"]
+	path = runtimes/native/vendor/toywasm
+	url = https://github.com/yamt/toywasm

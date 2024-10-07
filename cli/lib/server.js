@@ -41,7 +41,17 @@ async function start (cartFile, opts) {
     }
 
     // Serve the WASM-4 developer runtime.
-    app.use(express.static(path.resolve(__dirname, "../assets/runtime/developer-build")));
+    app.use(express.static(
+        path.resolve(__dirname, "../assets/runtime/developer-build"),
+        {
+            setHeaders: function (res, path, stat) {
+                // These COOP and COEP headers allow us to get high-precision time.
+                // https://developer.mozilla.org/en-US/docs/Web/API/Performance/now#security_requirements
+                res.set("Cross-Origin-Opener-Policy", "same-origin");
+                res.set("Cross-Origin-Embedder-Policy", "require-corp");
+            }
+        }
+    ));
 
 
     const first_port = opts.port;

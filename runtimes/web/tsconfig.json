@@ -14,7 +14,8 @@
     "forceConsistentCasingInFileNames": true,
     "alwaysStrict": true,
     "useDefineForClassFields": false,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "types": []
   },
   "include": ["src/**/*.ts", "src/**/*.js"],
   "exclude": []

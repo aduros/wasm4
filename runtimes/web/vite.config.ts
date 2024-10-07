@@ -10,6 +10,12 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
       open: '/?url=cart.wasm',
+      headers: {
+        // These COOP and COEP headers allow us to get high-precision time.
+        // https://developer.mozilla.org/en-US/docs/Web/API/Performance/now#security_requirements
+        "Cross-Origin-Opener-Policy": "same-origin",
+        "Cross-Origin-Embedder-Policy": "require-corp", // "credentialless" is also a possibility
+      },
     },
     build: {
       sourcemap: gamedev_build,

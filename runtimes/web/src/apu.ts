@@ -12,6 +12,9 @@ export class APU {
     audioCtx: AudioContext;
     processor!: APUProcessor;
     processorPort!: MessagePort;
+    bufferedToneCalls: BufferedToneCalls = [null, null, null, null];
+    needsTicking: boolean = false;
+    paused: boolean = false;
 
     constructor () {
         this.audioCtx = new (window.AudioContext || window.webkitAudioContext)({
@@ -55,25 +58,33 @@ export class APU {
         }
     }
 
-    tick() {
+    tick () {
         if (this.processorPort != null) {
-            this.processorPort.postMessage('tick');
+            // Send the buffered tone calls for this tick to the audio worklet
+            this.processorPort.postMessage(this.bufferedToneCalls);
         } else {
-            this.processor.tick();
+            // For the ScriptProcessorNode fallback, just call tick() directly
+            this.processor.tick(this.bufferedToneCalls);
+        }
+        // Clear the buffered calls for the next update
+        this.bufferedToneCalls = [null, null, null, null];
+    }
+
+    tickIfNeedsTicking () {
+        if (this.needsTicking) {
+            this.tick();
+            this.needsTicking = false;
         }
     }
 
     tone (frequency: number, duration: number, volume: number, flags: number) {
-        if (this.processorPort != null) {
-            // Send params out to the worker
-            this.processorPort.postMessage([frequency, duration, volume, flags]);
-        } else {
-            // For the ScriptProcessorNode fallback, just call tone() directly
-            this.processor.tone(frequency, duration, volume, flags);
-        }
+        const channelIdx = flags & 0x3;
+
+        this.bufferedToneCalls[channelIdx] = [frequency, duration, volume, flags];
     }
 
-    unlockAudio () {
+    unpauseAudio () {
+        this.paused = false;
         const audioCtx = this.audioCtx;
         if (audioCtx.state == "suspended") {
             audioCtx.resume();
@@ -81,9 +92,20 @@ export class APU {
     }
 
     pauseAudio () {
+        this.paused = true;
         const audioCtx = this.audioCtx;
         if (audioCtx.state == "running") {
             audioCtx.suspend();
+        }
+    }
+
+    // Most web browsers won't play audio until the user has interacted with the web page.
+    // Even if there are already pending Promises from an AudioContext.resume() call when the
+    // page gets interaction, apparently the AudioContext still needs to be poked with a
+    // resume() call to start playing.
+    pokeAudio () {
+        if (!this.paused) {
+            this.audioCtx.resume();
         }
     }
 }

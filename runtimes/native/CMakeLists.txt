@@ -161,8 +161,14 @@ target_include_directories(wasm4 PRIVATE
     $<$<BOOL:${GLFW}>:${CMAKE_SOURCE_DIR}/vendor/glad/include>
     $<$<BOOL:${WASM3}>:${CMAKE_SOURCE_DIR}/vendor/wasm3/source>
     $<$<BOOL:${TOYWASM}>:${toywasm_tmp_install}/include>)
+# Note: as of writing this, libretro CI uses an ancient cmake, which
+# doesn't have target_link_directories. the following target_link_directories
+# is wrapped with an otherwise redundant "if (TOYWASM)" to avoid errors there.
+# https://github.com/aduros/wasm4/issues/768
+if (TOYWASM)
 target_link_directories(wasm4 PRIVATE
     $<$<BOOL:${TOYWASM}>:${toywasm_tmp_install}/lib>)
+endif ()
 
 target_link_libraries(wasm4 cubeb
     $<$<BOOL:${MINIFB}>:minifb>
@@ -208,8 +214,10 @@ endif ()
 target_include_directories(wasm4_libretro PRIVATE
     $<$<BOOL:${WASM3}>:${CMAKE_SOURCE_DIR}/vendor/wasm3/source>
     $<$<BOOL:${TOYWASM}>:${toywasm_tmp_install}/include>)
+if (TOYWASM)  # https://github.com/aduros/wasm4/issues/768
 target_link_directories(wasm4_libretro PRIVATE
     $<$<BOOL:${TOYWASM}>:${toywasm_tmp_install}/lib>)
+endif ()
 target_include_directories(wasm4_libretro PRIVATE "${CMAKE_SOURCE_DIR}/vendor/libretro/include")
 target_link_libraries(wasm4_libretro $<$<BOOL:${TOYWASM}>:toywasm-core>)
 set_target_properties(wasm4_libretro PROPERTIES C_STANDARD 99)

@@ -118,7 +118,7 @@ w4.PALETTE.* = .{
 
 </MultiLanguageCode>
 
-The palette colors are considered to be numbered 1-4, even though they may accessed with indices 0-3.
+The palette colors are considered to be numbered 1-4, even though they may be accessed with indices 0-3.
 
 The default Gameboy-ish palette looks like this:
 
@@ -133,13 +133,13 @@ The first color in the palette register is used as the screen background color.
 
 ## The `DRAW_COLORS` Register
 
-`DRAW_COLORS` is a set of 4 indexes into `PALLETE`. Drawing functions use these indexes to
+`DRAW_COLORS` is a set of 4 indexes into `PALETTE`. Drawing functions use these indexes to
 decide which colors to use, and what to use them for.
 
 `DRAW_COLORS` is a 16 bit value that holds 4 indexes. Bits 0-3 (the least significant bits)
 hold the first draw color, bits 4-7 hold the second draw color, and so on.
 
-Setting a draw color to `1` means use `PALLETE` color 1 for that draw color. The same applies
+Setting a draw color to `1` means use `PALETTE` color 1 for that draw color. The same applies
 when setting a draw color to `2`, `3`, or `4`.
 
 For example, `rect()` uses the first draw color for the fill color, and the second draw color

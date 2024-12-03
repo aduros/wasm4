@@ -252,10 +252,10 @@ export class Netplay {
         const localPeerId = await this.peerMgr.localPeerId;
 
         const loc = window.location;
-        if (loc.protocol == "file:"
+        if (!DEV_NETPLAY && (loc.protocol == "file:"
             || loc.hostname == "localhost"
             || loc.hostname == "127.0.0.1"
-            || loc.hostname == "wasm4.org") {
+            || loc.hostname == "wasm4.org")) {
             return `https://wasm4.org/netplay/#${localPeerId}`;
         }
         const url = new URL(loc.href);

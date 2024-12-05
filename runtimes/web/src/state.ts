@@ -38,7 +38,10 @@ export class State {
         for (const exName in runtime.wasm!.exports) {
             const exInst = runtime.wasm!.exports[exName]
             if (exInst instanceof WebAssembly.Global && exName in this.globals) {
-                exInst.value = this.globals[exName];
+                try {
+                    // this will fail for immutable globals that have been exported, but is safe
+                    exInst.value = this.globals[exName];
+                } catch {}
             }
         }
 

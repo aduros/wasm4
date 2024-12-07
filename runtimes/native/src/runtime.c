@@ -50,7 +50,7 @@ static void panic(const char *msg)
 
 static void out_of_bounds_access(void)
 {
-    panic("out of bands memory access");
+    panic("out of bounds memory access");
 }
 
 static uint32_t mul_u32_with_overflow_check(uint32_t a, uint32_t b)

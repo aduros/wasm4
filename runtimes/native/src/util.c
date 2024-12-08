@@ -1,6 +1,7 @@
 #include "util.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #    define W4_BIG_ENDIAN
@@ -35,47 +36,54 @@ uint32_t bswap32(uint32_t x) {
             (( x & 0x000000ffu ) << 24 ));
 }
 
-uint16_t w4_read16LE (const uint16_t* ptr) {
+uint16_t w4_read16LE (const void* ptr) {
+    uint16_t le;
+    memcpy(&le, ptr, sizeof(le));
 #ifdef W4_BIG_ENDIAN
-    return bswap16(*ptr);
+    return bswap16(le);
 #else
-    return *ptr;
+    return le;
 #endif
 }
 
-uint32_t w4_read32LE (const uint32_t* ptr) {
+uint32_t w4_read32LE (const void* ptr) {
+    uint32_t le;
+    memcpy(&le, ptr, sizeof(le));
 #ifdef W4_BIG_ENDIAN
-    return bswap32(*ptr);
+    return bswap32(le);
 #else
-    return *ptr;
+    return le;
 #endif
 }
 
-double w4_readf64LE (const uint64_t* ptr) {
+double w4_readf64LE (const void* ptr) {
     union {
         uint64_t u;
         double d;
     } u;
+    memcpy(&u.d, ptr, sizeof(u.d));
 #ifdef W4_BIG_ENDIAN
-    u.u = bswap32(*ptr);
-#else
-    u.u = *ptr;
+    u.u = bswap32(u.u);
 #endif
     return u.d;
 }
 
-void w4_write16LE (uint16_t* ptr, uint16_t value) {
+void w4_write16LE (void* ptr, uint16_t value) {
+    uint16_t le;
 #ifdef W4_BIG_ENDIAN
-    *ptr = bswap16(value);
+    le = bswap16(value);
 #else
-    *ptr = value;
+    le = value;
 #endif
+    memcpy(ptr, &le, sizeof(le));
 }
 
-void w4_write32LE (uint32_t* ptr, uint32_t value) {
+void w4_write32LE (void* ptr, uint32_t value) {
+    uint32_t le;
 #ifdef W4_BIG_ENDIAN
-    *ptr = bswap32(value);
+    le = bswap32(value);
 #else
-    *ptr = value;
+    le = value;
 #endif
+    memcpy(ptr, &le, sizeof(le));
 }

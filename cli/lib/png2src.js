@@ -352,8 +352,7 @@ function runAll(files, opts) {
 
             output.sprites.push(run(file));
         } catch (error) {
-            console.error("Error processing " + file + ": " + error.message);
-            break;
+            throw new Error("Error processing " + file + ": " + error.message);
         }
     }
 

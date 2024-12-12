@@ -165,11 +165,11 @@ describe("PNG2SRC", () => {
     });
 
     it("should abort and output an error message for invalid image paths", () => {
-      runAll(["/invalid/path"], {
+      expect(() => 
+        runAll(["/invalid/path"], {
         lang: "rust",
         output: "-",
-      });
-      expect(console.error).toHaveBeenCalledWith("Error processing /invalid/path: ENOENT: no such file or directory, open '/invalid/path'");
+      })).toThrowError(/Error processing \/invalid\/path: ENOENT: no such file or directory, open '\/invalid\/path'/);
     });
 
     it("should console log one sprite", () => {

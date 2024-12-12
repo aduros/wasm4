@@ -173,7 +173,12 @@ program.command("png2src <images...>")
         if (!opts.template) {
             opts.lang = requireLang(opts);
         }
-        png2src.runAll(images, opts);
+        try {
+            png2src.runAll(images, opts);
+        } catch (error) {
+            console.error(error.message);
+            process.exit(1);
+        }
     });
 
 program.command("bundle <cart>")

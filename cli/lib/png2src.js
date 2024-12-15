@@ -343,16 +343,22 @@ function runAll(files, opts) {
 
     let output = { "sprites": [] };
     for (let ii = 0; ii < files.length; ++ii) {
-        const file = files[ii];
-
+        const filePath = files[ii];
         try {
-            if (ii > 0) {
-                console.log();
-            }
+            const filePaths = !fs.statSync(filePath).isDirectory() ? [filePath] : 
+                               fs.readdirSync(filePath)
+                                 .filter(file => path.extname(file).toLowerCase() === '.png')
+                                 .map(file => path.join(filePath, file));
 
-            output.sprites.push(run(file));
+            for (let iii = 0; iii < filePaths.length; ++iii) {
+                const pngFile = filePaths[iii];
+                if (ii | iii > 0) {
+                    console.log();
+                }
+                output.sprites.push(run(pngFile));
+            }
         } catch (error) {
-            throw new Error("Error processing " + file + ": " + error.message);
+            throw new Error("Error processing " + filePath + ": " + error.message);
         }
     }
 

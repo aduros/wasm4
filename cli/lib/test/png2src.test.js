@@ -169,7 +169,7 @@ describe("PNG2SRC", () => {
         runAll(["/invalid/path"], {
         lang: "rust",
         output: "-",
-      })).toThrowError(/Error processing \/invalid\/path: ENOENT: no such file or directory, open '\/invalid\/path'/);
+      })).toThrowError(/Error processing \/invalid\/path: ENOENT: no such file or directory, stat '\/invalid\/path'/);
     });
 
     it("should console log one sprite", () => {
@@ -208,6 +208,21 @@ describe("PNG2SRC", () => {
           __dirname + "/data/smile_8x8_2BPP.png",
           __dirname + "/data/smile_7x7_1BPP.png",
           __dirname + "/data/smile_7x7_2BPP.png",
+        ],
+        {
+          lang: "c",
+          output: "output.h",
+        }
+      );
+
+      expect(console.log).toHaveBeenCalledTimes(3);
+      expect(fs.writeFileSync).toHaveBeenCalledTimes(1);
+    });
+
+    it("should process directories", () => {
+      runAll(
+        [
+          __dirname + "/data_ok",
         ],
         {
           lang: "c",

@@ -1,4 +1,3 @@
-export const GAMEDEV_MODE = WASM4_GAMEDEV_MODE;
 export const WIDTH = 160;
 export const HEIGHT = 160;
 

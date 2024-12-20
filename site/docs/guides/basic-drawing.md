@@ -446,9 +446,9 @@ func pixel (x int, y int) {
     var palette_color = uint8(*w4.DRAW_COLORS & 0b1111)
     if palette_color == 0 {
         // Transparent
-        return;
+        return
     }
-    var color = uint8((palette_color - 1) & 0b11);
+    var color = uint8((palette_color - 1) & 0b11)
 
     // Write to the framebuffer
     w4.FRAMEBUFFER[idx] = (color << shift) | (w4.FRAMEBUFFER[idx] &^ mask)

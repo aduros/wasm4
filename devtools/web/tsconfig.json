@@ -17,7 +17,8 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": false,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "types": []
   },
   "include": ["src/**/*.ts"],
   "exclude": []

@@ -34,7 +34,6 @@
     "@types/lodash-es": "^4.17.12"
   },
   "devDependencies": {
-    "@types/node": "^20.11.16",
     "prettier": "3.2.4",
     "rimraf": "5.0.5",
     "rollup-plugin-postcss-lit": "^2.1.0",

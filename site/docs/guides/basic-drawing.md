@@ -444,7 +444,7 @@ func pixel (x int, y int) {
 
     // Use the first DRAW_COLOR as the pixel color
     var palette_color = uint8(*w4.DRAW_COLORS & 0b1111)
-    if (palette_color == 0) {
+    if palette_color == 0 {
         // Transparent
         return;
     }

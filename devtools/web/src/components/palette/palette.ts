@@ -34,7 +34,7 @@ export class Wasm4Palette extends LitElement {
       ${this.heading && html`<h4>${this.heading}</h4>`}
       <div class="palette-grid">
         ${this.palette.slice(0, 4).map((color) => {
-          const colorHex = formatColor(color);
+          const colorHex = formatColor(color & 0xffffff);
 
           const shouldInvertColor =
             ((color & 0xff) + ((color >> 8) & 0xff) + (color >> 16)) / 3 > 128;

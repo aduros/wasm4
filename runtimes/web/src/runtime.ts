@@ -5,6 +5,7 @@ import { Framebuffer } from "./framebuffer";
 import { WebGLCompositor } from "./compositor";
 import * as devkit from "./devkit";
 import { wasmPatchExportGlobals } from "./wasm-patch";
+import * as configConstants from "./config-constants";
 
 export class Runtime {
     canvas: HTMLCanvasElement;
@@ -120,7 +121,7 @@ export class Runtime {
         this.wasm = null;
 
         if (wasmBuffer.byteLength > limit) {
-            if (constants.GAMEDEV_MODE) {
+            if (configConstants.GAMEDEV_MODE) {
                 if (!this.warnedFileSize) {
                     this.warnedFileSize = true;
                     this.print(`Warning: Cart is larger than ${limit} bytes. Ensure the release build of your cart is small enough to be bundled.`);
@@ -262,8 +263,8 @@ export class Runtime {
     }
 
     printToServer (str: string) {
-        if (devkit.websocket != null && devkit.websocket.readyState == 1) {
-            devkit.websocket.send(str);
+        if (devkit.cli_websocket != null && devkit.cli_websocket.readyState == 1) {
+            devkit.cli_websocket.send(str);
         }
     }
 

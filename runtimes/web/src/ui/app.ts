@@ -2,6 +2,7 @@ import { LitElement, html, css } from "lit";
 import { customElement, state, query } from 'lit/decorators.js';
 
 import * as constants from "../constants";
+import * as configConstants from "../config-constants";
 import * as devkit from "../devkit";
 import * as utils from "./utils";
 import * as z85 from "../z85";
@@ -141,7 +142,7 @@ export class App extends LitElement {
                 // Nothing
             },
         };
-        if (constants.GAMEDEV_MODE) {
+        if (configConstants.GAMEDEV_MODE) {
             devtoolsManager = await import('@wasm4/web-devtools').then(({ DevtoolsManager}) => new DevtoolsManager());
         }
 
@@ -153,8 +154,8 @@ export class App extends LitElement {
             this.copyNetplayLink();
         }
 
-        if (constants.GAMEDEV_MODE) {
-            devkit.websocket?.addEventListener("message", async event => {
+        if (configConstants.GAMEDEV_MODE) {
+            devkit.cli_websocket?.addEventListener("message", async event => {
                 switch (event.data) {
                 case "reload":
                     this.resetCart(await loadCartWasm());
@@ -481,8 +482,7 @@ export class App extends LitElement {
 
                 runtime.composite();
 
-                if (constants.GAMEDEV_MODE) {
-                    // FIXED(2023-12-13): Pass the correct FPS for display                    
+                if (configConstants.GAMEDEV_MODE) {              
                     devtoolsManager.updateCompleted(runtime, timeFrameStart - lastTimeFrameStart);
                     lastTimeFrameStart = timeFrameStart;
                 }

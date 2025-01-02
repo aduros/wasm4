@@ -47,6 +47,7 @@ interface RuntimeInfo {
   wasmBufferByteLen: number;
 }
 
+const INTER_FRAME_TIME_BUFFER_SIZE = 30;
 export class DevtoolsManager {
   /**
    * @private
@@ -58,17 +59,19 @@ export class DevtoolsManager {
    */
   private _bufferedData = new BufferedRuntimeData();
 
-  private _fpsBuffer : number[] = [0,0,0,0,0,0,0,0,0,0];
+  private _interFrameTimeBuffer : number[] = new Array(INTER_FRAME_TIME_BUFFER_SIZE).fill(1000/60);
   private _fpsBufferIdx = 0;
-  //calculate an average FPS for the last 10 frames
   private _calcAvgFPS = () => {
-    let sum = this._fpsBuffer[0];
-    for (let i = 1; i < 10; i++)
-      sum += this._fpsBuffer[i];
-    return Math.floor(sum / 10);
+    let totalFramesTimeMs = this._interFrameTimeBuffer[0];
+    for (let i = 1; i < INTER_FRAME_TIME_BUFFER_SIZE; i++)
+      totalFramesTimeMs += this._interFrameTimeBuffer[i];
+    return Math.round(INTER_FRAME_TIME_BUFFER_SIZE * 1000 / totalFramesTimeMs);
   }
   private _nextFPSBufferIdx = () => {
-    (this._fpsBufferIdx == 9) ? this._fpsBufferIdx = 0 : this._fpsBufferIdx++;
+    this._fpsBufferIdx++;
+    if (this._fpsBufferIdx == INTER_FRAME_TIME_BUFFER_SIZE) {
+      this._fpsBufferIdx = 0;
+    }
     return this._fpsBufferIdx;
   }
 
@@ -77,10 +80,10 @@ export class DevtoolsManager {
    */
   updateCompleted = <Info extends RuntimeInfo>(
     runtimeInfo: Info,
-    deltaFrame: number
+    interFrameTime: number
   ) => {
     if (this._enabled) {
-      this._fpsBuffer[this._nextFPSBufferIdx()] = 1_000 / deltaFrame;
+      this._interFrameTimeBuffer[this._nextFPSBufferIdx()] = interFrameTime;
       this._bufferedData.update(runtimeInfo.data);
       this._notifyUpdateCompleted(
         runtimeInfo.data,

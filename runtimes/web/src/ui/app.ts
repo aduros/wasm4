@@ -84,7 +84,7 @@ export class App extends LitElement {
         }
 
         // Try to begin playing audio
-        this.runtime.unlockAudio();
+        this.runtime.pokeAudio();
     }
 
     constructor () {
@@ -262,8 +262,8 @@ export class App extends LitElement {
 
             const down = (event.type == "keydown");
 
-            // Poke WebAudio
-            runtime.unlockAudio();
+            // Try to begin playing audio
+            runtime.pokeAudio();
 
             // We're using the keyboard now, hide the mouse cursor for extra immersion
             document.body.style.cursor = "none";
@@ -475,12 +475,19 @@ export class App extends LitElement {
             this.inputState.gamepad[0] |= constants.BUTTON_X;
         } else {
             this.showMenu = true;
+            // During netplay, opening the menu doesn't pause the game, so shouldn't
+            // pause the audio either. Also, when audio is paused, the browser is
+            // more likely to throttle our update rate when we're in the background.
+            if (!this.netplay) {
+                this.runtime.pauseAudio();
+            }
         }
     }
 
     closeMenu () {
         if (this.showMenu) {
             this.showMenu = false;
+            this.runtime.unpauseAudio();
 
             // Kind of a hack to prevent the button press to close the menu from being passed
             // through to the game

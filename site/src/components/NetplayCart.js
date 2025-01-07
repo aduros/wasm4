@@ -39,9 +39,6 @@ export default function NetplayCart () {
 
                 <h2>FAQ</h2>
 
-                <b><i>The game seems to be paused or incredibly slow?</i></b>
-                <p>Make sure you're not playing in a background tab! Most browsers heavily throttle pages in a background tab. To test netplay, open the game in two separate, visible windows.</p>
-
                 <b><i>How do I check our connection quality?</i></b>
                 <p>You can see your ping to each of the other players on the pause menu by pressing Enter. For fast-paced action games, ping below 200 ms is recommended for best results.</p>
 

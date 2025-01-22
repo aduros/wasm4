@@ -1,10 +1,10 @@
 ---
 author: BigRobCoder
 github: BigRobCoder
-date: 2024-05-15
+date: 2025-01-21
 ---
 
-# Hero of the Woods v2.1
+# Hero of the Woods v3
 
 Move with the arrows. The indicator on the edge of the screen points you to your next objective.
 

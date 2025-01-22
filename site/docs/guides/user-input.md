@@ -476,4 +476,20 @@ fn update() {
 }
 ```
 
+```zig
+export fn update() void {
+    const mouse = w4.MOUSE_BUTTONS.*;
+    const mouseX = w4.MOUSE_X.*;
+    const mouseY = w4.MOUSE_Y.*;
+
+    if (mouse & w4.MOUSE_LEFT) {
+        w4.DRAW_COLORS.* = 4;
+        w4.rect(@as(i32, mouseX) - 8, @as(i32, mouseY) - 8, 16, 16);
+    } else {
+        w4.DRAW_COLORS.* = 2;
+        w4.rect(@as(i32, mouseX) - 4, @as(i32, mouseY) - 4, 8, 8);
+    }
+}
+```
+
 </MultiLanguageCode>

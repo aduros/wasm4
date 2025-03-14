@@ -1065,7 +1065,7 @@ I think it's easier to pick `[0]`.
 Since the body is drawn, head is not much of a problem. Simply use the `rect` function again. But use a specific part instead:
 
 ```zig
-    w4.rect(this.body[0].x * 8, this.body[0].y * 8, 8, 8)
+    w4.rect(this.body.get(0).x * 8, this.body.get(0).y * 8, 8, 8)
 ```
 
 The draw function should now look like this:

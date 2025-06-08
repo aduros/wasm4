@@ -102,7 +102,7 @@ The `snake_push` function will use the `realloc` function to allocate memory for
 ```c
 void snake_push(struct snake *snake, struct point p)
 {
-    struct point* body = realloc(snake->body, sizeof body * (snake->length+1));
+    struct point* body = realloc(snake->body, sizeof(struct point) * (snake->length+1));
     if(body)
     {
         snake->body = body;

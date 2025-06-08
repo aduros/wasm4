@@ -17,8 +17,7 @@ jobs:
                       wasm4: bin/wasm4
                       libretro: lib/wasm4_libretro.dylib
 
-                    # glibc 2.31
-                    - os: ubuntu-20.04
+                    - os: ubuntu-latest
                       artifact: "linux"
                       wasm4: bin/wasm4
                       libretro: lib/wasm4_libretro.so
@@ -39,7 +38,7 @@ jobs:
               with:
                   submodules: true
 
-            - if: matrix.config.os == 'ubuntu-20.04'
+            - if: matrix.config.os == 'ubuntu-latest'
               name: Install local dependencies
               run: |
                   ldd --version

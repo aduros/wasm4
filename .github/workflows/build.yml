@@ -17,10 +17,7 @@ jobs:
                       wasm4: bin/wasm4
                       libretro: lib/wasm4_libretro.dylib
 
-                    # We don't use ubuntu-latest here in order to maximize compat with other Linux
-                    # distros: https://github.com/aduros/wasm4/commit/c3f706c25237cb98e789615e8f789479ac5e70af#commitcomment-159519995
-                    # This will need updating in the future to the oldest available Ubuntu LTS runner
-                    - os: ubuntu-22.04
+                    - os: ubuntu-latest
                       artifact: "linux"
                       wasm4: bin/wasm4
                       libretro: lib/wasm4_libretro.so

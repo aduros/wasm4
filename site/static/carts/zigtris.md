@@ -1,7 +1,7 @@
 ---
 author: Toby Jaffey
 github: ringtailsoftware
-date: 2025-01-17 02:25:00 BST
+date: 2025-01-17 02:25:00
 ---
 
 # Zigtris

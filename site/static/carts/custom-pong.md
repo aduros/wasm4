@@ -1,7 +1,7 @@
 ---
 author: UnusualEgg
 github: UnusualEgg
-date: 2025-02-07)
+date: 2025-02-07
 ---
 
 # Customizable Pong

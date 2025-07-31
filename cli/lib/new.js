@@ -82,7 +82,7 @@ const HELP = {
     },
     zig: {
       name: 'Zig',
-      build: 'zig build -Doptimize=ReleaseSmall',
+      build: 'zig build --release=small',
       cart: 'zig-out/bin/cart.wasm',
     }
 };

@@ -1,0 +1,14 @@
+.{
+    .name = .cart,
+    .version = "0.0.1",
+    .fingerprint = 0xba388b76e32853e,
+    .minimum_zig_version = "0.15.0-dev.1283+1fcaf90dd",
+    .dependencies = .{},
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+        "README.md",
+        //"LICENSE",
+    },
+}

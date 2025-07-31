@@ -43,11 +43,12 @@ jobs:
               run: |
                   ldd --version
                   sudo apt update
-                  sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libxkbcommon-dev libasound2-dev libpulse-dev
+                  sudo apt install libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev libxkbcommon-dev libasound2-dev libpulse-dev libwayland-dev
 
             - name: Build
               run: |
-                  cmake -B build -DCMAKE_BUILD_TYPE=Release -DWASM_BACKEND=${{ matrix.wasm_backend }}
+                  cmake -B build -DCMAKE_BUILD_TYPE=Release -DWASM_BACKEND=${{ matrix.wasm_backend }} -DWINDOW_BACKEND=glfw -DGLFW_BUILD_WAYLAND=ON -DGLFW_BUILD_X11=ON
+
                   cmake --build build --config Release --parallel
 
             - name: Install

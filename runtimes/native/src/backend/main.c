@@ -127,10 +127,14 @@ int main (int argc, const char* argv[]) {
 
     if (argc < 2) {
         FILE* file = fopen(argv[0], "rb");
+        if (file == NULL) {
+            goto usage;
+        }
         fseek(file, -sizeof(FileFooter), SEEK_END);
 
         FileFooter footer;
         if (fread(&footer, 1, sizeof(FileFooter), file) < sizeof(FileFooter) || footer.magic != 1414676803) {
+usage:
             // No bundled cart found
             fprintf(stderr, "Usage: wasm4 <cart>\n");
             return 1;

@@ -72,7 +72,7 @@ const HELP = {
     },
     rust: {
         name: "Rust",
-        build: "cargo build --release",
+        build: "cargo xtask build",
         cart: "target/wasm32-unknown-unknown/release/cart.wasm",
     },
     wat: {

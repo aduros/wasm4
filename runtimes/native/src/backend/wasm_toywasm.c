@@ -324,6 +324,18 @@ static uint32_t find_func(const struct module *m, const char *name_cstr,
                 ret);
         exit(1);
     }
+    /*
+     * note: we don't use exported functions with parameters or results.
+     */
+    const struct functype *ft = module_functype(m, idx);
+    if (ft->parameter.ntypes != 0 || ft->result.ntypes != 0) {
+        if (!require) {
+            return (uint32_t)-1;
+        }
+        fprintf(stderr, "exported function (%s) has an unexpected type\n",
+                name_cstr);
+        exit(1);
+    }
     return idx;
 }
 

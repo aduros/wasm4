@@ -15,7 +15,7 @@ const SMILEY: [u8; 8] = [
     0b11000011,
 ];
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 fn update() {
     unsafe { *DRAW_COLORS = 2 }
     text("Hello from Rust!", 10, 10);

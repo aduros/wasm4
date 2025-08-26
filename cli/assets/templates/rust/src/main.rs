@@ -1,3 +1,5 @@
+#![no_main]
+
 #[cfg(feature = "buddy-alloc")]
 mod alloc;
 mod wasm4;

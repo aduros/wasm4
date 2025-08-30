@@ -55,7 +55,7 @@ pub const SYSTEM_HIDE_GAMEPAD_OVERLAY: u8 = 2;
 pub fn blit(sprite: &[u8], x: i32, y: i32, width: u32, height: u32, flags: u32) {
     unsafe { extern_blit(sprite.as_ptr(), x, y, width, height, flags) }
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "blit"]
     fn extern_blit(sprite: *const u8, x: i32, y: i32, width: u32, height: u32, flags: u32);
 }
@@ -87,7 +87,7 @@ pub fn blit_sub(
         )
     }
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "blitSub"]
     fn extern_blit_sub(
         sprite: *const u8,
@@ -112,7 +112,7 @@ pub const BLIT_ROTATE: u32 = 8;
 pub fn line(x1: i32, y1: i32, x2: i32, y2: i32) {
     unsafe { extern_line(x1, y1, x2, y2) }
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "line"]
     fn extern_line(x1: i32, y1: i32, x2: i32, y2: i32);
 }
@@ -121,7 +121,7 @@ extern "C" {
 pub fn oval(x: i32, y: i32, width: u32, height: u32) {
     unsafe { extern_oval(x, y, width, height) }
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "oval"]
     fn extern_oval(x: i32, y: i32, width: u32, height: u32);
 }
@@ -130,7 +130,7 @@ extern "C" {
 pub fn rect(x: i32, y: i32, width: u32, height: u32) {
     unsafe { extern_rect(x, y, width, height) }
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "rect"]
     fn extern_rect(x: i32, y: i32, width: u32, height: u32);
 }
@@ -140,7 +140,7 @@ pub fn text<T: AsRef<[u8]>>(text: T, x: i32, y: i32) {
     let text_ref = text.as_ref();
     unsafe { extern_text(text_ref.as_ptr(), text_ref.len(), x, y) }
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "textUtf8"]
     fn extern_text(text: *const u8, length: usize, x: i32, y: i32);
 }
@@ -152,7 +152,7 @@ pub fn vline(x: i32, y: i32, len: u32) {
     }
 }
 
-extern "C" {
+unsafe extern "C" {
     #[link_name = "vline"]
     fn extern_vline(x: i32, y: i32, len: u32);
 }
@@ -164,7 +164,7 @@ pub fn hline(x: i32, y: i32, len: u32) {
     }
 }
 
-extern "C" {
+unsafe extern "C" {
     #[link_name = "hline"]
     fn extern_hline(x: i32, y: i32, len: u32);
 }
@@ -179,7 +179,7 @@ extern "C" {
 pub fn tone(frequency: u32, duration: u32, volume: u32, flags: u32) {
     unsafe { extern_tone(frequency, duration, volume, flags) }
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "tone"]
     fn extern_tone(frequency: u32, duration: u32, volume: u32, flags: u32);
 }
@@ -202,7 +202,7 @@ pub const TONE_NOTE_MODE: u32 = 64;
 // │                                                                           │
 // └───────────────────────────────────────────────────────────────────────────┘
 
-extern "C" {
+unsafe extern "C" {
     /// Reads up to `size` bytes from persistent storage into the pointer `dest`.
     pub fn diskr(dest: *mut u8, size: u32) -> u32;
 
@@ -221,7 +221,7 @@ pub fn trace<T: AsRef<str>>(text: T) {
     let text_ref = text.as_ref();
     unsafe { extern_trace(text_ref.as_ptr(), text_ref.len()) }
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "traceUtf8"]
     fn extern_trace(trace: *const u8, length: usize);
 }

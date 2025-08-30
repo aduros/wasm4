@@ -400,9 +400,28 @@ void w4_wasmLoadModule(const uint8_t *wasmBuffer, int byteLength) {
 
     start = find_func(module, "start", false);
     update = find_func(module, "update", true);
-    uint32_t init = find_func(module, "_initialize", false);
-    if (init != (uint32_t)-1) {
-        run_func(instance, init);
+
+    /*
+     * usually, a wasm module exports either '_start' or '_initialize',
+     * not both. however, some wasm4 carts export both.
+     *
+     * also, as wasm4 carts are reactors, it doesn't make sense to use
+     * '_start'. however, some wasm4 carts actually seem to expect it to
+     * be called.
+     *
+     * here we call both of them. it matches what the web runtime does.
+     *
+     * references:
+     * - https://github.com/WebAssembly/tool-conventions/blob/3822c2b4365ac2849c85ea078d7679ed896f2fd2/BasicModuleABI.md
+     * - https://github.com/WebAssembly/WASI/blob/8a69f1ed6ce7bfd3cfe72270b787d4d4598b721d/legacy/application-abi.md#current-unstable-abi
+     */
+    uint32_t _start = find_func(module, "_start", false);
+    if (_start != (uint32_t)-1) {
+        run_func(instance, _start);
+    }
+    uint32_t _initialize = find_func(module, "_initialize", false);
+    if (_initialize != (uint32_t)-1) {
+        run_func(instance, _initialize);
     }
 }
 

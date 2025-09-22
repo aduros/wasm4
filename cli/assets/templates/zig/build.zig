@@ -30,7 +30,7 @@ pub fn build(b: *std.Build) !void {
     const step_run = b.step("run", "compile and run the cart");
     step_run.dependOn(&run_exe.step);
 
-    const run_exe_web = b.addSystemCommand(&.{ "w4", "run "});
+    const run_exe_web = b.addSystemCommand(&.{ "w4", "run"});
     run_exe_web.addArtifactArg(exe);
 
     const step_run_web = b.step("run-web", "compile and run the cart in a web browser");

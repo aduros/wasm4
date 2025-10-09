@@ -239,7 +239,8 @@ export class Netplay {
         this.localPlayerIdx = 0;
     }
 
-    join (peerId: string) {
+    async join (peerId: string) {
+        await this.peerMgr.localPeerId; // ensure iceServers ready
         const connection = this.peerMgr.connect(peerId);
         this.createRemotePlayer(connection, peerId).then(remotePlayer => {
             remotePlayer.sendMessage({ type: "JOIN_REQUEST" });

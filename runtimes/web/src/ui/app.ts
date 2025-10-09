@@ -129,7 +129,7 @@ export class App extends LitElement {
         const hostPeerId = utils.getUrlParam("netplay");
         if (hostPeerId) {
             this.netplay = this.createNetplay();
-            this.netplay.join(hostPeerId);
+            await this.netplay.join(hostPeerId);
         } else {
             await runtime.load(await loadCartWasm());
         }

@@ -19,6 +19,7 @@ export class Runtime {
     wasmBufferByteLen: number;
     wasm: WebAssembly.Instance | null = null;
     warnedFileSize = false;
+    playerIdx : number;
 
     diskName: string;
     diskBuffer: ArrayBuffer;
@@ -66,6 +67,7 @@ export class Runtime {
         this.reset();
 
         this.pauseState = 0;
+        this.playerIdx = 0;
         this.wasmBufferByteLen = 0;
     }
 
@@ -85,6 +87,7 @@ export class Runtime {
 
     setNetplay (localPlayerIdx: number) {
         this.data.setUint8(constants.ADDR_NETPLAY, 0b100 | (localPlayerIdx & 0b11));
+        this.playerIdx = localPlayerIdx;
     }
 
     getSystemFlag (mask: number) {
@@ -231,15 +234,20 @@ export class Runtime {
         const src = new Uint8Array(this.memory.buffer, srcPtr, bytesWritten);
         const dest = new Uint8Array(this.diskBuffer);
 
-        // Try to save to localStorage
-        const str = z85.encode(src);
-        try {
-            localStorage.setItem(this.diskName, str);
-        } catch (error) {
-            // TODO(2022-02-13): Show a warning to the user that storage is not persisted
-            console.error("Error writing disk", error);
+        // save to localStorage only for the hosting player. (index 0)
+        // as the disk buffer is a part of the shared state provided by
+        // the hosting player, don't risk overwriting the local data
+        // for others.
+        if (this.playerIdx == 0) {
+            // Try to save to localStorage
+            const str = z85.encode(src);
+            try {
+                localStorage.setItem(this.diskName, str);
+            } catch (error) {
+                // TODO(2022-02-13): Show a warning to the user that storage is not persisted
+                console.error("Error writing disk", error);
+            }
         }
-
         dest.set(src);
         this.diskSize = bytesWritten;
         return bytesWritten;

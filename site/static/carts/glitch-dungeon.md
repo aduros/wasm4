@@ -41,3 +41,7 @@ or can be selected using the gamepad 2, or by clicking on the spell bar ingame.
 ### Reset all progress
 
 Holding BUTTON_2 (Z) for 2 seconds will prompt you to reset your save file
+
+### Source code
+
+https://github.com/wormi-ra/glitch-dungeon-w4

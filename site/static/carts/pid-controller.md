@@ -1,6 +1,5 @@
 ---
-author: rezajamesahmed
-github: ghost
+author: rezajamesahmed <ghost>
 date: 2022-01-23 00:00:15 GMT
 ---
 

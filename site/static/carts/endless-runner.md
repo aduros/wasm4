@@ -1,6 +1,5 @@
 ---
-author: Richard McCormack
-github: DenialAdams
+author: Richard McCormack <DenialAdams>
 date: 2021-11-07
 ---
 

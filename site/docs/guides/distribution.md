@@ -75,16 +75,28 @@ The manual is a
 [Markdown](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
 document that should be in this format:
 
-```md
+```markdown
 ---
-author: (Your name or username)
-github: (Your github username, used to show a profile pic)
+author: Your Name <your_github_username>
 date: (When the cart was last updated, in YYYY-MM-DD format)
 ---
 
 # (Your game's title)
 
 Additional info can go here. It will be displayed on your game's page.
+```
+
+### Author Format
+
+The `author` field uses the format `Name <contact>` where contact can be:
+- A GitHub username (shows profile picture): `Alice <alice>`
+- An email address: `Alice <alice@example.com>`
+- A website URL: `Alice <https://alice.dev>`
+
+For multiple authors, separate them with commas:
+
+```yaml
+author: Alice <alice>, Bob <bob@example.com>, Chris <https://chris.dev>
 ```
 
 Now just commit your changes and open a pull request! As soon as it's merged, your game will appear

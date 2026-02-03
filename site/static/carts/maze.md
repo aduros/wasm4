@@ -1,6 +1,5 @@
 ---
-author: Ben Smith
-github: binji
+author: Ben Smith <binji>
 date: 2021-12-19
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: Dial0
-github: ghost
+author: Dial0 <ghost>
 date: 2022-01-23 00:00:26 GMT
 ---
 

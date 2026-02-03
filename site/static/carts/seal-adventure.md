@@ -1,6 +1,5 @@
 ---
-author: katspaugh
-github: katspaugh
+author: katspaugh <katspaugh>
 date: 2023-02-27
 ---
 

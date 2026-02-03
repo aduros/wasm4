@@ -1,6 +1,5 @@
 ---
-author: Toby Jaffey
-github: ringtailsoftware
+author: Toby Jaffey <ringtailsoftware>
 date: 2025-01-17 02:25:00
 ---
 

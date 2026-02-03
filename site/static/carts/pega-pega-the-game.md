@@ -1,6 +1,5 @@
 ---
-author: Ana Paula Crippa, Maria Eduarda Policante
-github: anapaulacrippa, poli404
+author: Ana Paula Crippa <anapaulacrippa>, Maria Eduarda Policante <poli404>
 date: 2025-07-22
 ---
 

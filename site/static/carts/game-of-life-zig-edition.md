@@ -1,6 +1,5 @@
 ---
-author: David Roman
-github: davidroman0O
+author: David Roman <davidroman0O>
 date: 2022-09-10
 ---
 

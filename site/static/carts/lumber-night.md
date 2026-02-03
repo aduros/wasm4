@@ -1,6 +1,5 @@
 ---
-author: Vitaly
-github: madwareru
+author: Vitaly <madwareru>
 date: 2022-01-23 00:00:19 GMT
 ---
 

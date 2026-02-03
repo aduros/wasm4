@@ -1,6 +1,5 @@
 ---
-author: kirinokirino
-github: kirinokirino
+author: kirinokirino <kirinokirino>
 date: 2022-01-23 00:00:30 GMT
 ---
 

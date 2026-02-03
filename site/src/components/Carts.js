@@ -7,7 +7,14 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import PlayButton from "./PlayButton";
 
 export default function Carts ({ carts }) {
-    const cartButtons = carts.map(cart => (<PlayButton key={cart.slug} { ...cart } />));
+    const cartButtons = carts.map(cart => (
+        <PlayButton
+            key={cart.slug}
+            slug={cart.slug}
+            title={cart.title}
+            author={cart.authors.map(a => a.name).join(', ')}
+        />
+    ));
     return (
         <Layout title="Play">
             <main>

@@ -1,6 +1,5 @@
 ---
-author: Eduardo Bart
-github: edubart
+author: Eduardo Bart <edubart>
 date: 2022-01-23 00:00:44 GMT
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: pfg
-github: pfgithub
+author: pfg <pfgithub>
 date: 2022-01-17
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: LogicProjects
-github: mwbryant
+author: LogicProjects <mwbryant>
 date: 2022-06-11 08:22:58 GMT
 ---
 

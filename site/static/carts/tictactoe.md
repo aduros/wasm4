@@ -1,6 +1,5 @@
 ---
-author: Christopher Kleine
-github: christopher-kleine
+author: Christopher Kleine <christopher-kleine>
 date: 2021-09-13
 ---
 

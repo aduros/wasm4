@@ -1,6 +1,5 @@
 ---
-author: samX500
-github: samX500
+author: samX500 <samX500>
 date: 2022-08-21
 ---
 

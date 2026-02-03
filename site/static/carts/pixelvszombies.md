@@ -1,6 +1,5 @@
 ---
-author: Vitor Lorençone
-github: VitorLorencone
+author: Vitor Lorençone <VitorLorencone>
 date: 2025-07-23
 ---
 

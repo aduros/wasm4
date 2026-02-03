@@ -1,6 +1,5 @@
 ---
-author: Mr.Rafael
-github: MrRafael-dev
+author: Mr.Rafael <MrRafael-dev>
 date: 2022-08-20 04:00:00 GMT
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: Dave Purdum
-github: rutrum
+author: Dave Purdum <rutrum>
 date: 2022-01-23 00:00:32 GMT
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: Sander in 't Veld
-github: sliv9
+author: Sander in 't Veld <sliv9>
 date: 2022-01-07
 ---
 

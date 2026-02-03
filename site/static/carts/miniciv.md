@@ -1,6 +1,5 @@
 ---
-author: Jeremy Zeiber
-github: jzeiber
+author: Jeremy Zeiber <jzeiber>
 date: 2024-06-23
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: Marcus Ramse
-github: JerwuQu
+author: Marcus Ramse <JerwuQu>
 date: 2022-01-23 00:00:42 GMT
 ---
 

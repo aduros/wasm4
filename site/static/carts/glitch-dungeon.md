@@ -1,6 +1,5 @@
 ---
-author: jakeonaut, Wormi
-github: wormi-ra
+author: jakeonaut <jakeonaut>, Wormi <wormi-ra>
 date: 2025-12-30
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: iszn_11
-github: iszn11
+author: iszn_11 <iszn11>
 date: 2022-08-21
 ---
 

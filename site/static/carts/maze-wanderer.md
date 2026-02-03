@@ -1,6 +1,5 @@
 ---
-author: Grant Handy
-github: grantshandy
+author: Grant Handy <grantshandy>
 date: 2022-11-25
 ---
 

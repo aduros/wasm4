@@ -1,6 +1,5 @@
 ---
-author: Garrett Hale
-github: Gertkeno
+author: Garrett Hale <Gertkeno>
 date: 2022-09-21 23:17:00 CST
 ---
 

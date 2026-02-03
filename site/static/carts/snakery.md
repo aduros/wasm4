@@ -1,6 +1,5 @@
 ---
-author: hahahahaman
-github: hahahahaman
+author: hahahahaman <hahahahaman>
 date: 2023-03-26
 ---
 

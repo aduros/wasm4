@@ -1,6 +1,5 @@
 ---
-author: Samarth Hattangady
-github: samhattangady
+author: Samarth Hattangady <samhattangady>
 date: 2022-01-23 00:00:34 GMT
 ---
 

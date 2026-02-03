@@ -1,6 +1,5 @@
 ---
-author: Kris Dabrowski
-github: ChuuniMage
+author: Kris Dabrowski <ChuuniMage>
 date: 2022-05-13
 ---
 

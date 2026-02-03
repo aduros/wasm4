@@ -1,6 +1,5 @@
 ---
-author: ericvilcu
-github: ericvilcu
+author: ericvilcu <ericvilcu>
 date: 2022-08-21
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: Julia Marques Sanches
-github: jMarquesssss
+author: Julia Marques Sanches <jMarquesssss>
 date: 2025-07-29
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: Đe-Alchmst
-github: de-alchmst
+author: Đe-Alchmst <de-alchmst>
 date: 2025-10-12
 ---
 

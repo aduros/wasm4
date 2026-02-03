@@ -1,6 +1,5 @@
 ---
-author: Dennis Ranke
-github: exoticorn
+author: Dennis Ranke <exoticorn>
 date: 2021-11-11
 ---
 

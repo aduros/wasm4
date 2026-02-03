@@ -1,6 +1,5 @@
 ---
-author: Gelatin Studios
-github: gelatinstudios
+author: Gelatin Studios <gelatinstudios>
 date: 2023-04-30
 ---
 

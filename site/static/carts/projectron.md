@@ -1,6 +1,5 @@
 ---
-author: James McMurray
-github: jamesmcm
+author: James McMurray <jamesmcm>
 date: 2022-01-23 00:00:10 GMT
 ---
 

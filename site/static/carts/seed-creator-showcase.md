@@ -1,6 +1,5 @@
 ---
-author: huntrss@posteo.me
-github: huntr3ss
+author: huntrss@posteo.me <huntr3ss>
 date: 2022-10-22
 ---
 

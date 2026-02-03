@@ -1,6 +1,5 @@
 ---
-author: Cannon Tuttle
-github: CanyonTurtle
+author: Cannon Tuttle <CanyonTurtle>
 date: 2025-5-09
 ---
 

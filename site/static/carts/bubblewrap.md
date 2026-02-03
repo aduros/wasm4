@@ -1,6 +1,5 @@
 ---
-author: Henrik Zenkert
-github: yesseri
+author: Henrik Zenkert <yesseri>
 date: 2022-08-09
 ---
 

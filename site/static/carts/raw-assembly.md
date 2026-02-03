@@ -1,6 +1,5 @@
 ---
-author: Bruno Garcia
-github: aduros
+author: Bruno Garcia <aduros>
 date: 2021-09-02
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: Shimon Ulewicz
-github: sulewicz
+author: Shimon Ulewicz <sulewicz>
 date: 2025-06-10
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: Mota Link
-github: Mota-Link
+author: Mota Link <Mota-Link>
 date: 2024-12-17
 ---
 

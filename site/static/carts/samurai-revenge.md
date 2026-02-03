@@ -1,6 +1,5 @@
 ---
-author: Krylan & Dominik Koperkiewicz
-github: Krylan
+author: Krylan <Krylan>, Dominik Koperkiewicz <DominikKoperkiewicz>
 date: 2022-09-16 21:48:00 GMT
 ---
 

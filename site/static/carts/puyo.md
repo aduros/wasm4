@@ -1,6 +1,5 @@
 ---
-author: Shigeki Karita
-github: ShigekiKarita
+author: Shigeki Karita <ShigekiKarita>
 date: 2022-01-23 00:00:14 GMT
 ---
 

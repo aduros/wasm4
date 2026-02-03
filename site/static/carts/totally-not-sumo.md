@@ -1,6 +1,5 @@
 ---
-author: André L. Alvares
-github: Andre-LA
+author: André L. Alvares <Andre-LA>
 date: 2022-01-30 18:03:48 GMT
 ---
 

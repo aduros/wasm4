@@ -1,6 +1,5 @@
 ---
-author: Matúš Chovan
-github: grouter
+author: Matúš Chovan <grouter>
 date: 2022-01-23 00:00:37 GMT
 ---
 

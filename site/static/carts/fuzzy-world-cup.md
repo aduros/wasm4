@@ -1,6 +1,5 @@
 ---
-author: Damian Girardi - Sebastian Alvarez
-github: damiangirardi
+author: Damian Girardi <damiangirardi>, Sebastian Alvarez
 date: 2022-10-07
 ---
 

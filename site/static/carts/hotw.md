@@ -1,6 +1,5 @@
 ---
-author: BigRobCoder
-github: BigRobCoder
+author: BigRobCoder <BigRobCoder>
 date: 2025-01-21
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: Isaiah Billingsley
-github: ibillingsley
+author: Isaiah Billingsley <ibillingsley>
 date: 2022-08-22
 ---
 

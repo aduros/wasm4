@@ -1,6 +1,5 @@
 ---
-author: Cedric Hutchings
-github: cedric-h
+author: Cedric Hutchings <cedric-h>
 date: 2022-08-14
 ---
 

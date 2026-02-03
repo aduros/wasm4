@@ -1,6 +1,5 @@
 ---
-author: Venkatesh.H
-github: venkatesh-coder
+author: Venkatesh.H <venkatesh-coder>
 date: 2022-01-23 00:00:09 GMT
 ---
 

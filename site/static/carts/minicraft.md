@@ -1,6 +1,5 @@
 ---
-author: TheFloatingPixel
-github: TheFloatingPixel
+author: TheFloatingPixel <TheFloatingPixel>
 date: 2022-08-26
 ---
 

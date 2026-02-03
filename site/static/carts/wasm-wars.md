@@ -1,6 +1,5 @@
 ---
-author: Daniel Kiyoshi
-github: Kiyoshi364
+author: Daniel Kiyoshi <Kiyoshi364>
 date: 2022-01-23 00:00:16 GMT
 ---
 

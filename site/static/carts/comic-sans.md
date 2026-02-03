@@ -1,6 +1,5 @@
 ---
-author: Eduardo Minholi, Nuno Abilio
-github: MinholiEduardo, nuno-m-abilio
+author: Eduardo Minholi <MinholiEduardo>, Nuno Abilio <nuno-m-abilio>
 date: 2025-07-25
 ---
 

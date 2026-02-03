@@ -1,6 +1,5 @@
 ---
-author: Patbox
-github: Patbox
+author: Patbox <Patbox>
 date: 2023-04-06
 ---
 

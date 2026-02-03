@@ -1,6 +1,5 @@
 ---
-author: Troy Wiegand
-github: troywiegand
+author: Troy Wiegand <troywiegand>
 date: 2022-01-23 00:00:11 GMT
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: korhadris
-github: ghost
+author: korhadris <ghost>
 date: 2022-01-23 00:00:21 GMT
 ---
 

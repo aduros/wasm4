@@ -1,6 +1,5 @@
 ---
-author: Donatien Rabiller
-github: sharundaar
+author: Donatien Rabiller <sharundaar>
 date: 2022-01-23 00:00:40 GMT
 ---
 

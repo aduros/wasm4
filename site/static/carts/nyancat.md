@@ -1,6 +1,5 @@
 ---
-author: Jake Ledoux
-github: jakeledoux
+author: Jake Ledoux <jakeledoux>
 date: 2021-11-22
 ---
 

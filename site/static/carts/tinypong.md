@@ -1,6 +1,5 @@
 ---
-author: Ztry8
-github: Ztry8
+author: Ztry8 <Ztry8>
 date: 2024-05-15 
 ---
 

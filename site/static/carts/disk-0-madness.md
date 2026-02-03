@@ -1,6 +1,5 @@
 ---
-author: Max Curzi
-github: maxcurzi
+author: Max Curzi <maxcurzi>
 date: 2022-08-21
 ---
 

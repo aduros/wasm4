@@ -1,6 +1,5 @@
 ---
-author: Claudio Mattera
-github: claudiomattera
+author: Claudio Mattera <claudiomattera>
 date: 2021-12-30
 ---
 

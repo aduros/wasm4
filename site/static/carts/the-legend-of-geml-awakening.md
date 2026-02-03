@@ -1,6 +1,5 @@
 ---
-author: Robby Zampino, Ethan Hunter
-github: restitux
+author: Robby Zampino <restitux>, Ethan Hunter <spaceman1701>
 date: 2022-01-23 00:00:20 GMT
 ---
 

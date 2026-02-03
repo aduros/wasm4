@@ -1,6 +1,5 @@
 ---
-author: unnick
-github: kcinnu
+author: unnick <kcinnu>
 date: 2021-10-19
 ---
 

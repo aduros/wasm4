@@ -4,7 +4,7 @@ import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
-export default function PlayButton ({ slug, title, author, github, colWidth }) {
+export default function PlayButton ({ slug, title, author, colWidth }) {
     return (
         <div className={`col col--${colWidth || 2} margin-vert--md col-cart`}>
           <div className="cart card">

@@ -1,6 +1,5 @@
 ---
-author: UnusualEgg
-github: UnusualEgg
+author: UnusualEgg <UnusualEgg>
 date: 2025-02-07
 ---
 

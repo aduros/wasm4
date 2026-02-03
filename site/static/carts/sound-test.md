@@ -1,6 +1,5 @@
 ---
-author: Mr.Rafael
-github: MrRafael-dev
+author: Mr.Rafael <MrRafael-dev>
 date: 2022-07-04
 ---
 

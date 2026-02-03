@@ -1,6 +1,5 @@
 ---
-author: Chris Breece
-github: TheBebopCowboy
+author: Chris Breece <TheBebopCowboy>
 date: 2022-05-19 21:00:00 GMT
 ---
 

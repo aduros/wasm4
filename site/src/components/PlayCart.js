@@ -60,19 +60,37 @@ export default function PlayCart ({ cart }) {
                         </RWebShare>
                     </span>
                 </h1>
-                <div className="avatar">
-                  <a
-                    className="avatar__photo-link avatar__photo avatar__photo--lg"
-                    href={`https://github.com/${cart.github}`} target="_blank"
-                  >
-                    <img src={`https://github.com/${cart.github}.png?size=128`} />
-                  </a>
-                  <div className="avatar__intro">
-                    <div className="avatar__name"><a href={`https://github.com/${cart.github}`} target="_blank">{cart.author}</a></div>
-                    <small className="avatar__subtitle">
-                      {dateString}
-                    </small>
-                  </div>
+                <div className="avatar-group">
+                  {cart.authors.map((author, index) => (
+                    <div className="avatar" key={index}>
+                      {author.contactType === 'github' ? (
+                        <a
+                          className="avatar__photo-link avatar__photo avatar__photo--lg"
+                          href={author.contactUrl} target="_blank"
+                        >
+                          <img src={`https://github.com/${author.contact}.png?size=128`} />
+                        </a>
+                      ) : (
+                        <div className="avatar__photo avatar__photo--lg avatar__photo--placeholder">
+                          {author.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div className="avatar__intro">
+                        <div className="avatar__name">
+                          {author.contactUrl ? (
+                            <a href={author.contactUrl} target="_blank">{author.name}</a>
+                          ) : (
+                            author.name
+                          )}
+                        </div>
+                        {index === 0 && (
+                          <small className="avatar__subtitle">
+                            {dateString}
+                          </small>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
                 <div className="margin-top--lg">

@@ -1,6 +1,5 @@
 ---
-author: Colby Hubscher
-github: colbyhub
+author: Colby Hubscher <colbyhub>
 date: 2022-01-23 00:00:29 GMT
 ---
 

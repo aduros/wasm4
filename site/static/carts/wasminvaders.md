@@ -1,6 +1,5 @@
 ---
-author: Lorenzo Henrique Zanetti, Matheus Cenerini Jacomini
-github: lorenzohz, Mathayuz
+author: Lorenzo Henrique Zanetti <lorenzohz>, Matheus Cenerini Jacomini <Mathayuz>
 date: 2025-07-22
 ---
 

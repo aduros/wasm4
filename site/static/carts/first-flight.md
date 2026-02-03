@@ -1,6 +1,5 @@
 ---
-author: bootra
-github: bootradev
+author: bootra <bootradev>
 date: 2022-08-20
 ---
 

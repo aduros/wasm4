@@ -1,6 +1,5 @@
 ---
-author: Davidian1024
-github: Davidian1024
+author: Davidian1024 <Davidian1024>
 date: 2022-11-01
 ---
 

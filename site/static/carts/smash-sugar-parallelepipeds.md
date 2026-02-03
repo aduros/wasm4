@@ -1,6 +1,5 @@
 ---
-author: Lázaro Albuquerque
-github: lzralbu
+author: Lázaro Albuquerque <lzralbu>
 date: 2022-01-23 00:00:13 GMT
 ---
 

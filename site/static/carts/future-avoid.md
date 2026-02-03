@@ -1,6 +1,5 @@
 ---
-author: Joakim Hentula
-github: jockus
+author: Joakim Hentula <jockus>
 date: 2022-01-23 00:00:38 GMT
 ---
 

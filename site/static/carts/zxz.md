@@ -1,6 +1,5 @@
 ---
-author: Ścisław Dercz
-github: drcz
+author: Ścisław Dercz <drcz>
 date: 2022-04-02 22:22:22 GMT
 ---
 

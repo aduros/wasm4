@@ -23,6 +23,9 @@ for cart in db:
     subprocess.run(["npx", "--package=wasm4@latest", "--", "w4", "bundle", site_root+"/static/carts/"+slug+".wasm",
         "--html", "/tmp/"+slug+".html", "--windows", "/tmp/"+slug+".exe"]);
 
+    # Extract author names from the authors array
+    creators = [author["name"] for author in cart["authors"]]
+
     metadata = {
         "collection": "wasm4",
 
@@ -30,7 +33,7 @@ for cart in db:
         "subject": "video game; computer game; game; emulation; console; fantasy console; WASM-4",
 
         "title": cart["title"],
-        "creator": cart["author"],
+        "creator": creators,  # Internet Archive supports multiple creators as a list
         "date": datetime.utcfromtimestamp(cart["date"]/1000).strftime("%Y-%m-%d"),
 
         "notes": "<p>This is a game cartridge for the WASM-4 fantasy console. The <code>"+slug+".wasm</code> file contains the cart data (ROM), in WebAssembly format. Also included are versions compiled to HTML and Windows.</p><p>Originally hosted at <a href=\"https://wasm4.org/play/"+slug+"\">https://wasm4.org/play/"+slug+"</a>.</p>",

@@ -1,6 +1,5 @@
 ---
-author: kzerot
-github: ghost
+author: kzerot <ghost>
 date: 2022-01-23 00:00:18 GMT
 ---
 

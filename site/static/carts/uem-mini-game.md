@@ -1,6 +1,5 @@
 ---
-author: Thiago Calvi
-github: thiagocalvi
+author: Thiago Calvi <thiagocalvi>
 date: 2025-07-23
 ---
 

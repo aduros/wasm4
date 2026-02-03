@@ -176,14 +176,38 @@ module.exports = {
                               throw new Error("Missing content title in markdown");
                           }
 
-                          const author = markdown.frontMatter.author;
-                          if (!author) {
+                          const authorRaw = markdown.frontMatter.author;
+                          if (!authorRaw) {
                               throw new Error("Missing author");
                           }
 
-                          const github = markdown.frontMatter.github;
-                          if (!github) {
-                              throw new Error("Missing github");
+                          // Parse author field: "Name <contact>, Name2 <contact2>"
+                          // Contact can be: GitHub username, email, or URL
+                          const authors = authorRaw.split(/,\s*(?=[^<]*(?:<|$))/).map(entry => {
+                              const match = entry.trim().match(/^(.+?)\s*<([^>]+)>$/);
+                              if (match) {
+                                  const name = match[1].trim();
+                                  const contact = match[2].trim();
+                                  let contactType, contactUrl;
+                                  if (contact.includes('@') && !contact.includes('://')) {
+                                      contactType = 'email';
+                                      contactUrl = `mailto:${contact}`;
+                                  } else if (contact.startsWith('http://') || contact.startsWith('https://')) {
+                                      contactType = 'url';
+                                      contactUrl = contact;
+                                  } else {
+                                      contactType = 'github';
+                                      contactUrl = `https://github.com/${contact}`;
+                                  }
+                                  return { name, contact, contactType, contactUrl };
+                              } else {
+                                  // No contact info, just a name
+                                  return { name: entry.trim(), contact: null, contactType: null, contactUrl: null };
+                              }
+                          });
+
+                          if (authors.length === 0) {
+                              throw new Error("No authors found");
                           }
 
                           const date = new Date(markdown.frontMatter.date).getTime();
@@ -192,7 +216,7 @@ module.exports = {
                           }
 
                           cartData = {
-                              slug, title, author, github, date, readme: readme.contents,
+                              slug, title, authors, date, readme: readme.contents,
                           };
                           allCartData.push(cartData);
 
@@ -218,7 +242,7 @@ module.exports = {
                   const indexData = allCartData.map(cartData => ({
                       slug: cartData.slug,
                       title: cartData.title,
-                      author: cartData.author,
+                      authors: cartData.authors,
                   }));
                   const cartsJsonPath = await actions.createData("carts.json", JSON.stringify(indexData));
                   actions.addRoute({

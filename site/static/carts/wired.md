@@ -1,6 +1,5 @@
 ---
-author: Louis Pearson
-github: desttinghim
+author: Louis Pearson <desttinghim>
 date: 2022-08-22 22:42:00 MST
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: 12Boti
-github: 12Boti
+author: 12Boti <12Boti>
 date: 2022-01-23 00:00:17 GMT
 ---
 

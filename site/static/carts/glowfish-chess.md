@@ -1,6 +1,5 @@
 ---
-author: Analog Hors
-github: analog-hors
+author: Analog Hors <analog-hors>
 date: 2022-04-18
 ---
 

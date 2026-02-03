@@ -1,6 +1,5 @@
 ---
-author: Sander in 't Veld
-github: SLiV9
+author: Sander in 't Veld <SLiV9>
 date: 2022-09-28
 ---
 

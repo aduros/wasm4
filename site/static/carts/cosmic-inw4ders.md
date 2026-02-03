@@ -1,6 +1,5 @@
 ---
-author: Pierro
-github: pierroelmito
+author: Pierro <pierroelmito>
 date: 2025-11-17
 ---
 

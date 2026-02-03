@@ -1,6 +1,5 @@
 ---
-author: Chris Heyes
-github: hazeycode
+author: Chris Heyes <hazeycode>
 date: 2022-08-22
 ---
 

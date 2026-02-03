@@ -114,3 +114,24 @@ html[data-theme='dark'] .header-github-link:before {
   margin-left: 0.5em;
   vertical-align: middle;
 }
+
+/* Multiple authors support */
+.avatar-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.avatar-group .avatar {
+  flex: 0 0 auto;
+}
+
+.avatar__photo--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ifm-color-primary);
+  color: white;
+  font-weight: bold;
+  font-size: 1.5rem;
+}

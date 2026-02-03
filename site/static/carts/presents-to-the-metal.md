@@ -1,6 +1,5 @@
 ---
-author: errorStream
-github: mallow-malt
+author: errorStream <mallow-malt>
 date: 2022-01-23 00:00:23 GMT
 ---
 

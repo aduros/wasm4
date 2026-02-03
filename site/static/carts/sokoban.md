@@ -1,6 +1,5 @@
 ---
-author: Lars Hamre
-github: chemecse
+author: Lars Hamre <chemecse>
 date: 2022-01-23 00:00:24 GMT
 ---
 

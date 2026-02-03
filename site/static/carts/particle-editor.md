@@ -1,8 +1,5 @@
 ---
-author: Dominik Koperkiewicz
-
-github: DominikKoperkiewicz
-
+author: Dominik Koperkiewicz <DominikKoperkiewicz>
 date: 2025-10-15
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: Fabrizio Vitale
-github: FaberVitale
+author: Fabrizio Vitale <FaberVitale>
 date: 2021-09-08
 ---
 

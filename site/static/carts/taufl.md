@@ -1,6 +1,5 @@
 ---
-author: Tau
-github: tau-dev
+author: Tau <tau-dev>
 date: 2022-08-22
 ---
 

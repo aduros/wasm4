@@ -1,6 +1,5 @@
 ---
-author: Mateusz Czarnecki
-github: blackstaff
+author: Mateusz Czarnecki <blackstaff>
 date: 2022-01-23 00:00:12 GMT
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: douglett
-github: douglett
+author: douglett <douglett>
 date: 2023-01-01
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: William Guimont-Martin
-github: willGuimont
+author: William Guimont-Martin <willGuimont>
 date: 2022-01-23 00:00:31 GMT
 ---
 

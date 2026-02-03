@@ -1,6 +1,5 @@
 ---
-author: Davy Willems
-github: joyrider3774
+author: Davy Willems <joyrider3774>
 date: 2024-06-10
 ---
 

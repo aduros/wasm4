@@ -1,6 +1,5 @@
 ---
-author: Sergey Poznyak
-github: sergeypdev
+author: Sergey Poznyak <sergeypdev>
 date: 2023-08-19
 ---
 

@@ -1,6 +1,5 @@
 ---
-author: Matheus Foltran Consonni
-github: MatheusFoltran
+author: Matheus Foltran Consonni <MatheusFoltran>
 date: 2025-07-25
 ---
 

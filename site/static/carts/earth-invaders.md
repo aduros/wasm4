@@ -1,6 +1,5 @@
 ---
-author: Yara F. Scramin
-github: yarafs
+author: Yara F. Scramin <yarafs>
 date: 2025-08-02
 ---
 

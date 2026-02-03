@@ -1,6 +1,5 @@
 ---
-author: Sine System
-github: Penncilk
+author: Sine System <Penncilk>
 date: 2024-05-31
 ---
 

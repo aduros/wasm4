@@ -1,6 +1,5 @@
 ---
-author: Milky Natas
-github: Milky2018
+author: Milky Natas <Milky2018>
 date: 2024-11-11 00:00:00 GMT
 ---
 

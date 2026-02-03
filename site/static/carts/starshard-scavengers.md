@@ -1,6 +1,5 @@
 ---
-author: HitchH1k3r
-github: hitchh1k3r
+author: HitchH1k3r <hitchh1k3r>
 date: 2024-04-30
 ---
 

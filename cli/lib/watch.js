@@ -66,6 +66,7 @@ function start (opts) {
     }
 
     console.log("Building with: "+buildCommand+" "+buildParams.join(" "));
+    console.log("Note: This creates debug builds. For smaller release builds, check your language's documentation.");
     build();
 
     let buildTimeoutId = 0;

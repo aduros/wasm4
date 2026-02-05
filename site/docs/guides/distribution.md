@@ -1,5 +1,11 @@
 # Distribution
 
+:::tip Use Release Builds
+Before distributing your game, make sure you're using a release build of your cart. Debug builds
+(created by `w4 watch`) are larger and slower. Check your language's documentation for how to create
+optimized release builds. For example, `cargo build --release` for Rust or `npm run build` for AssemblyScript.
+:::
+
 ## Bundle to HTML
 
 When you're ready to distribute your game, you can bundle it into a standalone HTML file with `w4 bundle`:

@@ -137,8 +137,8 @@ jobs:
                   path: cli-build
                   name: w4
 
-    netlify-ci:
-        name: Run Netlify CI
+    build-site:
+        name: Build website
         runs-on: ubuntu-latest
 
         steps:
@@ -146,11 +146,52 @@ jobs:
               with:
                   submodules: true
 
-            - name: Run Netlify CI script
+            - name: Build web devtools
+              working-directory: devtools/web
+              run: npm ci
+
+            - name: Build web runtime
+              working-directory: runtimes/web
               run: |
-                  scripts/run-netlify-ci
+                  npm ci
+                  npm run build
+
+            - name: Build site
+              working-directory: site
+              run: |
+                  rm -rf static/embed
+                  cp -r ../runtimes/web/dist/slim static/embed
+                  npm ci
+                  npm run build
               env:
                   NODE_OPTIONS: --openssl-legacy-provider
+
+            - name: Add CNAME for custom domain
+              run: echo "wasm4.org" > site/build/CNAME
+
+            - name: Upload Pages artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: site/build
+
+    deploy-site:
+        name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        needs: build-site
+        runs-on: ubuntu-latest
+
+        permissions:
+            pages: write
+            id-token: write
+
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+
+        steps:
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
 
     release:
         if: startsWith(github.ref, 'refs/tags/v')

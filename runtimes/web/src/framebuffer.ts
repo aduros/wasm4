@@ -160,10 +160,10 @@ export class Framebuffer {
     drawOval (x: number, y: number, width: number, height: number) {
         const drawColors = this.drawColors[0];
         const dc0 = drawColors & 0xf;
-        const dc1 = (drawColors >>> 4) & 0xf;
+        let dc1 = (drawColors >>> 4) & 0xf;
 
-        if (dc1 === 0xf) {
-            return;
+        if (dc1 == 0) {
+            dc1 = dc0;
         }
 
         const strokeColor = (dc1 - 1) & 0x3;
@@ -193,10 +193,13 @@ export class Framebuffer {
         b1 = 8 * b2;
 
         do {
-            this.drawPointUnclipped(strokeColor, east, north); /*   I. Quadrant     */
-            this.drawPointUnclipped(strokeColor, west, north); /*   II. Quadrant    */
-            this.drawPointUnclipped(strokeColor, west, south); /*   III. Quadrant   */
-            this.drawPointUnclipped(strokeColor, east, south); /*   IV. Quadrant    */
+            if (dc1 !== 0) {
+                this.drawPointUnclipped(strokeColor, east, north); /*   I. Quadrant     */
+                this.drawPointUnclipped(strokeColor, west, north); /*   II. Quadrant    */
+                this.drawPointUnclipped(strokeColor, west, south); /*   III. Quadrant   */
+                this.drawPointUnclipped(strokeColor, east, south); /*   IV. Quadrant    */
+            }
+            
 
             const start = west + 1;
             const len = east - start;
@@ -225,14 +228,16 @@ export class Framebuffer {
             }
         } while (west <= east);
 
-        // Make sure north and south have moved the entire way so top/bottom aren't missing
-        while (north - south < height) {
-            this.drawPointUnclipped(strokeColor, west - 1, north); /*   II. Quadrant    */
-            this.drawPointUnclipped(strokeColor, east + 1, north); /*   I. Quadrant     */
-            north += 1;
-            this.drawPointUnclipped(strokeColor, west - 1, south); /*   III. Quadrant   */
-            this.drawPointUnclipped(strokeColor, east + 1, south); /*   IV. Quadrant    */
-            south -= 1;
+        if (dc1 !== 0) {
+            // Make sure north and south have moved the entire way so top/bottom aren't missing
+            while (north - south < height) {
+                this.drawPointUnclipped(strokeColor, west - 1, north); /*   II. Quadrant    */
+                this.drawPointUnclipped(strokeColor, east + 1, north); /*   I. Quadrant     */
+                north += 1;
+                this.drawPointUnclipped(strokeColor, west - 1, south); /*   III. Quadrant   */
+                this.drawPointUnclipped(strokeColor, east + 1, south); /*   IV. Quadrant    */
+                south -= 1;
+            }
         }
     }
 

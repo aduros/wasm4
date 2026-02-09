@@ -5,7 +5,7 @@ const SAMPLE_RATE = 44100;
 const MAX_VOLUME = 0.15;
 // The triangle channel sounds a bit quieter than the others, so give it higher amplitude
 const MAX_VOLUME_TRIANGLE = 0.25;
-// Also the triangle channel prevent popping on hard stops by adding a 1 ms release
+// Also for the triangle channel, prevent popping on hard stops by adding a 1 ms release
 const RELEASE_TIME_TRIANGLE = Math.floor(SAMPLE_RATE / 1000);
 
 class Channel {
@@ -24,14 +24,17 @@ class Channel {
     /** Time at the end of the decay period. */
     decayTime = 0;
 
-    /** Time at the end of the sustain period. */
+    /** Time at the end of the sustain period, with adjustments due to tick-sample drift. */
     sustainTime = 0;
 
-    /** Time the tone should end. */
+    /** Time at the end of the release period, with adjustments due to tick-sample drift. */
     releaseTime = 0;
 
-    /** The tick the tone should end. */
-    endTick = 0;
+    /** Time at the end of the release period, without adjustments due to tick-sample drift. */
+    estReleaseTime = 0;
+
+    /** Tick at the end of the sustain period where the tone switches over to release. */
+    sustainTick = 0;
 
     /** Sustain volume level. */
     sustainVolume = 0;
@@ -109,7 +112,7 @@ class APUProcessor extends AudioWorkletProcessor {
 
     getCurrentFrequency (channel: Channel) {
         if (channel.freq2 > 0) {
-            return this.ramp(channel.freq1, channel.freq2, channel.startTime, channel.releaseTime);
+            return this.ramp(channel.freq1, channel.freq2, channel.startTime, channel.estReleaseTime);
         } else {
             return channel.freq1;
         }
@@ -117,7 +120,7 @@ class APUProcessor extends AudioWorkletProcessor {
 
     getCurrentVolume (channel: Channel) {
         const time = this.time;
-        if (time >= channel.sustainTime && (channel.releaseTime - channel.sustainTime) > RELEASE_TIME_TRIANGLE) {
+        if (this.ticks > channel.sustainTick) {
             // Release
             return this.ramp(channel.sustainVolume, 0, channel.sustainTime, channel.releaseTime);
         } else if (time >= channel.decayTime) {
@@ -133,6 +136,17 @@ class APUProcessor extends AudioWorkletProcessor {
     }
 
     tick () {
+        // Update releaseTime for channels that should begin their release period this tick.
+        // This fixes drift drift between ticks and samples.
+        for (let channelIdx = 0; channelIdx < 4; ++channelIdx) {
+            const channel = this.channels[channelIdx];
+            if (this.ticks == channel.sustainTick) {
+                const delta = this.time - channel.sustainTime;
+                channel.sustainTime = this.time;
+                channel.releaseTime += delta;
+            }
+        }
+
         this.ticks++;
     }
 
@@ -155,7 +169,7 @@ class APUProcessor extends AudioWorkletProcessor {
         const channel = this.channels[channelIdx];
 
         // Restart the phase if this channel wasn't already playing
-        if (this.time > channel.releaseTime && this.ticks != channel.endTick) {
+        if (this.time > channel.releaseTime && this.ticks > channel.sustainTick) {
             channel.phase = (channelIdx == 2) ? 0.25 : 0;
         }
         if (noteMode) {
@@ -169,8 +183,8 @@ class APUProcessor extends AudioWorkletProcessor {
         channel.attackTime = channel.startTime + ((SAMPLE_RATE*attack/60) >>> 0);
         channel.decayTime = channel.attackTime + ((SAMPLE_RATE*decay/60) >>> 0);
         channel.sustainTime = channel.decayTime + ((SAMPLE_RATE*sustain/60) >>> 0);
-        channel.releaseTime = channel.sustainTime + ((SAMPLE_RATE*release/60) >>> 0);
-        channel.endTick = this.ticks + attack + decay + sustain + release;
+        channel.estReleaseTime = channel.sustainTime + ((SAMPLE_RATE*release/60) >>> 0);
+        channel.sustainTick = this.ticks + attack + decay + sustain;
         channel.pan = pan;
 
         const maxVolume = (channelIdx == 2) ? MAX_VOLUME_TRIANGLE : MAX_VOLUME;
@@ -192,9 +206,11 @@ class APUProcessor extends AudioWorkletProcessor {
 
         } else if (channelIdx == 2) {
             if (release == 0) {
-                channel.releaseTime += RELEASE_TIME_TRIANGLE;
+                channel.estReleaseTime += RELEASE_TIME_TRIANGLE;
             }
         }
+
+        channel.releaseTime = channel.estReleaseTime;
     }
 
     process (_inputs: Float32Array[][] | null, [[ outputLeft, outputRight ]]: Float32Array[][], _parameters: Record<string, Float32Array> | null) {
@@ -204,7 +220,7 @@ class APUProcessor extends AudioWorkletProcessor {
             for (let channelIdx = 0; channelIdx < 4; ++channelIdx) {
                 const channel = this.channels[channelIdx];
 
-                if (this.time < channel.releaseTime || this.ticks == channel.endTick) {
+                if (this.time < channel.releaseTime || this.ticks <= channel.sustainTick) {
                     const freq = this.getCurrentFrequency(channel);
                     const volume = this.getCurrentVolume(channel);
                     let sample;

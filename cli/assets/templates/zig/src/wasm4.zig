@@ -136,3 +136,31 @@ extern fn traceUtf8(strPtr: [*]const u8, strLen: usize) void;
 /// See https://github.com/aduros/wasm4/issues/244 for discussion and type-safe
 /// alternatives.
 pub extern fn tracef(x: [*:0]const u8, ...) void;
+
+/// zig powered formatted print with type safety at compile time.
+/// prints on debug console.
+/// `extra_len` specifies how many characteres you will need at most, _on addition_ to the format string length.
+/// You can pass negative numbers, as long as the value is comptime known.
+pub fn print(comptime extra_len: comptime_int, comptime fmt: []const u8, args: anytype) !void {
+    var str = [_]u8{0} ** (@as(comptime_int, fmt.len) + extra_len);
+    try printBuffer(&str, fmt, args);
+    trace(&str);
+}
+
+/// zig powered formatted print with type safety at compile time.
+/// prints on screen.
+/// `extra_len` specifies how many characteres you will need at most, _on addition_ to the format string length.
+/// You can pass negative numbers, as long as the value is comptime known.
+pub fn textPrint(comptime extra_len: comptime_int, comptime fmt: []const u8, x: i32, y: i32, args: anytype) !void {
+    var str = [_]u8{0} ** (@as(comptime_int, fmt.len) + extra_len);
+    try printBuffer(&str, fmt, args);
+    text(&str, x, y);
+}
+
+/// zig powered formatted print with type safety at compile time.
+/// prints on arbitrary u8 buffer.
+pub fn printBuffer(buffer: []u8, comptime fmt: []const u8, args: anytype) !void {
+    var stream = std.io.fixedBufferStream(buffer);
+    const writer = stream.writer();
+    try writer.print(fmt, args);
+}

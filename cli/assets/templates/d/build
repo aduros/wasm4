@@ -2,10 +2,11 @@
 set -e
 
 ## A WASM-4 project should look like this:
-##    +- Folder -+
-##    | app.d    |
-##    | build    |
-##    +----------+
+##    +- Folder -------+
+##    | source/app.d   |
+##    | source/wasm4.d |
+##    | build          |
+##    +----------------+
 
 output="cart.wasm"
 source="source"

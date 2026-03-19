@@ -2,10 +2,11 @@
 setlocal enabledelayedexpansion
 
 :: A WASM-4 project should look like this:
-::    +- Folder --+
-::    | app.d     |
-::    | build.bat |
-::    +-----------+
+::    +- Folder -------+
+::    | source\app.d   |
+::    | source\wasm4.d |
+::    | build.bat      |
+::    +----------------+
 
 set "output=cart.wasm"
 set "source=source"

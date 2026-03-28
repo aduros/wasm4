@@ -6,6 +6,7 @@
 
 #include "../apu.h"
 #include "../runtime.h"
+#include "../store.h"
 #include "../wasm.h"
 #include "../window.h"
 #include "../util.h"
@@ -126,37 +127,55 @@ int main (int argc, const char* argv[]) {
     char* diskPath = NULL;
 
     if (argc < 2) {
+        // Try bundled cart first
         FILE* file = fopen(argv[0], "rb");
-        if (file == NULL) {
-            goto usage;
-        }
-        fseek(file, -sizeof(FileFooter), SEEK_END);
-
-        FileFooter footer;
-        if (fread(&footer, 1, sizeof(FileFooter), file) < sizeof(FileFooter) || footer.magic != 1414676803) {
-usage:
-            // No bundled cart found
-            fprintf(stderr, "Usage: wasm4 <cart>\n");
-            return 1;
-        }
-
-        // Make sure the title is null terminated
-        footer.title[sizeof(footer.title)-1] = '\0';
-        title = footer.title;
-
-        cartBytes = xmalloc(footer.cartLength);
-        fseek(file, -sizeof(FileFooter) - footer.cartLength, SEEK_END);
-        cartLength = fread(cartBytes, 1, footer.cartLength, file);
-        fclose(file);
-
-        // Look for disk file
-        diskPath = xmalloc(strlen(argv[0]) + sizeof(DISK_FILE_EXT));
-        strcpy(diskPath, argv[0]);
+        if (file != NULL) {
+            fseek(file, -sizeof(FileFooter), SEEK_END);
+            FileFooter footer;
+            if (fread(&footer, 1, sizeof(FileFooter), file) >= sizeof(FileFooter) && footer.magic == 1414676803) {
+                footer.title[sizeof(footer.title)-1] = '\0';
+                title = footer.title;
+                cartBytes = xmalloc(footer.cartLength);
+                fseek(file, -sizeof(FileFooter) - footer.cartLength, SEEK_END);
+                cartLength = fread(cartBytes, 1, footer.cartLength, file);
+                fclose(file);
+                diskPath = xmalloc(strlen(argv[0]) + sizeof(DISK_FILE_EXT));
+                strcpy(diskPath, argv[0]);
 #ifdef _WIN32
-        trimFileExtension(diskPath); // Trim .exe on Windows
+                trimFileExtension(diskPath);
 #endif
-        strcat(diskPath, DISK_FILE_EXT);
-        loadDiskFile(&disk, diskPath);
+                strcat(diskPath, DISK_FILE_EXT);
+                loadDiskFile(&disk, diskPath);
+                goto load_cart;
+            }
+            fclose(file);
+        }
+
+        // No bundled cart — launch store with minimal dummy cart
+        {
+            // Minimal WASM module: imports env.memory, exports empty start+update
+            static const uint8_t dummyCart[] = {
+                0x00,0x61,0x73,0x6d,0x01,0x00,0x00,0x00,0x01,0x04,0x01,0x60,0x00,0x00,0x02,0x0f,
+                0x01,0x03,0x65,0x6e,0x76,0x06,0x6d,0x65,0x6d,0x6f,0x72,0x79,0x02,0x00,0x01,0x03,
+                0x03,0x02,0x00,0x00,0x07,0x12,0x02,0x05,0x73,0x74,0x61,0x72,0x74,0x00,0x00,0x06,
+                0x75,0x70,0x64,0x61,0x74,0x65,0x00,0x01,0x0a,0x07,0x02,0x02,0x00,0x0b,0x02,0x00,
+                0x0b
+            };
+            audioInit();
+            w4_storeInit();
+            cartBytes = xmalloc(sizeof(dummyCart));
+            memcpy(cartBytes, dummyCart, sizeof(dummyCart));
+            cartLength = sizeof(dummyCart);
+
+            uint8_t* memory = w4_wasmInit();
+            w4_runtimeInit(memory, &disk);
+            w4_wasmLoadModule(cartBytes, cartLength);
+            w4_storeOpen();
+            w4_windowSetStoreMode(true);
+            w4_windowBoot(title);
+            audioUninit();
+            return 0;
+        }
 
     } else if (!strcmp(argv[1], "-") || !strcmp(argv[1], "/dev/stdin")) {
         size_t bufsize = 1024;
@@ -205,7 +224,9 @@ usage:
         loadDiskFile(&disk, diskPath);
     }
 
+load_cart:
     audioInit();
+    w4_storeInit();
 
     uint8_t* memory = w4_wasmInit();
     w4_runtimeInit(memory, &disk);

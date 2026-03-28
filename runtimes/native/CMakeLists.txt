@@ -120,6 +120,8 @@ endif ()
 add_subdirectory(vendor/cubeb)
 endif ()
 
+find_package(CURL REQUIRED)
+
 file(GLOB COMMON_SOURCES RELATIVE "${CMAKE_SOURCE_DIR}" "src/*.c")
 
 # Include a strnlen polyfill for some platforms where it's missing (OSX PPC, maybe others)
@@ -170,7 +172,8 @@ target_link_directories(wasm4 PRIVATE
     $<$<BOOL:${TOYWASM}>:${toywasm_tmp_install}/lib>)
 endif ()
 
-target_link_libraries(wasm4 cubeb
+target_include_directories(wasm4 PRIVATE ${CURL_INCLUDE_DIRS})
+target_link_libraries(wasm4 cubeb CURL::libcurl pthread
     $<$<BOOL:${MINIFB}>:minifb>
     $<$<BOOL:${GLFW}>:glfw>
     $<$<BOOL:${TOYWASM}>:toywasm-core>)

@@ -155,13 +155,35 @@ static m3ApiRawFunction (tracef) {
     m3ApiSuccess();
 }
 
+static bool storeLoaded = false;
+static bool cartCrashed = false;
+
 static void check (M3Result result) {
     if (result != m3Err_none) {
         M3ErrorInfo info;
         m3_GetErrorInfo(runtime, &info);
-        fprintf(stderr, "WASM error: %s (%s)\n", result, info.message);
-        exit(1);
+        if (storeLoaded) {
+            fprintf(stderr, "WASM warning: %s (%s)\n", result, info.message);
+            update = NULL;
+            start = NULL;
+            cartCrashed = true;
+        } else {
+            fprintf(stderr, "WASM error: %s (%s)\n", result, info.message);
+            exit(1);
+        }
     }
+}
+
+bool w4_wasmDidCrash(void) {
+    if (cartCrashed) {
+        cartCrashed = false;
+        return true;
+    }
+    return false;
+}
+
+void w4_wasmSetStoreLoaded(bool value) {
+    storeLoaded = value;
 }
 
 uint8_t* w4_wasmInit () {
@@ -187,6 +209,15 @@ uint8_t* w4_wasmInit () {
 void w4_wasmDestroy () {
     m3_FreeRuntime(runtime);
     m3_FreeEnvironment(env);
+    env = NULL;
+    runtime = NULL;
+    module = NULL;
+    start = NULL;
+    update = NULL;
+}
+
+uint8_t* w4_wasmGetMemory () {
+    return m3_GetMemory(runtime, NULL, 0);
 }
 
 void w4_wasmLoadModule (const uint8_t* wasmBuffer, int byteLength) {
@@ -243,6 +274,70 @@ void w4_wasmLoadModule (const uint8_t* wasmBuffer, int byteLength) {
     if (func) {
         check(m3_CallV(func));
     }
+}
+
+int w4_wasmLoadModuleSafe (const uint8_t* wasmBuffer, int byteLength) {
+    M3Result result;
+    storeLoaded = true;
+
+    result = m3_ParseModule(env, &module, wasmBuffer, byteLength);
+    if (result) {
+        fprintf(stderr, "WASM parse error: %s\n", result);
+        return -1;
+    }
+
+    module->memoryImported = true;
+
+    result = m3_LoadModule(runtime, module);
+    if (result) {
+        fprintf(stderr, "WASM load error: %s\n", result);
+        return -1;
+    }
+
+    m3_LinkRawFunction(module, "env", "blit", "v(iiiiii)", blit);
+    m3_LinkRawFunction(module, "env", "blitSub", "v(iiiiiiiii)", blitSub);
+    m3_LinkRawFunction(module, "env", "line", "v(iiii)", line);
+    m3_LinkRawFunction(module, "env", "hline", "v(iii)", hline);
+    m3_LinkRawFunction(module, "env", "vline", "v(iii)", vline);
+    m3_LinkRawFunction(module, "env", "oval", "v(iiii)", oval);
+    m3_LinkRawFunction(module, "env", "rect", "v(iiii)", rect);
+    m3_LinkRawFunction(module, "env", "text", "v(iii)", text);
+    m3_LinkRawFunction(module, "env", "textUtf8", "v(iiii)", textUtf8);
+    m3_LinkRawFunction(module, "env", "textUtf16", "v(iiii)", textUtf16);
+    m3_LinkRawFunction(module, "env", "tone", "v(iiii)", tone);
+    m3_LinkRawFunction(module, "env", "diskr", "i(ii)", diskr);
+    m3_LinkRawFunction(module, "env", "diskw", "i(ii)", diskw);
+    m3_LinkRawFunction(module, "env", "trace", "v(i)", trace);
+    m3_LinkRawFunction(module, "env", "traceUtf8", "v(ii)", traceUtf8);
+    m3_LinkRawFunction(module, "env", "traceUtf16", "v(ii)", traceUtf16);
+    m3_LinkRawFunction(module, "env", "tracef", "v(ii)", tracef);
+
+    m3_FindFunction(&start, runtime, "start");
+    m3_FindFunction(&update, runtime, "update");
+
+    result = m3_RunStart(module);
+    if (result) {
+        fprintf(stderr, "WASM start error: %s\n", result);
+        return -1;
+    }
+
+    M3Function* func;
+    m3_FindFunction(&func, runtime, "_start");
+    if (func) {
+        result = m3_CallV(func);
+        if (result) {
+            fprintf(stderr, "WASM _start warning: %s (ignored)\n", result);
+        }
+    }
+    m3_FindFunction(&func, runtime, "_initialize");
+    if (func) {
+        result = m3_CallV(func);
+        if (result) {
+            fprintf(stderr, "WASM _initialize warning: %s (ignored)\n", result);
+        }
+    }
+
+    return 0;
 }
 
 void w4_wasmCallStart () {

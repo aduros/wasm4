@@ -87,6 +87,10 @@ static void bounds_check_cstr(const char *p)
     }
 }
 
+void w4_runtimeSetMemory (uint8_t* memoryBytes) {
+    memory = (Memory*)memoryBytes;
+}
+
 void w4_runtimeInit (uint8_t* memoryBytes, w4_Disk* diskBytes) {
     memory = (Memory*)memoryBytes;
     disk = diskBytes;

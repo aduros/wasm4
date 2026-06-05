@@ -70,6 +70,7 @@ ExternalProject_Add(toywasm
     SOURCE_DIR "${CMAKE_SOURCE_DIR}/vendor/toywasm"
     CMAKE_ARGS
         -DCMAKE_INSTALL_PREFIX=${toywasm_tmp_install}
+        -DUSE_DEFAULT_TOOLCHAIN=ON
         -DBUILD_TESTING=OFF
         -DTOYWASM_BUILD_CLI=OFF
         -DTOYWASM_BUILD_UNITTEST=OFF

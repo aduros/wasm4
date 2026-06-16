@@ -404,8 +404,8 @@ Each note is a **signed 8-bit** value, and it will range from **-96 to 96**, or 
 - If **lower than zero**, then it will play a tone using the **shadow channel**.
 - If **equals zero**, it will **do nothing**.
 
-Each index corresponds to a frequency stored in the note lookup table. Negative and positive indexes should all point to the same frequency.
-For instance: indexes `-1` and `1` would both point to note index `1` (16Hz).
+Each index corresponds to a frequency stored in the note lookup table. Negative and positive indices should all point to the same frequency.
+For instance: indices `-1` and `1` would both point to note index `1` (16Hz).
 
 ## Note breaks
 

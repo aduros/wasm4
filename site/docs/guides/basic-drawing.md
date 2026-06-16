@@ -133,10 +133,10 @@ The first color in the palette register is used as the screen background color.
 
 ## The `DRAW_COLORS` Register
 
-`DRAW_COLORS` is a set of 4 indexes into `PALETTE`. Drawing functions use these indexes to
+`DRAW_COLORS` is a set of 4 indices into `PALETTE`. Drawing functions use these indices to
 decide which colors to use, and what to use them for.
 
-`DRAW_COLORS` is a 16 bit value that holds 4 indexes. Bits 0-3 (the least significant bits)
+`DRAW_COLORS` is a 16 bit value that holds 4 indices. Bits 0-3 (the least significant bits)
 hold the first draw color, bits 4-7 hold the second draw color, and so on.
 
 Setting a draw color to `1` means use `PALETTE` color 1 for that draw color. The same applies

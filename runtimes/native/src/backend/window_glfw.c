@@ -8,6 +8,9 @@
 
 #include "../window.h"
 #include "../runtime.h"
+#include "../wasm.h"
+#include "../menu.h"
+#include "../store.h"
 
 static uint32_t table[256];
 static GLuint paletteLocation;
@@ -24,6 +27,11 @@ static int viewportY;
 static int viewportSize;
 
 static bool should_close = false;
+static bool storeMode = false; // true when launched without a cart
+
+void w4_windowSetStoreMode (bool enabled) {
+    storeMode = enabled;
+}
 
 static void initLookupTable () {
     // Create a lookup table for each byte mapping to 4 bytes:
@@ -183,8 +191,32 @@ static void update (GLFWwindow* window) {
     w4_runtimeSetGamepad(0, gamepad);
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
-        should_close = true;
+        if (w4_storeIsOpen()) {
+            if (storeMode) {
+                should_close = true;
+            } else {
+                w4_storeClose();
+            }
+        } else if (w4_menuIsOpen()) {
+            w4_menuClose();
+        } else {
+            should_close = true;
+        }
     }
+
+    // Enter toggles pause menu
+    static int enterWasPressed = 0;
+    int enterPressed = glfwGetKey(window, GLFW_KEY_ENTER);
+    if (enterPressed && !enterWasPressed) {
+        if (w4_storeIsOpen()) {
+            // ignore Enter in store
+        } else if (w4_menuIsOpen()) {
+            w4_menuClose();
+        } else {
+            w4_menuOpen();
+        }
+    }
+    enterWasPressed = enterPressed;
 
     // Mouse handling
     double mouseX, mouseY;
@@ -201,7 +233,52 @@ static void update (GLFWwindow* window) {
     }
     w4_runtimeSetMouse(160*(mouseX-contentX)/contentSizeX, 160*(mouseY-contentY)/contentSizeY, mouseButtons);
 
-    w4_runtimeUpdate();
+    if (w4_storeIsOpen()) {
+        w4_storeInput(gamepad);
+
+        // Store was closed via Z button without selecting a cart
+        if (!w4_storeIsOpen() && storeMode) {
+            should_close = true;
+            return;
+        }
+
+        // Check if a cart was downloaded
+        int cartLen = 0;
+        uint8_t* cartData = w4_storeGetSelectedCart(&cartLen);
+        if (cartData) {
+            w4_storeJoinThread();
+            fprintf(stderr, "[store] Loading cart (%d bytes)\n", cartLen);
+            w4_wasmDestroy();
+            uint8_t* mem = w4_wasmInit();
+            static w4_Disk storeDisk = {0};
+            storeDisk.size = 0;
+            w4_runtimeInit(mem, &storeDisk);
+            w4_wasmSetStoreLoaded(true);
+            w4_wasmLoadModule(cartData, cartLen);
+            // Note: cartData must NOT be freed — wasm3 holds pointers into it
+            // Refresh memory pointer — wasm3 may realloc during module load
+            w4_runtimeSetMemory(w4_wasmGetMemory());
+            storeMode = false;
+        }
+    } else if (w4_menuIsOpen()) {
+        w4_menuInput(gamepad);
+        int action = w4_menuGetAction();
+        switch (action) {
+            case MENU_ACTION_CONTINUE:
+                w4_menuClose();
+                break;
+            case MENU_ACTION_STORE:
+                w4_menuClose();
+                w4_storeOpen();
+                break;
+        }
+    } else {
+        w4_runtimeUpdate();
+        if (w4_wasmDidCrash()) {
+            fprintf(stderr, "[store] Cart crashed, opening store\n");
+            w4_storeOpen();
+        }
+    }
 }
 
 void w4_windowBoot (const char* title) {
@@ -242,6 +319,19 @@ void w4_windowBoot (const char* title) {
         }
 
         update(window);
+
+        if (w4_storeIsOpen()) {
+            static uint32_t storePalette[4];
+            static uint8_t storeFb[160*160/4];
+            w4_storeRender(storePalette, storeFb);
+            w4_windowComposite(storePalette, storeFb);
+        } else if (w4_menuIsOpen()) {
+            static uint32_t menuPalette[4];
+            static uint8_t menuFb[160*160/4];
+            w4_menuRender(menuPalette, menuFb);
+            w4_windowComposite(menuPalette, menuFb);
+        }
+
         glfwSwapBuffers(window);
         glfwPollEvents();
 

@@ -1,6 +1,16 @@
 module wasm4;
 
-extern(C):
+private {
+    version (LDC) {
+        import ldc = ldc.attributes;
+        private alias llvmAttr = ldc.llvmAttr;
+    } else {
+        private struct llvmAttr { immutable(char)[] a, b; }
+    }
+
+    enum wasm4 = llvmAttr("wasm-import-module", "env");
+    auto importName(immutable(char)[] name) => llvmAttr("wasm-import-name", name);
+}
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │
@@ -50,14 +60,18 @@ enum systemHideGamepadOverlay = 2;
 // │                                                                           │
 // └───────────────────────────────────────────────────────────────────────────┘
 
-/** Copies pixels to the framebuffer. */
-void blit(const ubyte* data, int x, int y, uint width, uint height, uint flags);
+extern(C) nothrow @nogc @wasm4 {
+    /** Copies pixels to the framebuffer. */
+    @importName("blit")
+    void blit(const ubyte* data, int x, int y, uint width, uint height, uint flags);
 
-/** Copies a subregion within a larger sprite atlas to the framebuffer. */
-void blitSub(
-    const ubyte* data, int x, int y, uint width, uint height,
-    uint srcX, uint srcY, uint stride, uint flags,
-);
+    /** Copies a subregion within a larger sprite atlas to the framebuffer. */
+    @importName("blitSub")
+    void blitSub(
+        const ubyte* data, int x, int y, uint width, uint height,
+        uint srcX, uint srcY, uint stride, uint flags,
+    );
+}
 
 enum blit2Bpp = 1;
 enum blit1Bpp = 0;
@@ -65,23 +79,31 @@ enum blitFlipX = 2;
 enum blitFlipY = 4;
 enum blitRotate = 8;
 
-/** Draws a line between two points. */
-void line(int x1, int y1, int x2, int y2);
+extern(C) nothrow @nogc @wasm4 {
+    /** Draws a line between two points. */
+    @importName("line")
+    void line(int x1, int y1, int x2, int y2);
 
-/** Draws a horizontal line. */
-void hline(int x, int y, uint len);
+    /** Draws a horizontal line. */
+    @importName("hline")
+    void hline(int x, int y, uint len);
 
-/** Draws a vertical line. */
-void vline(int x, int y, uint len);
+    /** Draws a vertical line. */
+    @importName("vline")
+    void vline(int x, int y, uint len);
 
-/** Draws an oval (or circle). */
-void oval(int x, int y, uint width, uint height);
+    /** Draws an oval (or circle). */
+    @importName("oval")
+    void oval(int x, int y, uint width, uint height);
 
-/** Draws a rectangle. */
-void rect(int x, int y, uint width, uint height);
+    /** Draws a rectangle. */
+    @importName("rect")
+    void rect(int x, int y, uint width, uint height);
 
-// /** Draws text using the built-in system font. */
-void text(const char* text, int x, int y);
+    // /** Draws text using the built-in system font. */
+    @importName("text")
+    void text(const char* text, int x, int y);
+}
 
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │                                                                           │
@@ -89,8 +111,11 @@ void text(const char* text, int x, int y);
 // │                                                                           │
 // └───────────────────────────────────────────────────────────────────────────┘
 
-/** Plays a sound tone. */
-void tone(uint frequency, uint duration, uint volume, uint flags);
+extern(C) nothrow @nogc @wasm4 {
+    /** Plays a sound tone. */
+    @importName("tone")
+    void tone(uint frequency, uint duration, uint volume, uint flags);
+}
 
 enum tonePulse1 = 0;
 enum tonePulse2 = 1;
@@ -110,14 +135,20 @@ enum toneNoteMode = 64;
 // │                                                                           │
 // └───────────────────────────────────────────────────────────────────────────┘
 
-/** Reads up to `size` bytes from persistent storage into the pointer `destPtr`. */
-uint diskr(void* dest, uint size);
+extern(C) nothrow @nogc @wasm4 {
+    /** Reads up to `size` bytes from persistent storage into the pointer `destPtr`. */
+    @importName("diskr")
+    uint diskr(void* dest, uint size);
 
-/** Writes up to `size` bytes from the pointer `srcPtr` into persistent storage. */
-uint diskw(const void* src, uint size);
+    /** Writes up to `size` bytes from the pointer `srcPtr` into persistent storage. */
+    @importName("diskw")
+    uint diskw(const void* src, uint size);
 
-/** Prints a message to the debug console. */
-void trace(const char* str);
+    /** Prints a message to the debug console. */
+    @importName("trace")
+    void trace(const char* str);
 
-/** Prints a message to the debug console. */
-void tracef(const char* fmt, ...);
+    /** Prints a message to the debug console. */
+    @importName("tracef")
+    void tracef(const char* fmt, ...);
+}

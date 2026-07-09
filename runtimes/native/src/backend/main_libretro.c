@@ -349,6 +349,12 @@ void retro_unload_game () {
 }
 
 void retro_reset () {
+    // Complete clear all memory and build a new instance as reusing
+    // the existing model could result in a memory leak.
+    w4_wasmDestroy();
+
+    // Build a new wasm instance.
+    memory = w4_wasmInit();
     w4_runtimeInit(memory, &disk);
     w4_wasmLoadModule(wasmData, wasmLength);
 }

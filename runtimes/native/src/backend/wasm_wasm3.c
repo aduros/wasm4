@@ -179,6 +179,7 @@ uint8_t* w4_wasmInit () {
     runtime = m3_NewRuntime(env, wasm3StackSize, NULL);
 
     runtime->memory.maxPages = 1;
+    runtime->memory.pageSize = wasm3StackSize;
     ResizeMemory(runtime, 1);
 
     return m3_GetMemory(runtime, NULL, 0);

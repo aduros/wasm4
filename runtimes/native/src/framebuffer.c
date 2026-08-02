@@ -395,8 +395,8 @@ void w4_framebufferOval (int x, int y, int width, int height) {
     uint8_t dc0 = dc01 & 0xf;
     uint8_t dc1 = (dc01 >> 4) & 0xf;
 
-    if (dc1 == 0xf) {
-        return;
+    if (dc1 == 0) {
+        dc1 = dc0;
     }
 
     uint8_t strokeColor = (dc1 - 1) & 0x3;
@@ -426,10 +426,12 @@ void w4_framebufferOval (int x, int y, int width, int height) {
     b1 = 8 * b2;
 
     do {
-        drawPointUnclipped(strokeColor, east, north); /*   I. Quadrant     */
-        drawPointUnclipped(strokeColor, west, north); /*   II. Quadrant    */
-        drawPointUnclipped(strokeColor, west, south); /*   III. Quadrant   */
-        drawPointUnclipped(strokeColor, east, south); /*   IV. Quadrant    */
+        if (dc1 != 0) {
+            drawPointUnclipped(strokeColor, east, north); /*   I. Quadrant     */
+            drawPointUnclipped(strokeColor, west, north); /*   II. Quadrant    */
+            drawPointUnclipped(strokeColor, west, south); /*   III. Quadrant   */
+            drawPointUnclipped(strokeColor, east, south); /*   IV. Quadrant    */
+        }
 
         const int start = west + 1;
         const int len = east - start;
@@ -458,14 +460,16 @@ void w4_framebufferOval (int x, int y, int width, int height) {
         }
     } while (west <= east);
 
-    // Make sure north and south have moved the entire way so top/bottom aren't missing
-    while (north - south < height) {
-        drawPointUnclipped(strokeColor, west - 1, north); /*   II. Quadrant    */
-        drawPointUnclipped(strokeColor, east + 1, north); /*   I. Quadrant     */
-        north += 1;
-        drawPointUnclipped(strokeColor, west - 1, south); /*   III. Quadrant   */
-        drawPointUnclipped(strokeColor, east + 1, south); /*   IV. Quadrant    */
-        south -= 1;
+    if (dc1 != 0) {
+        // Make sure north and south have moved the entire way so top/bottom aren't missing
+        while (north - south < height) {
+            drawPointUnclipped(strokeColor, west - 1, north); /*   II. Quadrant    */
+            drawPointUnclipped(strokeColor, east + 1, north); /*   I. Quadrant     */
+            north += 1;
+            drawPointUnclipped(strokeColor, west - 1, south); /*   III. Quadrant   */
+            drawPointUnclipped(strokeColor, east + 1, south); /*   IV. Quadrant    */
+            south -= 1;
+        }
     }
 }
 

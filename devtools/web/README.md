@@ -33,7 +33,7 @@ All exported components can be customized using the following css variables:
 ### Install dependencies
 
 ```bash
-npm --prefix devtools/web-devtools i
+npm --prefix devtools/web i
 ```
 
 This package relies on [lit](https://lit.dev) library to manage custom elements:
@@ -44,25 +44,25 @@ docs are available [here](https://lit.dev/docs/).
 Starts local server
 
 ```bash
-npm --prefix devtools/web-devtools run dev
+npm --prefix devtools/web run dev
 ```
 
 ### Build package & web runtime
 
 ```bash
-npm --prefix devtools/web-devtools/ run build && npm --prefix runtimes/web/ run build
+npm --prefix devtools/web/ run build && npm --prefix runtimes/web/ run build
 ```
 
 ### Build package
 
 ```bash
-npm --prefix devtools/web-devtools run build
+npm --prefix devtools/web run build
 ```
 
 ### Run formatter
 
 ```bash
-npm --prefix devtools/web-devtools run prettify
+npm --prefix devtools/web run prettify
 ```
 
 ## License

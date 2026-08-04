@@ -2,6 +2,7 @@
 target = "wasm32-unknown-unknown"
 
 [target.wasm32-unknown-unknown]
+runner = "w4 run-native"
 rustflags = [
     # Import memory from WASM-4
     "-C", "link-arg=--import-memory",

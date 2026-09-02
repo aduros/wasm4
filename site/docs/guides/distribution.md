@@ -105,6 +105,8 @@ For multiple authors, separate them with commas:
 author: Alice <alice>, Bob <bob@example.com>, Chris <https://chris.dev>
 ```
 
+If you want your cart to be marked as an experiment or tech demo rather than a complete game, you can add `type: experiment` below the date.
+
 Now just commit your changes and open a pull request! As soon as it's merged, your game will appear
 on the site.
 

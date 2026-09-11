@@ -2,11 +2,13 @@ import React from 'react';
 import Layout from '@theme/Layout';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import { AspectRatio } from './AspectRatio';
+import { useIOSTapToPlay } from './useIOSTapToPlay';
+import { IOSTapOverlay } from './IOSTapOverlay';
 import { Giscus } from "@giscus/react";
 import { RWebShare } from "react-web-share";
 import { MdSaveAlt, MdShare } from "react-icons/md";
 
-function Embed ({ slug, title, author }) {
+function Embed ({ slug, isIOSDevice, isPlaying, onPlay }) {
     let params = "?url="+encodeURIComponent(`/carts/${slug}.wasm`);
     params += "&disk-prefix="+encodeURIComponent(slug);
     // params += "&screenshot="+encodeURIComponent(`/carts/${slug}.png`);
@@ -16,6 +18,7 @@ function Embed ({ slug, title, author }) {
     // if (author) {
     //     params += "&author="+encodeURIComponent(author);
     // }
+
     return (
         <AspectRatio width={1} height={1} className="game-embed-wrapper">
             <iframe
@@ -24,12 +27,15 @@ function Embed ({ slug, title, author }) {
                 frameBorder="0"
                 className="game-embed">
             </iframe>
+            <IOSTapOverlay isIOSDevice={isIOSDevice} isPlaying={isPlaying} onPlay={onPlay} />
         </AspectRatio>
     );
 }
 
 export default function PlayCart ({ cart }) {
     const {siteConfig} = useDocusaurusContext();
+
+    const { isIOSDevice, isPlaying, onPlay: handlePlay } = useIOSTapToPlay(".game-embed");
 
     const dateString = new Intl.DateTimeFormat(undefined, {
         day: "numeric",
@@ -44,8 +50,10 @@ export default function PlayCart ({ cart }) {
             image={`https://wasm4.org/carts/${cart.slug}.png`}>
             <main>
             <div className="container game-container">
-                <Embed {... cart}/>
+                <Embed {...cart} isIOSDevice={isIOSDevice} isPlaying={isPlaying} onPlay={handlePlay} />
 
+                {!isPlaying && (
+                <>
                 <div className="text--center margin-bottom--lg">
                     <small>P1 controls: Arrows, X, Z / P2 controls: ESDF, Tab, Q</small>
                 </div>
@@ -112,6 +120,8 @@ export default function PlayCart ({ cart }) {
                     reactionsEnabled="1"
                     emitMetadata="0"
                 />
+                </>
+                )}
             </div>
             </main>
         </Layout>

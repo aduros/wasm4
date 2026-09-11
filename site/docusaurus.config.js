@@ -215,8 +215,13 @@ module.exports = {
                               throw new Error("Missing date");
                           }
 
+                          const type = markdown.frontMatter.type ?? "game";
+                          if (type !== "game" && type !== "experiment") {
+                              throw new Error("Invalid type: only 'game' or 'experiment' allowed");
+                          }
+
                           cartData = {
-                              slug, title, authors, date, readme: readme.contents,
+                              slug, title, authors, date, type, readme: readme.contents,
                           };
                           allCartData.push(cartData);
 
@@ -243,6 +248,7 @@ module.exports = {
                       slug: cartData.slug,
                       title: cartData.title,
                       authors: cartData.authors,
+                      type: cartData.type,
                   }));
                   const cartsJsonPath = await actions.createData("carts.json", JSON.stringify(indexData));
                   actions.addRoute({

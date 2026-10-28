@@ -14,8 +14,8 @@
     "write-heading-ids": "docusaurus write-heading-ids"
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-beta.4",
-    "@docusaurus/preset-classic": "2.0.0-beta.4",
+    "@docusaurus/core": "2.4.3",
+    "@docusaurus/preset-classic": "2.4.3",
     "@giscus/react": "^1.1.2",
     "@mdx-js/react": "^1.6.21",
     "@svgr/webpack": "^5.5.0",
@@ -29,6 +29,9 @@
     "rehype-stringify": "^9.0.3",
     "remark-rehype": "^10.1.0",
     "url-loader": "^4.1.1"
+  },
+  "overrides": {
+    "webpack": "5.73.0"
   },
   "browserslist": {
     "production": [

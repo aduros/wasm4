@@ -51,6 +51,22 @@ Example of a template file:
 </html>
 ```
 
+### Hosting the HTML file at your own link
+
+Since the bundle is a single self-contained file, any static host can serve it as a web page. One
+option is [deed.page](https://deed.page) (disclosure: this section was added by the deed.page team).
+Uploading the file gives you a permanent `https://<name>.deed.page/` link, with no account needed:
+
+```shell
+curl -T my-game.html "https://deed.page/v1/sites?slug=my-game"
+```
+
+Each site is served from its own subdomain, so your game's localStorage disk won't collide with
+other games hosted there. The first response includes an owner token, which is the only way to
+update or delete the site later, so keep it private. If you use an AI coding agent, the
+[deed.page skill](https://github.com/f-o-x11/deed-page-skill) does the same upload: it asks you
+before publishing and never shows the owner token in its output.
+
 ## Bundle to Windows/Mac/Linux executable
 
 Native executables for multiple platforms can also be bundled:

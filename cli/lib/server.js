@@ -109,7 +109,10 @@ async function start (cartFile, opts) {
             if (sentReload) {
                 const cart = path.basename(cartFile);
                 let now = new Date();
-                let time_string = `${now.getHours()}:${now.getMinutes()}`;
+                let hour_string = String(now.getHours()).padStart(2, "0");
+                let minute_string = String(now.getMinutes()).padStart(2, "0");
+                let second_string = String(now.getSeconds()).padStart(2, "0");
+                let time_string = `${hour_string}:${minute_string}:${second_string}`;
                 if (hot) {
                     console.log(`${time_string} 🔄🔥 Hot swapped ${cart} (press R for full reload)`);
                 } else {

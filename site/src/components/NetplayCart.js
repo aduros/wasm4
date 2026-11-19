@@ -4,11 +4,13 @@ import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import { AspectRatio } from './AspectRatio';
+import { useIOSTapToPlay } from './useIOSTapToPlay';
+import { IOSTapOverlay } from './IOSTapOverlay';
 import { Giscus } from "@giscus/react";
 import { RWebShare } from "react-web-share";
 import { MdSaveAlt, MdShare } from "react-icons/md";
 
-function Embed () {
+function Embed ({ isIOSDevice, isPlaying, onPlay }) {
     const peerId = location.hash.substring(1);
     return (
         <AspectRatio width={1} height={1} className="game-embed-wrapper">
@@ -18,17 +20,24 @@ function Embed () {
                 frameBorder="0"
                 className="game-embed">
             </iframe>
+            <IOSTapOverlay isIOSDevice={isIOSDevice} isPlaying={isPlaying} onPlay={onPlay} />
         </AspectRatio>
     );
 }
 
 export default function NetplayCart () {
+    const { isIOSDevice, isPlaying, onPlay: handlePlay } = useIOSTapToPlay(".game-embed");
+
     return (
         <Layout title="Netplay">
             <main>
             <div className="container game-container">
-                <BrowserOnly>{() => Embed()}</BrowserOnly>
+                <BrowserOnly>{() => (
+                    <Embed isIOSDevice={isIOSDevice} isPlaying={isPlaying} onPlay={handlePlay} />
+                )}</BrowserOnly>
 
+                {!isPlaying && (
+                <>
                 <div className="text--center margin-bottom--lg">
                     <small>Controls: Arrows, X, Z</small>
                 </div>
@@ -47,6 +56,8 @@ export default function NetplayCart () {
 
                 <b><i>How does this work?</i></b>
                 <p>Check out the <Link href="/docs/guides/multiplayer">documentation</Link> for more details about building multiplayer games with WASM-4.</p>
+                </>
+                )}
             </div>
             </main>
         </Layout>

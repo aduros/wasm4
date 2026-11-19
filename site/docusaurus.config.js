@@ -23,7 +23,7 @@ module.exports = {
   projectName: 'wasm4', // Usually your repo name.
   themeConfig: {
     image: 'img/logo.png',
-    metadatas: [
+    metadata: [
         { name: 'description', property: 'og:description', content: 'Build retro games using WebAssembly for a fantasy console' },
     ],
     // announcementBar: {

@@ -25,7 +25,7 @@ The `tone()` function is used to play a tone with a given frequency on a given c
 - Volume ranges from 0 (silent) to 100 (full volume).
 - Flags sets the channel (0-3), duty cycle (0-3) and panning (0-2).
 
-For example, to play a one second (60 frames) tone of 262 Hz ([middle C](https://pages.mtu.edu/~suits/notefreqs.html)) on the first pulse wave channel:
+For example, to play a one second (60 frames) tone of 262 Hz ([middle C](https://plastic.audio/note-frequencies/?note=C4)) on the first pulse wave channel:
 
 <MultiLanguageCode>
 
